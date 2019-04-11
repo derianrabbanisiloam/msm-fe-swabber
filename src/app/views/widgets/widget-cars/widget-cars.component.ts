@@ -10,17 +10,9 @@ import { CarService } from '../../../services/car.service';
 })
 export class WidgetCarsComponent implements OnInit {
 
-  public car: Car = {
-    id: null,
-    name: null,
-    color: null,
-    price: null,
-  };
+  public car: Car = new Car;
   public carList: Car[];
-  public formHandlerMessage: FormHandlerMessage = {
-    type: '',
-    message: ''
-  };
+  public formHandlerMessage: FormHandlerMessage = new FormHandlerMessage;
 
   constructor(private carService: CarService) { }
 

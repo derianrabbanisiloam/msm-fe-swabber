@@ -9,9 +9,9 @@ import { FormHandlerMessage } from '../../../models/formHandlerMessage';
 })
 export class WidgetFoodsComponent implements OnInit {
 
-  public food = new Food;
+  public food: Food = new Food;
 
-  public foodData = new Food;
+  public foodData: Food;
 
   public formHandlerMessage = new FormHandlerMessage;
 

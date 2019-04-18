@@ -4,6 +4,7 @@ import { HttpClient, HttpHeaders } from '@angular/common/http';
 import { catchError, tap } from 'rxjs/operators';
 import { Car } from '../../app/models/car';
 import { environment } from '../../environments/environment';
+import { httpOptions } from '../../app/utils/http.util';
 
 @Injectable({
   providedIn: 'root'
@@ -16,25 +17,12 @@ export class CarService {
 
   private carUrl = environment.DUMMY_SERVICE + '/files/belajar/api.php';
 
-  private httpOptions = {
-    headers: new HttpHeaders({
-      'Accept': 'application/json',
-      'Content-Type':  'application/json',
-      'Authorization': 'Basic ' + btoa('ganexa:Ba5kXUsLqC64zpdMg4zNrB8n'),
-      'Access-Control-Allow-Origin': '*',
-      'Access-Control-Allow-Methods': 'POST, GET, OPTIONS, PUT, DELETE, HEAD',
-      'Access-Control-Allow-Headers': 'Origin, X-Requested-With, Content-Type, Accept, Secret',
-      'Access-Control-Allow-Credentials': 'true',
-      'Access-Control-Max-Age': '1728000'
-    })
-  };
-
   getCars(): Observable<any> {
     return this.http.get<Car[]>(this.carUrl);
   }
 
   addCar (car: Car): Observable<Car> {
-    return this.http.post<Car>(this.carUrl, car, this.httpOptions);
+    return this.http.post<Car>(this.carUrl, car, httpOptions);
       // .pipe(
       //   catchError(this.handleError('addCar', car))
       // );
@@ -45,7 +33,7 @@ export class CarService {
     const id = typeof car === 'number' ? car : car.id;
     const url = `${this.carUrl}/${id}`;
  
-    return this.http.delete<Car>(url, this.httpOptions).pipe(
+    return this.http.delete<Car>(url, httpOptions).pipe(
       catchError(this.handleError<Car>('deleteCar'))
     );
   }
@@ -55,7 +43,7 @@ export class CarService {
     const id = car.id;
     const url = `${this.carUrl}/${id}`;
 
-    return this.http.put(url, car, this.httpOptions).pipe(
+    return this.http.put(url, car, httpOptions).pipe(
       catchError(this.handleError<any>('updateCar'))
     );
   }

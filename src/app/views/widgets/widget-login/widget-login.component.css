@@ -1,0 +1,141 @@
+.page-login-top {
+    position: absolute;
+    background-repeat: no-repeat;
+    background: #EFEFEF;
+    height: 50%;
+    width: 100%;
+  }
+  
+  .page-login-bottom {
+    position: absolute;
+    top: 50%;
+    background-repeat: no-repeat;
+    background: #1A2269;
+    height: 50%;
+    width: 100%;
+  }
+  
+  .form-group {
+    display: block;
+  }
+  
+  .logo2x {
+    position: absolute;
+    margin: 200px 0 0 150px;
+  }
+  
+  .login-box {
+    position: absolute;
+    z-index: 3;
+    margin:100px 219px 0px 770px;
+    background: white;
+    -webkit-box-shadow: 0px 1px 2px 0px rgba(0,0,0,0.16);
+    -moz-box-shadow: 0px 1px 2px 0px rgba(0,0,0,0.16);
+    box-shadow: 0px 1px 2px 0px rgba(0,0,0,0.16);
+    border-radius: 4px;
+    border-bottom: solid 8px #F2C22C;
+    padding: 0;
+  }
+  
+  .login-box-header-1, .login-box-header-2{
+    display: inline;
+    float:left;
+    width: 50%;
+    font-weight: bold;
+    font-size: 16px;
+    border-bottom: solid 4px #1A2269;
+    text-align: center;
+    padding: 10px 0;
+  }
+  
+  .login-box-header-1 {
+    /*border-right: solid 0.5px #717171;*/
+  }
+  
+  .login-box-header-1 h3 a, .login-box-header-2 h3 a{
+    margin: 0;
+    padding: 0;
+    color: #1A2269;
+    font-weight: bold;
+  }
+  
+  .login-box-body, .signup-box-body {
+    padding: 25px 43px;
+  }
+  
+  .login-box-body label, .signup-box-body label {
+    margin: 15px 0 10px 0;
+  }
+  
+  .login-box-body input, .signup-box-body input {
+    box-shadow: none;
+    border: solid 1px #C1C1C1;
+  }
+  
+  .login-box-body button, .signup-box-body button {
+    width: 100%;
+    background: #4D9B35;
+    color: white;
+    border-radius: 4px;
+  }
+  
+  .login-box-body a {
+    color: #4D9B35;
+    float: right;
+    margin: 5px 0 15px 0;
+  }
+  
+  .login-box-tail {
+    height: 43px;
+    width: 510px;
+    background: #060B4D;
+    margin:-20px 219px 0px 740px;
+    border-radius: 100%;
+  }
+  
+  label {
+    width: 100%;
+  }
+  
+  .error-msg {
+    color: red;
+    float: right;
+    right:0;
+  }
+  
+  .btn-form {
+    margin-top:15px;
+  }
+  
+  .toggleActive {
+    border-bottom: none;
+  }
+  
+  @media only screen and (max-width: 1000px) and (min-width: 300px) {
+    .logo2x {
+      position: relative;
+      margin: 50px 0px 25px 0px;
+    }
+  
+    .login-box {
+      position: relative;
+      margin: 50px 0px 25px 0px;
+      z-index: 3;
+    }
+  }
+  
+  @media only screen and (max-width: 1266px) and (min-width: 768px) {
+    .logo2x {
+      position: relative;
+      display: block;
+      margin: 50px auto;
+    }
+  
+    .login-box {
+      position: relative;
+      display: block;
+      margin: 25px auto;
+      z-index: 3;
+    }
+  }
+  

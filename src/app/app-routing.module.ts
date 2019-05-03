@@ -11,9 +11,21 @@ const routes: Routes = [
     loadChildren: './views/pages/page-food/page-food.module#PageFoodModule'
   },
   {
-    path: '**',
-    loadChildren: './views/pages/page-car/page-car.module#PageCarModule'
+    path: 'login',
+    loadChildren: './views/pages/page-login/page-login.module#PageLoginModule'
   },
+  {
+    path: 'view-quota',
+    loadChildren: './views/pages/page-view-quota/page-view-quota.module#PageViewQuotaModule'
+  },
+  {
+    path: 'send-notification',
+    loadChildren: './views/pages/page-send-notification/page-send-notification.module#PageSendNotificationModule'
+  },
+  // {
+  //   path: '**',
+  //   loadChildren: './views/pages/page-car/page-car.module#PageCarModule'
+  // },
 ];
 
 @NgModule({

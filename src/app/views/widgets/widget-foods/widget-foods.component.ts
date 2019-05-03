@@ -22,7 +22,7 @@ export class WidgetFoodsComponent implements OnInit {
 
   addFood() {
     this.foodData = this.food;
-    console.log(this.foodData)
+    console.log(this.foodData);
   }
 
 }

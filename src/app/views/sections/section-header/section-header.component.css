@@ -1,4 +1,4 @@
-.header{
+/* .header{
   width: 100%;
   height: 100px;
   margin: 0;
@@ -9,4 +9,205 @@
 
 .header h2 {
   padding: 35px;
+} */
+
+
+@import url('https://fonts.googleapis.com/css?family=Roboto:300');
+
+.ms_fixed_header {
+  position: fixed;
+  width: 100%;
+  z-index: 10;
+}
+#header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 12.5px 44px;
+  background: white;
+}
+.header_right{
+  display: flex;
+  justify-content: flex-end;
+}
+
+.header_right a{
+  font-weight: bold;
+}
+
+#header_logo img{
+  padding: 0px 10px;
+  height: 55px;
+}
+
+a:hover{
+  text-decoration: none ;
+}
+#header_signio,#header_account{
+  width: auto;
+  display: flex;
+  justify-content: flex-end;
+  align-items: center;
+  white-space: nowrap;
+  margin-right: 2%;
+
+}
+a div{
+  color: black;
+  font-style: none;
+}
+.header_right > div {
+  margin: auto;
+  margin-left: 2em;
+}
+.queue-caller > button{
+  display: flex;
+}
+.queue-caller span {
+  white-space: nowrap;
+  margin: auto;
+}
+.hospital-option {
+  margin: auto;
+}
+.hospital-option button {
+  display: flex;
+}
+.dropdown-toggle::after {
+  margin: auto .255em;
+}
+.hospital-option button, .hospital-option a {
+  font-weight: bold;
+  font-size: 14px;
+  border: transparent;
+  background: transparent;
+}
+
+.ms_logo_right{ margin-top: auto}
+.ms_logo_right div:first-child{ padding-bottom: 0.4vw}
+.ms_logo_right img{ padding: 0 0!important; height: 25px!important;}
+
+
+.queue-caller {
+  margin: auto 0
+}
+.queue-caller button {
+  display: flex;justify-content: flex-end;
+  white-space: nowrap;
+  background: none;
+  border: none;
+  cursor: pointer;
+  padding: 0.2em 0.5em;
+  border-radius: 0.2em;
+  font-weight: bolder;
+  font-size: 1.1em;
+  user-select: none;
+}
+.queue-caller button span {
+  margin: auto 0;
+}
+.queue-caller button:focus {outline: none;}
+.queue-caller button span:focus {outline: none;}
+.queue-caller button:active {box-shadow: 0 0.05em 0.1em #c1c1c1}
+
+
+.caller-container { display: flex; justify-content: flex-end; background: #171717}
+.caller-container button {
+  background: #028883;
+  border: none;
+  border-radius: 2px;
+  color: white;
+  font-size: 12px;
+  padding: 2px 30px;
+  margin: 2px 50px;
+}
+.modal-dialog {
+  max-width: fit-content;
+}
+.modal-content {
+  border-radius: 4px;
+}
+.ms_modal_header {
+  display: flex;
+  justify-content: space-between;
+  padding: 10px 15px;
+  border-bottom: 0.5px solid #ccc;
+  color: #171717;
+}
+.ms_modal_header > div { margin: auto 0; font-size: 16px; font-weight: 1000;}
+.ms_modal_header > button {
+  border: none;
+  background: none;
+}
+.ms_modal_header > button > img{ width: 15px;}
+.modal-body {
+  padding: 16px 70px;
+  padding-bottom: 40px;
+}
+.modal-body > div:first-child {
+  text-align: center;
+  font-size: 24px;
+  font-weight: 300;
+  font-family: 'Roboto', sans-serif;
+}
+.queue-button-container > div {
+  display: flex;
+  justify-content: space-between;
+}
+.queue-button-container > div > div {
+  margin: auto 0;
+}
+.button-queue-call {
+  display: flex; justify-content: flex-start;
+  padding: 5px 5px;
+  -webkit-border-radius: 10%/50%;
+  -moz-border-radius: 10%/50%;
+  border-radius: 10%/50%;
+  width: 230px;
+}
+.button-queue-call > div { margin: auto auto; white-space: nowrap;}
+.button-queue-call > img { width: 30px; height: 30px}
+.button-queue-recall { margin-left: 20px!important;}
+.button-queue-recall > img { width: 25px; height: 25px}
+.current-queue-number {  font-weight: 900; font-size: 42px; min-width: 120px; min-height: 65px; text-align: center}
+.next-queue-number { white-space: nowrap; font-size: 16px; font-weight: 300;font-family: 'Roboto', sans-serif;}
+
+.queue-darkgreen .button-queue-call { background: #028883;color: white;}
+.queue-darkgreen > .current-queue-number { color: #028883;}
+.queue-lightgreen .button-queue-call { background: #4D9B35;color: white;}
+.queue-lightgreen > .current-queue-number { color: #4D9B35;}
+.queue-lightred .button-queue-call { background: #D82F50;color: white;}
+.queue-lightred > .current-queue-number { color: #D82F50;}
+
+.total-menu-badge {
+  border-radius: 100%;
+  padding: 4px 5px;
+  margin-left: 5px;
+  background: #0000FF;
+  color: white;
+}
+
+.active-menu-badge {
+  border-radius: 100%;
+  padding: 4px 5px;
+  margin-left: 5px;
+  background: #00FF00;
+  color: white;
+}
+
+.cancel-menu-badge {
+  border-radius: 100%;
+  padding: 4px 5px;
+  margin-left: 5px;
+  background: #FF0000;
+  color: white;
+}
+
+@media only screen and (max-width: 1366px) and (min-width: 700px) {
+}
+
+@media only screen and (max-width: 699px) and (min-width: 375px) {
+}
+
+@media only screen and (max-width: 374px) and (min-width: 320px) {
 }

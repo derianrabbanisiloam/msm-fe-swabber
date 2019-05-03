@@ -17,6 +17,7 @@ export class WidgetCarsComponent implements OnInit {
   constructor(private carService: CarService) { }
 
   ngOnInit() {
+    console.log('ssaslasla');
     this.getCars();
   }
 
@@ -45,7 +46,7 @@ export class WidgetCarsComponent implements OnInit {
   }
 
   async updateCar(car: Car) {
-    let body = {
+    const body = {
       name: car.name,
       color: car.color,
       price: car.price

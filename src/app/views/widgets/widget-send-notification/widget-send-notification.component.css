@@ -1,0 +1,27 @@
+:host(arkcare-content-send-notification) { width:100% }
+::ng-deep ngb-progressbar .progress .progress-bar{ background-color: #4D9B35 !important; color: white!important;}
+.fo_send_notification_input{ width: 100%}
+.fo_send_notification_input select {
+  width: fit-content;
+}
+.fo_doctor_name{ width: 60%; margin-right: 1rem}
+.fo_send_notification_notes > div {
+  margin: 5.4rem 2rem;
+  padding-bottom: 10px;
+}
+.fo_send_notification_notes{ width: 100%}
+.fo_notes_text_area{
+  margin: 1.5rem;
+}
+.fo_notes_text_area textarea{
+  resize: none;
+  min-height: 10rem;
+}
+
+.fo_panel_header div{
+  padding: 19px 16px;
+}
+
+.fo_doctor_name_type > div{
+  margin-right: 1em;
+}

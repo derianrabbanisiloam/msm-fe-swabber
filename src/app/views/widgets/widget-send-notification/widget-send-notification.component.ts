@@ -106,13 +106,13 @@ export class WidgetSendNotificationComponent implements OnInit {
 
   checkIfAllSelected() {
     this.selectedAll = this.patientList.every((item: any) => {
-      return item.selected == true;
+      return item.selected === true;
     });
   }
 
   sendNotif() {
     const idx = this.patientList.findIndex((i) => {
-      return i.selected == true;
+      return i.selected === true;
     });
 
     if (idx >= 0) {

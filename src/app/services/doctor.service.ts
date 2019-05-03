@@ -33,7 +33,8 @@ export class DoctorService {
   // paging doctor quota
   getPager(totalItems: number, currentPage: number = 1, pageSize: number = 10) {
     const totalPages = Math.ceil(totalItems / pageSize);
-    let startPage: number, endPage: number;
+    let startPage: number;
+    let endPage: number;
 
     if (totalPages <= 10) {
       startPage = 1;

@@ -8,7 +8,7 @@
           <img src="../../../../assets/icons/ic_Development@2x.png">
         </div>
         <div>
-            Siloam Hospitals Lippo Village
+            {{currentHospital.name}}
         </div>
       </div>
     </div>
@@ -24,21 +24,22 @@
 
       <div id="header_account" class="header-3">
         <img style="height: 2.8rem; width: 2.8rem; margin-right: 1rem" src="../../../../assets/icons/ic_UserFemale.png">
-        <a><div>Jamblang</div></a>
+        <a><div>{{currentUser.fullname}}</div></a>
       </div>
 
       <div ngbDropdown class="d-inline-block hospital-option">
-        <button id="dropdownBasic1" ngbDropdownToggle>SHLV</button>
-        <div ngbDropdownMenu aria-labelledby="dropdownBasic1">
-          <a class="dropdown-item" *ngFor="let h of hospitals" (click)="changeOrg(h.hospital_id+':'+h.hospital_alias+':'+h.hospital_name+':'+h.hospital_guid)" href="" target="_parent" [routerLink]="['/']"> {{h.hospital_alias}}
-          </a>
+          <button id="dropdownBasic1" ngbDropdownToggle>{{currentHospital.alias}}</button>
+          <div ngbDropdownMenu aria-labelledby="dropdownBasic1">
+            <a class="dropdown-item" *ngFor="let h of hospitals" (click)="changeOrg(h.hospitalId)" href="" target="_parent" [routerLink]="['/']"> {{h.hospitalAlias}}
+            </a>
+          </div>
         </div>
-      </div>
 
-      <div id="header_signio" class="header-3">
+      <div *ngIf="auth.isLoggedIn()" id="header_signio" class="header-3">
         <img class="icon" src="../../../../assets/icons/ic_SignOut.png">
         <a [routerLink]="['/login']"><div>SIGN OUT</div></a>
       </div>
+
     </div>
   </div>
 </div>

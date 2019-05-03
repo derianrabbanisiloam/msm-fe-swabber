@@ -29,6 +29,10 @@ export class UserService {
 
     return this.http.post<any>(this.userUrl + uri, body, httpOptions);
   }
+  
+  signOut() {
+    localStorage.clear();
+  }
 
   private handleError<T>(operation = 'operation', result?: T) {
     return (error: any): Observable<T> => {

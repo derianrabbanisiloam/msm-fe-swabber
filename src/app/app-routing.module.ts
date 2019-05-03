@@ -1,5 +1,6 @@
 import { NgModule } from '@angular/core';
 import { Routes, RouterModule } from '@angular/router';
+import { AuthGuard } from '../app/guard/auth.guard';
 
 const routes: Routes = [
   {
@@ -16,16 +17,19 @@ const routes: Routes = [
   },
   {
     path: 'view-quota',
+    canActivate: [AuthGuard],
     loadChildren: './views/pages/page-view-quota/page-view-quota.module#PageViewQuotaModule'
   },
   {
     path: 'send-notification',
+    canActivate: [AuthGuard],
     loadChildren: './views/pages/page-send-notification/page-send-notification.module#PageSendNotificationModule'
   },
-  // {
-  //   path: '**',
-  //   loadChildren: './views/pages/page-car/page-car.module#PageCarModule'
-  // },
+  {
+    path: '**',
+    canActivate: [AuthGuard],
+    loadChildren: './views/pages/page-car/page-car.module#PageCarModule'
+  },
 ];
 
 @NgModule({

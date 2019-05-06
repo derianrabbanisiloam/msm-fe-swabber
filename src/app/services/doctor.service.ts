@@ -6,13 +6,14 @@ import { DoctorHospital } from '../../app/models/doctors/doctor-hospital';
 import { Doctor } from '../../app/models/doctors/doctor';
 import { environment } from '../../environments/environment';
 import { httpOptions } from '../../app/utils/http.util';
+import { cacheInfo } from '../variables/common.variable';
 
 @Injectable({
   providedIn: 'root'
 })
 export class DoctorService {
 
-  public hospitalId = '39764039-37b9-4176-a025-ef7b2e124ba4';
+  public hospitalId = cacheInfo.hospital.id;
 
   constructor(
     private http: HttpClient

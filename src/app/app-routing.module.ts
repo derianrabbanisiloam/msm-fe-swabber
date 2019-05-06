@@ -5,30 +5,39 @@ import { AuthGuard } from '../app/guard/auth.guard';
 const routes: Routes = [
   {
     path: 'cars',
-    loadChildren: './views/pages/page-car/page-car.module#PageCarModule'
+    loadChildren: './views/pages/page-car/page-car.module#PageCarModule',
   },
   {
     path: 'foods',
-    loadChildren: './views/pages/page-food/page-food.module#PageFoodModule'
+    loadChildren: './views/pages/page-food/page-food.module#PageFoodModule',
   },
   {
     path: 'login',
-    loadChildren: './views/pages/page-login/page-login.module#PageLoginModule'
+    loadChildren: './views/pages/page-login/page-login.module#PageLoginModule',
   },
   {
     path: 'view-quota',
     canActivate: [AuthGuard],
-    loadChildren: './views/pages/page-view-quota/page-view-quota.module#PageViewQuotaModule'
+    loadChildren: './views/pages/page-view-quota/page-view-quota.module#PageViewQuotaModule',
   },
   {
     path: 'send-notification',
     canActivate: [AuthGuard],
-    loadChildren: './views/pages/page-send-notification/page-send-notification.module#PageSendNotificationModule'
+    loadChildren: './views/pages/page-send-notification/page-send-notification.module#PageSendNotificationModule',
+  },
+  {
+    path: 'home',
+    canActivate: [AuthGuard],
+    loadChildren: './views/pages/page-home/page-home.module#PageHomeModule'
+  },
+  {
+    path: '',
+    canActivate: [AuthGuard],
+    loadChildren: './views/pages/page-home/page-home.module#PageHomeModule'
   },
   {
     path: '**',
-    canActivate: [AuthGuard],
-    loadChildren: './views/pages/page-car/page-car.module#PageCarModule'
+    redirectTo: ''
   },
 ];
 

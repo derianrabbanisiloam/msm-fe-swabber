@@ -32,9 +32,13 @@ export class WidgetViewQuotaComponent implements OnInit {
     this.doctorQuota = await this.doctorService.getDoctorQuota()
     .toPromise().then(res => {
       if (res.status === 'OK') {
-        this.tempDoctorQuota = res.data;
-				    this.allItems = res.data;
-				    this.setPage(1);
+        if(res.data.length !== 0){
+          this.tempDoctorQuota = res.data;
+          this.allItems = res.data;
+          this.setPage(1);
+        }else{
+          this.showNotFoundMsg = true;
+        }
         this.showWaitMsg = false;
         return res.data;
       } else {

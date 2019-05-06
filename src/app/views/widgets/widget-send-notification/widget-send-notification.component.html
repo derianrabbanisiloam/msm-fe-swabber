@@ -2,15 +2,11 @@
     <div>
       <form id="inputForm">
         <div class="">
-          <div class="">
-            <ngb-alert *ngIf="successMessage" type="success"
-                       (close)="successMessage = null">{{ successMessage }}
-            </ngb-alert>
-            <ngb-alert *ngIf="errorMessage" type="danger"
-                       (close)="errorMessage = null">{{ errorMessage }}
-            </ngb-alert>
+          <div class="" style="width:50%" *ngFor="let alert of alerts">
+            <ngb-alert *ngIf="alert && !staticAlertClosed" type="{{cssAlertType(alert)}}" (close)="removeAlert(alert)">{{ alert.message }}</ngb-alert>  
           </div>
         </div>
+
         <div class="d-flex justify-content-start">
           <div class="fo_send_notification_input">
             <div class="fo_doctor_name_type d-flex justify-content-start">
@@ -109,19 +105,17 @@
               </div>
             </div>
           </div>
-  
+
         </div>
-  
-        <div class="">
-          <div class="form-group col-md-10">
-            <div class="alert alert-info" *ngIf="showWaitMsg">
-              Please wait...
-            </div>
-            <div class="alert alert-danger" *ngIf="showNotFoundMsg">
-              Patient Not Found
-            </div>
-          </div>
+
+        <div style="width:50%" class="alert alert-info" *ngIf="showWaitMsg">
+            Please wait...
         </div>
+
+        <div style="width:50%" class="alert alert-danger" *ngIf="showNotFoundMsg">
+            Patient Not Found
+        </div>
+        
       </form>
     </div>
   </div>

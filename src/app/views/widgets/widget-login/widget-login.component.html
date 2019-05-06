@@ -39,11 +39,6 @@
 
       <div class="signup-box-body" *ngIf="!toggleBox">
         <form name="form" (ngSubmit)="g.form.valid && signup()" #g="ngForm" novalidate>
-          <!-- <label>Birth Date <i *ngIf="g.submitted && !birth.valid && !isSuccessSubmit" class="error-msg">* Birth is required</i></label>
-          <div class="inner-addon left-addon" [ngClass]="{ 'has-error': g.submitted && !birth.valid }">
-            <i class="glyphicon fa fa-birthday-cake"></i>
-            <input id="birth" class="form-control" type="date" id="textbox-birth" placeholder="Birth" name="birth" [(ngModel)]="model.birth" #birth="ngModel" required/>
-          </div> -->
 
           <label>Fullname <i *ngIf="g.submitted && !fullnameSignup.valid && !isSuccessSubmit" class="error-msg">* Fullname is required</i></label>
           <div class="inner-addon left-addon" [ngClass]="{ 'has-error': g.submitted && !fullnameSignup.valid }">
@@ -101,10 +96,6 @@
                                 !model.hospital)" class="btn btn-form">Sign Up</button>
             <img *ngIf="loading" src="data:image/gif;base64,R0lGODlhEAAQAPIAAP///wAAAMLCwkJCQgAAAGJiYoKCgpKSkiH/C05FVFNDQVBFMi4wAwEAAAAh/hpDcmVhdGVkIHdpdGggYWpheGxvYWQuaW5mbwAh+QQJCgAAACwAAAAAEAAQAAADMwi63P4wyklrE2MIOggZnAdOmGYJRbExwroUmcG2LmDEwnHQLVsYOd2mBzkYDAdKa+dIAAAh+QQJCgAAACwAAAAAEAAQAAADNAi63P5OjCEgG4QMu7DmikRxQlFUYDEZIGBMRVsaqHwctXXf7WEYB4Ag1xjihkMZsiUkKhIAIfkECQoAAAAsAAAAABAAEAAAAzYIujIjK8pByJDMlFYvBoVjHA70GU7xSUJhmKtwHPAKzLO9HMaoKwJZ7Rf8AYPDDzKpZBqfvwQAIfkECQoAAAAsAAAAABAAEAAAAzMIumIlK8oyhpHsnFZfhYumCYUhDAQxRIdhHBGqRoKw0R8DYlJd8z0fMDgsGo/IpHI5TAAAIfkECQoAAAAsAAAAABAAEAAAAzIIunInK0rnZBTwGPNMgQwmdsNgXGJUlIWEuR5oWUIpz8pAEAMe6TwfwyYsGo/IpFKSAAAh+QQJCgAAACwAAAAAEAAQAAADMwi6IMKQORfjdOe82p4wGccc4CEuQradylesojEMBgsUc2G7sDX3lQGBMLAJibufbSlKAAAh+QQJCgAAACwAAAAAEAAQAAADMgi63P7wCRHZnFVdmgHu2nFwlWCI3WGc3TSWhUFGxTAUkGCbtgENBMJAEJsxgMLWzpEAACH5BAkKAAAALAAAAAAQABAAAAMyCLrc/jDKSatlQtScKdceCAjDII7HcQ4EMTCpyrCuUBjCYRgHVtqlAiB1YhiCnlsRkAAAOwAAAAAAAAAAAA==" />
           </div>
-
-          <!-- <ngb-alert *ngIf="successMessage" type="success" (close)="successMessage = null">{{ successMessage }}</ngb-alert>
-
-          <ngb-alert *ngIf="errorMessage" type="danger" (close)="errorMessage = null">{{ errorMessage }}</ngb-alert> -->
           <div *ngFor="let alert of alerts">
               <ngb-alert *ngIf="alert && !staticAlertClosed" type="{{cssAlertType(alert)}}" (close)="removeAlert(alert)">{{ alert.message }}</ngb-alert>
           </div>

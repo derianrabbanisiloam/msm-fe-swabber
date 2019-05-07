@@ -1,4 +1,4 @@
 export class General {
     value: string;
-    desc: string;
+    description: string;
 }

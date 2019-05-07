@@ -23,7 +23,6 @@ export class WidgetLoginComponent implements OnInit {
   public roleId = appInfo.ROLE_ID;
 
   public alerts: Alert[] = [];
-  public staticAlertClosed: boolean = false;
 
   constructor(
     private hospitalService: HospitalService,
@@ -38,7 +37,6 @@ export class WidgetLoginComponent implements OnInit {
     this.returnUrl = this.route.snapshot.queryParams['returnUrl'] || '/';
     this.getListHopital();
     this.getCollectionAlert();
-    setTimeout(() => this.staticAlertClosed = true, 10000);
   }
 
   async getListHopital() {
@@ -58,6 +56,7 @@ export class WidgetLoginComponent implements OnInit {
   }
 
   async signup() {
+    this.alerts = [];
     const fullname = this.model.fullnameSignup;
     const username = this.model.usernameSignup;
     const mobileNo = this.model.mobileSignup;
@@ -89,8 +88,8 @@ export class WidgetLoginComponent implements OnInit {
   }
 
   async login() {
+    this.alerts = [];
     this.loading = true;
-
     const username = this.model.username;
     const password = this.model.password;
     const applicationId = this.applicationId;
@@ -104,7 +103,7 @@ export class WidgetLoginComponent implements OnInit {
     await this.userService.signIn(body)
     .toPromise().then(res => {
       if (res.status == 'OK') {
-
+        
         localStorage.setItem('userId', res.data[0].user_id);
         localStorage.setItem('username', res.data[0].user_name);
         localStorage.setItem('fullname', res.data[0].full_name);
@@ -153,7 +152,7 @@ export class WidgetLoginComponent implements OnInit {
 
   cssAlertType(alert: Alert) {
     if (!alert) {
-        return;
+      return;
     }
 
     switch (alert.type) {
@@ -167,10 +166,9 @@ export class WidgetLoginComponent implements OnInit {
         return 'warning';
     }
   }
-  
+
   removeAlert(alert: Alert) {
     this.alerts = this.alerts.filter(x => x !== alert);
-    this.staticAlertClosed = true;
   }
 
 }

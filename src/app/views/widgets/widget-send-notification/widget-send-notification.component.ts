@@ -32,7 +32,6 @@ export class WidgetSendNotificationComponent implements OnInit {
   public notes: any;
 
   public alerts: Alert[] = [];
-  public staticAlertClosed: boolean = false;
   public showWaitMsg: boolean = false;
   public showNotFoundMsg: boolean = false;
 
@@ -50,11 +49,11 @@ export class WidgetSendNotificationComponent implements OnInit {
     this.getNotificationType();
     this.getListDoctor();
     this.getCollectionAlert();
-
-    setTimeout(() => this.staticAlertClosed = true, 10000);
   }
 
   async getNotificationType() {
+    this.alerts = [];
+
     this.notificationType = await this.generalService.getNotificationType()
     .toPromise().then(res => {
       if(res.status === 'OK' && res.data.length === 0){
@@ -68,6 +67,8 @@ export class WidgetSendNotificationComponent implements OnInit {
   }
 
   async getListDoctor() {
+    this.alerts = [];
+
     this.doctorList = await this.doctorService.getListDoctor()
     .toPromise().then( res => {
       if(res.status === 'OK' && res.data.length === 0){
@@ -94,6 +95,8 @@ export class WidgetSendNotificationComponent implements OnInit {
   }
 
   checkDatePickerIsValid(){
+    this.alerts = [];
+
     if(this.appointmentDate){
       const d = this.appointmentDate.split('-');
       const date = d[0];
@@ -131,6 +134,7 @@ export class WidgetSendNotificationComponent implements OnInit {
   }
 
   async getDoctorPatient(doctorId: string, date: any) {
+    this.alerts = [];
     this.patientList = await this.appointmentService.getListReceiver(doctorId, date)
     .toPromise().then( res => {
       if (res.status === 'OK' && res.data.length === 0) {
@@ -164,6 +168,8 @@ export class WidgetSendNotificationComponent implements OnInit {
   }
 
   sendNotif() {
+    this.alerts = [];
+
     const idx = this.patientList.findIndex((i) => {
       return i.selected === true;
     });
@@ -203,6 +209,8 @@ export class WidgetSendNotificationComponent implements OnInit {
   }
 
   async notifySender(payload: any) {
+    this.alerts = [];
+
     await this.notificationService.sendNotification(payload)
       .toPromise().then( res => {
         if(res.status === 'OK'){
@@ -234,6 +242,5 @@ export class WidgetSendNotificationComponent implements OnInit {
     
     removeAlert(alert: Alert) {
       this.alerts = this.alerts.filter(x => x !== alert);
-      this.staticAlertClosed = true;
     }
 }

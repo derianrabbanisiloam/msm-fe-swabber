@@ -6,14 +6,11 @@ import { DoctorHospital } from '../../app/models/doctors/doctor-hospital';
 import { Doctor } from '../../app/models/doctors/doctor';
 import { environment } from '../../environments/environment';
 import { httpOptions } from '../../app/utils/http.util';
-import { cacheInfo } from '../variables/common.variable';
 
 @Injectable({
   providedIn: 'root'
 })
 export class DoctorService {
-
-  public hospitalId = cacheInfo.hospital.id;
 
   constructor(
     private http: HttpClient
@@ -21,13 +18,13 @@ export class DoctorService {
 
   private doctorUrl = environment.OPADMIN_SERVICE + '/doctors';
 
-  getDoctorQuota(): Observable<any> {
-    const uri = '/hospital/' + this.hospitalId;
+  getDoctorQuota(hospitalId: any): Observable<any> {
+    const uri = '/hospital/' + hospitalId;
     return this.http.get<DoctorHospital[]>(this.doctorUrl + uri, httpOptions);
   }
 
-  getListDoctor(): Observable<any> {
-    const uri = '/lite?hospitalId=' + this.hospitalId;
+  getListDoctor(hospitalId: any): Observable<any> {
+    const uri = '/lite?hospitalId=' + hospitalId;
     return this.http.get<Doctor[]>(this.doctorUrl + uri, httpOptions);
   }
 

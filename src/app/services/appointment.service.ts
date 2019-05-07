@@ -6,23 +6,20 @@ import { Appointment} from '../../app/models/appointments/appointment';
 import { Receiver } from '../../app/models/appointments/receiver';
 import { environment } from '../../environments/environment';
 import { httpOptions } from '../../app/utils/http.util';
-import { cacheInfo } from '../variables/common.variable';
 
 @Injectable({
   providedIn: 'root'
 })
 export class AppointmentService {
-
-  public hospitalId = cacheInfo.hospital.id;
-
+  
   constructor(
     private http: HttpClient
   ) { }
 
   private appointmentUrl = environment.FRONT_OFFICE_SERVICE + '/appointments';
 
-  getListReceiver(doctorId: string, date: any): Observable<any> {
-    const uri = '/doctor/' + doctorId + '/hospital/' + this.hospitalId + '/date/' + date;
+  getListReceiver(doctorId: string, date: any, hospitalId: any): Observable<any> {
+    const uri = '/doctor/' + doctorId + '/hospital/' + hospitalId + '/date/' + date;
     return this.http.get<Receiver[]>(this.appointmentUrl + uri, httpOptions);
   }
 

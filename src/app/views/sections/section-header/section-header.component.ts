@@ -29,6 +29,10 @@ export class SectionHeaderComponent implements OnInit {
     this.hospitals = JSON.parse(hospitals); 
   }
 
+  getAllQueue(){
+    
+  }
+
   changeOrg(hospitalId) {
     const selectedOrg = hospitalId; 
     const idx = this.hospitals.findIndex((i)=>{

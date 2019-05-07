@@ -9,7 +9,7 @@ import { AppointmentService } from '../../../services/appointment.service';
 import { dateFormatter, localSpliter } from '../../../utils/helpers.util';
 import { AlertService } from '../../../services/alert.service';
 import { Alert, AlertType } from '../../../models/alerts/alert';
-import { cacheInfo, sourceApps } from '../../../variables/common.variable';
+import { sourceApps } from '../../../variables/common.variable';
 
 @Component({
   selector: 'app-widget-send-notification',
@@ -34,6 +34,7 @@ export class WidgetSendNotificationComponent implements OnInit {
   public alerts: Alert[] = [];
   public showWaitMsg: boolean = false;
   public showNotFoundMsg: boolean = false;
+  public hospitalId: any = localStorage.getItem('hospitalId');
 
   constructor(
     private generalService: GeneralService,
@@ -69,7 +70,7 @@ export class WidgetSendNotificationComponent implements OnInit {
   async getListDoctor() {
     this.alerts = [];
 
-    this.doctorList = await this.doctorService.getListDoctor()
+    this.doctorList = await this.doctorService.getListDoctor(this.hospitalId)
     .toPromise().then( res => {
       if(res.status === 'OK' && res.data.length === 0){
         this.alertService.success('No List Doctor in This Hospital');
@@ -135,7 +136,7 @@ export class WidgetSendNotificationComponent implements OnInit {
 
   async getDoctorPatient(doctorId: string, date: any) {
     this.alerts = [];
-    this.patientList = await this.appointmentService.getListReceiver(doctorId, date)
+    this.patientList = await this.appointmentService.getListReceiver(doctorId, date, this.hospitalId)
     .toPromise().then( res => {
       if (res.status === 'OK' && res.data.length === 0) {
         this.showNotFoundMsg = true;
@@ -187,8 +188,8 @@ export class WidgetSendNotificationComponent implements OnInit {
 
       const date = localSpliter(this.appointmentDate, false);
 
-      const userId = cacheInfo.user.id;
-      const orgId = cacheInfo.hospital.orgId;
+      const userId = localStorage.getItem('userId');
+      const orgId = parseInt(localStorage.getItem('organizationId'));
       const source = sourceApps;
 
       const body = {
@@ -239,7 +240,7 @@ export class WidgetSendNotificationComponent implements OnInit {
           return 'warning';
       }
     }
-    
+
     removeAlert(alert: Alert) {
       this.alerts = this.alerts.filter(x => x !== alert);
     }

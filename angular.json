@@ -3,7 +3,7 @@
   "version": 1,
   "newProjectRoot": "projects",
   "projects": {
-    "msm-fe-template": {
+    "msm-fe-front-office": {
       "root": "",
       "sourceRoot": "src",
       "projectType": "application",
@@ -118,24 +118,24 @@
         "serve": {
           "builder": "@angular-devkit/build-angular:dev-server",
           "options": {
-            "browserTarget": "msm-fe-template:build"
+            "browserTarget": "msm-fe-front-office:build"
           },
           "configurations": {
             "development": {
-              "browserTarget": "msm-fe-template:build:development"
+              "browserTarget": "msm-fe-front-office:build:development"
             },
             "testing": {
-              "browserTarget": "msm-fe-template:build:testing"
+              "browserTarget": "msm-fe-front-office:build:testing"
             },
             "production": {
-              "browserTarget": "msm-fe-template:build:production"
+              "browserTarget": "msm-fe-front-office:build:production"
             }
           }
         },
         "extract-i18n": {
           "builder": "@angular-devkit/build-angular:extract-i18n",
           "options": {
-            "browserTarget": "msm-fe-template:build"
+            "browserTarget": "msm-fe-front-office:build"
           }
         },
         "test": {
@@ -187,7 +187,7 @@
         }
       }
     },
-    "msm-fe-template-e2e": {
+    "msm-fe-front-office-e2e": {
       "root": "e2e/",
       "projectType": "application",
       "prefix": "",
@@ -196,11 +196,11 @@
           "builder": "@angular-devkit/build-angular:protractor",
           "options": {
             "protractorConfig": "e2e/protractor.conf.js",
-            "devServerTarget": "msm-fe-template:serve"
+            "devServerTarget": "msm-fe-front-office:serve"
           },
           "configurations": {
             "production": {
-              "devServerTarget": "msm-fe-template:serve:production"
+              "devServerTarget": "msm-fe-front-office:serve:production"
             }
           }
         },
@@ -216,5 +216,5 @@
       }
     }
   },
-  "defaultProject": "msm-fe-template"
+  "defaultProject": "msm-fe-front-office"
 }

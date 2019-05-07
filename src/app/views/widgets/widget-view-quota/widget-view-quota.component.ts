@@ -21,6 +21,7 @@ export class WidgetViewQuotaComponent implements OnInit {
   public pagedItems: any [];
 
   public tempDoctorQuota: any = [];
+  public hospitalId: any = localStorage.getItem('hospitalId');
 
   constructor(private doctorService: DoctorService) { }
 
@@ -29,7 +30,7 @@ export class WidgetViewQuotaComponent implements OnInit {
   }
 
   async getQuotaDoctor() {
-    this.doctorQuota = await this.doctorService.getDoctorQuota()
+    this.doctorQuota = await this.doctorService.getDoctorQuota(this.hospitalId)
     .toPromise().then(res => {
       if (res.status === 'OK') {
         if(res.data.length !== 0){

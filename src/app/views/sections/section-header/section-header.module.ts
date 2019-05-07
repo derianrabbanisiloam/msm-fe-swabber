@@ -3,12 +3,14 @@ import { CommonModule } from '@angular/common';
 import { RouterModule } from '@angular/router';
 
 import { SectionHeaderComponent } from './section-header.component';
+import { NgbDropdownModule } from '@ng-bootstrap/ng-bootstrap';
 
 @NgModule({
   declarations: [SectionHeaderComponent],
   imports: [
     CommonModule,
-    RouterModule
+    RouterModule,
+    NgbDropdownModule,
   ],
   exports: [SectionHeaderComponent]
 })

@@ -1,0 +1,30 @@
+tr th,tr td{ padding: 10px 20px}
+th:not(:last-child),td:not(:last-child){ border-right: 0.5px solid #C1C1C1}
+tbody tr:not(:last-child){ border-bottom: 0.5px solid #C1C1C1}
+thead tr{ font-size: 10px; color: #1A2269}
+.fo_table_body_header{ background: #F4F4F4}
+.fo_table_body_header td{ padding: 5px 1rem ;}
+.fo_table_body_header td{ font-size: 10px ;}
+.page-item img{ width: 1rem;}
+.page-item img.fo_arrow_big{ width: 0.5rem}
+:host(arkcare-common-view-quota) { width:100% }
+::ng-deep .fo_view_quota_pagination .page-item.active .page-link{
+  background: #4D9B35; color: white; border-color: #4D9B35;
+}
+::ng-deep ngb-progressbar .progress .progress-bar{ background-color: #4D9B35 !important; color: white!important;}
+
+@media only screen and (max-width: 940px) and (min-width: 320px) {
+
+  section#group-doctor-quota {
+    zoom: 0.6;
+    left:-50px;
+    overflow:auto;
+    font-size: 22px;
+    height:50%;
+  }
+
+  input, select {
+    font-size: 22px;
+  }
+
+}

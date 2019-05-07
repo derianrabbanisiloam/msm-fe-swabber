@@ -13,7 +13,7 @@ export class WidgetFoodsDetailComponent implements OnInit {
   constructor() { }
 
   ngOnInit() {
-    console.log(this.food)
+    console.log(this.food);
   }
 
 }

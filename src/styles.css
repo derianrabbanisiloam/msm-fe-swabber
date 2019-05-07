@@ -1,1 +1,775 @@
 /* You can add global styles to this file, and also import other style files */
+
+@import "~font-awesome/css/font-awesome.css";
+@import "~bootstrap/dist/css/bootstrap.min.css";
+@import url('https://fonts.googleapis.com/css?family=Roboto');
+
+.btn {
+  cursor: pointer;
+  margin: 0px 2.5px;
+}
+
+.print-btn {
+  background: #4D9B35;
+  color: white;
+  font-size: 12px;
+  font-weight: 500;
+  display: inline;
+  float: right;
+  padding: 5px 15px;
+}
+
+.print-only{
+  display: none;
+}
+
+.print-only-two{
+  display: none;
+}
+
+.printable-table-schedule-doctor-name {
+  text-align:center;
+  padding-top: 5px
+}
+.printable-table-schedule-doctor-gender {
+  display: none;
+}
+
+.printable-table-schedule-doctor-type {
+  display: none;
+}
+
+input[type="date" i]::-webkit-inner-spin-button, input[type="date"]::-webkit-calendar-picker-indicator {
+  -webkit-appearance: none;
+}
+
+.input-hide{
+  display: none;
+}
+.print-header{
+  display: none;
+}
+.print-date{
+  display: none;
+}
+
+/* width */
+::-webkit-scrollbar {
+  width: 5px;
+}
+
+/* Track */
+::-webkit-scrollbar-track {
+  background: #f1f1f1;
+}
+
+/* Handle */
+::-webkit-scrollbar-thumb {
+  background: #888;
+  border-radius: 5px;
+}
+
+/* Handle on hover */
+::-webkit-scrollbar-thumb:hover {
+  background: #555;
+}
+
+.table-my-siloam th h4 {
+  color: #171717;
+}
+
+.table-my-siloam th {
+  color: #1A2269;
+}
+
+.table-my-siloam th, .table-my-siloam td {
+  padding: 5px 25px;
+  border: solid 0.5px #C1C1C1;
+}
+
+.search-btn {
+  background: #F2C22C;
+  color: white;
+  padding: 5px 25px;
+}
+
+.create-btn {
+  background: #1A2269;
+  color: white;
+}
+
+#inputHidden{
+  display: none;
+}
+
+.alert-message-top{
+  position: fixed;
+  top: 50px;
+  right: 50px;
+  z-index: 2;
+}
+
+.form-horizontal .ngui-auto-complete {
+  width: 300px;
+  position: absolute;
+}
+
+.ms_btn_border{
+  border: none;
+  border-radius: 2px;
+}
+.ms_btn_blue{ background: #1A2269; color: white}
+.ms_btn_blue:active{ background: #141b52; color: white}
+.ms_btn_darkgrey{background: #6e6e6e; color: white;}
+.ms_btn_darkgrey:active{ background: #595959; color: white}
+.ms_btn_red{ background: #C43D32; color: white}
+.ms_btn_red:active{ background: #a2342a; color: white}
+.ms_btn_green{ background: #4D9B35; color: white}
+.ms_btn_green:active{ background: #42852e; color: white}
+.ms_btn_black{ background: #000000; color: white}
+.ms_btn_black:active{ background: #333333; color: white}
+.ms_btn_yellow { background: #F2C22C; color: white}
+.ms_btn_yellow:active{ background: #f0b80f; color: white}
+
+html, body {
+  font-size: 12px;
+  font-family: 'Roboto', sans-serif;
+}
+
+.span-canceled {
+  color: #C43D32;
+}
+
+.span-checkedin {
+  width: 7rem;
+  text-align: center;
+  border: none;
+  background: greenyellow;
+  border-radius: 0.2rem;
+  color: black;
+}
+
+.slc-splash-background {
+  /*background-image: url("assets/aaa-images/background.jpg");*/
+  /*height: 100%;*/
+  /*background-position: center;*/
+  /*background-repeat: no-repeat;*/
+  /*background-size: cover;*/
+}
+.btn-cancel {
+  width: 7rem;
+  border: none;
+  background: #C43D32;
+  border-radius: 0.2rem;
+  color: white;
+}
+
+.span-canceled {
+  color: #C43D32;
+}
+
+.span-expired {
+  color: #6E6E6E;
+}
+
+.span-th-holiday.span-th-holiday {
+  color:red;
+  display: block;
+  margin: 0;
+}
+
+
+html, body, div{
+  font-family: 'Roboto', sans-serif;
+  margin: 0px;
+  padding: 0;
+}
+html,body{
+  background: #EFEFEF !important;
+  background-size: cover;
+  -moz-background-size: cover;
+  -o-background-size: cover;
+  -webkit-background-size: cover;
+}
+div{
+  margin: 0px;
+}
+.bold{
+  font-weight: bold}
+.icon{
+  height: 2.2rem;
+  width: 2.2rem;
+  margin: 0.5rem 0rem 0.5rem 0rem;
+  border: 0px;
+}
+.shadow-2{  box-shadow: 0 1px 2px #cccccc ;  }
+.shadow-4{  box-shadow: 0px 1px 4px #d9d9d9;  }
+.container-menu{
+  display: flex;
+  justify-content: flex-start;
+}
+
+.aside{
+  width: fit-content;
+  display: flex;
+  flex-flow: column;
+}
+.section{
+  margin-top: 35px;
+  width: 100%;
+  display: flex;
+  justify-content: center;
+  /*border: black 1px solid;*/
+}
+
+.container-fluid{
+  padding: 0 !important;
+  margin: 0 !important;
+}
+
+.container-button{
+  margin: 6px 0px !important;
+  border-radius: 0;
+  border-top-right-radius: 5px !important;
+  border-bottom-right-radius: 5px !important;
+  border: none;
+  height: fit-content;
+  width: fit-content;
+  background: white !important;
+  /*overflow: hidden !important;*/
+  max-width: 264px;
+}
+.container-menu{
+  display: flex;
+  justify-content: flex-start;
+}
+
+.aside{
+  width: fit-content;
+  display: flex;
+  flex-flow: column;
+}
+.section{
+  margin-top: 35px;
+  width: 100%;
+  display: flex;
+  justify-content: center;
+  /*border: black 1px solid;*/
+}
+
+.ms_container{ border: none; border-radius: 4px; background: white}
+.ms_shadow_4{ box-shadow: 0px 1px 2px #d9d9d9}
+
+/*accordion arrow*/
+/*.dropdown .hide:after{*/
+/*font-family: 'Glyphicons Halflings';*/
+/*content: "v";*/
+/*float: right;*/
+/*color: grey;*/
+/*}*/
+
+/*.dropdown.collapsed .hide:after{*/
+/*content: 'asdasdasdasdasd';*/
+/*font-family: 'Glyphicons Halflings';*/
+/*content: ">";*/
+/*color: grey;*/
+/*}*/
+.nav-link{
+  color: black !important;
+  border-radius: 0 !important;
+}
+.nav-link.active{
+  background-color: #EFEFEF !important;
+  border-bottom: solid 2px #1A2268;
+}
+.btn-green{
+  background: #4D9B35 !important;
+  color: white ;
+}
+
+.header-1{
+  font-size: 20px !important;
+  font-weight: bold !important;
+}
+.header-2{
+  font-size: 16px ;
+  font-weight: bold ;
+}
+.header-3{
+  font-size: 14px;
+}
+.body-text{
+  font-size: 12px;
+  font-weight: normal;
+}
+.foot-note.foot-note.foot-note{
+  font-size: 10px !important;
+  font-weight: normal !important;
+}
+::ng-deep .col{
+  padding: 0px !important;
+  padding-left: 0 !important;
+  padding-right: 0 !important;
+}
+.unavailable.unavailable {
+  color:#C43D32 !important;
+}
+.kolom-nama{ }
+
+
+/*PLACE HOLDER COLOR*/
+::placeholder { /* Chrome, Firefox, Opera, Safari 10.1+ */
+  color: black;
+  opacity: 1; /* Firefox */
+}
+
+:-ms-input-placeholder { /* Internet Explorer 10-11 */
+  color: black;
+}
+
+::-ms-input-placeholder { /* Microsoft Edge */
+  color: black;
+}
+
+
+.collapse {
+  visibility: hidden;
+}
+.collapse.in {
+  visibility: visible;
+}
+.collapsing {
+  position: relative;
+  height: 0;
+  overflow: hidden;
+  -webkit-transition-property: height, visibility;
+  transition-property: height, visibility;
+  -webkit-transition-duration: 0.35s;
+  transition-duration: 0.35s;
+  -webkit-transition-timing-function: ease;
+  transition-timing-function: ease;
+}
+.collapsing.width {
+  -webkit-transition-property: width, visibility;
+  transition-property: width, visibility;
+  width: 0;
+  height: auto;
+}
+.collapse.show {
+  visibility: visible;
+}
+
+.fo_header_grey{ background: #F4F4F4}
+.fo_color_blue{ color: #1A2269;}
+.fo_btn_green{
+  border: none;
+  background: #4D9B35;
+  color: white;
+  border-radius: 4px;
+}
+.fo_btn_red{ background: #C43D32; color: white; border-radius: 4px; border: none}
+.fo_btn_black{ background: black; color: white}
+.fo_btn_save{ width: 16rem; color: white; background: #4D9B35}
+.fo_btn_blue{ width: 16rem; color: white; background: #1A2269}
+.fo_btn_black{ width: 16rem; color: white; background: black}
+.fo_btn_disabled{ width: 16rem; color: white; background: #C1C1C1}
+.fo_btn_reset{ width: 9rem; color: #C43D32; background: white; border: 1px solid #C43D32}
+
+.fo_btn_admission:disabled { width: 16rem; color: white; background: #C1C1C1 }
+
+button { cursor: pointer }
+button:disabled { cursor: not-allowed }
+
+.fo_container{
+  background: white;
+  border: none;
+  border-radius: 4px;
+}
+
+/* enable absolute positioning */
+.inner-addon {
+  position: relative;
+}
+
+/* style glyph */
+.inner-addon .glyphicon {
+  position: absolute;
+  padding: 10px;
+  pointer-events: none;
+}
+
+/* align glyph */
+.left-addon .glyphicon  { left:  0px;}
+.right-addon .glyphicon { right: 0px;}
+
+/* add padding  */
+.left-addon input  { padding-left:  30px; }
+.right-addon input { padding-right: 30px; }
+
+@media print
+{
+  .container-button{
+    display: none;
+  }
+  .alert-message {
+    display: none;
+  }
+  footer{
+    display: none;
+  }
+  #group-menu{
+    display:none;
+  }
+  #group-account{
+    display: none;
+  }
+  #group-title-nav{
+    display: none;
+  }
+  form#formHidden{
+    display: none;
+  }
+  .table-leave{
+    margin-top: -300px;
+    margin-left: 100px;
+  }
+  .room-configuration{
+    margin-top: -170px;
+    margin-left: -350px;
+  }
+  #header-group-right{
+    display: none;
+  }
+  #inputHidden{
+    display: none;
+  }
+  #inputHidden2{
+    display: none;
+  }
+  #formdate{
+    display: none;
+  }
+  #formdate2{
+    display: none;
+  }
+  #menuHidden{
+    display: none;
+  }
+  #menu-edit-delete{
+    display: none;
+  }
+  #logo-title{
+    display: none;
+  }
+  #logo-title-2{
+    display: none;
+  }
+  #thHidden{
+    display: none;
+  }
+  #tdHidden{
+    display: none;
+  }
+  #titleHidden{
+    display: none;
+  }
+  #divHidden{
+    display: none;
+  }
+  #divHiddenTwo{
+    display: none;
+  }
+  #buttonHidden{
+    display: none;
+  }
+  #buttonHiddenTwo{
+    display: none;
+  }
+
+  .table select{
+    border-color: transparent;
+  }
+  select{
+    appearance: none;
+  }
+  .table input{
+    border-color: transparent;
+  }
+
+  /*room-configuration*/
+
+  .print-only-two{
+    display: block;
+  }
+
+
+  /*doctor-quota*/
+
+  #filter-quota{
+    display: none;
+  }
+  #filter-quota-two{
+    display: none;
+  }
+  .print-only {
+    display: block;
+    /*margin-top: 10px;*/
+    /*margin-left: 60px;*/
+    /*margin-right: -180px;*/
+  }
+  .quota-list{
+    display: none;
+  }
+  .alert-print-wait{
+    visibility: hidden;
+  }
+
+  /* Print Doctor Schedule */
+  section#group-doctor-schedule {
+    display: none;
+  }
+  #list-menu{
+    display: none;
+  }
+  #account-name{
+    display:none;
+  }
+  .printable-table-schedule{
+    /*margin-left: 75px;*/
+    /*margin-top: -90px;*/
+  }
+  #group-doctor-schedule-table-all{
+    /*display: block;*/
+    /*margin-left: 70px;*/
+    /*margin-top:-140px;*/
+  }
+  .printable-table-schedule-all-header {
+    text-align: center;
+    font-size: 22px;
+  }
+  printable-table-schedule-all-header span{
+    display: inline;
+  }
+  .printable-table-schedule-doctor-name {
+    font-size: 22px;
+    width: 1000px;
+    display: block;
+    text-align: center;
+  }
+  .printable-table-schedule-doctor-name:after {
+    /*content: ' - Schedule';*/
+  }
+  .printable-table-schedule-doctor-gender{
+    display: inline;
+  }
+  .printable-table-schedule-doctor-type{
+    display: inline;
+  }
+  .unprintable-table-schedule-doctor-gender{
+    display: none;
+  }
+  .unprintable-table-schedule-doctor-type{
+    display: none;
+  }
+  .printable-table-schedule-doctor-specialty {
+    font-size: 22px;
+  }
+  .printable-table-schedule .unprintable {
+    display: none;
+  }
+  .text-unprintable{
+    display: none;
+  }
+  /*room-configuration*/
+
+  .room-configuration{
+    margin-left: 140px;
+    top: -25px;
+  }
+  .room-configuration td{
+    width: 80px;
+  }
+  .unprintable-room-configuration {
+    display: none;
+  }
+  .div-conf{
+    max-width:50%;
+  }
+
+  #group-room-assignment{
+    display: none;
+  }
+  #group-room-assignment-fixed{
+    display: none;
+  }
+  #group-room-assignment-table{
+    display: none;
+  }
+
+  .doctor-unassigned{
+    display: block;
+
+  }
+  .doctor-unassigned td{
+    width: 50px;
+  }
+
+  .table textarea{
+    border-color: transparent;
+  }
+  #input-search-doctor-leave{
+    display: none;
+  }
+
+  .div-to-bottom{
+    margin-top: 230px;
+  }
+  .input-hide{
+    display: block;
+  }
+  .input-show{
+    display: none;
+  }
+  .print-button{
+    display: none;
+  }
+  textarea {
+    resize: none;
+  }
+  .print-header{
+    display: inline;
+    /*position: fixed;top: 115px;left: 840px;*/
+  }
+  .print-date{
+    display: inline;
+    /*position: fixed;top: 140px;right: 870px;*/
+  }
+
+}
+
+.loading-div {
+  text-align: center;
+}
+.loading-div img {
+  width: 8vw;
+}
+
+
+
+
+/*Form Error*/
+.form-error > label {
+  color: red;
+  font-weight: 600;
+}
+.form-error input, .form-error textarea, .form-error select {
+  color: red;
+  font-weight: 600;
+  border: 1px solid red !important;
+}
+.form-error input::-webkit-input-placeholder, .form-error textarea::-webkit-input-placeholder, .form-error select::-webkit-input-placeholder{  color: red; }
+.form-error input:-moz-placeholder, .form-error textarea:-moz-placeholder, .form-error select:-moz-placeholder {  color: red; }
+.form-error input::-moz-placeholder, .form-error textarea::-moz-placeholder, .form-error select::-moz-placeholder {  color: red; }
+.form-error input:-ms-input-placeholder, .form-error textarea:-ms-input-placeholder, .form-error select:-ms-input-placeholder {  color: red; }
+.form-tab-error {
+  position: relative;
+}
+.form-tab-error::after {
+  content: "!";
+  color: white;
+  background: red;
+  border-radius: 50%;
+  padding: 0 10px;
+  position: absolute;
+  top: -10px;
+  right: -12px;
+}
+/*--Form Error--*/
+
+.alert-danger-2 {
+  padding: 5px 25px;
+  background: #c43d32;
+  color:white;
+}
+
+.disable {
+  pointer-events: none;
+  background: #c1c1c1 !important;
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+.beforePrint.printing {
+  display: block !important;
+  top: 0;
+  left: 0;
+  background: white;
+  width: 100%;
+}
+.root-printing.printing {
+  display: none;
+}
+
+@media print {
+  .beforePrint.printing {
+    display: block !important;
+    top: 0;
+    left: 0;
+    width: 100%;
+  }
+  .root-printing.printing {
+    display: none;
+  }
+}
+@page {
+  size: auto;   /* auto is the initial value */
+  margin: 0;  /* this affects the margin in the printer settings */
+}
+
+/*Scroll Container*/
+.scrollContainer {
+  overflow: scroll;
+  max-height: 500px;
+}
+.scrollContainer thead th{
+  z-index: 1;
+}
+.scrollContainer thead tr:first-child th {
+  position: sticky;
+  top: 0;
+  border: none;
+  background: white;
+}
+.scrollContainer thead tr th:after {
+  content: '';
+  position: absolute;
+  left: 0;
+  bottom: 0;
+  width: 100%;
+  border-bottom: 0.05em solid #c1c1c1;
+}
+
+.fo_menu_container{
+  width: fit-content;
+  display: flex;
+  flex-flow: column;
+}
+.fo_content_container{
+  margin-top: 4.5rem;
+  margin-left: 1.5rem;
+  margin-right: 1.5rem;
+  width: 100%;
+  display: flex;
+  justify-content: left;
+}

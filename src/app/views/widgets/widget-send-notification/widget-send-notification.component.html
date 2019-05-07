@@ -1,0 +1,121 @@
+<div>
+    <div>
+      <form id="inputForm">
+        <div class="">
+          <div class="" style="width:50%" *ngFor="let alert of alerts">
+            <ngb-alert *ngIf="alert" type="{{cssAlertType(alert)}}" (close)="removeAlert(alert)">{{ alert.message }}</ngb-alert>  
+          </div>
+        </div>
+
+        <div class="d-flex justify-content-start">
+          <div class="fo_send_notification_input">
+            <div class="fo_doctor_name_type d-flex justify-content-start">
+  
+              <div class="form-group">
+                <label>Appointment Date</label>
+                <input [textMask]="{mask: maskAppDate}" type="text" class="form-control" [(ngModel)]="appointmentDate"
+                placeholder="dd-mm-yyyy" name="appointmentDate" (keydown.enter)="onDateChange($event)"/>
+              </div>
+  
+  
+              <div class="form-group">
+                <label for="notifType">Type</label>
+                <select id="notifType" class="form-control" required [(ngModel)]="notifType" name="notifType">
+                  <option *ngFor = "let itr of notificationType" [ngValue]="itr">{{itr.description}}
+                </select>
+              </div>
+              
+              
+              <div class="fo_doctor_name form-group">
+                <label>Doctor</label>
+                <input class="form-control"
+                       ngui-auto-complete
+                       auto-select-first-item="true"
+                       max-num-list="20"
+                       placeholder="Notification from doctor..."
+                       value-formatter="name"
+                       list-formatter="name"
+                       [match-formatted]="true"
+                       min-chars="1"
+                       [source]="doctorList"
+                       name="doctorSelected"
+                       [(ngModel)] = "doctorSelected"
+                       (change) = "displayPatient()"
+                       ngbTooltip="Press 'Enter' to Search"
+                       required>
+              </div>
+              
+            </div>
+            <div class="">
+              <div class="fo_container shadow-4 form-group" *ngIf="showTable">
+                <div class="fo_panel_header header-2">
+                  <div for="notes">Choose Patient</div>
+                </div>
+                <table class="table">
+                  <thead>
+                  <tr class="fo_header_grey fo_color_blue foot-note">
+                    <th>
+                      <label class="check_box_container">
+                        <input type="checkbox"
+                               id="selectAll"
+                               [(ngModel)]="selectedAll"
+                               (change)="selectAll()"
+                               name="selectAll">
+                        <span class="checkmark "></span>
+                      </label>
+                    </th>
+                    <th>Patient Name</th>
+                    <th style="width: 35%">Mobile Number</th>
+                  </tr>
+                  </thead>
+                  <tbody>
+                  <tr *ngFor="let n of patientList">
+                    <td>
+                      <label class="check_box_container">
+                        <input type="checkbox"
+                               id="cb1"
+                               name="cb1"
+                               value="{{n.phone_number_1}}"
+                               [(ngModel)]="n.selected"
+                               (change)="checkIfAllSelected()">
+                        <span class="checkmark"></span>
+                      </label>
+                    </td>
+                    <td>{{n.name}}</td>
+                    <td>{{n.phone_number_1}}</td>
+                  </tr>
+                  </tbody>
+                </table>
+              </div>
+            </div>
+          </div>
+          <div class="fo_send_notification_notes">
+            <div class="fo_container shadow-4" *ngIf="showTable">
+              <div class="fo_panel_header header-2" style="border-bottom: 0.5px solid #C1C1C1;">
+                <div for="notes">Write Notes</div>
+              </div>
+              <div class="fo_notes_text_area">
+                <textarea class="form-control" s="5" id="comment" required [(ngModel)]="notes" name="notes" id="notes"></textarea>
+              </div>
+              <div class="d-flex justify-content-end" style="margin: 25px 19px">
+                <button type="button" class="fo_btn_green header-3"
+                        [disabled]="buttonNotify" (click)="sendNotif()">
+                  &nbsp; Send Notes
+                </button>
+              </div>
+            </div>
+          </div>
+
+        </div>
+
+        <div style="width:50%" class="alert alert-info" *ngIf="showWaitMsg">
+            Please wait...
+        </div>
+
+        <div style="width:50%" class="alert alert-danger" *ngIf="showNotFoundMsg">
+            Patient Not Found
+        </div>
+        
+      </form>
+    </div>
+  </div>

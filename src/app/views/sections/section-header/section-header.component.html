@@ -1,21 +1,113 @@
-<div class="header">
-  <h2>
-    HEADER
-  </h2>
+<div class="ms_fixed_header">
+  <div id="header"class="shadow-4">
+
+    <div id="header_logo" class="d-flex justify-content-start">
+      <img src="../../../../assets/icons/ic_Logo_FrontOffice@2x.png">
+      <div class="ms_logo_right">
+        <div>
+          <img src="../../../../assets/icons/ic_Development@2x.png">
+        </div>
+        <div>
+            {{currentHospital.name}}
+        </div>
+      </div>
+    </div>
+
+
+    <div class="header_right">
+      <div class="queue-caller">
+        <button data-toggle="modal" data-target="#myModal" (click)="getAllQueue()">
+          <img style="height: 2rem; width: 2rem; margin-right: 0.5rem" src="../../../../assets/icons/ic_Call Queue-1@2x.png">
+          <span>Call queue</span>
+        </button>
+      </div>
+
+      <div id="header_account" class="header-3">
+        <img style="height: 2.8rem; width: 2.8rem; margin-right: 1rem" src="../../../../assets/icons/ic_UserFemale.png">
+        <a><div>{{currentUser.fullname}}</div></a>
+      </div>
+
+      <div ngbDropdown class="d-inline-block hospital-option">
+          <button id="dropdownBasic1" ngbDropdownToggle>{{currentHospital.alias}}</button>
+          <div ngbDropdownMenu aria-labelledby="dropdownBasic1">
+            <a class="dropdown-item" *ngFor="let h of hospitals" (click)="changeOrg(h.hospitalId)" href="" target="_parent" [routerLink]="['/']"> {{h.hospitalAlias}}
+            </a>
+          </div>
+        </div>
+
+      <div *ngIf="auth.isLoggedIn()" id="header_signio" class="header-3">
+        <img class="icon" src="../../../../assets/icons/ic_SignOut.png">
+        <a [routerLink]="['/login']"><div>SIGN OUT</div></a>
+      </div>
+
+    </div>
+  </div>
 </div>
-<!--The content below is only a placeholder and can be replaced.-->
-<div style="text-align:center">
-  <h1>
-    Welcome to {{ title }}!
-  </h1>
-  <img width="150" alt="Angular Logo" src="data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCAyNTAgMjUwIj4KICAgIDxwYXRoIGZpbGw9IiNERDAwMzEiIGQ9Ik0xMjUgMzBMMzEuOSA2My4ybDE0LjIgMTIzLjFMMTI1IDIzMGw3OC45LTQzLjcgMTQuMi0xMjMuMXoiIC8+CiAgICA8cGF0aCBmaWxsPSIjQzMwMDJGIiBkPSJNMTI1IDMwdjIyLjItLjFWMjMwbDc4LjktNDMuNyAxNC4yLTEyMy4xTDEyNSAzMHoiIC8+CiAgICA8cGF0aCAgZmlsbD0iI0ZGRkZGRiIgZD0iTTEyNSA1Mi4xTDY2LjggMTgyLjZoMjEuN2wxMS43LTI5LjJoNDkuNGwxMS43IDI5LjJIMTgzTDEyNSA1Mi4xem0xNyA4My4zaC0zNGwxNy00MC45IDE3IDQwLjl6IiAvPgogIDwvc3ZnPg==">
+<div style="height: 80px">Filler</div>
+
+<!-- Modal -->
+<div class="modal fade" id="myModal" role="dialog">
+  <div class="modal-dialog">
+
+    <!-- Modal content-->
+    <!-- <div class="modal-content">
+      <div class="ms_modal_header">
+        <div class="">View The Queue</div>
+        <button type="button" class="" data-dismiss="modal">
+          <img src="../../../assets/Asset%20-WEB%20Front%20Office/ic_Cross@2x.png">
+        </button>
+      </div>
+      <div class="modal-body">
+        <div>Press buttons below to call next queue</div>
+        <div class="queue-button-container">
+          <div class="queue-darkgreen">
+            <div (click)="postCallQueue(currentQueueTypeAID, false, 'A')" class="button-queue-call ">
+              <img src="../../../assets/Asset%20-WEB%20Front%20Office/ic_Call_Generic@2x.png">
+              <div>REGISTRATION - APPOINTMENT</div>
+            </div>
+            <div (click)="postCallQueue(currentQueueTypeAID, true, 'A')" class="button-queue-recall">
+              <img src="../../../assets/Asset%20-WEB%20Front%20Office/ic_Recall_RegAppo@2x.png">
+            </div>
+            <div class="current-queue-number">
+              {{currentQueueTypeAContent}}
+            </div>
+            <div class="next-queue-number">
+              Next queue: {{NextQueueTypeAContent}}
+            </div>
+          </div>
+          <div class="queue-lightgreen">
+            <div (click)="postCallQueue(currentQueueTypeBID, false, 'B')" class="button-queue-call ">
+              <img src="../../../assets/Asset%20-WEB%20Front%20Office/ic_Call_Generic@2x.png">
+              <div>REGISTRATION</div>
+            </div>
+            <div (click)="postCallQueue(currentQueueTypeBID, true, 'B')" class="button-queue-recall">
+              <img src="../../../assets/Asset%20-WEB%20Front%20Office/ic_Recall_Reg@2x.png">
+            </div>
+            <div class="current-queue-number">
+              {{currentQueueTypeBContent}}
+            </div>
+            <div class="next-queue-number">
+              Next queue: {{NextQueueTypeBContent}}
+            </div>
+          </div>
+          <div class="queue-lightred">
+            <div (click)="postCallQueue(currentQueueTypeEID, false, 'E')" class="button-queue-call ">
+              <img src="../../../assets/Asset%20-WEB%20Front%20Office/ic_Call_Generic@2x.png">
+              <div>OTHERS</div>
+            </div>
+            <div (click)="postCallQueue(currentQueueTypeEID, true, 'E')" class="button-queue-recall">
+              <img src="../../../assets/Asset%20-WEB%20Front%20Office/ic_Recall_Others@2x.png">
+            </div>
+            <div class="current-queue-number">
+              {{currentQueueTypeEContent}}
+            </div>
+            <div class="next-queue-number">
+              Next queue: {{NextQueueTypeEContent}}
+            </div>
+          </div>
+        </div>
+      </div>
+    </div> -->
+
+  </div>
 </div>
-<h2>Here are some links to help you start: </h2>
-<ul>
-  <li>
-    <h2><a rel="noopener" [routerLink]="['/cars']">Cars</a></h2>
-  </li>
-  <li>
-    <h2><a rel="noopener" [routerLink]="['/foods']">Foods</a></h2>
-  </li>
-</ul>

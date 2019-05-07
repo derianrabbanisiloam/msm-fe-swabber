@@ -1,0 +1,15 @@
+.fo_menu_container{
+    width: fit-content;
+    display: flex;
+    flex-flow: column;
+}
+  
+.fo_content_container{
+    margin-top: 4.5rem;
+    margin-left: 1.5rem;
+    margin-right: 1.5rem;
+    width: 100%;
+    display: flex;
+    justify-content: left;
+  }
+  

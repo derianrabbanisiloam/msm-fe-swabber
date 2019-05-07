@@ -1,0 +1,110 @@
+<div class="row">
+  <div class="col-md-12 page-login-top">
+
+    <div class="col-md-4 col-xs-12 col-sm-12 logo2x">
+      <img src="../../../../assets/icons/ic_LoginFO.png">
+    </div>
+
+    <div class="col-md-4 col-xs-12 col-sm-12 login-box">
+      <div class="login-box-header-1" [ngClass]="{'toggleActive': !toggleBox ? true : false}">
+        <h3><a href="javascript:void(0)" (click)="showToggleBox('login')" [ngStyle]="{color : toggleBox ? '#1A2269' : '#6e6e6e'}">SIGN IN</a></h3>
+      </div>
+      <div class="login-box-header-2" [ngClass]="{'toggleActive': toggleBox ? true : false}">
+        <h3><a href="javascript:void(0)" (click)="showToggleBox('signup')" [ngStyle]="{color : toggleBox ? '#6e6e6e' : '#1A2269'}">SIGN UP</a></h3>
+      </div>
+
+      <div class="login-box-body" *ngIf="toggleBox">
+        <form name="form" (ngSubmit)="f.form.valid && login()" #f="ngForm" novalidate>
+          <label>Username <i *ngIf="f.submitted && !username.valid" class="error-msg">* Username is required</i></label>
+          <div class="inner-addon left-addon" [ngClass]="{ 'has-error': f.submitted && !username.valid }">
+            <i class="glyphicon fa fa-user"></i>
+            <input id="username" class="form-control" type="text" id="textbox-username" placeholder="Username" name="username" [(ngModel)]="model.username" #username="ngModel" required/>
+          </div>
+          <label>Password <i *ngIf="f.submitted && !password.valid" class="error-msg">* Password is required</i></label>
+          <div class="inner-addon left-addon" [ngClass]="{ 'has-error': f.submitted && !password.valid }">
+            <i class="glyphicon fa fa-lock"></i>
+            <input id="password" class="form-control" type="password" id="textbox-password" placeholder="Password" name="password" [(ngModel)]="model.password" #password="ngModel" required />
+          </div>
+          <div class="form-group">
+            <button [disabled]="loading" class="btn btn-form">Sign In</button>
+            <img *ngIf="loading" src="data:image/gif;base64,R0lGODlhEAAQAPIAAP///wAAAMLCwkJCQgAAAGJiYoKCgpKSkiH/C05FVFNDQVBFMi4wAwEAAAAh/hpDcmVhdGVkIHdpdGggYWpheGxvYWQuaW5mbwAh+QQJCgAAACwAAAAAEAAQAAADMwi63P4wyklrE2MIOggZnAdOmGYJRbExwroUmcG2LmDEwnHQLVsYOd2mBzkYDAdKa+dIAAAh+QQJCgAAACwAAAAAEAAQAAADNAi63P5OjCEgG4QMu7DmikRxQlFUYDEZIGBMRVsaqHwctXXf7WEYB4Ag1xjihkMZsiUkKhIAIfkECQoAAAAsAAAAABAAEAAAAzYIujIjK8pByJDMlFYvBoVjHA70GU7xSUJhmKtwHPAKzLO9HMaoKwJZ7Rf8AYPDDzKpZBqfvwQAIfkECQoAAAAsAAAAABAAEAAAAzMIumIlK8oyhpHsnFZfhYumCYUhDAQxRIdhHBGqRoKw0R8DYlJd8z0fMDgsGo/IpHI5TAAAIfkECQoAAAAsAAAAABAAEAAAAzIIunInK0rnZBTwGPNMgQwmdsNgXGJUlIWEuR5oWUIpz8pAEAMe6TwfwyYsGo/IpFKSAAAh+QQJCgAAACwAAAAAEAAQAAADMwi6IMKQORfjdOe82p4wGccc4CEuQradylesojEMBgsUc2G7sDX3lQGBMLAJibufbSlKAAAh+QQJCgAAACwAAAAAEAAQAAADMgi63P7wCRHZnFVdmgHu2nFwlWCI3WGc3TSWhUFGxTAUkGCbtgENBMJAEJsxgMLWzpEAACH5BAkKAAAALAAAAAAQABAAAAMyCLrc/jDKSatlQtScKdceCAjDII7HcQ4EMTCpyrCuUBjCYRgHVtqlAiB1YhiCnlsRkAAAOwAAAAAAAAAAAA==" />
+          </div>
+
+        </form>
+
+        <div *ngFor="let alert of alerts">
+            <ngb-alert *ngIf="alert" type="{{cssAlertType(alert)}}" (close)="removeAlert(alert)">{{ alert.message }}</ngb-alert>
+        </div>
+      </div>
+
+      <div class="signup-box-body" *ngIf="!toggleBox">
+        <form name="form" (ngSubmit)="g.form.valid && signup()" #g="ngForm" novalidate>
+
+          <label>Fullname <i *ngIf="g.submitted && !fullnameSignup.valid && !isSuccessSubmit" class="error-msg">* Fullname is required</i></label>
+          <div class="inner-addon left-addon" [ngClass]="{ 'has-error': g.submitted && !fullnameSignup.valid }">
+            <i class="glyphicon fa fa-user"></i>
+            <input id="fullname-signup" class="form-control" type="text" id="textbox-fullname-signup" placeholder="Fullname" name="fullnameSignup" [(ngModel)]="model.fullnameSignup" #fullnameSignup="ngModel" required/>
+          </div>
+
+          <label>Username <i *ngIf="g.submitted && !usernameSignup.valid && !isSuccessSubmit" class="error-msg">* Username is required</i></label>
+          <div class="inner-addon left-addon" [ngClass]="{ 'has-error': g.submitted && !usernameSignup.valid }">
+            <i class="glyphicon fa fa-user"></i>
+            <input id="username-signup" class="form-control" type="text" id="textbox-username-signup" placeholder="Username" name="usernameSignup" [(ngModel)]="model.usernameSignup" #usernameSignup="ngModel" required/>
+          </div>
+
+          <label>Mobile Number <i *ngIf="g.submitted && !mobileSignup.valid && !isSuccessSubmit" class="error-msg">* Mobile Number is required</i></label>
+          <div class="inner-addon left-addon" [ngClass]="{ 'has-error': g.submitted && !mobileSignup.valid }">
+            <i class="glyphicon fa fa-mobile-phone"></i>
+            <input id="mobile-signup" class="form-control" type="text" id="textbox-mobile-signup" placeholder="Mobile Number" name="mobileSignup" [(ngModel)]="model.mobileSignup" #mobileSignup="ngModel" required/>
+          </div>
+
+          <label>Email <i *ngIf="g.submitted && !emailSignup.valid && !isSuccessSubmit" class="error-msg">* Email is required</i></label>
+          <div class="inner-addon left-addon" [ngClass]="{ 'has-error': g.submitted && !emailSignup.valid }">
+            <i class="glyphicon fa fa-envelope"></i>
+            <input id="email-signup" class="form-control" type="email" id="textbox-email-signup" placeholder="Email" name="emailSignup" [(ngModel)]="model.emailSignup" #emailSignup="ngModel" required/>
+          </div>
+
+          <label>Password <i *ngIf="g.submitted && !passwordSignup.valid && !isSuccessSubmit" class="error-msg">* Password is required</i></label>
+          <div class="inner-addon left-addon" [ngClass]="{ 'has-error': g.submitted && !passwordSignup.valid }">
+            <i class="glyphicon fa fa-lock"></i>
+            <input id="password-signup" class="form-control" type="password" id="textbox-password-signup" placeholder="Password" name="passwordSignup" [(ngModel)]="model.passwordSignup" #passwordSignup="ngModel" required/>
+          </div>
+
+          <label>
+            Re-type Password
+            <i *ngIf="g.submitted && !rePasswordSignup.valid && !isSuccessSubmit" class="error-msg">* Re-Type Password is required</i>
+            <i *ngIf="model.passwordSignup != model.rePasswordSignup && model.rePasswordSignup" class="error-msg">* Re-Type Password is not match</i>
+          </label>
+          <div class="inner-addon left-addon" [ngClass]="{ 'has-error': g.submitted && !passwordSignup.valid }">
+            <i class="glyphicon fa fa-lock"></i>
+            <input id="repassword-signup" class="form-control" type="password" placeholder="Re-Type Password" name="rePasswordSignup" [(ngModel)]="model.rePasswordSignup" #rePasswordSignup="ngModel" required/>
+          </div>
+
+          <label>Hospital <i *ngIf="g.submitted && !hospital.valid && !isSuccessSubmit" class="error-msg">* Hospital is required</i></label>
+          <select class="form-control" name="hospital_id" [(ngModel)]="model.hospital" #hospital="ngModel" required>
+            <option value="" selected="true">---</option>
+            <option *ngFor="let itr of hospitalList" [ngValue]="itr" >{{itr.organization_name}}</option>
+          </select>
+
+          <div class="form-group">
+            <button [disabled]="loading ||
+                                (model.passwordSignup != model.rePasswordSignup ||
+                                !model.fullnameSignup ||
+                                !model.usernameSignup ||
+                                !model.mobileSignup ||
+                                !model.emailSignup ||
+                                !model.hospital)" class="btn btn-form">Sign Up</button>
+            <img *ngIf="loading" src="data:image/gif;base64,R0lGODlhEAAQAPIAAP///wAAAMLCwkJCQgAAAGJiYoKCgpKSkiH/C05FVFNDQVBFMi4wAwEAAAAh/hpDcmVhdGVkIHdpdGggYWpheGxvYWQuaW5mbwAh+QQJCgAAACwAAAAAEAAQAAADMwi63P4wyklrE2MIOggZnAdOmGYJRbExwroUmcG2LmDEwnHQLVsYOd2mBzkYDAdKa+dIAAAh+QQJCgAAACwAAAAAEAAQAAADNAi63P5OjCEgG4QMu7DmikRxQlFUYDEZIGBMRVsaqHwctXXf7WEYB4Ag1xjihkMZsiUkKhIAIfkECQoAAAAsAAAAABAAEAAAAzYIujIjK8pByJDMlFYvBoVjHA70GU7xSUJhmKtwHPAKzLO9HMaoKwJZ7Rf8AYPDDzKpZBqfvwQAIfkECQoAAAAsAAAAABAAEAAAAzMIumIlK8oyhpHsnFZfhYumCYUhDAQxRIdhHBGqRoKw0R8DYlJd8z0fMDgsGo/IpHI5TAAAIfkECQoAAAAsAAAAABAAEAAAAzIIunInK0rnZBTwGPNMgQwmdsNgXGJUlIWEuR5oWUIpz8pAEAMe6TwfwyYsGo/IpFKSAAAh+QQJCgAAACwAAAAAEAAQAAADMwi6IMKQORfjdOe82p4wGccc4CEuQradylesojEMBgsUc2G7sDX3lQGBMLAJibufbSlKAAAh+QQJCgAAACwAAAAAEAAQAAADMgi63P7wCRHZnFVdmgHu2nFwlWCI3WGc3TSWhUFGxTAUkGCbtgENBMJAEJsxgMLWzpEAACH5BAkKAAAALAAAAAAQABAAAAMyCLrc/jDKSatlQtScKdceCAjDII7HcQ4EMTCpyrCuUBjCYRgHVtqlAiB1YhiCnlsRkAAAOwAAAAAAAAAAAA==" />
+          </div>
+          <div *ngFor="let alert of alerts">
+              <ngb-alert *ngIf="alert" type="{{cssAlertType(alert)}}" (close)="removeAlert(alert)">{{ alert.message }}</ngb-alert>
+          </div>
+        </form>
+      </div>
+
+      </div>
+    </div>
+
+  <div class="col-md-12 page-login-bottom">
+  </div>
+</div>

@@ -34,7 +34,7 @@ export class WidgetLoginComponent implements OnInit {
 
   ngOnInit() {
     this.userService.signOut();
-    this.returnUrl = this.route.snapshot.queryParams['returnUrl'] || '/';
+    this.returnUrl = this.route.snapshot.queryParams.returnUrl || '/';
     this.getListHopital();
     this.getCollectionAlert();
   }
@@ -78,7 +78,7 @@ export class WidgetLoginComponent implements OnInit {
       axOrganizationId: hospital.ax_organization_id,
       roleId,
     };
-    
+
     await this.userService.signUp(body)
     .toPromise().then(res => {
       this.alertService.success(res.message);
@@ -104,37 +104,37 @@ export class WidgetLoginComponent implements OnInit {
     .toPromise().then(res => {
       if (res.status == 'OK') {
 
-        let collections = [];
-        
-        for(var i = 0; i < res.data.length; i++){
+        const collections = [];
+
+        for (let i = 0; i < res.data.length; i++) {
           collections.push({
             id: res.data[i].hospital_id,
             orgId: res.data[i].hospital_hope_id,
-            name : res.data[i].name, 
+            name : res.data[i].name,
             alias: res.data[i].alias,
             zone: res.data[i].time_zone,
-          })
+          });
         }
-        
+
         const key = {
           user: {
             id: res.data[0].user_id,
             username: res.data[0].user_name,
-            fullname: res.data[0].full_name,   
+            fullname: res.data[0].full_name,
           },
           hospital: {
             id: res.data[0].hospital_id,
             orgId: res.data[0].hospital_hope_id,
             name: res.data[0].name,
-            alias: res.data[0].alias, 
-            zone: res.data[0].time_zone,   
+            alias: res.data[0].alias,
+            zone: res.data[0].time_zone,
           },
           collection: collections,
         };
-        
+
         localStorage.setItem('key', JSON.stringify(key));
-        
-        this.router.navigate([this.returnUrl])
+
+        this.router.navigate([this.returnUrl]);
       } else {
         this.alertService.error(`Username or/and Password wrong`);
       }
@@ -146,7 +146,7 @@ export class WidgetLoginComponent implements OnInit {
     });
   }
 
-  async getCollectionAlert(){
+  async getCollectionAlert() {
     this.alertService.getAlert().subscribe((alert: Alert) => {
       if (!alert) {
           // clear alerts when an empty alert is received

@@ -11,7 +11,7 @@ import { httpOptions } from '../../app/utils/http.util';
   providedIn: 'root'
 })
 export class AppointmentService {
-  
+
   constructor(
     private http: HttpClient
   ) { }

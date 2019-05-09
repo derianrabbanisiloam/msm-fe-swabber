@@ -1,11 +1,11 @@
-import { Injectable } from "@angular/core";
-import { NgbDateParserFormatter, NgbDateStruct } from "@ng-bootstrap/ng-bootstrap";
+import { Injectable } from '@angular/core';
+import { NgbDateParserFormatter, NgbDateStruct } from '@ng-bootstrap/ng-bootstrap';
 
 function padNumber(value: number) {
   if (isNumber(value)) {
     return `0${value}`.slice(-2);
   } else {
-    return "";
+    return '';
   }
 }
 
@@ -35,10 +35,10 @@ export class NgbDateFRParserFormatter extends NgbDateParserFormatter {
   }
 
   format(date: NgbDateStruct): string {
-    let stringDate: string = "";
-    if(date) {
-      stringDate += isNumber(date.day) ? padNumber(date.day) + "-" : "";
-      stringDate += isNumber(date.month) ? padNumber(date.month) + "-" : "";
+    let stringDate = '';
+    if (date) {
+      stringDate += isNumber(date.day) ? padNumber(date.day) + '-' : '';
+      stringDate += isNumber(date.month) ? padNumber(date.month) + '-' : '';
       stringDate += date.year;
     }
     return stringDate;

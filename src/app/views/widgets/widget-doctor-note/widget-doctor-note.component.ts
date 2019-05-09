@@ -18,7 +18,24 @@ import * as moment from 'moment';
   providers: [NgbDatepickerConfig, { provide: NgbDateParserFormatter, useClass: NgbDateFRParserFormatter }],
 })
 export class WidgetDoctorNoteComponent implements OnInit {
-  
+  /* For Alert Message */
+
+  constructor(
+    private doctorService: DoctorService,
+    private modalService: NgbModal,
+    config: NgbDatepickerConfig,
+    configTwo: NgbProgressbarConfig,
+    calendar: NgbCalendar,
+  ) {
+    this.today = calendar.getToday();
+    this.yesterday = this.todayDateISO.split('-');
+    configTwo.max = 100;
+    configTwo.striped = true;
+    configTwo.animated = true;
+    configTwo.type = 'success';
+    configTwo.height = '20px';
+  }
+
   public key: any = JSON.parse(localStorage.getItem('key'));
   public hospital = this.key.hospital;
   public user = this.key.user;
@@ -53,12 +70,12 @@ export class WidgetDoctorNoteComponent implements OnInit {
   public doctorUid: string;
   public dfRefresh: string = null;
   public tfRefresh: string = null;
-  public showLoadingTwo: boolean = false;
+  public showLoadingTwo = false;
   public tampungOne: string;
   public tampungTwo: string;
   public from_to_view: string;
   public from_to_post: string;
-  public selector: number = 0;
+  public selector = 0;
 
   /* For Alert Message */
   public _success = new Subject<string>();
@@ -71,39 +88,39 @@ export class WidgetDoctorNoteComponent implements OnInit {
   public errorMessageConnection: string;
   public _printMsgWait = new Subject<string>();
   public printWaitMessage: string;
-  /* For Alert Message */
 
-  constructor(
-    private doctorService: DoctorService,
-    private modalService: NgbModal,
-    config: NgbDatepickerConfig,
-    configTwo: NgbProgressbarConfig,
-    calendar: NgbCalendar,
-  ) { 
-    this.today = calendar.getToday();
-    this.yesterday = this.todayDateISO.split('-');
-    configTwo.max = 100;
-    configTwo.striped = true;
-    configTwo.animated = true;
-    configTwo.type = 'success';
-    configTwo.height = '20px';
-  }
+  public getViewDoctorNotesForm = new FormGroup({
+    doctorId: new FormControl('doctorId'),
+    from_to_date: new FormControl('from_to_date', Validators.required),
+  });
+
+  public postDoctorNotesForm = new FormGroup({
+    note: new FormControl('', Validators.required),
+    from_to_pn: new FormControl('', Validators.required),
+  });
+
+  public options = {
+    position: ['top', 'right'],
+    timeOut: 3000,
+    lastOnBottom: true,
+    clickToClose: true
+  };
 
   ngOnInit() {
     this.myDateRangePickerOptions = {
       dateFormat: 'dd/mm/yyyy',
-      height:'27px',
-      width:'240px',
+      height: '27px',
+      width: '240px',
       disableUntil: {year: this.yesterday[0], month: this.yesterday[1], day: this.yesterday[2]}
     };
 
     this.myDateRangePickerOptionsTwo = {
       dateFormat: 'dd/mm/yyyy',
-      height:'27px',
-      width:'240px'
+      height: '27px',
+      width: '240px'
     };
-    this.todayString = this.today.year + "-" + this.today.month + "-" + this.today.day;
-    this.todayStringTwo = this.today.day + "-" + this.today.month + "-" + this.today.year;
+    this.todayString = this.today.year + '-' + this.today.month + '-' + this.today.day;
+    this.todayStringTwo = this.today.day + '-' + this.today.month + '-' + this.today.year;
 
     this.from_date_notes = null;
     this.to_date_notes = null;
@@ -126,7 +143,7 @@ export class WidgetDoctorNoteComponent implements OnInit {
         this.doctorNotes = [];
       });
   }
-  
+
   open(content) {
     this.modalService.open(content).result.then((result) => {
 
@@ -136,7 +153,7 @@ export class WidgetDoctorNoteComponent implements OnInit {
     });
   }
 
-  clear(){
+  clear() {
     this.postDoctorNotesForm.reset();
   }
 
@@ -158,18 +175,8 @@ export class WidgetDoctorNoteComponent implements OnInit {
     this.doctorIdSelectedTwo = item.doctor_id;
   }
 
-  public getViewDoctorNotesForm = new FormGroup({
-    doctorId: new FormControl("doctorId"),
-    from_to_date: new FormControl("from_to_date", Validators.required),
-  });
 
-  public postDoctorNotesForm = new FormGroup({
-    note: new FormControl("", Validators.required),
-    from_to_pn: new FormControl("", Validators.required),
-  });
-
-
-  postDoctorNotes():void {
+  postDoctorNotes(): void {
     this.postDoctorNotesForm.controls.note.setValue(this.postDoctorNotesForm.controls.note.value);
 
     this.model.note = this.postDoctorNotesForm.controls.note.value;
@@ -178,35 +185,35 @@ export class WidgetDoctorNoteComponent implements OnInit {
 
     this.model.doctorId = this.doctorIdSelectedTwo;
     this.doctorUid = this.doctorIdSelectedTwo;
-    let fromDate = this.postDoctorNotesForm.controls.from_to_pn.value.beginDate.year + "-" +
-      this.postDoctorNotesForm.controls.from_to_pn.value.beginDate.month + "-" +
+    const fromDate = this.postDoctorNotesForm.controls.from_to_pn.value.beginDate.year + '-' +
+      this.postDoctorNotesForm.controls.from_to_pn.value.beginDate.month + '-' +
       this.postDoctorNotesForm.controls.from_to_pn.value.beginDate.day;
-    let toDate = this.postDoctorNotesForm.controls.from_to_pn.value.endDate.year + "-" +
-      this.postDoctorNotesForm.controls.from_to_pn.value.endDate.month + "-" +
+    const toDate = this.postDoctorNotesForm.controls.from_to_pn.value.endDate.year + '-' +
+      this.postDoctorNotesForm.controls.from_to_pn.value.endDate.month + '-' +
       this.postDoctorNotesForm.controls.from_to_pn.value.endDate.day;
 
-      let modelFromDate = fromDate
-      let splitFromDate = modelFromDate.split('-')
-      let yearSplit = splitFromDate[0]
-      let monthSplit = splitFromDate[1].length === 1? '0'+splitFromDate[1] : splitFromDate[1];
-      let daySplit = splitFromDate[2].length === 1? '0'+splitFromDate[2] : splitFromDate[2];
-      let dateFromChange = yearSplit+'-'+monthSplit+'-'+daySplit;
+    const modelFromDate = fromDate;
+    const splitFromDate = modelFromDate.split('-');
+    const yearSplit = splitFromDate[0];
+    const monthSplit = splitFromDate[1].length === 1 ? '0' + splitFromDate[1] : splitFromDate[1];
+    const daySplit = splitFromDate[2].length === 1 ? '0' + splitFromDate[2] : splitFromDate[2];
+    const dateFromChange = yearSplit + '-' + monthSplit + '-' + daySplit;
 
-      let modelToDate = toDate
-      let splitToDate = modelToDate.split('-')
-      let yearSplitTwo = splitToDate[0]
-      let monthSplitTwo = splitToDate[1].length === 1? '0'+splitToDate[1] : splitToDate[1];
-      let daySplitTwo = splitToDate[2].length === 1? '0'+splitToDate[2] : splitToDate[2];
-      let dateToChange = yearSplitTwo+'-'+monthSplitTwo+'-'+daySplitTwo;
-      this.model.fromDate = dateFromChange;
-      this.model.toDate = dateToChange;
-      this.model.userId = this.userId;
-      this.model.source = this.dummyMACAddress;
+    const modelToDate = toDate;
+    const splitToDate = modelToDate.split('-');
+    const yearSplitTwo = splitToDate[0];
+    const monthSplitTwo = splitToDate[1].length === 1 ? '0' + splitToDate[1] : splitToDate[1];
+    const daySplitTwo = splitToDate[2].length === 1 ? '0' + splitToDate[2] : splitToDate[2];
+    const dateToChange = yearSplitTwo + '-' + monthSplitTwo + '-' + daySplitTwo;
+    this.model.fromDate = dateFromChange;
+    this.model.toDate = dateToChange;
+    this.model.userId = this.userId;
+    this.model.source = this.dummyMACAddress;
 
-      this.dfRefresh = this.model.fromDate;
-      this.tfRefresh = this.model.toDate;
-      
-      this.doctorService.postDoctorNotes(this.hospitalId, this.model)
+    this.dfRefresh = this.model.fromDate;
+    this.tfRefresh = this.model.toDate;
+
+    this.doctorService.postDoctorNotes(this.hospitalId, this.model)
         .subscribe(data => {
           Swal.fire({
             position: 'top-end',
@@ -214,8 +221,8 @@ export class WidgetDoctorNoteComponent implements OnInit {
             title: 'Success',
             showConfirmButton: false,
             timer: 1500
-          })
-          this.note = "";
+          });
+          this.note = '';
           this.from_to_post = null;
           this.refreshNotes();
         }, err => {
@@ -224,32 +231,32 @@ export class WidgetDoctorNoteComponent implements OnInit {
             title: 'Oops...',
             text: 'Something went wrong!',
             timer: 1500
-          })
+          });
         });
   }
 
-  getDoctorNotes():void {
+  getDoctorNotes(): void {
     this.showLoadingTwo = true;
     this.model.doctorId = this.doctorIdSelectedOne;
 
-    this.model.fromDate = this.getViewDoctorNotesForm.controls.from_to_date.value.beginDate.year + "-" +
-      this.getViewDoctorNotesForm.controls.from_to_date.value.beginDate.month + "-" +
+    this.model.fromDate = this.getViewDoctorNotesForm.controls.from_to_date.value.beginDate.year + '-' +
+      this.getViewDoctorNotesForm.controls.from_to_date.value.beginDate.month + '-' +
       this.getViewDoctorNotesForm.controls.from_to_date.value.beginDate.day;
-    this.model.toDate = this.getViewDoctorNotesForm.controls.from_to_date.value.endDate.year + "-" +
-      this.getViewDoctorNotesForm.controls.from_to_date.value.endDate.month + "-" +
+    this.model.toDate = this.getViewDoctorNotesForm.controls.from_to_date.value.endDate.year + '-' +
+      this.getViewDoctorNotesForm.controls.from_to_date.value.endDate.month + '-' +
       this.getViewDoctorNotesForm.controls.from_to_date.value.endDate.day;
 
     this.dfRefresh = this.model.fromDate;
     this.tfRefresh = this.model.toDate;
 
-    this.tampungOne = this.getViewDoctorNotesForm.controls.from_to_date.value.beginDate.day + "-" +
-      this.getViewDoctorNotesForm.controls.from_to_date.value.beginDate.month + "-" +
+    this.tampungOne = this.getViewDoctorNotesForm.controls.from_to_date.value.beginDate.day + '-' +
+      this.getViewDoctorNotesForm.controls.from_to_date.value.beginDate.month + '-' +
       this.getViewDoctorNotesForm.controls.from_to_date.value.beginDate.year;
-    this.tampungTwo = this.getViewDoctorNotesForm.controls.from_to_date.value.endDate.year + "-" +
-      this.getViewDoctorNotesForm.controls.from_to_date.value.endDate.month + "-" +
+    this.tampungTwo = this.getViewDoctorNotesForm.controls.from_to_date.value.endDate.year + '-' +
+      this.getViewDoctorNotesForm.controls.from_to_date.value.endDate.month + '-' +
       this.getViewDoctorNotesForm.controls.from_to_date.value.endDate.day;
 
-    if(this.doctorIdSelectedOne != ""){
+    if (this.doctorIdSelectedOne != '') {
       this.doctorService.getDoctorNotes(this.hospitalId, this.model.fromDate, this.model.toDate, this.doctorIdSelectedOne)
         .subscribe(data => {
           this.doctorNotes = data.data;
@@ -263,13 +270,12 @@ export class WidgetDoctorNoteComponent implements OnInit {
             title: 'Oops...',
             text: 'Something went wrong!',
             timer: 1500
-          })
+          });
           this.doctorNotes = [];
           this.from_to_view = null;
           this.showLoadingTwo = false;
         });
-    }
-    else{
+    } else {
       this.doctorService.getDoctorNotes(this.hospitalId, this.model.fromDate, this.model.toDate)
         .subscribe(data => {
           this.doctorUid = '';
@@ -287,7 +293,7 @@ export class WidgetDoctorNoteComponent implements OnInit {
             title: 'Oops...',
             text: 'Something went wrong!',
             timer: 1500
-          })
+          });
           this.doctorNotes = [];
           this.doctorUid = '';
           this.from_to_view = null;
@@ -297,37 +303,35 @@ export class WidgetDoctorNoteComponent implements OnInit {
 
   }
 
-  refreshNotes(){
-    if(this.doctorUid == null || this.doctorUid == '' ){
-      console.log('mmmmmmmm')
-      if(this.dfRefresh == null || this.dfRefresh == ''){
-        console.log('lllllllllll')
-      this.doctorService.getDoctorNotes(this.hospitalId, this.todayString, this.todayString)
+  refreshNotes() {
+    if (this.doctorUid == null || this.doctorUid == '' ) {
+      console.log('mmmmmmmm');
+      if (this.dfRefresh == null || this.dfRefresh == '') {
+        console.log('lllllllllll');
+        this.doctorService.getDoctorNotes(this.hospitalId, this.todayString, this.todayString)
         .subscribe(data => {
-          this.doctorNotes = []
+          this.doctorNotes = [];
           this.doctorNotes = data.data;
           this.from_date_notes = null;
           this.to_date_notes = null;
         }, err => {
           this.doctorNotes = [];
         });
-      }
-      else{
-        console.log('00000000000')
+      } else {
+        console.log('00000000000');
         this.doctorService.getDoctorNotes(this.hospitalId, this.dfRefresh, this.tfRefresh)
         .subscribe(data => {
-          this.doctorNotes = []
+          this.doctorNotes = [];
           this.doctorNotes = data.data;
         }, err => {
           this.doctorNotes = [];
         });
       }
-    }
-    else{
-      console.log('kkkkkkkkkkk')
+    } else {
+      console.log('kkkkkkkkkkk');
       this.doctorService.getDoctorNotes(this.hospitalId, this.dfRefresh, this.tfRefresh, this.doctorUid)
         .subscribe(data => {
-          this.doctorNotes = []
+          this.doctorNotes = [];
           this.doctorNotes = data.data;
         }, err => {
           this.doctorNotes = [];
@@ -335,39 +339,32 @@ export class WidgetDoctorNoteComponent implements OnInit {
     }
   }
 
-  showError(){
-    if(this.selectedEditNote.doctor_id == '' || this.selectedEditNote.doctor_id == null){
-    }
-    else if (!this.fromDateEdit) {
-    }
-    else if (!this.toDateEdit) {
-    }
-    else if(!this.selectedEditNote.note){
-    }
-    else if(this.fromDateEdit.year > this.toDateEdit.year){
+  showError() {
+    if (this.selectedEditNote.doctor_id == '' || this.selectedEditNote.doctor_id == null) {
+    } else if (!this.fromDateEdit) {
+    } else if (!this.toDateEdit) {
+    } else if (!this.selectedEditNote.note) {
+    } else if (this.fromDateEdit.year > this.toDateEdit.year) {
       this._error.next(`To date Harus Lebih Besar / Sama Dengan from date`);
-    }
-    else if(this.fromDateEdit.month > this.toDateEdit.month){
+    } else if (this.fromDateEdit.month > this.toDateEdit.month) {
       this._error.next(`To date Harus Lebih Besar / Sama Dengan from date`);
-    }
-    else if(this.fromDateEdit.month == this.toDateEdit.month && this.fromDateEdit.day > this.toDateEdit.day){
+    } else if (this.fromDateEdit.month == this.toDateEdit.month && this.fromDateEdit.day > this.toDateEdit.day) {
       this._error.next(`To date Harus Lebih Besar / Sama Dengan from date`);
-    }
-    else{
+    } else {
       this.editDoctorNotes();
     }
   }
 
   editDoctorNotes() {
-    let noteId = this.selectedEditNote.doctor_note_id
+    const noteId = this.selectedEditNote.doctor_note_id;
     this.modelEdit.note = this.selectedEditNote.note;
-    let monthF = this.fromDateEdit.month < 10 ? 0+''+this.fromDateEdit.month : this.fromDateEdit.month;
-    let monthT = this.toDateEdit.month < 10 ? 0+''+this.toDateEdit.month : this.toDateEdit.month;
-    let dayF = this.fromDateEdit.day < 10 ? 0+''+this.fromDateEdit.day : this.fromDateEdit.day;
-    let dayT = this.toDateEdit.day < 10 ? 0+''+this.toDateEdit.day : this.toDateEdit.day;
+    const monthF = this.fromDateEdit.month < 10 ? 0 + '' + this.fromDateEdit.month : this.fromDateEdit.month;
+    const monthT = this.toDateEdit.month < 10 ? 0 + '' + this.toDateEdit.month : this.toDateEdit.month;
+    const dayF = this.fromDateEdit.day < 10 ? 0 + '' + this.fromDateEdit.day : this.fromDateEdit.day;
+    const dayT = this.toDateEdit.day < 10 ? 0 + '' + this.toDateEdit.day : this.toDateEdit.day;
 
-    this.modelEdit.fromDate = this.fromDateEdit.year +'-'+ monthF +'-'+ dayF;
-    this.modelEdit.toDate = this.toDateEdit.year +'-'+ monthT +'-'+ dayT;
+    this.modelEdit.fromDate = this.fromDateEdit.year + '-' + monthF + '-' + dayF;
+    this.modelEdit.toDate = this.toDateEdit.year + '-' + monthT + '-' + dayT;
     this.modelEdit.userId = this.userId;
     this.modelEdit.source = this.dummyMACAddress;
 
@@ -379,7 +376,7 @@ export class WidgetDoctorNoteComponent implements OnInit {
             title: 'Success',
             showConfirmButton: false,
             timer: 1500
-          })
+          });
           this.refreshNotes();
         }, err => {
           Swal.fire({
@@ -387,7 +384,7 @@ export class WidgetDoctorNoteComponent implements OnInit {
             title: 'Oops...',
             text: 'Something went wrong!',
             timer: 1500
-          })
+          });
           this._error.next(`Failed`);
         });
   }
@@ -406,12 +403,12 @@ export class WidgetDoctorNoteComponent implements OnInit {
       year: parseInt(dateOne.split('-')[0]),
       month: parseInt(dateOne.split('-')[1]),
       day: parseInt(dateOne.split('-')[2])
-    }
+    };
     this.toDateEdit = {
       year: parseInt(dateTwo.split('-')[0]),
       month: parseInt(dateTwo.split('-')[1]),
       day: parseInt(dateTwo.split('-')[2])
-    }
+    };
 
     this.open(content);
   }
@@ -422,9 +419,9 @@ export class WidgetDoctorNoteComponent implements OnInit {
   }
 
   deleteDoctorNotes() {
-    var data = this.deleteDoctorNoteService();
+    const data = this.deleteDoctorNoteService();
     this.refreshNotes();
-    if(data){
+    if (data) {
       this.refreshNotes();
       Swal.fire({
         position: 'top-end',
@@ -432,34 +429,34 @@ export class WidgetDoctorNoteComponent implements OnInit {
         title: 'Success',
         showConfirmButton: false,
         timer: 1500
-      })
-    }else{
+      });
+    } else {
       this.refreshNotes();
       Swal.fire({
         type: 'error',
         title: 'Oops...',
         text: 'Something went wrong!',
         timer: 1500
-      })
+      });
     }
   }
 
   async deleteDoctorNoteService() {
-    let modal = {
+    const modal = {
       userId: this.userId,
       source: this.dummyMACAddress
-    }
-    
+    };
+
     await this.doctorService.deleteDoctorNotes(this.hospitalId, this.selectedDeleteNote.doctor_note_id, modal)
     .toPromise().then( res => {
-      if(res.status === 'OK'){
+      if (res.status === 'OK') {
         return true;
-      }else{
+      } else {
         return false;
       }
     }).catch(err => {
       return false;
-    })
+    });
   }
 
   clearNgModelDate(): void {
@@ -470,12 +467,5 @@ export class WidgetDoctorNoteComponent implements OnInit {
     event.stopPropagation();
     this.selector++;
   }
-
-  public options = {
-    position: ["top", "right"],
-    timeOut: 3000,
-    lastOnBottom: true,
-    clickToClose: true
-  };
 
 }

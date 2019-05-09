@@ -1,3 +1,322 @@
-<p>
-  widget-doctor-leave works!
-</p>
+<div class="row">
+  <div class="col-md-12">
+      <ng-template #content let-c="close" let-x="dismiss">
+          <div class="modal-header">
+            <h4 class="modal-title">Add Doctor Leave</h4>
+            <button type="button" class="close" aria-label="Close" (click)="clear($event)" (click)="x('Cross click')">
+              <span aria-hidden="true">&times;</span>
+            </button>
+          </div>
+          
+          <div class="modal-body">
+            <div class="col-md-12">
+              <form  class="form-horizontal" [formGroup]="postDoctorLeaveForm" novalidate>
+                <div class="row">
+                  <div class="col-md-12">
+                    <label>Doctor</label>
+                      <div class="ng-autocomplete" class="angular-autocomplete">
+                        <ng-autocomplete
+                          placeHolder="Search Doctor by name ..."
+                          [data]="doctors"
+                          searchKeyword="name"
+                          (selected)='searchDoctorOne($event)'
+                          [itemTemplate]="itemTemplateDoctor"
+                          [notFoundTemplate]="notFoundTemplate"> 
+                        </ng-autocomplete>
+                        
+                        <ng-template #itemTemplateDoctor let-item>
+                          <a [innerHTML]="item.name"></a>
+                        </ng-template>
+                        
+                        <ng-template #notFoundTemplate let-notFound>
+                          <div [innerHTML]="notFound"></div>
+                        </ng-template>
+                      </div>
+                  </div>
+                </div>
+    
+                <div class="row">
+                  <div class="col-md-4">
+                    <label>Leave Date</label>
+                    <div style="width: 150px;float: left;">
+                      <my-date-range-picker name="mydaterange" [options]="myDateRangePickerOptions" formControlName="from_to_pl" [(ngModel)]="fromToPost">
+                      </my-date-range-picker>
+                    </div>
+                  </div>
+                </div>
+    
+                <div class="row">
+                  <div class="col-md-12">
+                    <label>Leave type</label>
+                    <select class="form-control custom_select clear"
+                            formControlName="scheduleTypeId" [(ngModel)]="leave_type_doctor" required>
+                            <option *ngFor="let leave of leaveType" value="{{leave.schedule_type_id}}">{{leave.leave_type}}</option>
+                    </select>
+                  </div>
+                </div>
+    
+                <div class="row" style="padding-bottom: 5px">
+                  <div class="col-md-12">
+                    <label>Reason for leave</label>
+                    <textarea class="clear" class="form-control custom_select" rows="5" maxlength="250" formControlName="notes" [(ngModel)]="leave_notes_doctor"></textarea>
+                  </div>
+                </div>
+    
+                <div class="row">
+                  <div class="col-md-12" style="text-align: right">
+                    <button class="btn btn-light btn-outline-dark" [hidden]="postDoctorLeaveForm.valid && doctorIdSelectedOne">Save</button>
+                    <button class="btn create-btn" [hidden]="!(postDoctorLeaveForm.valid && doctorIdSelectedOne)" (click)="postDoctorLeave()" (click)="x('Cross click')">Save</button>
+                  </div>
+                </div>
+                
+              </form>
+            </div>
+          </div>
+    
+          <!-- <simple-notifications [options]="options"></simple-notifications> -->
+        </ng-template>
+  
+      <ng-template #editLeave let-c="close" let-x="dismiss">
+        <div class="modal-header">
+          <h4 class="modal-title">Edit Doctor Leave</h4>
+          <button type="button" class="close" aria-label="Close" (click)="clear($event)" (click)="x('Cross click')">
+            <span aria-hidden="true">&times;</span>
+          </button>
+        </div>
+        <div class="modal-body">
+          <div class="col-md-12">
+            <div class="row">
+              <div class="col-md-12">
+                <label>Doctor</label>  
+                <input class="form-control"
+                  [(ngModel)]="selectedEditLeave.doctor_name" readonly>
+              </div>
+            </div>
+            <div class="row">
+              <div class="col-md-4">
+                <label>Valid Date</label>
+                <div class="input-group" style="width: 125px">
+                  <input class="input-hidden" class="form-control custom_select" placeholder="dd-mm-yyyy"
+                          name="fromDate" [(ngModel)]="fromDateEdit"
+                          maxlength="10" [maxDate]="toDateEdit" #dp ngbDatepicker #o="ngbDatepicker">
+                  <button class="input-group-addon" (click)="o.toggle()" type="button">
+                    <img src="../../../../assets/icons/calendar-icon.svg" style="width: 1.2rem; height: 1rem; cursor: pointer;"/>
+                  </button>
+                </div>
+              </div>
+  
+              <div class="col-md-8">
+                <label>&nbsp;</label>
+                <div class="input-group" style="width: 125px" *ngIf="!fromDateEdit"  ngbTooltip="Select a from date first">
+                  <input class="form-control custom_select" [disabled]="!fromDateEdit"
+                          placeholder="dd-mm-yyyy"
+                          name="ep" [(ngModel)]="toDateEdit" [minDate]="fromDateEdit" ngbDatepicker #p="ngbDatepicker">
+                  <button class="input-group-addon" placement="top" [disabled]="!fromDateEdit" (click)="p.toggle()" type="button">
+                    <img *ngIf="!fromDateEdit" src="../../../../assets/icons/calendar-icon.svg" style="width: 1.2rem; height: 1rem; cursor: pointer;"/>
+                  </button>
+                </div>
+                <div class="input-group clear" style="width: 125px" *ngIf="fromDateEdit">
+                  <input id="input-hidden" class="form-control custom_select" [style.box-shadow] = "!toDateEdit  ? '0 0 10px #eb3a3a' : ''"
+                          placeholder="dd-mm-yyyy" maxlength="10"
+                          name="toDate" [(ngModel)]="toDateEdit"
+                          [minDate]="fromDateEdit" ngbDatepicker #q="ngbDatepicker">
+                  <button class="input-group-addon" placement="top" (click)="q.toggle()" type="button">
+                    <img *ngIf="fromDateEdit" src="../../../../assets/icons/calendar-icon.svg" style="width: 1.2rem; height: 1rem; cursor: pointer;"/>
+                  </button>
+                </div>
+              </div>
+            </div>
+  
+            <div class="row">
+                <div class="col-md-12">
+                  <label>Leave type</label>
+                  <select class="form-control custom_select clear"
+                          [(ngModel)]="scheduleTypeEdit" readonly>
+                          <option *ngFor="let leaves of leaveType"
+                          value="{{leaves.leave_type}}"
+                          [selected]="scheduleTypeEdit == leaves.leave_type" disabled>{{leaves.leave_type}}</option>
+                  </select>
+                </div>
+              </div>
+  
+              <div class="row" style="padding-bottom: 5px">
+                <div class="col-md-12">
+                  <label>Reason for leave</label>
+                  <textarea class="clear" class="form-control custom_select" rows="5" maxlength="250" [(ngModel)]="noteEdit"></textarea>
+                </div>
+              </div>
+
+            <div class="row">
+              <div class="col-md-12" style="text-align: right;margin-top:15px">
+                <button class="btn print-btn" (click)="showError()" (click)="x('Cross click')">Update Leave</button>
+              </div>
+  
+              <div class="col-md-12">
+                <ngb-alert *ngIf="successMessageTwo" type="success" (close)="successMessageTwo = null">{{ successMessageTwo }}</ngb-alert>
+                <ngb-alert *ngIf="errorMessage" type="danger" (close)="errorMessage = null">{{ errorMessage }}</ngb-alert>
+              </div>
+            </div>
+          </div>
+        </div>
+      </ng-template>
+  
+      <ng-template #deleteLeave let-c="close" let-d="dismiss">
+        <div class="modal-header">
+          <h4 class="modal-title">Confirmation</h4>
+          <button type="button" class="close" aria-label="Close" (click)="d('Cross click')">
+            <span aria-hidden="true">&times;</span>
+          </button>
+        </div>
+        <div class="modal-body">
+          <p>Are you sure to delete this leave?</p>
+          <div class="confirmation_button d-flex justify-content-center">
+            <button type="button" class="btn fo_btn_green" (click)="deleteDoctorLeave()" (click)="c('Cross click')">Ok</button>
+            <button type="button" class="btn fo_btn_red"(click)="c('Cross click')">Cancel</button>
+          </div>
+        </div>
+      </ng-template>
+  </div>
+</div>
+
+<div class="row">
+  <div class="col-md-9">
+    <form [formGroup]="getViewDoctorLeaveForm" novalidate>
+    <div class="row">
+        <div class="col-md-4">
+          <div class="ng-autocomplete" class="angular-autocomplete" style="margin-top: 12px">
+            <ng-autocomplete
+              placeHolder="Search Doctor by name ..."
+              [data]="doctors"
+              searchKeyword="name"
+              (selected)='searchDoctorTwo($event)'
+              [itemTemplate]="itemTemplateDoctor"
+              [notFoundTemplate]="notFoundTemplate"> 
+            </ng-autocomplete>
+            
+            <ng-template #itemTemplateDoctor let-item>
+              <a [innerHTML]="item.name"></a>
+            </ng-template>
+            
+            <ng-template #notFoundTemplate let-notFound>
+              <div [innerHTML]="notFound"></div>
+            </ng-template>
+          </div>
+        </div>
+        
+        <div class="col-md-8">
+            <div class="row">
+                <div class="col-md-8">
+                  <div class="row">
+                    <div class="col-md-9">
+                      <div class="row">
+                        <div class="col-md-12">
+                            <label>From - To</label>
+                        </div>
+                      </div>
+                      <div class="row">
+                          <div class="col-md-12">
+                            <my-date-range-picker name="mydaterange" formControlName="from_to_date" [options]="myDateRangePickerOptionsTwo" [(ngModel)]="fromToView">
+                              </my-date-range-picker>
+                          </div>
+                      </div>
+                    </div>
+                    <div class="col-md-3">
+                      <div class="row">
+                        <div class="col-md-12"></div>
+                      </div>
+                      <div class="row">
+                          <div class="col-md-12">
+                            <div class="row">
+                              <div class="col-md-12" style="margin-top: 25px">
+                              </div>
+                              <div class="col-md-12">
+                                  <button class="btn search-btn" [hidden]="getViewDoctorLeaveForm.valid">Search</button>
+                                  <button class="btn search-btn"
+                                          [hidden]="!getViewDoctorLeaveForm.valid"
+                                          (click)="getViewDoctorLeave()">Search</button>
+                              </div>
+                            </div>
+                          </div>
+                        </div>
+                    </div>
+                  </div>
+                </div>
+            </div>
+          </div>
+    </div>
+    </form>
+  </div>
+  <div class="col-md-3">
+    <div class="row">
+      <div class="col-md-12" style="margin-top: 25px">
+      </div>
+      <div class="col-md-12">
+          <button class="btn create-btn" (click)="open(content)" (click)="clear()" ><img src="../../../../assets/icons/ic_AddLeave.png"> Add Doctor Leave</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="row">
+  <div class="col-md-12">
+    <div class="row">
+      <div class="col-md-12" style="margin-top: 10px">
+      </div>
+      <div class="col-md-6">
+        <p id="titleHidden" *ngIf="!flag">From: {{tampungOne}} To: {{tampungTwo}}</p>
+      </div>
+    </div>
+    <div class="row">
+      <div class="col-md-12">
+        <table class="fixed_header">
+          <thead style="background: white">
+          <tr>
+            <th colspan="7" style="font-size: 20px; display:block; width: 100%"><strong>Today's Leave  |</strong></th>
+          </tr>
+          <tr>
+            <th width="60px">No.</th>
+            <th width="250px">Doctor</th>
+            <th width="100px">From</th>
+            <th width="100px">To</th>
+            <th width="120px" style="text-align: center">Leave Type</th>
+            <th width="140px" style="text-align: center">Reason For Leave</th>
+            <th width="140px" style="text-align: center">Modified By</th>
+            <th style="text-align: center; width: 105px">Action</th>
+          </tr>
+          </thead>
+          <tbody *ngIf="!leaves">
+            <tr>
+              <td colspan="7">result not found</td>
+            </tr>
+          </tbody>
+          <tbody>
+            <tr *ngFor="let i=index; let leave of leaves" style="border: solid 0.5px #C1C1C1">
+              <td width="60px">{{i+1}}</td>
+              <td width="250px">{{leave.doctor_name}}</td>
+              <td width="100px">{{leave.from_date.substring(0,10).split('-')[2]+ '-' +leave.from_date.substring(0,10).split('-')[1]+ '-' +leave.from_date.substring(0,10).split('-')[0]}}</td>
+              <td width="100px">{{leave.to_date.substring(0,10).split('-')[2]+ '-' +leave.to_date.substring(0,10).split('-')[1]+ '-' +leave.to_date.substring(0,10).split('-')[0]}}</td>
+              <td width="120px" style="text-align: left">
+                  {{leave.schedule_type_id == 2? 'Annual Leave': ''}}
+                  {{leave.schedule_type_id == 3? 'Personal Matters': ''}}
+                  {{leave.schedule_type_id == 4? 'Maternity': ''}}
+                  {{leave.schedule_type_id == 5? 'Sick Leave': ''}}
+              </td>
+              <td width="140px" style="text-align: center">{{leave.notes}}</td>
+              <td width="140px">{{leave.modified_by == undefined || leave.modified_by == null || leave.modified_by == '' ? '' : leave.modified_by}}</td>
+              <td style="width: 105px">
+                <span style="margin-right: 11px"></span>
+                <button type="button" class="btn-default" (click)="editDoctorLeaveModal(leave, editLeave)">
+                    <i class="fa fa-edit"></i>
+                </button>
+                <span style="margin-right: 11px"></span>
+                <button type="button" class="btn-default" (click)="deleteDoctorLeaveModal(leave, deleteLeave)">
+                    <i class="fa fa-trash"></i>
+                </button>
+              </td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+</div>

@@ -29,7 +29,7 @@ export class UserService {
 
     return this.http.post<any>(this.userUrl + uri, body, httpOptions);
   }
-  
+
   signOut() {
     localStorage.clear();
   }

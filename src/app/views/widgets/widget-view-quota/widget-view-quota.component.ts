@@ -28,17 +28,17 @@ export class WidgetViewQuotaComponent implements OnInit {
   }
 
   async getQuotaDoctor() {
-    
+
     const hospital = this.key.hospital;
 
     this.doctorQuota = await this.doctorService.getDoctorQuota(hospital.id)
     .toPromise().then(res => {
       if (res.status === 'OK') {
-        if(res.data.length !== 0){
+        if (res.data.length !== 0) {
           this.tempDoctorQuota = res.data;
           this.allItems = res.data;
           this.setPage(1);
-        }else{
+        } else {
           this.showNotFoundMsg = true;
         }
         this.showWaitMsg = false;

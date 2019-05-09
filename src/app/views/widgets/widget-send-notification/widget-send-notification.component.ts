@@ -32,8 +32,8 @@ export class WidgetSendNotificationComponent implements OnInit {
   public notes: any;
 
   public alerts: Alert[] = [];
-  public showWaitMsg: boolean = false;
-  public showNotFoundMsg: boolean = false;
+  public showWaitMsg = false;
+  public showNotFoundMsg = false;
   public key: any = JSON.parse(localStorage.getItem('key'));
 
   constructor(
@@ -57,7 +57,7 @@ export class WidgetSendNotificationComponent implements OnInit {
 
     this.notificationType = await this.generalService.getNotificationType()
     .toPromise().then(res => {
-      if(res.status === 'OK' && res.data.length === 0){
+      if (res.status === 'OK' && res.data.length === 0) {
         this.alertService.success('No List notification type');
       }
       return res.data;
@@ -75,7 +75,7 @@ export class WidgetSendNotificationComponent implements OnInit {
 
     this.doctorList = await this.doctorService.getListDoctor(hospital.id)
     .toPromise().then( res => {
-      if(res.status === 'OK' && res.data.length === 0){
+      if (res.status === 'OK' && res.data.length === 0) {
         this.alertService.success('No List Doctor in This Hospital');
       }
 
@@ -86,7 +86,7 @@ export class WidgetSendNotificationComponent implements OnInit {
     });
   }
 
-  async getCollectionAlert(){
+  async getCollectionAlert() {
     this.alertService.getAlert().subscribe((alert: Alert) => {
       if (!alert) {
           // clear alerts when an empty alert is received
@@ -98,38 +98,38 @@ export class WidgetSendNotificationComponent implements OnInit {
     });
   }
 
-  checkDatePickerIsValid(){
+  checkDatePickerIsValid() {
     this.alerts = [];
 
-    if(this.appointmentDate){
+    if (this.appointmentDate) {
       const d = this.appointmentDate.split('-');
       const date = d[0];
       const month = d[1];
       const year = d[2];
       const ymd = year + '-' + month + '-' + date;
 
-      const appDate: any = new Date(ymd)
+      const appDate: any = new Date(ymd);
 
-      if(appDate == "Invalid Date") {
+      if (appDate == 'Invalid Date') {
         this.alertService.error('Date format is wrong');
         return false;
-      }else{
+      } else {
         return true;
       }
-    }else{
+    } else {
       this.alertService.error('Please input appointment date');
       return false;
     }
   }
 
-  onDateChange(event: any){
+  onDateChange(event: any) {
     this.displayPatient();
   }
 
   displayPatient() {
     const status = this.checkDatePickerIsValid();
 
-    if(status){
+    if (status) {
       this.showWaitMsg = true;
       const doctorId = this.doctorSelected.doctor_id;
       const date = localSpliter(this.appointmentDate, false);
@@ -138,7 +138,7 @@ export class WidgetSendNotificationComponent implements OnInit {
   }
 
   async getDoctorPatient(doctorId: string, date: any) {
-    
+
     const hospital = this.key.hospital;
 
     this.alerts = [];
@@ -146,14 +146,14 @@ export class WidgetSendNotificationComponent implements OnInit {
     .toPromise().then( res => {
       if (res.status === 'OK' && res.data.length === 0) {
         this.showNotFoundMsg = true;
-      }else{
+      } else {
         for (let i = 0, { length } = res.data; i < length; i++) {
           res.data[i].selected = false;
         }
         this.showTable = true;
       }
       this.showWaitMsg = false;
-      
+
       return res.data;
     }).catch(err => {
       this.showWaitMsg = false;
@@ -204,7 +204,7 @@ export class WidgetSendNotificationComponent implements OnInit {
         organizationId: parseInt(hospital.orgId),
         bookingDate: date,
         receiver: patientSelected,
-        source: source,
+        source,
         userId: user.id,
       };
 
@@ -219,9 +219,9 @@ export class WidgetSendNotificationComponent implements OnInit {
 
     await this.notificationService.sendNotification(payload)
       .toPromise().then( res => {
-        if(res.status === 'OK'){
+        if (res.status === 'OK') {
           this.alertService.success(res.message);
-        }else{
+        } else {
           this.alertService.error(res.message);
         }
       }).catch(err => {
@@ -233,7 +233,7 @@ export class WidgetSendNotificationComponent implements OnInit {
       if (!alert) {
           return;
       }
-  
+
       switch (alert.type) {
         case AlertType.Success:
           return 'success';

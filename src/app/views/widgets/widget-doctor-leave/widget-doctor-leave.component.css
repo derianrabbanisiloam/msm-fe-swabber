@@ -1,0 +1,52 @@
+.fixed_header tbody{
+    display:block;
+    width: 100%;
+    overflow: auto;
+    height: 340px;
+  }
+  
+  .fixed_header thead tr {
+    border: solid 0.5px #C1C1C1;
+    display: block;
+  }
+  
+  .fixed_header th, .fixed_header td {
+    padding: 5px;
+    text-align: left;
+  }
+
+  section#group-doctor-leave {
+    font-family: futura-pt, sans-serif;
+    font-style: normal;
+    font-weight: 300;
+    position: absolute;
+    top: 0px;
+    width: 1000px;
+  }
+  
+  section#group-doctor-leave div.row{
+    padding:5px;
+  }
+  
+  section#doctor-leave-table {
+    margin-top: 60px;
+  }
+  
+  /* Version 2.0 */
+  /* table, tr, th, td {
+    background: white;
+  }
+  
+  table thead th {
+    color: #1A2269;
+  }
+  
+  h4 {
+    font-weight: bold;
+  }
+  
+  #delete-button{
+    width: 30px;
+    height: 30px;
+  } */
+  

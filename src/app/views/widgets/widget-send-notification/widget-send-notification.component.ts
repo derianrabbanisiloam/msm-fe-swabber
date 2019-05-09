@@ -34,7 +34,7 @@ export class WidgetSendNotificationComponent implements OnInit {
   public alerts: Alert[] = [];
   public showWaitMsg: boolean = false;
   public showNotFoundMsg: boolean = false;
-  public hospitalId: any = localStorage.getItem('hospitalId');
+  public key: any = JSON.parse(localStorage.getItem('key'));
 
   constructor(
     private generalService: GeneralService,
@@ -68,9 +68,12 @@ export class WidgetSendNotificationComponent implements OnInit {
   }
 
   async getListDoctor() {
+
+    const hospital = this.key.hospital;
+
     this.alerts = [];
 
-    this.doctorList = await this.doctorService.getListDoctor(this.hospitalId)
+    this.doctorList = await this.doctorService.getListDoctor(hospital.id)
     .toPromise().then( res => {
       if(res.status === 'OK' && res.data.length === 0){
         this.alertService.success('No List Doctor in This Hospital');
@@ -135,8 +138,11 @@ export class WidgetSendNotificationComponent implements OnInit {
   }
 
   async getDoctorPatient(doctorId: string, date: any) {
+    
+    const hospital = this.key.hospital;
+
     this.alerts = [];
-    this.patientList = await this.appointmentService.getListReceiver(doctorId, date, this.hospitalId)
+    this.patientList = await this.appointmentService.getListReceiver(doctorId, date, hospital.id)
     .toPromise().then( res => {
       if (res.status === 'OK' && res.data.length === 0) {
         this.showNotFoundMsg = true;
@@ -171,6 +177,11 @@ export class WidgetSendNotificationComponent implements OnInit {
   sendNotif() {
     this.alerts = [];
 
+    const hospital = this.key.hospital;
+    const user = this.key.user;
+    const date = localSpliter(this.appointmentDate, false);
+    const source = sourceApps;
+
     const idx = this.patientList.findIndex((i) => {
       return i.selected === true;
     });
@@ -186,21 +197,15 @@ export class WidgetSendNotificationComponent implements OnInit {
         }
       }
 
-      const date = localSpliter(this.appointmentDate, false);
-
-      const userId = localStorage.getItem('userId');
-      const orgId = parseInt(localStorage.getItem('organizationId'));
-      const source = sourceApps;
-
       const body = {
         doctorId: this.doctorSelected.doctor_id,
         content: this.notes,
         notifType: this.notifType.value,
-        organizationId: orgId,
+        organizationId: parseInt(hospital.orgId),
         bookingDate: date,
         receiver: patientSelected,
         source: source,
-        userId: userId,
+        userId: user.id,
       };
 
       this.notifySender(body);

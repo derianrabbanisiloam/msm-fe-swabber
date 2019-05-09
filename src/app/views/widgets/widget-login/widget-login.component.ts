@@ -103,29 +103,37 @@ export class WidgetLoginComponent implements OnInit {
     await this.userService.signIn(body)
     .toPromise().then(res => {
       if (res.status == 'OK') {
-        
-        localStorage.setItem('userId', res.data[0].user_id);
-        localStorage.setItem('username', res.data[0].user_name);
-        localStorage.setItem('fullname', res.data[0].full_name);
-        localStorage.setItem('hospitalId', res.data[0].hospital_id);
-        localStorage.setItem('organizationId', res.data[0].hospital_hope_id);
-        localStorage.setItem('hospitalName', res.data[0].name);
-        localStorage.setItem('hospitalAlias', res.data[0].alias);
-        localStorage.setItem('timeZone', res.data[0].time_zone);
-        
-        let hospitals = [];
+
+        let collections = [];
         
         for(var i = 0; i < res.data.length; i++){
-          hospitals.push({
-            hospitalId: res.data[i].hospital_id,
-            organizationId : res.data[i].hospital_hope_id,
-            hospitalName : res.data[i].name, 
-            hospitalAlias: res.data[i].alias,
-            timeZone: res.data[i].time_zone,
+          collections.push({
+            id: res.data[i].hospital_id,
+            orgId: res.data[i].hospital_hope_id,
+            name : res.data[i].name, 
+            alias: res.data[i].alias,
+            zone: res.data[i].time_zone,
           })
         }
         
-        localStorage.setItem('hospitals', JSON.stringify(hospitals))
+        const key = {
+          user: {
+            id: res.data[0].user_id,
+            username: res.data[0].user_name,
+            fullname: res.data[0].full_name,   
+          },
+          hospital: {
+            id: res.data[0].hospital_id,
+            orgId: res.data[0].hospital_hope_id,
+            name: res.data[0].name,
+            alias: res.data[0].alias, 
+            zone: res.data[0].time_zone,   
+          },
+          collection: collections,
+        };
+        
+        localStorage.setItem('key', JSON.stringify(key));
+        
         this.router.navigate([this.returnUrl])
       } else {
         this.alertService.error(`Username or/and Password wrong`);

@@ -22,31 +22,25 @@ export class AuthGuard implements CanActivate {
     state: RouterStateSnapshot): Observable<boolean> | Promise<boolean> | boolean {
 
       if(isPlatformBrowser(this.platformId)){
-        const userId = localStorage.getItem('userId');
-
-        if(userId) {
+        const key = localStorage.getItem('key');
+        
+        if(key) {
           return true;
         }else {
           return this.router.navigate(['login'], { queryParams: { returnUrl: state.url } });
         }
-      }else{
-
       }
   }
 
   isLoggedIn() {
-    
     if(isPlatformBrowser(this.platformId)){
-      const userId = localStorage.getItem('userId');
+      const key = localStorage.getItem('key');
 
-      if(userId) {
+      if(key) {
         return true;
       }else {
         return false;
       }
-    }else{
-
     }
-
   }
 }

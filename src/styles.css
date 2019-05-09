@@ -773,3 +773,48 @@ button:disabled { cursor: not-allowed }
   display: flex;
   justify-content: left;
 }
+
+.angular-autocomplete {
+  width: auto;
+}
+
+.autocomplete-container .input-container input[type=text] {
+  font-size: 12px;
+}
+
+.angular-autocomplete .autocomplete-container .suggestions-container {
+  z-index: 2 !important;
+}
+
+.angular-autocomplete .autocomplete-container .suggestions-container ul li a {
+  font-size: 12px;
+}
+
+.autocomplete-container {
+  box-shadow: 0 1px 3px 0 rgba(0,0,0,.2), 0 1px 1px 0 rgba(0,0,0,.14), 0 2px 1px -1px rgba(0,0,0,.12);
+  position: relative;
+  overflow: visible;
+  height: 30px !important;
+}
+
+.autocomplete-container .input-container input {
+  box-sizing: border-box;
+  border: none;
+  box-shadow: none;
+  outline: 0;
+  background-color: #fff;
+  color: rgba(0,0,0,.87);
+  width: 100%;
+  padding: 0 15px;
+  line-height: 30px !important;
+  height: 30px !important;
+}
+
+.autocomplete-container .suggestions-container ul li a {
+  padding: 7px 15px !important;
+  display: block;
+  text-decoration: none;
+  cursor: pointer;
+  color: rgba(0,0,0,.87);
+  font-size: 15px;
+}

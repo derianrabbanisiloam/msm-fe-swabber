@@ -30,7 +30,7 @@
       <div ngbDropdown class="d-inline-block hospital-option">
           <button id="dropdownBasic1" ngbDropdownToggle>{{currentHospital.alias}}</button>
           <div ngbDropdownMenu aria-labelledby="dropdownBasic1">
-            <a class="dropdown-item" *ngFor="let h of hospitals" (click)="changeOrg(h.hospitalId)" href="" target="_parent" [routerLink]="['/']"> {{h.hospitalAlias}}
+            <a class="dropdown-item" *ngFor="let h of hospitals" (click)="changeOrg(h.id)" href="" target="_parent" [routerLink]="['/']"> {{h.alias}}
             </a>
           </div>
         </div>

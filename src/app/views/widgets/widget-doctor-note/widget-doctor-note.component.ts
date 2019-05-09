@@ -417,48 +417,33 @@ export class WidgetDoctorNoteComponent implements OnInit {
     this.selectedDeleteNote = val;
     this.open(content);
   }
-
+  
   deleteDoctorNotes() {
-    const data = this.deleteDoctorNoteService();
-    this.refreshNotes();
-    if (data) {
-      this.refreshNotes();
-      Swal.fire({
-        position: 'top-end',
-        type: 'success',
-        title: 'Success',
-        showConfirmButton: false,
-        timer: 1500
-      });
-    } else {
-      this.refreshNotes();
-      Swal.fire({
-        type: 'error',
-        title: 'Oops...',
-        text: 'Something went wrong!',
-        timer: 1500
-      });
-    }
-  }
-
-  async deleteDoctorNoteService() {
-    const modal = {
+    let modal = {
       userId: this.userId,
       source: this.dummyMACAddress
-    };
-
-    await this.doctorService.deleteDoctorNotes(this.hospitalId, this.selectedDeleteNote.doctor_note_id, modal)
-    .toPromise().then( res => {
-      if (res.status === 'OK') {
-        return true;
-      } else {
-        return false;
-      }
-    }).catch(err => {
-      return false;
-    });
+    }
+    this.doctorService.deleteDoctorNotes(this.hospitalId, this.selectedDeleteNote.doctor_note_id, modal)
+        .subscribe(data => {
+          Swal.fire({
+            position: 'top-end',
+            type: 'success',
+            title: 'Success',
+            showConfirmButton: false,
+            timer: 1500
+          })
+          this.refreshNotes();
+        }, err => {
+          Swal.fire({
+            type: 'error',
+            title: 'Oops...',
+            text: 'Something went wrong!',
+            timer: 1500
+          })
+          this._error.next(`Failed`);
+        });
   }
-
+  
   clearNgModelDate(): void {
     this.model = null;
   }

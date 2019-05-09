@@ -379,46 +379,33 @@ export class WidgetDoctorLeaveComponent implements OnInit {
   }
 
   deleteDoctorLeave() {
-    const data = this.deleteDoctorLeaveService();
-    if (this.doctorRefresh == null) {
-      this.refreshDoctorLeave();
-    } else {
-      this.refreshDoctorLeaveByDoctorId();
-    }
-    if (data) {
-      Swal.fire({
-        position: 'top-end',
-        type: 'success',
-        title: 'Delete Success',
-        showConfirmButton: false,
-        timer: 1500
-      });
-    } else {
-      Swal.fire({
-        type: 'error',
-        title: 'Oops...',
-        text: 'Something went wrong!',
-        timer: 1500
-      });
-    }
-  }
-
-  async deleteDoctorLeaveService() {
-    const modal = {
+    let modal = {
       userId: this.userId,
       source: this.dummyMACAddress
-    };
-
-    await this.doctorService.deleteDoctorLeave(this.hospitalId, this.selectedDeleteLeave.schedule_id, modal)
-    .toPromise().then( res => {
-      if (res.status === 'OK') {
-        return true;
-      } else {
-        return false;
-      }
-    }).catch(err => {
-      return false;
-    });
+    }
+    this.doctorService.deleteDoctorLeave(this.hospitalId, this.selectedDeleteLeave.schedule_id, modal)
+        .subscribe(data => {
+          Swal.fire({
+            position: 'top-end',
+            type: 'success',
+            title: 'Success',
+            showConfirmButton: false,
+            timer: 1500
+          })
+          if(this.doctorRefresh == null){
+            this.refreshDoctorLeave();
+          }
+          else{
+            this.refreshDoctorLeaveByDoctorId();
+          }
+        }, err => {
+          Swal.fire({
+            type: 'error',
+            title: 'Oops...',
+            text: 'Something went wrong!',
+            timer: 1500
+          })
+        });
   }
 
   refreshDoctorLeaveByDoctorId() {
@@ -434,7 +421,6 @@ export class WidgetDoctorLeaveComponent implements OnInit {
           this.flag = false;
           this.leaves = null;
         });
-
   }
 
   refreshDoctorLeave() {

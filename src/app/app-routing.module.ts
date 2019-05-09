@@ -8,6 +8,11 @@ const routes: Routes = [
     loadChildren: './views/pages/page-login/page-login.module#PageLoginModule',
   },
   {
+    path: 'appointment-list',
+    canActivate: [AuthGuard],
+    loadChildren: './views/pages/page-appointment-list/page-appointment-list.module#PageAppointmentListModule',
+  },
+  {
     path: 'view-quota',
     canActivate: [AuthGuard],
     loadChildren: './views/pages/page-view-quota/page-view-quota.module#PageViewQuotaModule',

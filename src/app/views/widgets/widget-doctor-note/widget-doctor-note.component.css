@@ -1,0 +1,59 @@
+.fixed_header tbody{
+    display:block;
+    width: 100%;
+    overflow: auto;
+    height: 340px;
+  }
+  
+  .fixed_header thead tr {
+    border: solid 0.5px #C1C1C1;
+    display: block;
+  }
+  
+  .fixed_header th, .fixed_header td {
+    padding: 5px;
+    text-align: left;
+  }
+  
+  ::ng-deep .modal-header{
+    padding: 16px;
+  }
+  
+  .confirmation_button.justify-content-center button{
+    margin: 2rem 1rem;
+    width: 9rem; height: 2.7rem;
+  }
+  
+  section#doctor-notes {
+    font-family: futura-pt, sans-serif;
+    font-style: normal;
+    font-weight: 300;
+    position: absolute;
+    top: 100px;
+    width: 1000px;
+  }
+  
+  section#doctor-notes div.row{
+    padding:5px;
+  }
+  
+  h4 {
+    font-weight: bold;
+  }
+  
+  .table-my-siloam {
+    background: white;
+  }
+  
+  .table-my-siloam th h4 {
+    color: #171717;
+  }
+  
+  .table-my-siloam th {
+    color: #1A2269;
+  }
+  
+  .table-my-siloam th, .table-my-siloam td {
+    padding: 5px 25px;
+    border: solid 0.5px #C1C1C1;
+  }

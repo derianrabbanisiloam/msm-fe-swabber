@@ -4,6 +4,8 @@ import { HttpClient } from '@angular/common/http';
 import { catchError, tap } from 'rxjs/operators';
 import { DoctorHospital } from '../../app/models/doctors/doctor-hospital';
 import { Doctor } from '../../app/models/doctors/doctor';
+import { DoctorNote } from '../../app/models/doctors/doctor-note';
+import { DoctorLeave } from '../../app/models/doctors/doctor-leave';
 import { environment } from '../../environments/environment';
 import { httpOptions } from '../../app/utils/http.util';
 
@@ -26,6 +28,89 @@ export class DoctorService {
   getListDoctor(hospitalId: any): Observable<any> {
     const uri = '/lite?hospitalId=' + hospitalId;
     return this.http.get<Doctor[]>(this.doctorUrl + uri, httpOptions);
+  }
+
+  getDoctorNotes(hospital: string, fromDate: string, toDate: string, doctor?: string): Observable<any> {
+    const uri = '/notes/hospital/';
+
+    let url = this.doctorUrl + uri;
+    const urlDefault = `${url}${hospital}?fromDate=${fromDate}&toDate=${toDate}`;
+    url = doctor ? `${url}${hospital}?doctorId=${doctor}&fromDate=${fromDate}&toDate=${toDate}` : urlDefault;
+    return this.http.get<DoctorNote[]>(url, httpOptions);
+  }
+
+  postDoctorNotes(hospital: string, payload: any) {
+    const uri = '/notes/hospital/';
+
+    let url = this.doctorUrl + uri;
+    const body = JSON.stringify(payload);
+    url = `${url}${hospital}`;
+    return this.http.post(url, body, httpOptions);
+  }
+
+  editDoctorNotes(hospital: string, note: string, payload: any) {
+    const uri = '/notes/hospital/';
+
+    let url = this.doctorUrl + uri;
+    const body = JSON.stringify(payload);
+    url = `${url}${hospital}/note/${note}`;
+    return this.http.put(url, body, httpOptions);
+  }
+
+  deleteDoctorNotes(hospital: string, note: string, payload: any) {
+    const uri = '/notes/hospital/';
+
+    let url = this.doctorUrl + uri;
+    const body = JSON.stringify(payload);
+    url = `${url}${hospital}/note/${note}`;
+
+    const options = {
+      ...httpOptions,
+      body,
+    };
+    return this.http.delete<any>(url, options);
+  }
+
+  getViewDoctorLeave(hospital: string, fromDate: string, toDate: string, doctor?: string): Observable<any> {
+    const uri = '/leaves/hospital/';
+
+    let url = this.doctorUrl + uri;
+    const urlDefault = `${url}${hospital}?limit=10000&offset=0&fromDate=${fromDate}&toDate=${toDate}`;
+    url = doctor ? `${url}${hospital}?limit=10000&offset=0&doctorId=${doctor}&fromDate=${fromDate}&toDate=${toDate}` : urlDefault;
+    return this.http.get<DoctorLeave[]>(url, httpOptions);
+  }
+
+  postDoctorLeave(hospital: string, payload: any) {
+    const uri = '/leaves/hospital/';
+
+    let url = this.doctorUrl + uri;
+    const body = JSON.stringify(payload);
+    url = `${url}${hospital}`;
+    return this.http.post(url, body, httpOptions);
+  }
+
+  editDoctorLeave(hospital: string, schedule: string, payload: any) {
+    const uri = '/leaves/hospital/';
+
+    let url = this.doctorUrl + uri;
+
+    const body = JSON.stringify(payload);
+    url = `${url}${hospital}/schedule/${schedule}`;
+    return this.http.put(url, body, httpOptions);
+  }
+
+  deleteDoctorLeave(hospital: string, schedule: string, payload: any) {
+    const uri = '/leaves/hospital/';
+
+    let url = this.doctorUrl + uri;
+    const body = JSON.stringify(payload);
+    url = `${url}${hospital}/schedule/${schedule}`;
+
+    const options = {
+      ...httpOptions,
+      body,
+    };
+    return this.http.delete<any>(url, options);
   }
 
   // paging doctor quota

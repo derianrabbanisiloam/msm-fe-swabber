@@ -4,3 +4,22 @@ export const appInfo = {
 };
 
 export const sourceApps = '::ffff:10.83.146.145';
+
+export const leaveType = [
+    {
+      leave_type: 'Sick Leave',
+      schedule_type_id: '5'
+    },
+    {
+      leave_type: 'Maternity',
+      schedule_type_id: '4'
+    },
+    {
+      leave_type: 'Personal Matters',
+      schedule_type_id: '3'
+    },
+    {
+      leave_type: 'Annual Leave',
+      schedule_type_id: '2'
+    }
+];

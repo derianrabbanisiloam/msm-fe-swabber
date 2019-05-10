@@ -32,9 +32,9 @@ export class WidgetSendNotificationComponent implements OnInit {
   public notes: any;
 
   public alerts: Alert[] = [];
-  public showWaitMsg: boolean = false;
-  public showNotFoundMsg: boolean = false;
-  public hospitalId: any = localStorage.getItem('hospitalId');
+  public showWaitMsg = false;
+  public showNotFoundMsg = false;
+  public key: any = JSON.parse(localStorage.getItem('key'));
 
   constructor(
     private generalService: GeneralService,
@@ -57,7 +57,7 @@ export class WidgetSendNotificationComponent implements OnInit {
 
     this.notificationType = await this.generalService.getNotificationType()
     .toPromise().then(res => {
-      if(res.status === 'OK' && res.data.length === 0){
+      if (res.status === 'OK' && res.data.length === 0) {
         this.alertService.success('No List notification type');
       }
       return res.data;
@@ -68,11 +68,14 @@ export class WidgetSendNotificationComponent implements OnInit {
   }
 
   async getListDoctor() {
+
+    const hospital = this.key.hospital;
+
     this.alerts = [];
 
-    this.doctorList = await this.doctorService.getListDoctor(this.hospitalId)
+    this.doctorList = await this.doctorService.getListDoctor(hospital.id)
     .toPromise().then( res => {
-      if(res.status === 'OK' && res.data.length === 0){
+      if (res.status === 'OK' && res.data.length === 0) {
         this.alertService.success('No List Doctor in This Hospital');
       }
 
@@ -83,7 +86,7 @@ export class WidgetSendNotificationComponent implements OnInit {
     });
   }
 
-  async getCollectionAlert(){
+  async getCollectionAlert() {
     this.alertService.getAlert().subscribe((alert: Alert) => {
       if (!alert) {
           // clear alerts when an empty alert is received
@@ -95,38 +98,38 @@ export class WidgetSendNotificationComponent implements OnInit {
     });
   }
 
-  checkDatePickerIsValid(){
+  checkDatePickerIsValid() {
     this.alerts = [];
 
-    if(this.appointmentDate){
+    if (this.appointmentDate) {
       const d = this.appointmentDate.split('-');
       const date = d[0];
       const month = d[1];
       const year = d[2];
       const ymd = year + '-' + month + '-' + date;
 
-      const appDate: any = new Date(ymd)
+      const appDate: any = new Date(ymd);
 
-      if(appDate == "Invalid Date") {
+      if (appDate == 'Invalid Date') {
         this.alertService.error('Date format is wrong');
         return false;
-      }else{
+      } else {
         return true;
       }
-    }else{
+    } else {
       this.alertService.error('Please input appointment date');
       return false;
     }
   }
 
-  onDateChange(event: any){
+  onDateChange(event: any) {
     this.displayPatient();
   }
 
   displayPatient() {
     const status = this.checkDatePickerIsValid();
 
-    if(status){
+    if (status) {
       this.showWaitMsg = true;
       const doctorId = this.doctorSelected.doctor_id;
       const date = localSpliter(this.appointmentDate, false);
@@ -135,19 +138,22 @@ export class WidgetSendNotificationComponent implements OnInit {
   }
 
   async getDoctorPatient(doctorId: string, date: any) {
+
+    const hospital = this.key.hospital;
+
     this.alerts = [];
-    this.patientList = await this.appointmentService.getListReceiver(doctorId, date, this.hospitalId)
+    this.patientList = await this.appointmentService.getListReceiver(doctorId, date, hospital.id)
     .toPromise().then( res => {
       if (res.status === 'OK' && res.data.length === 0) {
         this.showNotFoundMsg = true;
-      }else{
+      } else {
         for (let i = 0, { length } = res.data; i < length; i++) {
           res.data[i].selected = false;
         }
         this.showTable = true;
       }
       this.showWaitMsg = false;
-      
+
       return res.data;
     }).catch(err => {
       this.showWaitMsg = false;
@@ -171,6 +177,11 @@ export class WidgetSendNotificationComponent implements OnInit {
   sendNotif() {
     this.alerts = [];
 
+    const hospital = this.key.hospital;
+    const user = this.key.user;
+    const date = localSpliter(this.appointmentDate, false);
+    const source = sourceApps;
+
     const idx = this.patientList.findIndex((i) => {
       return i.selected === true;
     });
@@ -186,21 +197,15 @@ export class WidgetSendNotificationComponent implements OnInit {
         }
       }
 
-      const date = localSpliter(this.appointmentDate, false);
-
-      const userId = localStorage.getItem('userId');
-      const orgId = parseInt(localStorage.getItem('organizationId'));
-      const source = sourceApps;
-
       const body = {
         doctorId: this.doctorSelected.doctor_id,
         content: this.notes,
         notifType: this.notifType.value,
-        organizationId: orgId,
+        organizationId: parseInt(hospital.orgId),
         bookingDate: date,
         receiver: patientSelected,
-        source: source,
-        userId: userId,
+        source,
+        userId: user.id,
       };
 
       this.notifySender(body);
@@ -214,9 +219,9 @@ export class WidgetSendNotificationComponent implements OnInit {
 
     await this.notificationService.sendNotification(payload)
       .toPromise().then( res => {
-        if(res.status === 'OK'){
+        if (res.status === 'OK') {
           this.alertService.success(res.message);
-        }else{
+        } else {
           this.alertService.error(res.message);
         }
       }).catch(err => {
@@ -228,7 +233,7 @@ export class WidgetSendNotificationComponent implements OnInit {
       if (!alert) {
           return;
       }
-  
+
       switch (alert.type) {
         case AlertType.Success:
           return 'success';

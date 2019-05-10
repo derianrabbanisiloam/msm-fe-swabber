@@ -1,7 +1,6 @@
 import { Component, OnInit } from '@angular/core';
 import { DoctorHospital } from '../../../models/doctors/doctor-hospital';
 import { DoctorService } from '../../../services/doctor.service';
-import { FormHandlerMessage } from '../../../models/formHandlerMessage';
 
 @Component({
   selector: 'app-widget-view-quota',
@@ -12,7 +11,6 @@ export class WidgetViewQuotaComponent implements OnInit {
 
   public doctorHospitals: DoctorHospital = new DoctorHospital;
   public doctorQuota: DoctorHospital[];
-  public formHandlerMessage: FormHandlerMessage = new FormHandlerMessage;
   public showWaitMsg = true;
   public showNotFoundMsg = false;
 
@@ -21,7 +19,7 @@ export class WidgetViewQuotaComponent implements OnInit {
   public pagedItems: any [];
 
   public tempDoctorQuota: any = [];
-  public hospitalId: any = localStorage.getItem('hospitalId');
+  public key: any = JSON.parse(localStorage.getItem('key'));
 
   constructor(private doctorService: DoctorService) { }
 
@@ -30,14 +28,17 @@ export class WidgetViewQuotaComponent implements OnInit {
   }
 
   async getQuotaDoctor() {
-    this.doctorQuota = await this.doctorService.getDoctorQuota(this.hospitalId)
+
+    const hospital = this.key.hospital;
+
+    this.doctorQuota = await this.doctorService.getDoctorQuota(hospital.id)
     .toPromise().then(res => {
       if (res.status === 'OK') {
-        if(res.data.length !== 0){
+        if (res.data.length !== 0) {
           this.tempDoctorQuota = res.data;
           this.allItems = res.data;
           this.setPage(1);
-        }else{
+        } else {
           this.showNotFoundMsg = true;
         }
         this.showWaitMsg = false;

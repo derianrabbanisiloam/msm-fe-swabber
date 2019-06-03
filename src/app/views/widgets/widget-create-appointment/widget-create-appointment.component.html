@@ -1,0 +1,144 @@
+<div *ngFor="let alert of alerts" class="alert-fixed-div">
+  <ngb-alert *ngIf="alert" type="{{cssAlertType(alert)}}" (close)="removeAlert(alert)">{{ alert.message }}</ngb-alert>
+</div>
+
+<div class="fd-column" id="tutorial4">
+  <div class="jc-space-between content-appointment-01-group-col">
+    <div *ngIf="isOriginal" style="padding: 0.2vw">
+      <div class="d-flex justify-content-start cc_container_btn_topleft" >
+        <div class="btn" style="background: white; padding: 0.2vw 0.5vw" (click)="prevPage()">
+          <img style="width: 1vw" src="../../../../assets/icons/ic_BackGreen@2x.png">
+        </div>
+        <div>
+          <button class="btn btn-green" (click)="openScheduleBlockModal()">Manage Block</button>
+        </div>
+      </div>
+    </div>
+    <div class=""  style="margin-bottom: 1vw">
+      <div class="header-2 center-text">{{schedule.doctor_name}} | {{ doctorProfile.doctor_type_name }}</div>
+      <div class="body-text center-text"><span class="bold">Hospital:</span> {{schedule.hospital_name}}</div>
+    </div>
+    <div></div>
+  </div>
+
+  <div *ngIf="doctorNotes" class="notes-container d-flex justify-content-start">
+    <div>
+      <img class="icon" src="../../../../assets/icons/ic_Warning.png">
+    </div>
+    <div class="">
+      <div class="bold">Important Notes:</div>
+      <div>
+        <div *ngFor="let note of doctorNotes">
+          - {{ note.note }}
+        </div>
+        <div *ngFor="let block of scheduleBlocks">
+          - Block from {{block.from_time}} to {{block.to_time}}. Reason : {{block.reason}}. Modified by: {{block.modified_by}}
+        </div>
+      </div>
+    </div>
+  </div>
+  
+  <div class="content-appointment-01-group-col-2">
+    <div class="">
+      <table class="table shadow-4" id="tutorial8">
+        <thead>
+          <tr>
+            <th colspan="11" class="header-2 left-text no-padding center-text" style="padding: 1rem 1rem">
+              {{ appDateDisplay }} | Floor {{ schedule.floor_name }} - Wing {{ schedule.wing_name }} - Room {{ schedule.room_name }}
+            </th>
+          </tr>
+          <tr class="column-header foot-note blue table-title">
+            <th *ngFor="let header of table1Header">{{header}}</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr *ngFor="let app of appList; let i=index"
+              [ngClass]="{'cc_row_rescheduled': app.is_blocked == true}">
+            <td class="st-kolom-time">{{app.appointment_range_time}}</td>
+            <td>{{app.no}}</td>
+            <td *ngIf="app.is_can_create && isOriginal" 
+                class="st-kolom-available"
+                (click)="openCreateAppModal(app)"><a>Available</a></td>
+            <td *ngIf="app.is_can_create && !isOriginal" 
+                class="st-kolom-available"
+                (click)="openCreateAppModal2(app)"><a>Available</a></td>
+            <td *ngIf="!app.is_can_create">
+              {{app.patient_name}}
+              <span *ngIf="app.appointment_temporary_id" class="newPatientIcon">
+                <span>
+                  Tentative
+                  <span>
+                    Please verify this patient first
+                  </span>
+                </span>
+              </span>
+            </td>
+            <td>{{app.date_of_birth}}</td>
+            <td>{{app.local_mr_no}}</td>
+            <td>{{app.phone_no}}</td>
+            <td>{{app.queue_no}}</td>
+            <td>{{app.note}}</td>
+            <td>{{app.modified_by}}</td>
+            <td class="st-kolom-button">
+              <button *ngIf="app.is_can_cancel && isOriginal" 
+                      class="btn-cancel-2"
+                      (click)="confirmCancelAppointment(app.appointment_id)">x</button>
+            </td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+    <div class="col-md-12" *ngIf="doctorProfile.doctor_type_name !== doctorType.FCFS">
+      <p>Total Waiting List : <strong>{{appListWaiting.length - 1}}</strong></p>
+    </div>
+
+
+    <!--                              Waiting List                                -->
+    <table class="table shadow-4" *ngIf="doctorProfile.doctor_type_name !== doctorType.FCFS">
+      <thead >
+      <tr>
+        <th colspan="10" class="header-2 left-text no-padding" style="padding: 1rem 1rem">Waiting List</th>
+      </tr>
+      <tr class="column-header foot-note blue table-title">
+        <th *ngFor="let header of table2Header">{{header}}</th>
+      </tr>
+      </thead>
+      <tbody>
+        <tr *ngFor="let app of appListWaiting"
+            [ngClass]="{'cc_row_rescheduled': app.is_blocked == true}">
+          <td class="st-kolom-time">{{app.appointment_range_time}}</td>
+          <td>{{app.no}}</td>
+          <td *ngIf="app.is_can_create && isOriginal" 
+              class="st-kolom-available" 
+              (click)="openCreateAppModal(app)"><a>Available</a></td>
+          <td *ngIf="app.is_can_create && !isOriginal" 
+              class="st-kolom-available"
+              (click)="openCreateAppModal2(app)"><a>Available</a></td>
+          <td *ngIf="!app.is_can_create">
+            {{app.patient_name}}
+            <span class="newPatientIcon">
+              <span *ngIf="app.appointment_temporary_id">
+                Tentative
+                <span>
+                  Please verify this patient first
+                </span>
+              </span>
+            </span>
+          </td>
+          <td>{{app.date_of_birth}}</td>
+          <td>{{app.local_mr_no}}</td>
+          <td>{{app.phone_no}}</td>
+          <td>{{app.queue_no}}</td>
+          <td>{{app.note}}</td>
+          <td>{{app.modified_by}}</td>
+          <td class="st-kolom-button">
+            <button 
+              *ngIf="app.is_can_cancel && isOriginal" 
+              class="btn-cancel-2"
+              (click)="confirmCancelAppointment(app.appointment_id)">x</button>
+          </td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+</div>

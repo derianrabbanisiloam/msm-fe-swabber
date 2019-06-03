@@ -417,12 +417,12 @@ export class WidgetDoctorNoteComponent implements OnInit {
     this.selectedDeleteNote = val;
     this.open(content);
   }
-  
+
   deleteDoctorNotes() {
-    let modal = {
+    const modal = {
       userId: this.userId,
       source: this.dummyMACAddress
-    }
+    };
     this.doctorService.deleteDoctorNotes(this.hospitalId, this.selectedDeleteNote.doctor_note_id, modal)
         .subscribe(data => {
           Swal.fire({
@@ -431,7 +431,7 @@ export class WidgetDoctorNoteComponent implements OnInit {
             title: 'Success',
             showConfirmButton: false,
             timer: 1500
-          })
+          });
           this.refreshNotes();
         }, err => {
           Swal.fire({
@@ -439,11 +439,11 @@ export class WidgetDoctorNoteComponent implements OnInit {
             title: 'Oops...',
             text: 'Something went wrong!',
             timer: 1500
-          })
+          });
           this._error.next(`Failed`);
         });
   }
-  
+
   clearNgModelDate(): void {
     this.model = null;
   }

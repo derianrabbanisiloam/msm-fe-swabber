@@ -379,10 +379,10 @@ export class WidgetDoctorLeaveComponent implements OnInit {
   }
 
   deleteDoctorLeave() {
-    let modal = {
+    const modal = {
       userId: this.userId,
       source: this.dummyMACAddress
-    }
+    };
     this.doctorService.deleteDoctorLeave(this.hospitalId, this.selectedDeleteLeave.schedule_id, modal)
         .subscribe(data => {
           Swal.fire({
@@ -391,11 +391,10 @@ export class WidgetDoctorLeaveComponent implements OnInit {
             title: 'Success',
             showConfirmButton: false,
             timer: 1500
-          })
-          if(this.doctorRefresh == null){
+          });
+          if (this.doctorRefresh == null) {
             this.refreshDoctorLeave();
-          }
-          else{
+          } else {
             this.refreshDoctorLeaveByDoctorId();
           }
         }, err => {
@@ -404,7 +403,7 @@ export class WidgetDoctorLeaveComponent implements OnInit {
             title: 'Oops...',
             text: 'Something went wrong!',
             timer: 1500
-          })
+          });
         });
   }
 

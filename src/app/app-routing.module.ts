@@ -18,6 +18,11 @@ const routes: Routes = [
     loadChildren: './views/pages/page-view-quota/page-view-quota.module#PageViewQuotaModule',
   },
   {
+    path: 'reschedule-worklist',
+    canActivate: [AuthGuard],
+    loadChildren: './views/pages/page-reschedule-worklist/page-reschedule-worklist.module#PageRescheduleWorklistModule',
+  },
+  {
     path: 'send-notification',
     canActivate: [AuthGuard],
     loadChildren: './views/pages/page-send-notification/page-send-notification.module#PageSendNotificationModule',

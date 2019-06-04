@@ -4,7 +4,7 @@ import { Router, ActivatedRoute } from '@angular/router';
 import { AppointmentService } from '../../../services/appointment.service';
 import { ScheduleService } from '../../../services/schedule.service';
 import { DoctorService } from '../../../services/doctor.service';
-import { Appointment } from '../../../models/appointments/appointment';
+import { AppointmentMini } from '../../../models/appointments/appointment-mini';
 import { Schedule } from '../../../models/schedules/schedule';
 import { DoctorNote } from '../../../models/doctors/doctor-note';
 import { DoctorProfile } from '../../../models/doctors/doctor-profile';
@@ -23,14 +23,14 @@ import { sourceApps } from '../../../variables/common.variable';
 @Component({
   selector: 'app-widget-create-appointment',
   templateUrl: './widget-create-appointment.component.html',
-  styleUrls: ['./widget-create-appointment.component.css']
+  styleUrls: ['./widget-create-appointment.component.css'],
 })
 export class WidgetCreateAppointmentComponent implements OnInit {
   @Input() appointmentPayloadInput: appPayload;
   @Output() opSlotSelected = new EventEmitter<any>();
   public key: any = JSON.parse(localStorage.getItem('key'));
   
-  public appointments: Appointment[];
+  public appointments: AppointmentMini[];
   public appList: any = [];
   public appListWaiting: any = [];
   public appointmentPayload: appPayload = new appPayload;
@@ -238,12 +238,12 @@ export class WidgetCreateAppointmentComponent implements OnInit {
         if (Number(x.appointment_no) === i && x.is_waiting_list === false) {
           this.appList[i].appointment_id = x.appointment_id;
           this.appList[i].appointment_no = x.appointment_no;
-          this.appList[i].patient_name = x.contact_name;
-          this.appList[i].date_of_birth = moment(x.birth_date).format('DD-MM-YYYY');
+          this.appList[i].patient_name = x.patient_name;
+          this.appList[i].date_of_birth = moment(x.patient_birth).format('DD-MM-YYYY');
           this.appList[i].local_mr_no = x.medical_record_number;
-          this.appList[i].phone_no = x.phone_number;
+          this.appList[i].phone_no = x.patient_phone_number;
           this.appList[i].queue_no = x.queue_number;
-          this.appList[i].note = x.appointment_note;
+          this.appList[i].note = x.note;
           this.appList[i].modified_by = x.modified_by;
           this.appList[i].is_waiting_list = x.is_waiting_list;
           this.appList[i].is_can_create = false;
@@ -281,12 +281,12 @@ export class WidgetCreateAppointmentComponent implements OnInit {
           appointment_range_time: appTime,
           appointment_no: x.appointment_no,
           appointment_id: x.appointment_id,
-          patient_name: x.contact_name,
-          date_of_birth: moment(x.birth_date).format('DD-MM-YYYY'),
+          patient_name: x.patient_name,
+          date_of_birth: moment(x.patient_birth).format('DD-MM-YYYY'),
           local_mr_no: x.medical_record_number,
-          phone_no: x.phone_number,
+          phone_no: x.patient_phone_number,
           queue_no: x.queue_number,
-          note: x.appointment_note,
+          note: x.note,
           modified_by: x.modified_by,
           is_waiting_list: x.is_waiting_list,
           is_can_create: false,
@@ -367,6 +367,7 @@ export class WidgetCreateAppointmentComponent implements OnInit {
   }
 
   async openCreateAppModal(item: any) {
+    console.log("=======")
     await this.reserveSlotApp(item);
     const canReserved = await this.getReservedSlot(item);
     const data = {

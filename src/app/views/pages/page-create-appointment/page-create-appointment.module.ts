@@ -7,6 +7,17 @@ import { SectionFooterModule } from '../../sections/section-footer/section-foote
 import { PageCreateAppointmentRoutingModule } from './page-create-appointment-routing.module';
 import { PageCreateAppointmentComponent } from './page-create-appointment.component';
 import { WidgetCreateAppointmentComponent } from '../../widgets/widget-create-appointment/widget-create-appointment.component';
+import { NgbAlertModule, NgbModalModule } from '@ng-bootstrap/ng-bootstrap';
+import { TextMaskModule } from 'angular2-text-mask';
+
+import { ModalScheduleBlockModule } from '../../widgets/modal-schedule-block/modal-schedule-block.module';
+import { ModalScheduleBlockComponent } from '../../widgets/modal-schedule-block/modal-schedule-block.component';
+
+import { ModalCreateAppointmentModule } from '../../widgets/modal-create-appointment/modal-create-appointment.module';
+import { ModalCreateAppointmentComponent } from '../../widgets/modal-create-appointment/modal-create-appointment.component';
+
+import { ModalSearchPatientModule } from '../../widgets/modal-search-patient/modal-search-patient.module';
+import { ModalSearchPatientComponent } from '../../widgets/modal-search-patient/modal-search-patient.component'
 
 @NgModule({
   declarations: [
@@ -21,6 +32,17 @@ import { WidgetCreateAppointmentComponent } from '../../widgets/widget-create-ap
     SectionSidebarModule,
     SectionFooterModule,
     PageCreateAppointmentRoutingModule,
+    NgbAlertModule,
+    NgbModalModule,
+    TextMaskModule,
+    ModalScheduleBlockModule,
+    ModalCreateAppointmentModule,
+    ModalSearchPatientModule,
+  ],
+  entryComponents: [
+    ModalScheduleBlockComponent,
+    ModalCreateAppointmentComponent,
+    ModalSearchPatientComponent
   ],
   exports: [
     PageCreateAppointmentComponent,

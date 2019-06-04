@@ -18,6 +18,10 @@ import { map } from 'rxjs/operators';
 export class WidgetDoctorScheduleComponent implements OnInit {
 
   @Output() public opScheduleSelected = new EventEmitter<any>();
+
+  public key: any = JSON.parse(localStorage.getItem('key'));
+  public hospital = this.key.hospital;
+  public user = this.key.user;
   public keywords: any = {};
   private dates: any = [];
   public doctorSchedules1: DoctorSchedule[];
@@ -72,11 +76,12 @@ export class WidgetDoctorScheduleComponent implements OnInit {
     this.doctorService.searchDoctorSource$.subscribe(
       async(params) => {
         this.keywords = params;
-        // await this.getLeaveHeader(this.keywords);
         await this.getSchedulesLogic(this.keywords);
       }
     );
     this.initForeignSource();
+
+    console.log("this.isForeign", this.isForeign, "this.isOriginal", this.isOriginal)
   }
 
   initForeignSource() {
@@ -94,7 +99,6 @@ export class WidgetDoctorScheduleComponent implements OnInit {
   }
 
   getSchedulesLogic(keywords: any) {
-    console.log('key*******', keywords)
     const doctorId = keywords.doctor ? keywords.doctor.doctor_id : null;
     const areaId = keywords.area ? keywords.area.area_id : null;
     const hospitalId = keywords.hospital ? keywords.hospital.hospital_id : null;
@@ -129,10 +133,11 @@ export class WidgetDoctorScheduleComponent implements OnInit {
       // this.dates.push({ dateHeader, dateISO, dateDay, isLeave });
       this.dates.push({ dateHeader, dateISO, dateDay });
     }
+    console.log("this.dates", this.dates)
   }
 
   getSchedulesByDoctor(doctorId: string, date: string) {
-    this.doctorService.getScheduleByDoctorId(doctorId, date)
+    this.doctorService.getScheduleByDoctorId(doctorId, date, this.hospital.id)
       .subscribe(data => {
         this.doctorSchedules1 = data.data;
 

@@ -36,6 +36,10 @@ export class AppointmentService {
     this.cancelAppSource.next(params);
   }
 
+  addAppointment(payload: any): Observable<any> {
+    return this.http.post<any>(this.ccAppointmentUrl, payload, httpOptions);
+  }
+
   getListAppointment(date: any, hospital: string, name?: string, birth?: any, mr?: any, doctor?: string, limit?: number, offset?: number): Observable<any> {
 
     let uri = `/hospital/${hospital}?date=${date}`;

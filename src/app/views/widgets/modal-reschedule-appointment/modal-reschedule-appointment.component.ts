@@ -47,6 +47,7 @@ export class ModalRescheduleAppointmentComponent implements OnInit {
     this.appointmentService.getAppointmentById(appointmentId).subscribe(
       data => {
         this.appointment = data.data[0];
+        this.rescheduleSelected.note = this.appointment.appointment_note; 
         console.log("this.appointment", this.appointment);
       }
     );
@@ -78,11 +79,11 @@ export class ModalRescheduleAppointmentComponent implements OnInit {
       appointmentNo: data.appointment_no,
       hospitalId: data.hospital_id,
       isWaitingList: data.is_waiting_list,
-      note: app.note,
+      note: this.rescheduleSelected.note,
       userId: this.userId,
       source: this.source,
     };
-    console.log(data);
+    console.log(this.rescheduleAppPayload, "this.rescheduleAppPayload");
   }
 
   openDoctorSchedule() {

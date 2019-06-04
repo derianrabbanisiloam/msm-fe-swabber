@@ -16,12 +16,17 @@ export class PatientService {
   private contactUrl = environment.CALL_CENTER_SERVICE + '/contacts';
   private patientUrl = environment.FRONT_OFFICE_SERVICE + '/patients';
 
+  private patientHopeUrl = environment.CALL_CENTER_SERVICE + '/patients/hope';
+
   private searchPatientHopeSource = new Subject<any>();
   public searchPatientHopeSource$ = this.searchPatientHopeSource.asObservable();
   private updateContactSource = new Subject<boolean>();
   public updateContactSource$ = this.updateContactSource.asObservable();
 
-
+  changeSearchPatientHope(params: any) {
+    this.searchPatientHopeSource.next(params);
+  }
+  
   emitUpdateContact(params: boolean) {
     this.updateContactSource.next(params);
   }
@@ -41,6 +46,18 @@ export class PatientService {
     const body = JSON.stringify(payload);
     
     return this.http.post<any>(url, body, httpOptions);
+  }
+
+  searchPatientHope1(hospitalId: string, patientName: string, birthDate: string): Observable<any> {
+    const url = `${this.patientHopeUrl}?hospitalId=${hospitalId}&patientName=${patientName}&birthDate=${birthDate}`;
+    return this.http.get<any>(url, httpOptions);
+    // return of(PATIENTHOPE);
+  }
+
+  searchPatientHope2(hospitalId: string, localMrNo: number): Observable<any> {
+    const url = `${this.patientHopeUrl}?hospitalId=${hospitalId}&mrLocalNo=${localMrNo}`
+    return this.http.get<any>(url, httpOptions);
+    // return of(PATIENTHOPE);
   }
   
 }

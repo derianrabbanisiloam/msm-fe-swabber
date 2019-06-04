@@ -6,6 +6,7 @@ import { DoctorHospital } from '../../app/models/doctors/doctor-hospital';
 import { Doctor } from '../../app/models/doctors/doctor';
 import { DoctorNote } from '../../app/models/doctors/doctor-note';
 import { DoctorLeave } from '../../app/models/doctors/doctor-leave';
+import { Speciality } from '../../app/models/specialities/speciality';
 import { environment } from '../../environments/environment';
 import { httpOptions } from '../../app/utils/http.util';
 
@@ -20,6 +21,7 @@ export class DoctorService {
 
   private doctorUrl = environment.OPADMIN_SERVICE + '/doctors';
   private scheduleUrl = environment.OPADMIN_SERVICE + '/schedules';
+  private specialityUrl = environment.OPADMIN_SERVICE + '/generals/specialities';
 
   private searchDoctorSource = new Subject<any>();
   public searchDoctorSource$ = this.searchDoctorSource.asObservable();
@@ -127,9 +129,9 @@ export class DoctorService {
     return this.http.get<any>(url, httpOptions);
   }
 
-  getScheduleByDoctorId(doctorId: string, date: string): Observable<any> {
+  getScheduleByDoctorId(doctorId: string, date: string, hospitalId?: string): Observable<any> {
     // return of(SCHEDULES);
-    const url = `${this.scheduleUrl}?doctorId=${doctorId}&date=${date}`;
+    const url = `${this.scheduleUrl}?doctorId=${doctorId}&date=${date}&hospitalId=${hospitalId}`;
     return this.http.get<any>(url, httpOptions);
   }
 
@@ -142,6 +144,12 @@ export class DoctorService {
       url = `${this.scheduleUrl}?hospitalId=${hospitalId}&specialityId=${specialityId}&date=${date}`;
     }
     return this.http.get<any>(url, httpOptions);
+  }
+
+  getSpecialities(specialityname?: string, total?: number): Observable<any> {
+    let url = `${this.specialityUrl}?total=all`;
+    url = specialityname ? `${url}&specialityname=${specialityname}` : url;
+    return this.http.get<Speciality[]>(url, httpOptions);
   }
 
   // paging doctor quota

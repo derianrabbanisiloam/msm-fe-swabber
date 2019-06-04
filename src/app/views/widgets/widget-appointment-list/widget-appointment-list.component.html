@@ -95,7 +95,7 @@
 
         <td style="text-transform: uppercase">
 
-          <a *ngIf="!itr.admission_id" href="javascript:void(0)" (click)="openRescheduleModal(modalReschedule, itr)">{{itr.contact_name}}
+          <a *ngIf="!itr.admission_id" href="javascript:void(0)" (click)="openRescheduleModal(itr)">{{itr.contact_name}}
           </a>
           <span *ngIf="itr.admission_id">{{itr.contact_name}}</span>
 

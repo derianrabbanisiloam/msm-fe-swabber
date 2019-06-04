@@ -16,6 +16,10 @@ import { PatientService } from '../../../services/patient.service';
 import { Alert, AlertType } from '../../../models/alerts/alert';
 import { sourceApps, queueType } from '../../../variables/common.variable';
 import { BoundElementProperty } from '@angular/compiler';
+import { 
+  ModalRescheduleAppointmentComponent 
+} from '../modal-reschedule-appointment/modal-reschedule-appointment.component';
+import { RescheduleAppointment } from '../../../models/appointments/reschedule-appointment';
 import * as pdfMake from 'pdfmake/build/pdfmake';
 import * as pdfFonts from 'pdfmake/build/vfs_fonts';
 
@@ -129,7 +133,21 @@ export class WidgetAppointmentListComponent implements OnInit {
     this.getListDoctor();
     this.getPatientType();
     this.listAppointment();
+    this.emitRescheduleApp();
     this.getCollectionAlert();
+  }
+
+  emitRescheduleApp() {
+    this.appointmentService.rescheduleAppSource$.subscribe(
+      result => {
+        if (result) {
+          this.alertService.success('Reschedule appointment berhasil', false, 5000);
+          this.listAppointment();
+        } else {
+          this.alertService.error('Gagal reschedule appointment', false, 5000);
+        }
+      }
+    );
   }
 
   nextPage() {
@@ -222,6 +240,8 @@ export class WidgetAppointmentListComponent implements OnInit {
   async listAppointment(name = '', birth= '', mr= '', doctor= '') {
     this.showWaitMsg = true;
     this.showNotFoundMsg = false;
+
+    console.log("this.dateAppointment.date", this.dateAppointment.date);
     
     const { year, month, day } = this.dateAppointment.date;
     const date = year + '-' + month + '-' + day;
@@ -257,6 +277,8 @@ export class WidgetAppointmentListComponent implements OnInit {
       }
       return res.data;
     }).catch( err => {
+      this.showWaitMsg = false;
+      this.showNotFoundMsg = true;
       this.alertService.error(err.error.message);
       return [];
     });
@@ -284,6 +306,8 @@ export class WidgetAppointmentListComponent implements OnInit {
   }
 
   onDateChange(val) {
+    console.log("val", val);
+    this.dateAppointment.date = val.date;
     this.model = { hospital_id: '', name: '', mr: '', doctor: '' };
 
     this.offset = 0;
@@ -383,6 +407,13 @@ export class WidgetAppointmentListComponent implements OnInit {
     })
     
     return patient;
+  }
+
+  openRescheduleModal(appointmentSelected: any){
+    console.log("appointmentSelected", appointmentSelected);
+    const modalRef = this.modalService.open(ModalRescheduleAppointmentComponent,  
+      {windowClass: 'cc_modal_confirmation', size: 'lg'});
+    modalRef.componentInstance.appointmentSelected = appointmentSelected;
   }
   
   async buildMrLocal(detail, close, modal){

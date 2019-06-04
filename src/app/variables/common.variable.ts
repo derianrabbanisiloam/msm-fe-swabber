@@ -37,7 +37,8 @@ export const doctorType = {
 };
 
 export const channelId = {
-  CALL_CENTER: '1'
+  CALL_CENTER: '1',
+  FRONT_OFFICE: '2',
 };
 
 export const appointmentStatusId = {

@@ -7,7 +7,7 @@ thead tr{ font-size: 10px; color: #1A2269}
 .fo_table_body_header td{ font-size: 10px ;}
 .page-item img{ width: 1rem;}
 .page-item img.fo_arrow_big{ width: 0.5rem}
-:host(arkcare-common-view-quota) { width:100% }
+:host(app-widget-view-quota) { width:50% }
 ::ng-deep .fo_view_quota_pagination .page-item.active .page-link{
   background: #4D9B35; color: white; border-color: #4D9B35;
 }

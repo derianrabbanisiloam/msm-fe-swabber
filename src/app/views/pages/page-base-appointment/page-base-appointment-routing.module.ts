@@ -1,11 +1,11 @@
 import { NgModule } from '@angular/core';
 import { Routes, RouterModule } from '@angular/router';
-import { PageCreateAppointmentComponent } from './page-create-appointment.component';
+import { PageBaseAppointmentComponent } from './page-base-appointment.component';
 
 const routes: Routes = [
   {
     path: '',
-    component: PageCreateAppointmentComponent,
+    component: PageBaseAppointmentComponent,
   }
 ];
 
@@ -13,4 +13,4 @@ const routes: Routes = [
   imports: [RouterModule.forChild(routes)],
   exports: [RouterModule]
 })
-export class PageCreateAppointmentRoutingModule { }
+export class PageBaseAppointmentRoutingModule { }

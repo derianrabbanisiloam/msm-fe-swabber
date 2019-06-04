@@ -8,6 +8,21 @@ const routes: Routes = [
     loadChildren: './views/pages/page-login/page-login.module#PageLoginModule',
   },
   {
+    path: 'create-appointment',
+    canActivate: [AuthGuard],
+    loadChildren: './views/pages/page-create-appointment/page-create-appointment.module#PageCreateAppointmentModule',
+  },
+  {
+    path: 'create-appointment-271095',
+    canActivate: [AuthGuard],
+    loadChildren: './views/widgets/widget-create-appointment/widget-create-appointment.module#WidgetCreateAppointmentModule',
+  },
+  {
+    path: 'base-appointment',
+    canActivate: [AuthGuard],
+    loadChildren: './views/pages/page-base-appointment/page-base-appointment.module#PageBaseAppointmentModule',
+  },
+  {
     path: 'appointment-list',
     canActivate: [AuthGuard],
     loadChildren: './views/pages/page-appointment-list/page-appointment-list.module#PageAppointmentListModule',

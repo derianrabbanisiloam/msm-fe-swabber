@@ -129,6 +129,7 @@ export class WidgetRescheduleWorklistComponent implements OnInit {
   }
 
   openRescheduleModal(appointmentSelected: any) {
+    console.log("appointmentSelected", appointmentSelected);
     const modalRef = this.modalService.open(ModalRescheduleAppointmentComponent,  
       {windowClass: 'cc_modal_confirmation', size: 'lg'});
     modalRef.componentInstance.appointmentSelected = appointmentSelected;

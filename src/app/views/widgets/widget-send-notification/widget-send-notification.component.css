@@ -12,7 +12,7 @@ section#group-doctor-quota {
   overflow-y: scroll;*/
   /*background: yellow*/
 }
-:host(arkcare-content-send-notification) { width:100% }
+:host(app-widget-send-notification) { width:100% }
 ::ng-deep ngb-progressbar .progress .progress-bar{ background-color: #4D9B35 !important; color: white!important;}
 .fo_send_notification_input{ width: 100%}
 .fo_send_notification_input select {

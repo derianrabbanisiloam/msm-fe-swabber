@@ -1,0 +1,91 @@
+<div class="modal-header">
+  <div class="header-2 modal-padding"><strong>Edit Appointment List</strong></div>
+  <button #close_btn_reschedule type="button" class="close" aria-label="Close" (click)="close()">
+    <span aria-hidden="true">&times;</span>
+  </button>
+</div>
+<div class="modal-body search-patient-modal">
+  <div class="">
+    <div class="col-md-12" style="padding: 0">
+      <table class="table table-bordered">
+        <thead class="body-text bold">
+        <th style="min-width: 10vw">Patient Name</th>
+        <th style="width: 1%; min-width: 4vw; text-align: center">MR No.</th>
+        <th style="white-space: nowrap; min-width:3vw; width: 1%">Date of Birth</th>
+        <th>Mobile No.</th>
+        <th style="white-space: nowrap">Appo. Date</th>
+        <th>Time Slot</th>
+        <th style="min-width: 10vw">Doctor</th>
+        <th style="width: 1%;">Waiting List</th>
+        <th>Queue No.</th>
+        <th>Created By</th>
+        <th style="text-align: center;width: 1%">Note</th>
+        </thead>
+        <tbody>
+        <tr>
+          <td>{{ appointment.contact_name }}</td>
+          <td>{{ appointment.medical_record_number }}</td>
+          <td>{{ appointment.birth_date }}</td>
+          <td>
+            <input type="text" style="width: 8vw" [(ngModel)]="editModel.phoneNo" [value]="appointment.phone_number">
+          </td>
+          <td>{{ appointment.appointment_date }}</td>
+          <td style="white-space: nowrap">{{ appointment.from_time }} - {{ appointment.to_time }}</td>
+          <td>
+            {{ appointment.doctor_name }}
+          </td>
+          <td>{{ appointment.is_waiting_list }}</td>
+          <td>{{ appointment.queue_number }}</td>
+          <td>{{ appointment.created_by }}</td>
+          <td>
+            <textarea [(ngModel)]="rescheduleSelected.note">{{ appointment.appointment_note }}</textarea>
+          </td>
+        </tr>
+        </tbody>
+
+
+      </table>
+    </div>
+    <button class="ms_btn_border"
+            [ngClass]="isOpenDoctorSchedule == false ? 'ms_btn_blue' : 'ms_btn_darkgrey'"
+            style="padding: 0.3vw 0vw; width: 7vw"
+            (click)="openDoctorSchedule()">
+      Reschedule
+    </button>
+    <div class="col-md-12" style="padding: 0;max-height: 350px;overflow-y: scroll">
+      <app-widget-doctor-schedule 
+        (opScheduleSelected)="getScheduleData($event)">
+      </app-widget-doctor-schedule>
+      <app-widget-create-appointment 
+        *ngIf="opScheduleSelected"
+        (opSlotSelected)="getSlotData($event)"
+        [appointmentPayloadInput]="createAppInputData">
+      </app-widget-create-appointment>
+    </div>
+  </div>
+</div>
+<div class="modal-footer">
+  <div class="col-md-3">
+    <p>
+      <strong>Created By : </strong>
+      {{ appointment.created_by }}
+    </p>
+    <p>
+      <strong>Created Date : </strong>
+      {{ appointment.created_date }}
+    </p>
+  </div>
+  <div class="col-md-5">
+    <p>
+      <strong>Last Modified By : </strong>
+      {{ appointment.modified_by }}
+    </p>
+    <p>
+      <strong>Last Modified Date : </strong>
+      {{ appointment.modified_date }}
+    </p>
+  </div>
+  <div class="col-md-4" style="text-align: right">
+    <button class="ms_btn_border ms_btn_black" style="padding: 0.3vw 0vw; width: 7vw" #close_btn_reschedule aria-label="Close" (click)="close()">Cancel</button>
+    <button class="ms_btn_border ms_btn_green" style="padding: 0.3vw 0vw; width: 7vw" (click)="updateAppointment()" (click)="close()">Save & Close</button>
+  </div>

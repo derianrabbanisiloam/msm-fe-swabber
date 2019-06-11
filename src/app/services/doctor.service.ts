@@ -1,11 +1,12 @@
 import { Injectable } from '@angular/core';
-import { Observable, of, from } from 'rxjs';
+import { Observable, of, Subject } from 'rxjs';
 import { HttpClient } from '@angular/common/http';
 import { catchError, tap } from 'rxjs/operators';
 import { DoctorHospital } from '../../app/models/doctors/doctor-hospital';
 import { Doctor } from '../../app/models/doctors/doctor';
 import { DoctorNote } from '../../app/models/doctors/doctor-note';
 import { DoctorLeave } from '../../app/models/doctors/doctor-leave';
+import { Speciality } from '../../app/models/specialities/speciality';
 import { environment } from '../../environments/environment';
 import { httpOptions } from '../../app/utils/http.util';
 
@@ -19,6 +20,17 @@ export class DoctorService {
   ) { }
 
   private doctorUrl = environment.OPADMIN_SERVICE + '/doctors';
+  private scheduleUrl = environment.OPADMIN_SERVICE + '/schedules';
+  private specialityUrl = environment.OPADMIN_SERVICE + '/generals/specialities';
+
+  private searchDoctorSource = new Subject<any>();
+  public searchDoctorSource$ = this.searchDoctorSource.asObservable();
+  public searchDoctorSource2: any;
+
+  changeSearchDoctor(params: any) {
+    console.log("params changeSearchDoctor", params)
+    this.searchDoctorSource.next(params);
+  }
 
   getDoctorQuota(hospitalId: any): Observable<any> {
     const uri = '/hospital/' + hospitalId;
@@ -111,6 +123,34 @@ export class DoctorService {
       body,
     };
     return this.http.delete<any>(url, options);
+  }
+
+  getDoctorProfile(hospitalId: string, doctorId: string, date?: string): Observable<any> {
+    const url = `${this.doctorUrl}/hospital/${hospitalId}?doctorId=${doctorId}&hospitalId=${hospitalId}&date=${date}`;
+    return this.http.get<any>(url, httpOptions);
+  }
+
+  getScheduleByDoctorId(doctorId: string, date: string, hospitalId?: string): Observable<any> {
+    // return of(SCHEDULES);
+    const url = `${this.scheduleUrl}?doctorId=${doctorId}&date=${date}&hospitalId=${hospitalId}`;
+    return this.http.get<any>(url, httpOptions);
+  }
+
+  getScheduleByKeywords(specialityId: string, date: string, areaId?: string, hospitalId?: string): Observable<any> {
+    // return of(SCHEDULES2);
+    let url = this.scheduleUrl;
+    if (areaId) {
+      url = `${this.scheduleUrl}?areaId=${areaId}&specialityId=${specialityId}&date=${date}`;
+    } else {
+      url = `${this.scheduleUrl}?hospitalId=${hospitalId}&specialityId=${specialityId}&date=${date}`;
+    }
+    return this.http.get<any>(url, httpOptions);
+  }
+
+  getSpecialities(specialityname?: string, total?: number): Observable<any> {
+    let url = `${this.specialityUrl}?total=all`;
+    url = specialityname ? `${url}&specialityname=${specialityname}` : url;
+    return this.http.get<Speciality[]>(url, httpOptions);
   }
 
   // paging doctor quota

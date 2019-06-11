@@ -15,7 +15,12 @@ export class GeneralService {
     private http: HttpClient
   ) { }
 
-  private generalUrl = environment.FRONT_OFFICE_SERVICE + '/generals/notification';
+  private generalUrl = environment.FRONT_OFFICE_SERVICE + '/generals/';
+
+  getAdmissionType(): Observable<any> {
+    const uri = 'admission-type';
+    return this.http.get<General[]>(this.generalUrl + uri, httpOptions);
+  }
 
   getBloodType(): Observable<any> {
     const uri = 'bloodtype';
@@ -34,12 +39,17 @@ export class GeneralService {
 
   getNotificationType(): Observable<any> {
     const uri = 'notification';
-    return this.http.get<General[]>(this.generalUrl);
+    return this.http.get<General[]>(this.generalUrl + uri);
   }
 
   getNationalityIdType(): Observable<any> {
     const uri = 'nationalidtype';
     return this.http.get<General[]>(this.generalUrl + uri, httpOptions);
+  }
+
+  getPayer(hospitalId: string): Observable<any> {
+    const uri = 'payers/hospital/'+hospitalId;
+    return this.http.get<any[]>(this.generalUrl + uri, httpOptions);
   }
 
   getPatientType(): Observable<any> {
@@ -54,6 +64,11 @@ export class GeneralService {
 
   getTitle(): Observable<any> {
     const uri = 'titles';
+    return this.http.get<General[]>(this.generalUrl + uri, httpOptions);
+  }
+
+  getReferralType(): Observable<any> {
+    const uri = 'referral-type';
     return this.http.get<General[]>(this.generalUrl + uri, httpOptions);
   }
 

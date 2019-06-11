@@ -1,3 +1,123 @@
-<p>
-  modal-schedule-block works!
-</p>
+<div class="modal-header" style="padding-bottom: 0px">
+  <h4 class="modal-title" style="padding: 4px"><strong>Block Schedule</strong></h4>
+  <button type="button" class="close" aria-label="Close" (click)="close()">
+    <span aria-hidden="true">&times;</span>
+  </button>
+</div>
+<div class="modal-body" style="max-height: 550px;overflow-y: scroll;">
+  <div class="col-md-12">
+
+    <form name="form" (ngSubmit)="b.form.valid" #b="ngForm" novalidate>
+
+      <div class="row">
+      <div class="form-group col-md-2" style="padding: 0">
+        <label>From Time</label>
+        <br>
+        <select class="form-control select-time" name="fh" [(ngModel)]="blockModel.fh" (change)="checkBlockTime()" required>
+          <option *ngFor="let h of hourOptions" value="{{h}}">{{h}}</option>
+        </select>
+        <span> : </span>
+        <select class="form-control select-time" name="fm" [(ngModel)]="blockModel.fm" (change)="checkBlockTime()" required>
+          <option *ngFor="let m of minuteOptions" value="{{m}}">{{m}}</option>
+        </select>
+      </div>
+      <div class="form-group col-md-2" style="padding: 0">
+        <label>To Time</label>
+        <br>
+        <select class="form-control select-time" name="th" [(ngModel)]="blockModel.th" (change)="checkBlockTime()" required>
+          <option *ngFor="let h of hourOptions" value="{{h}}">{{h}}</option>
+        </select>
+        <span> : </span>
+        <select class="form-control select-time" name="tm" [(ngModel)]="blockModel.tm" (change)="checkBlockTime()" required>
+          <option *ngFor="let m of minuteOptions" value="{{m}}">{{m}}</option>
+        </select>
+      </div>
+      <div class="form-group col-md-4">
+        <label>Reason</label>
+        <input class="form-control" type="text" maxlength="100" name="reason" [(ngModel)]="blockModel.reason" required>
+      </div>
+      <div class="form-group col-md-2">
+        <label>Is Include Waiting List</label>
+        <input class="form-control" type="checkbox" name="isIncludeWaitingList" (change)="blockCheckBox($event)" [(ngModel)]="blockModel.isIncludeWaitingList">
+      </div>
+      <div class="form-group col-md-2">
+        <button [disabled]="!isValidBlock || !b.form.valid" (click)="addScheduleBlock()" class="btn btn-green">Add Block</button>
+      </div>
+      <div class="col-md-12 alert alert-danger-2">
+        <strong>* NOTE: Slot yang ter-block akan membuat pasien yang sudah terjadwal masuk ke reschedule worklist, dan tidak bisa dikembalikan lagi !</strong>
+      </div>
+      <div class="col-md-12 block-error-msg">
+        {{ addBlockErrMsg }}
+      </div>
+    </div>
+
+    </form>
+  </div>
+
+  <h5><strong>Block List</strong></h5>
+
+  <div class="col-md-12" *ngFor="let bl of scheduleBlocks; let i=index;">
+      <div class="row">
+        <div class="form-group col-md-2" style="padding: 0">
+          <label>From Time</label>
+          <br>
+          <select class="form-control select-time" (change)="openModalBlockConfirmation(content6, bl)" name="block_model_fh" [(ngModel)]="bl.fh" required>
+            <option *ngFor="let h of hourOptions" value="{{h}}">{{h}}</option>
+          </select>
+          <span>:</span>
+          <select class="form-control select-time" (change)="openModalBlockConfirmation(content6, bl)" name="block_model_fm" [(ngModel)]="bl.fm" required>
+            <option *ngFor="let m of minuteOptions" value="{{m}}">{{m}}</option>
+          </select>
+        </div>
+        <div class="form-group col-md-2" style="padding: 0">
+          <label>To Time</label>
+          <br>
+          <select class="form-control select-time" (change)="openModalBlockConfirmation(content6, bl)" name="block_model_th" [(ngModel)]="bl.th" required>
+            <option *ngFor="let h of hourOptions" value="{{h}}">{{h}}</option>
+          </select>
+          <span>:</span>
+          <select class="form-control select-time" (change)="openModalBlockConfirmation(content6, bl)" name="block_model_tm" [(ngModel)]="bl.tm" required>
+            <option *ngFor="let m of minuteOptions" value="{{m}}">{{m}}</option>
+          </select>
+        </div>
+        <div class="form-group col-md-4">
+          <label>Reason</label>
+          <input class="form-control" type="text" maxlength="100" name="block_model_reason" [(ngModel)]="bl.reason" disabled>
+        </div>
+        <div class="form-group col-md-2">
+          <label>Is Include Waiting List</label>
+          <input class="form-control" type="checkbox" name="block_model_is_waiting_list" (change)="blockCheckBoxEdit(i)" (change)="openModalBlockConfirmation(content6, bl)" [(ngModel)]="bl.isIncludeWaitingList">
+        </div>
+        <div class="form-group col-md-2">
+          <button (click)="openModalBlockConfirmation(content7, bl)" class="btn btn-danger">Delete</button>
+        </div>
+      </div>
+  </div>
+  <div class="col-md-12 block-error-msg">{{ editBlockErrMsg }}</div>
+</div>
+
+<ng-template #content6 let-c="close" let-d="dismiss">
+  <div class="modal-header" style="padding-bottom: 0px">
+    <h4 class="modal-title" style="padding: 4px">Confirmation !</h4>
+  </div>
+  <div class="modal-body">
+    <p style="padding: 1vw 4vw">Are you sure to modify this block?</p>
+    <div style="text-align: center">
+      <button class="ms_btn_border ms_btn_black" style="padding: 0.3vw 0vw; width: 5vw" aria-label="Close" (click)="d('Cross click')">Cancel</button>
+      <button class="ms_btn_border ms_btn_red" style="padding: 0.3vw 0vw; width: 5vw" (click)="updateScheduleBlock()" (click)="d('Cross click')">Yes</button>
+    </div>
+  </div>
+</ng-template>
+
+<ng-template #content7 let-c="close" let-d="dismiss">
+<div class="modal-header" style="padding-bottom: 0px">
+  <h4 class="modal-title" style="padding: 4px">Confirmation !</h4>
+</div>
+<div class="modal-body">
+  <p style="padding: 1vw 4vw">Are you sure to permanent delete this block?</p>
+  <div style="text-align: center">
+    <button class="ms_btn_border ms_btn_black" style="padding: 0.3vw 0vw; width: 5vw" aria-label="Close">Cancel</button>
+    <button class="ms_btn_border ms_btn_red" style="padding: 0.3vw 0vw; width: 5vw" (click)="deleteScheduleBlock()" (click)="d('Cross click')">Yes</button>
+  </div>
+</div>
+</ng-template>

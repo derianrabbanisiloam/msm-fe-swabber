@@ -1,5 +1,7 @@
 export class AppointmentMini {
     appointment_id: string;
+    appointment_temporary_id: string;
+    admission_id: string;
     appointment_no: number;
     appointment_from_time: string;
     appointment_to_time: string;

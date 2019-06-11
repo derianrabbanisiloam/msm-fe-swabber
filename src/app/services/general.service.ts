@@ -39,7 +39,7 @@ export class GeneralService {
 
   getNotificationType(): Observable<any> {
     const uri = 'notification';
-    return this.http.get<General[]>(this.generalUrl);
+    return this.http.get<General[]>(this.generalUrl + uri);
   }
 
   getNationalityIdType(): Observable<any> {

@@ -27,6 +27,8 @@ export class AppointmentService {
   public createAppSource$ = this.createAppSource.asObservable();
   private cancelAppSource = new Subject<boolean>();
   public cancelAppSource$ = this.cancelAppSource.asObservable();
+  private verifyAppSource = new Subject<boolean>();
+  public verifyAppSource$ = this.verifyAppSource.asObservable();
 
   emitCreateApp(params: boolean) {
     this.createAppSource.next(params);
@@ -34,6 +36,10 @@ export class AppointmentService {
 
   emitCancelApp(params: boolean) {
     this.cancelAppSource.next(params);
+  }
+
+  emitVerifyApp(params: boolean) {
+    this.verifyAppSource.next(params);
   }
 
   addAppointment(payload: any): Observable<any> {
@@ -128,8 +134,15 @@ export class AppointmentService {
     return this.http.post<any>(this.rescheduleUrl, addReschedulePayload, httpOptions);
   }
 
-  deleteAppointment(appointmentId: string, payload: any) {
-    const url = `${this.ccAppointmentUrl}/${appointmentId}`;
+  deleteAppointment(appointmentId: string, payload: any, temp = false) {
+    let url = `${this.ccAppointmentUrl}`;
+
+    if(temp){
+      url = `${url}/temporary/${appointmentId}`;
+    }else{
+      url = `${url}/${appointmentId}`
+    }
+
     const body = JSON.stringify(payload);
     
     const options = {
@@ -158,6 +171,17 @@ export class AppointmentService {
     userId: string): Observable<any> {
     const url = `${this.reserveSlotAppUrl}?scheduleId=${scheduleId}&appointmentDate=${appointmentDate}`
       + `&appointmentNo=${appointmentNo}&userId=${userId}`;
+    return this.http.get<any>(url, httpOptions);
+  }
+
+  verifyAppointment(verifyAppointmentPayload: any): Observable<any> {
+    return this.http.post<any>(this.ccAppointmentUrl, verifyAppointmentPayload, httpOptions);
+  }
+
+  getTempAppointment(tempId: any){
+    const url = `${this.ccAppointmentUrl}/temporary/${tempId}`;
+    // return of(APPOINTMENT);
+    console.log(url);
     return this.http.get<any>(url, httpOptions);
   }
 

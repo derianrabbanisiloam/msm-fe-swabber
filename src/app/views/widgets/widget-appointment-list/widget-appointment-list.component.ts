@@ -660,6 +660,10 @@ export class WidgetAppointmentListComponent implements OnInit {
     console.log("this.roomDetail", this.roomDetail)
   }
 
+  closeClicked(){
+    this.listAppointment();
+  }
+
   printQueueTicket(val) {
 
     setTimeout (() => {

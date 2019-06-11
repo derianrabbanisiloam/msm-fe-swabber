@@ -8,6 +8,11 @@ const routes: Routes = [
     loadChildren: './views/pages/page-login/page-login.module#PageLoginModule',
   },
   {
+    path: 'patient-data',
+    canActivate: [AuthGuard],
+    loadChildren: './views/pages/page-patient-data/page-patient-data.module#PagePatientDataModule',
+  },
+  {
     path: 'create-appointment',
     canActivate: [AuthGuard],
     loadChildren: './views/pages/page-create-appointment/page-create-appointment.module#PageCreateAppointmentModule',

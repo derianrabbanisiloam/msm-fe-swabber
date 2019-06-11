@@ -6,6 +6,7 @@ export class addScheduleBlockPayload {
       reason: string;
       isIncludeWaitingList: boolean;
       userId: string;
+      userName: string;
       source: string;
   }
   
@@ -17,10 +18,12 @@ export class addScheduleBlockPayload {
       reason: string;
       isIncludeWaitingList: boolean;
       userId: string;
+      userName: string;
       source: string;
   }
   
   export class deleteScheduleBlockPayload {
       userId: string;
+      userName: string;
       source: string;
   }

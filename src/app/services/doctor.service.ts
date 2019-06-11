@@ -28,6 +28,7 @@ export class DoctorService {
   public searchDoctorSource2: any;
 
   changeSearchDoctor(params: any) {
+    console.log("params changeSearchDoctor", params)
     this.searchDoctorSource.next(params);
   }
 

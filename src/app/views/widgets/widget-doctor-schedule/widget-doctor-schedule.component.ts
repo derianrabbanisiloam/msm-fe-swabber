@@ -7,8 +7,6 @@ import { ScheduleService } from '../../../services/schedule.service';
 import * as moment from 'moment';
 import { IMyDpOptions } from 'mydatepicker';
 import { isEmpty } from 'lodash';
-import { map } from 'rxjs/operators';
-
 
 @Component({
   selector: 'app-widget-doctor-schedule',
@@ -67,6 +65,7 @@ export class WidgetDoctorScheduleComponent implements OnInit {
     if (this.doctorService.searchDoctorSource2) {
       this.keywords = this.doctorService.searchDoctorSource2;
       this.doctorService.searchDoctorSource2 = null;
+
       this.getSchedulesLogic(this.keywords);
     } 
   }
@@ -76,6 +75,8 @@ export class WidgetDoctorScheduleComponent implements OnInit {
     this.doctorService.searchDoctorSource$.subscribe(
       async(params) => {
         this.keywords = params;
+
+        console.log("this.keywords", this.keywords)
         await this.getSchedulesLogic(this.keywords);
       }
     );
@@ -85,15 +86,18 @@ export class WidgetDoctorScheduleComponent implements OnInit {
   }
 
   initForeignSource() {
-    const params = this.activatedRoute.snapshot.queryParamMap;
-    if (!isEmpty(params)) {
+    const id = this.activatedRoute.snapshot.queryParamMap.get('doctor_id');
+    const name = this.activatedRoute.snapshot.queryParamMap.get('doctor_name');
+
+    if (id && name) {
       this.keywords = {
         doctor: {
-          doctor_id: params.get('doctor_id'),
-          name: params.get('doctor_name'),
+          doctor_id: id,
+          name: name,
         },
       };
       this.isForeign = true;
+
       this.getSchedulesLogic(this.keywords);
     }   
   }

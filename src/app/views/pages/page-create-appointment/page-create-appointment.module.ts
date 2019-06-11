@@ -6,9 +6,10 @@ import { SectionSidebarModule } from '../../sections/section-sidebar/section-sid
 import { SectionFooterModule } from '../../sections/section-footer/section-footer.module';
 import { PageCreateAppointmentRoutingModule } from './page-create-appointment-routing.module';
 import { PageCreateAppointmentComponent } from './page-create-appointment.component';
-import { WidgetCreateAppointmentComponent } from '../../widgets/widget-create-appointment/widget-create-appointment.component';
-import { NgbAlertModule, NgbModalModule } from '@ng-bootstrap/ng-bootstrap';
+import { WidgetCreateAppointmentModule } from '../../widgets/widget-create-appointment/widget-create-appointment.module';
+import { NgbAlertModule, NgbModalModule, NgbPopoverModule } from '@ng-bootstrap/ng-bootstrap';
 import { TextMaskModule } from 'angular2-text-mask';
+import { NguiAutoCompleteModule } from '@ngui/auto-complete';
 
 import { ModalScheduleBlockModule } from '../../widgets/modal-schedule-block/modal-schedule-block.module';
 import { ModalScheduleBlockComponent } from '../../widgets/modal-schedule-block/modal-schedule-block.component';
@@ -16,13 +17,18 @@ import { ModalScheduleBlockComponent } from '../../widgets/modal-schedule-block/
 import { ModalCreateAppointmentModule } from '../../widgets/modal-create-appointment/modal-create-appointment.module';
 import { ModalCreateAppointmentComponent } from '../../widgets/modal-create-appointment/modal-create-appointment.component';
 
+import { ModalCancelAppointmentModule } from '../../widgets/modal-cancel-appointment/modal-cancel-appointment.module';
+import { ModalCancelAppointmentComponent } from '../../widgets/modal-cancel-appointment/modal-cancel-appointment.component';
+
 import { ModalSearchPatientModule } from '../../widgets/modal-search-patient/modal-search-patient.module';
-import { ModalSearchPatientComponent } from '../../widgets/modal-search-patient/modal-search-patient.component'
+import { ModalSearchPatientComponent } from '../../widgets/modal-search-patient/modal-search-patient.component';
+
+import { ModalPatientVerificationModule } from '../../widgets/modal-patient-verification/modal-patient-verification.module';
+import { ModalPatientVerificationComponent } from '../../widgets/modal-patient-verification/modal-patient-verification.component';
 
 @NgModule({
   declarations: [
     PageCreateAppointmentComponent,
-    WidgetCreateAppointmentComponent,
   ],
   imports: [
     FormsModule,
@@ -37,12 +43,20 @@ import { ModalSearchPatientComponent } from '../../widgets/modal-search-patient/
     TextMaskModule,
     ModalScheduleBlockModule,
     ModalCreateAppointmentModule,
+    ModalCancelAppointmentModule,
     ModalSearchPatientModule,
+    ModalPatientVerificationModule,
+    WidgetCreateAppointmentModule,
+    NgbPopoverModule,
+    NguiAutoCompleteModule,
+    
   ],
   entryComponents: [
     ModalScheduleBlockComponent,
     ModalCreateAppointmentComponent,
-    ModalSearchPatientComponent
+    ModalSearchPatientComponent,
+    ModalCancelAppointmentComponent,
+    ModalPatientVerificationComponent
   ],
   exports: [
     PageCreateAppointmentComponent,

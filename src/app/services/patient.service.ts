@@ -17,6 +17,7 @@ export class PatientService {
   private patientUrl = environment.FRONT_OFFICE_SERVICE + '/patients';
 
   private patientHopeUrl = environment.CALL_CENTER_SERVICE + '/patients/hope';
+  private verifyPatientUrl = environment.CALL_CENTER_SERVICE + '/patients/verify';
 
   private searchPatientHopeSource = new Subject<any>();
   public searchPatientHopeSource$ = this.searchPatientHopeSource.asObservable();
@@ -58,6 +59,16 @@ export class PatientService {
     const url = `${this.patientHopeUrl}?hospitalId=${hospitalId}&mrLocalNo=${localMrNo}`
     return this.http.get<any>(url, httpOptions);
     // return of(PATIENTHOPE);
+  }
+
+  addContact(addContactPayload: any): Observable<any> {
+    const url = `${this.contactUrl}`;
+    return this.http.put<any>(url, addContactPayload, httpOptions);
+  }
+
+  verifyPatient(verifyPatientPayload: any): Observable<any> {
+    console.log(this.verifyPatientUrl);
+    return this.http.post<any>(this.verifyPatientUrl, verifyPatientPayload, httpOptions);
   }
   
 }

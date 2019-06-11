@@ -34,6 +34,26 @@ export class ScheduleService {
     return this.http.get<any>(url, httpOptions);
   }
 
+  addScheduleBlock(scheduleBlockId: string, addSchBlockPayload: any): Observable<any> {
+    const url = `${this.scheduleBlockUrl}/${scheduleBlockId}`
+    return this.http.post<any>(url, addSchBlockPayload, httpOptions);
+  }
+
+  updateScheduleBlock(scheduleBlockId: string, updateSchBlockPayload: any): Observable<any> {
+    const url = `${this.scheduleBlockUrl}/${scheduleBlockId}`
+    return this.http.put<any>(url, updateSchBlockPayload, httpOptions);
+  }
+
+  deleteScheduleBlock(scheduleBlockId: string, deleteSchBlockPayload: any) {
+    const url = `${this.scheduleBlockUrl}/${scheduleBlockId}`;
+    const body = JSON.stringify(deleteSchBlockPayload);
+    const options = {
+      ...httpOptions,
+      body,
+    };
+    return this.http.delete<any>(url, options);
+  }
+
   getLeaveHeader(
     year: string, 
     hospitalId: string, 

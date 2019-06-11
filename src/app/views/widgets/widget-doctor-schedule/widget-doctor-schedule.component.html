@@ -62,13 +62,13 @@
                                   date.dateISO >= todayDateISO && !date.isLeave">
                           <span *ngIf="!itemSch.is_full" class="success-light"></span>
                           <span *ngIf="itemSch.is_full" class="danger-light"></span>
-                          <a *ngIf="isOriginal && isForeign" (click)="gotoCreateApp(itemSch, date.dateISO)">
+                          <a *ngIf="isOriginal && !isForeign" (click)="gotoCreateApp(itemSch, date.dateISO)">
                             {{itemSch.from_time.substr(0,5)}} - {{itemSch.to_time.substr(0,5)}}
                           </a>
                           <a *ngIf="!isOriginal" (click)="gotoCreateApp2(itemSch, date.dateISO)">
                             {{itemSch.from_time.substr(0,5)}} - {{itemSch.to_time.substr(0,5)}}
                           </a>
-                          <a *ngIf="isOriginal && !isForeign" (click)="gotoCreateApp3(itemSch, date.dateISO)">
+                          <a *ngIf="isOriginal && isForeign" (click)="gotoCreateApp3(itemSch, date.dateISO)">
                             {{itemSch.from_time.substr(0,5)}} - {{itemSch.to_time.substr(0,5)}}
                           </a>
                           <br>
@@ -113,7 +113,7 @@
                 (click)="gotoPrevWeek()"
                 [disabled]="btnActive.prevWeek == false"
                 [ngClass]="btnActive.prevWeek == false ? 'btn-left-right-disabled' : ''">
-          <img src="../../../../assets/icons/ic_ArrowLeft_White.png">
+          <img src="../../../../assets/icons/ic_ArrowRight_White.png">
         </button>
         <button class="btn-nav btn-green btn-green header-3"
                 (click)="gotoThisWeek()"
@@ -125,7 +125,7 @@
                 (click)="gotoNextWeek()"
                 [disabled]="btnActive.nextWeek == false"
                 [ngClass]="btnActive.nextWeek == false ? 'btn-left-right-disabled' : ''">
-          <img src="../../../../assets/icons/ic_ArrowRight_White.png">
+          <img src="../../../../assets/icons/ic_ArrowLeft_White.png">
         </button>
       </div>
     </div>

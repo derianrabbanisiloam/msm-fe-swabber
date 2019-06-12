@@ -63,7 +63,7 @@ export class PatientService {
 
   addContact(addContactPayload: any): Observable<any> {
     const url = `${this.contactUrl}`;
-    return this.http.put<any>(url, addContactPayload, httpOptions);
+    return this.http.post<any>(url, addContactPayload, httpOptions);
   }
 
   verifyPatient(verifyPatientPayload: any): Observable<any> {

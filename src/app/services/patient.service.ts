@@ -63,12 +63,29 @@ export class PatientService {
 
   addContact(addContactPayload: any): Observable<any> {
     const url = `${this.contactUrl}`;
-    return this.http.put<any>(url, addContactPayload, httpOptions);
+    return this.http.post<any>(url, addContactPayload, httpOptions);
   }
 
   verifyPatient(verifyPatientPayload: any): Observable<any> {
     console.log(this.verifyPatientUrl);
     return this.http.post<any>(this.verifyPatientUrl, verifyPatientPayload, httpOptions);
+  }
+
+  searchPatient(orgId: any, name: string, birth: string): Observable<any> {
+    const url = `${this.patientUrl}/hope/name/${name}/birthdate/${birth}/organization/${orgId}`;
+    return this.http.get<any>(url, httpOptions);
+  }
+
+  getContact(contactId: string): Observable<any> {
+    const url = `${this.contactUrl}/${contactId}`;
+    return this.http.get<any>(url, httpOptions);
+  }
+
+  createPatientComplete(payload: any){
+    const url = `${this.patientUrl}`;
+    const body = JSON.stringify(payload);
+    
+    return this.http.post<any>(url, body, httpOptions);
   }
   
 }

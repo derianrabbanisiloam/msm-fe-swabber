@@ -15,6 +15,7 @@ import { ScheduleService } from '../../../services/schedule.service';
 import { PatientService } from '../../../services/patient.service';
 import { Alert, AlertType } from '../../../models/alerts/alert';
 import { sourceApps, queueType } from '../../../variables/common.variable';
+import { Router, ActivatedRoute } from '@angular/router';
 import { BoundElementProperty } from '@angular/compiler';
 import { 
   ModalRescheduleAppointmentComponent 
@@ -124,6 +125,8 @@ export class WidgetAppointmentListComponent implements OnInit {
     private queueService: QueueService,
     private scheduleService: ScheduleService,
     private patientService: PatientService,
+    private route: ActivatedRoute,
+    private router: Router,
   ) { }
 
   ngOnInit() {
@@ -387,7 +390,8 @@ export class WidgetAppointmentListComponent implements OnInit {
           if(detail.patient_hope_id){
             this.open(mrLocalModal);
           }else{
-            //this.router.navigate(['./patient-registration'], { queryParams: detail })
+            const params = { appointmentId: detail.appointment_id, };
+            this.router.navigate(['./patient-data'], { queryParams: params });
           }
         }else{
           await this.defaultPatientType(detail.patient_hope_id);

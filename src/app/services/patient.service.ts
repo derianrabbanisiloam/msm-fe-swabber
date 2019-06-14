@@ -87,5 +87,12 @@ export class PatientService {
     
     return this.http.post<any>(url, body, httpOptions);
   }
+
+  updatePatientComplete(payload: any, patientHopeId: any){
+    const url = `${this.patientUrl}/${patientHopeId}`;
+    const body = JSON.stringify(payload);
+    
+    return this.http.put<any>(url, body, httpOptions);
+  }
   
 }

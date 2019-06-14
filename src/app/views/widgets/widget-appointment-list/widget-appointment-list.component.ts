@@ -549,7 +549,7 @@ export class WidgetAppointmentListComponent implements OnInit {
       payerEligibility: payerEligibility,
       userId: this.user.id,
       source: sourceApps,
-      //userName: this.user.fullname,
+      userName: this.user.fullname,
     };
 
     this.admissionService.createAdmission(body).toPromise()

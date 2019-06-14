@@ -697,7 +697,11 @@ export class WidgetCreateAppointmentComponent implements OnInit {
         if(detail.patient_hope_id){
           this.open(mrLocalModal);
         }else{
-          //this.router.navigate(['./patient-registration'], { queryParams: detail })
+          const params = {
+            appointmentId: detail.appointment_id,
+          };
+          
+          this.router.navigate(['./patient-data'], { queryParams: params });
         }
       }else{
         await this.defaultPatientType(detail.patient_hope_id);

@@ -1,14 +1,14 @@
 import { Injectable } from '@angular/core';
-import { Observable, of, Subject } from 'rxjs';
+import { Observable, of, Subject, from } from 'rxjs';
 import { HttpClient } from '@angular/common/http';
 import { catchError, tap } from 'rxjs/operators';
-import { DoctorHospital } from '../../app/models/doctors/doctor-hospital';
-import { Doctor } from '../../app/models/doctors/doctor';
-import { DoctorNote } from '../../app/models/doctors/doctor-note';
-import { DoctorLeave } from '../../app/models/doctors/doctor-leave';
-import { Speciality } from '../../app/models/specialities/speciality';
+import { DoctorHospital } from '../models/doctors/doctor-hospital';
+import { Doctor } from '../models/doctors/doctor';
+import { DoctorNote } from '../models/doctors/doctor-note';
+import { DoctorLeave } from '../models/doctors/doctor-leave';
+import { Speciality } from '../models/specialities/speciality';
 import { environment } from '../../environments/environment';
-import { httpOptions } from '../../app/utils/http.util';
+import { httpOptions } from '../utils/http.util';
 
 @Injectable({
   providedIn: 'root'

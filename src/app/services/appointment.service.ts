@@ -2,10 +2,10 @@ import { Injectable } from '@angular/core';
 import { Observable, of, Subject } from 'rxjs';
 import { HttpClient } from '@angular/common/http';
 import { catchError, tap } from 'rxjs/operators';
-import { Appointment} from '../../app/models/appointments/appointment';
-import { Receiver } from '../../app/models/appointments/receiver';
+import { Appointment} from  '../models/appointments/appointment';
+import { Receiver } from '../models/appointments/receiver';
 import { environment } from '../../environments/environment';
-import { httpOptions } from '../../app/utils/http.util';
+import { httpOptions } from '../utils/http.util';
 
 @Injectable({
   providedIn: 'root'

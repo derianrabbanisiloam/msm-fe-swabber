@@ -11,7 +11,8 @@ import { PagePatientDataComponent } from './page-patient-data.component';
 import { WidgetPatientDataComponent } from '../../widgets/widget-patient-data/widget-patient-data.component';
 
 import { TextMaskModule } from 'angular2-text-mask';
-import { NgbAlertModule, NgbPopoverModule, NgbProgressbarModule, NgbModalModule } from '@ng-bootstrap/ng-bootstrap';
+import { NgbAlertModule, NgbPopoverModule, NgbProgressbarModule, 
+  NgbModalModule, NgbTabsetModule } from '@ng-bootstrap/ng-bootstrap';
 import { AutocompleteLibModule } from 'angular-ng-autocomplete';
 import { NguiAutoCompleteModule } from '@ngui/auto-complete';
 
@@ -35,6 +36,7 @@ import { NguiAutoCompleteModule } from '@ngui/auto-complete';
     NgbPopoverModule,
     NgbProgressbarModule,
     NgbModalModule,
+    NgbTabsetModule,
   ],
   exports: [
     PagePatientDataComponent,

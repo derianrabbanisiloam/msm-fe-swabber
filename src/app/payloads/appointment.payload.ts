@@ -16,4 +16,5 @@ export class appointmentPayload {
     isWaitingList: boolean;
     userId: string;
     source: string;
+    userName?: string;
   }

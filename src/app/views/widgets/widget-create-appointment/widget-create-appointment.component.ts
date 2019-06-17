@@ -623,8 +623,8 @@ export class WidgetCreateAppointmentComponent implements OnInit {
   async checkInAppointment(appointmentId, content) {
     await this.appointmentService.getAppointmentById(appointmentId).subscribe(
       data => {
-        this.selectedCheckIn = data.data[0]; 
-        console.log("this.appointment", this.selectedCheckIn);
+        this.selectedCheckIn = data.data[0];
+        this.selectedCheckIn.custome_birth_date = dateFormatter(this.selectedCheckIn.birth_date, true);
       }
     );
     this.late = await this.checkIsLate(appointmentId);
@@ -727,7 +727,7 @@ export class WidgetCreateAppointmentComponent implements OnInit {
     console.log("this.listActiveAdmission", this.listActiveAdmission)
 
     if(this.listActiveAdmission.length !== 0) {
-      this.open(activeModal);
+      this.openconfirmation(activeModal);
     }else{
       this.processCreateAdmission(val);
     }
@@ -765,7 +765,7 @@ export class WidgetCreateAppointmentComponent implements OnInit {
       payerEligibility: payerEligibility,
       userId: this.user.id,
       source: sourceApps,
-      //userName: this.user.fullname,
+      userName: this.user.fullname,
     };
 
     this.admissionService.createAdmission(body).toPromise()
@@ -974,8 +974,17 @@ export class WidgetCreateAppointmentComponent implements OnInit {
 
   }
 
+
   open(content) {
     this.modalService.open(content).result.then((result) => {
+      this.closeResult = `Closed with: ${result}`;
+    }, (reason) => {
+      this.closeResult = `Dismissed ${this.getDismissReason(reason)}`;
+    });
+  }
+
+  openconfirmation(content) {
+    this.modalService.open(content, {windowClass: 'fo_modal_confirmation'}).result.then((result) => {
       this.closeResult = `Closed with: ${result}`;
     }, (reason) => {
       this.closeResult = `Dismissed ${this.getDismissReason(reason)}`;

@@ -106,7 +106,7 @@ export class ModalCreateAppointmentComponent implements OnInit {
       note: note,
       channelId: channelId.FRONT_OFFICE,
       userId: this.userId,
-      //userName: this.userName,
+      userName: this.userName,
       source: this.source
     };
     console.log(JSON.stringify(this.addAppPayload));

@@ -49,8 +49,8 @@
                 <tr>
                   <th class="hack" *ngFor="let date of dates"
                       [ngStyle]="{'background': date.dateISO == todayDateISO ? '#ccc' : '' }">
-                      <span *ngIf="date.isLeave" class="unavailable">{{date.dateHeader}}</span>
-                      <span *ngIf="!date.isLeave">{{date.dateHeader}}</span>
+                      <span *ngIf="date.isLeave && sch.hospital_id === date.hospitalId" class="unavailable">{{date.dateHeader}} * {{date.leaveType}}</span>
+                      <span *ngIf="!(date.isLeave && sch.hospital_id === date.hospitalId)">{{date.dateHeader}}</span>
                   </th>
                 </tr>
                 </thead>
@@ -145,13 +145,15 @@
                 <tr>
                   <th class="hack" *ngFor="let date of dates"
                       [ngStyle]="{'background': date.dateISO == todayDateISO ? '#ccc' : '' }">
-                    {{date.dateHeader}}
+                      <span *ngIf="date.isLeave && sch.hospital_id === date.hospitalId && date.doctorId === doc.doctor_id" class="unavailable">{{date.dateHeader}} * {{date.leaveType}}</span>
+                      <span *ngIf="!(date.isLeave && sch.hospital_id === date.hospitalId && date.doctorId === doc.doctor_id)">{{date.dateHeader}}</span>
                   </th>
                 </tr>
                 <tr>
                   <td class="body-text" *ngFor="let date of dates">
                     <ng-container *ngFor="let itemSch of doc.schedules">
-                        <span *ngIf="itemSch.day == date.dateDay && date.dateISO >= todayDateISO">
+                        <span *ngIf="itemSch.day == date.dateDay && 
+                        date.dateISO >= todayDateISO && !(date.isLeave && sch.hospital_id === date.hospitalId && date.doctorId === doc.doctor_id)">
                             <span *ngIf="!itemSch.is_full" class="success-light"></span>
                             <span *ngIf="itemSch.is_full" class="danger-light"></span>
                             <a (click)="gotoCreateApp(itemSch, date.dateISO)">
@@ -159,8 +161,11 @@
                             </a>
                             <br>
                         </span>
-                        <span *ngIf="itemSch.day == date.dateDay &&
-                                    date.dateISO < todayDateISO" 
+
+                        <span *ngIf="(itemSch.day == date.dateDay &&
+                        date.dateISO < todayDateISO) || 
+                        (itemSch.day == date.dateDay &&
+                        date.dateISO >= todayDateISO && date.isLeave && sch.hospital_id === date.hospitalId && date.doctorId === doc.doctor_id)" 
                               class="unavailable">
                           {{itemSch.from_time.substr(0,5)}} - {{itemSch.to_time.substr(0,5)}}<br>
                         </span>

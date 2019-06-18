@@ -6,7 +6,7 @@ import { PatientService } from '../../../services/patient.service';
 import { Appointment } from '../../../models/appointments/appointment';
 import { editContactPayload } from '../../../payloads/edit-contact.payload';
 import { rescheduleAppointmentPayload } from '../../../payloads/reschedule-appointment.payload';
-import { sourceApps } from '../../../variables/common.variable';
+import { sourceApps, channelId } from '../../../variables/common.variable';
 
 
 @Component({
@@ -18,6 +18,9 @@ export class ModalRescheduleAppointmentComponent implements OnInit {
 
   @Input() appointmentSelected: any;
   public key: any = JSON.parse(localStorage.getItem('key'));
+  public hospital = this.key.hospital;
+  public user = this.key.user;
+
   public opScheduleSelected: any;
   public opSlotSelected: any;
   public createAppInputData: any = {};
@@ -27,8 +30,6 @@ export class ModalRescheduleAppointmentComponent implements OnInit {
   public editContactPayload: editContactPayload;
   public rescheduleAppPayload: rescheduleAppointmentPayload;
   public editModel: any = {};
-  public userId: string = this.key.user.id;
-  public source: string = sourceApps;
 
   constructor(
     private doctorService: DoctorService,
@@ -77,11 +78,13 @@ export class ModalRescheduleAppointmentComponent implements OnInit {
       appointmentDate: sch.date,
       appointmentFromTime: sch.from_time,
       appointmentNo: data.appointment_no,
+      channelId: channelId.FRONT_OFFICE,
       hospitalId: data.hospital_id,
       isWaitingList: data.is_waiting_list,
       note: this.rescheduleSelected.note,
-      userId: this.userId,
-      source: this.source,
+      userId: this.user.id,
+      userName: this.user.fullname,
+      source: sourceApps,
     };
     console.log(this.rescheduleAppPayload, "this.rescheduleAppPayload");
   }
@@ -125,12 +128,15 @@ export class ModalRescheduleAppointmentComponent implements OnInit {
       data: {
         phoneNumber1: this.editModel.phoneNo,
       },
-      userId: this.userId,
-      source: this.source
+      userName: this.user.fullname,
+      userId: this.user.id,
+      source: sourceApps,
     };
     await this.patientService.updateContact(contactId, this.editContactPayload).subscribe(
-      () => {
+      (data) => {
         this.patientService.emitUpdateContact(true);
+      }, error => {
+        this.patientService.emitUpdateContact(false);
       }
     );
   }

@@ -102,7 +102,6 @@ export class WidgetBaseAppointmentComponent implements OnInit {
     
     const speciality = this.model.speciality;
 
-
     this.searchKeywords = {
       doctor: {
         doctor_id: null,
@@ -126,16 +125,6 @@ export class WidgetBaseAppointmentComponent implements OnInit {
     this.doctorService.searchDoctorSource2 = this.searchKeywords;
 
     this.showSchedule = true;
-
-    console.log("this.searchKeywords", this.searchKeywords);
-
-    // if (this.router.url == '/doctor-schedule') {
-    //   this.doctorService.changeSearchDoctor(this.searchKeywords);
-    //   this.doctorService.searchDoctorSource2 = this.searchKeywords;
-    // } else {
-    //   this.doctorService.searchDoctorSource2 = this.searchKeywords;
-    //   this.router.navigate(['/doctor-schedule']);
-    // }
   }
 
 }

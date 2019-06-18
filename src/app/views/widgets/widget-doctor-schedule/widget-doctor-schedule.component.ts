@@ -62,27 +62,28 @@ export class WidgetDoctorScheduleComponent implements OnInit {
     private router: Router,
     private activatedRoute: ActivatedRoute,
   ) {
+     
+  }
+
+  async ngOnInit() {
     if (this.doctorService.searchDoctorSource2) {
       this.keywords = this.doctorService.searchDoctorSource2;
       this.doctorService.searchDoctorSource2 = null;
-
-      this.getSchedulesLogic(this.keywords);
-    } 
-  }
-
-  ngOnInit() {
-    this.generateDates();
+      await this.getLeaveHeader(this.keywords);
+      await this.generateDates();
+      await this.getSchedulesLogic(this.keywords);
+    }
+    
     this.doctorService.searchDoctorSource$.subscribe(
       async(params) => {
         this.keywords = params;
-
-        console.log("this.keywords", this.keywords)
+        await this.getLeaveHeader(this.keywords);
+        await this.generateDates();
         await this.getSchedulesLogic(this.keywords);
       }
     );
-    this.initForeignSource();
 
-    console.log("this.isForeign", this.isForeign, "this.isOriginal", this.isOriginal)
+    this.initForeignSource();
   }
 
   initForeignSource() {
@@ -98,6 +99,8 @@ export class WidgetDoctorScheduleComponent implements OnInit {
       };
       this.isForeign = true;
 
+      this.getLeaveHeader(this.keywords);
+      this.generateDates();
       this.getSchedulesLogic(this.keywords);
     }   
   }
@@ -115,7 +118,7 @@ export class WidgetDoctorScheduleComponent implements OnInit {
     }
   }
 
-  generateDates(selectedDate?: any) {
+  async generateDates(selectedDate?: any) {
     this.dates = [];
     let date: any = selectedDate ? moment(selectedDate).startOf('week') : moment().startOf('week');
     let dateTemp: any;
@@ -124,6 +127,9 @@ export class WidgetDoctorScheduleComponent implements OnInit {
     let dateDay: any;
     /** Kalo mau lanjutin pasang doctor leave, mulai dari sini ya */
     let isLeave: boolean = false;
+    let hospitalId: any;
+    let leaveType: any;
+    let doctorId: any;
     /** Kalo mau lanjutin pasang doctor leave, mulai dari sini ya */
     console.log(selectedDate);
     for (let i=0, length=7; i<length; i++) {
@@ -131,13 +137,16 @@ export class WidgetDoctorScheduleComponent implements OnInit {
       dateHeader = dateTemp.format('dddd, DD-MM-YYYY');
       dateISO = dateTemp.format('YYYY-MM-DD');
       dateDay = dateTemp.format('E');
-      // this.leaves.map(x => {
-      //   isLeave = moment(dateISO) >= moment(x.from_date) && moment(dateISO) <= moment(x.to_date) ? true : false;
-      // });
-      // this.dates.push({ dateHeader, dateISO, dateDay, isLeave });
-      this.dates.push({ dateHeader, dateISO, dateDay });
+
+      this.leaves.map(x => {
+        isLeave = moment(dateISO) >= moment(x.from_date) && moment(dateISO) <= moment(x.to_date) ? true : false;
+        hospitalId = x.hospital_id;
+        leaveType = x.schedule_type_name;
+        doctorId = x.doctor_id;
+      });
+      
+      this.dates.push({ dateHeader, dateISO, dateDay, isLeave, hospitalId, leaveType, doctorId });
     }
-    console.log("this.dates", this.dates)
   }
 
   getSchedulesByDoctor(doctorId: string, date: string) {
@@ -150,7 +159,6 @@ export class WidgetDoctorScheduleComponent implements OnInit {
           this.showScheduleType2 = false;
           this.showScheduleType1 = true;
           this.message1 = null;
-          console.log(data.data);
         } else {
           this.message1 = {
             title: 'Data tidak ditemukan',

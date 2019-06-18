@@ -54,7 +54,7 @@
     </div>
   </div>
   <div class="modal-footer">
-    <button type="button" class="btn ms_btn_black" data-dismiss="modal">Close</button>
+    <button type="button" class="btn ms_btn_black" data-dismiss="modal" (click)="close()">Close</button>
     <button [ngClass]="{'disable': !patientSelected && !contactId}" type="button" 
             class="btn ms_btn_green" data-toggle="modal" data-target="#confirming" 
             data-dismiss="modal" (click)="openConfirmationModal(verify_patient_modal)">Verify Appointment</button>

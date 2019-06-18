@@ -4,6 +4,7 @@ export class editContactPayload {
       phoneNumber1: string;
       genderId?: string;
     };
+    userName?: string;
     userId: string;
     source: string;
   }

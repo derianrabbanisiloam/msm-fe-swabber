@@ -798,6 +798,49 @@ export class WidgetCreateAppointmentComponent implements OnInit {
     }
   }
 
+  changeCondition(event:any){
+    const val = event.target.value;
+
+    console.log("val", val)
+    let idx = null
+
+    if(val == 'PRIVATE' || val == 'PASSPORT' || val == 'KITAS'){
+      this.txtPayer = true;
+      this.txtPayerNo = true;
+      this.txtPayerEligibility = true;
+
+      this.payer = null;
+      this.payerNo = null;
+      this.payerEligibility = null;
+
+      if(val == 'PRIVATE'){
+        idx = this.patientTypeList.findIndex((a)=>{
+          return a.description == "PRIVATE";
+        })
+      }else if(val == 'KITAS'){
+        idx = this.patientTypeList.findIndex((a)=>{
+          return a.description == "KITAS";
+        })
+      }else if(val == 'PASSPORT'){
+        idx = this.patientTypeList.findIndex((a)=>{
+          return a.description == "PASSPORT";
+        })
+      }
+    }else{
+      this.txtPayer = false;
+      this.txtPayerNo = false;
+      this.txtPayerEligibility = false;
+
+      idx = this.patientTypeList.findIndex((a)=>{
+        return a.description == "PAYER";
+      })
+    }
+
+    this.patientType = this.patientTypeList[idx];
+
+    console.log("this.patientType", this.patientType)
+  }
+
   filePdfCreated(val){
     const { 
       patientName, sex, phone, admissionNo, admissionDate, 

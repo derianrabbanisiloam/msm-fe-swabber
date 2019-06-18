@@ -16,7 +16,6 @@
     <thead class="fo_color_blue foot-note">
       <th style="min-width: 15em">
         Patient Name
-        <!-- <a href="javascript:void(0)" (click)="sort('patient_name')"> Patient Name  <i *ngIf="!sortByPatientName" class="fa fa-sort-down" aria-hidden="true"></i> <i *ngIf="sortByPatientName" class="fa fa-sort-up" aria-hidden="true"></i></a> -->
       </th>
       <th style="min-width: 8em">MR No.</th>
       <th style="white-space: nowrap; text-align: center; min-width: 10em">Date of Birth</th>
@@ -25,7 +24,6 @@
       <th>Time Slot</th>
       <th style="min-width: 12em">
         Doctor
-        <!-- <a href="javascript:void(0)" (click)="sort('doctor_name')"> Doctor  <i *ngIf="!sortByDoctorName" class="fa fa-sort-down" aria-hidden="true"></i> <i *ngIf="sortByDoctorName" class="fa fa-sort-up" aria-hidden="true"></i></a> -->
       </th>
       <th>Type App.</th>
       <th>Waiting</th>
@@ -66,6 +64,7 @@
                 [data]="doctorList"
                 searchKeyword="name"
                 (selected)='searchAppointment()'
+                (inputCleared)='searchAppointment()'
                 [itemTemplate]="itemTemplateDoctor"
                 [notFoundTemplate]="notFoundTemplate"> 
               </ng-autocomplete>
@@ -462,95 +461,5 @@
 	  	<h3 *ngIf="resQueue"> {{ resQueue.name }}</h3>
 	  </div>
   </ng-template>
-
-	<!-- <ng-template #modalReschedule let-c="close" let-d="dismiss">
-  <div class="modal-header">
-    <div class="header-2 modal-padding"><strong>Edit Appointment List</strong></div>
-    <button #close_btn_reschedule type="button" class="close" aria-label="Close" (click)="c('Cross click')">
-      <span aria-hidden="true">&times;</span>
-    </button>
-  </div>
-  <div class="modal-body search-patient-modal">
-    <div class="">
-      <div class="col-md-12" *ngIf="searching && model.patient" style="margin-bottom:25px">
-        <ngb-progressbar value="1000">Loading...</ngb-progressbar>
-      </div>
-      <div class="col-md-12" style="padding: 0">
-        <table class="table table-bordered">
-          <thead class="body-text bold">
-            <th style="min-width: 10vw">Patient Name</th>
-            <th style="width: 1%; min-width: 4vw; text-align: center">MR No.</th>
-            <th style="white-space: nowrap; min-width:3vw; width: 1%">Date of Birth</th>
-            <th>Mobile No.</th>
-            <th style="white-space: nowrap">Appo. Date</th>
-            <th>Time Slot</th>
-            <th style="min-width: 10vw">Doctor</th>
-            <th style="width: 1%;">Waiting List</th>
-            <th>Queue No.</th>
-            <th>Created By</th>
-            <th style="text-align: center;width: 1%">Note</th>
-          </thead>
-          <tbody>
-            <tr>
-              <td>{{ rescheduleSelected.patient_name }}</td>
-              <td>{{ rescheduleSelected.patient_mr }}</td>
-              <td>{{ rescheduleSelected.patient_birth }}</td>
-              <td>
-                <input type="text" style="width: 8vw" [(ngModel)]="rescheduleSelected.patient_phone">
-              </td>
-              <td>{{ rescheduleSelected.booking_date }}</td>
-              <td style="white-space: nowrap">{{ rescheduleSelected.from_time }} - {{ rescheduleSelected.to_time }}</td>
-              <td>{{ rescheduleSelected.doctor_name }}</td>
-              <td>{{ rescheduleSelected.is_waiting_list }}</td>
-              <td>{{ rescheduleSelected.queue_number }}</td>
-              <td>{{ rescheduleSelected.created_by }}</td>
-              <td>
-                <textarea [(ngModel)]="rescheduleSelected.note">{{ rescheduleSelected.note }}</textarea>
-              </td>
-            </tr>
-          </tbody>
-        </table>
-      </div>
-
-      <button class="ms_btn_border"
-              [ngClass]="isOpenDoctorSchedule == false ? 'ms_btn_blue' : 'ms_btn_darkgrey'"
-              style="padding: 0.3vw 0vw; width: 7vw"
-              (click)="openDoctorSchedule()">
-        Reschedule
-      </button>
-
-      <div class="col-md-12" style="padding: 0;max-height: 350px;overflow-y: scroll" *ngIf="isOpenDoctorSchedule == true">
-        <arkcare-frame-content-doctor-schedule></arkcare-frame-content-doctor-schedule>
-      </div>
-    </div>
-  </div>
-  <div class="modal-footer">
-      <div class="col-md-3">
-        <p>
-          <strong>Created By : </strong>
-          {{ rescheduleSelected.created_by }}
-        </p>
-        <p>
-          <strong>Created Date : </strong>
-          {{ rescheduleSelected.created_date }}
-        </p>
-      </div>
-      <div class="col-md-5">
-        <p>
-          <strong>Last Modified By : </strong>
-          {{ rescheduleSelected.modified_by_name }}
-        </p>
-        <p>
-          <strong>Last Modified Date : </strong>
-          {{ rescheduleSelected.modified_date }}
-        </p>
-      </div>
-    <div class="col-md-4" style="text-align: right">
-      <button class="ms_btn_border ms_btn_black" style="padding: 0.3vw 0vw; width: 7vw" #close_btn_reschedule aria-label="Close" (click)="d('Cross click')">Cancel</button>
-      <button class="ms_btn_border ms_btn_green" style="padding: 0.3vw 0vw; width: 7vw" (click)="updateBooking(close_btn_reschedule)">Save & Close</button>
-    </div>
-  </div>
-</ng-template> -->
-
 </section>
 

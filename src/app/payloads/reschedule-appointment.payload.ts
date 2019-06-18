@@ -7,6 +7,8 @@ export class rescheduleAppointmentPayload {
   hospitalId: string;
   isWaitingList: boolean;
   note?: string;
+  channelId?: string;
   userId: string;
+  userName?: string;
   source: string;
 }

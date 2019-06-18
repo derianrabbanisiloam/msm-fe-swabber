@@ -20,6 +20,7 @@ import * as pdfMake from 'pdfmake/build/pdfmake';
 import * as pdfFonts from 'pdfmake/build/vfs_fonts';
 
 import * as $ from 'jquery';
+import { THIS_EXPR } from '@angular/compiler/src/output/output_ast';
 
 @Component({
   selector: 'app-widget-patient-data',
@@ -1343,6 +1344,7 @@ export class WidgetPatientDataComponent implements OnInit {
 
   reset() {
     this.model = {};
+    this.model.sex = { value: ''};
     this.listDistrict = [];
     this.listSubdistrict = [];
   }

@@ -137,6 +137,7 @@ export class WidgetAppointmentListComponent implements OnInit {
     this.getPatientType();
     this.listAppointment();
     this.emitRescheduleApp();
+    this.emitUpdateContact();
     this.getCollectionAlert();
   }
 
@@ -148,6 +149,19 @@ export class WidgetAppointmentListComponent implements OnInit {
           this.listAppointment();
         } else {
           this.alertService.error('Gagal reschedule appointment', false, 5000);
+        }
+      }
+    );
+  }
+
+  emitUpdateContact() {
+    this.patientService.updateContactSource$.subscribe(
+      async (result) => {
+        if (result) {
+          this.alertService.success('Ubah nomor HP berhasil', false, 5000);
+          await this.listAppointment();
+        } else {
+          this.alertService.error('Gagal ubah nomor HP', false, 5000);
         }
       }
     );
@@ -223,6 +237,25 @@ export class WidgetAppointmentListComponent implements OnInit {
     })
   }
 
+  refreshPage(){
+    this.buttonCreateAdmission = false;
+    this.buttonPrintQueue = true;
+    this.buttonPatientLabel = true;
+    this.buttonCloseAdm = false;
+
+    this.model.name = '';
+    this.model.mr = '';
+    this.model.doctorName = '';
+    this.model.birth ='';
+
+    this.resQueue = { name: null };
+
+    this.patientType = null;
+    this.payer = null;
+    this.payerNo = null;
+    this.payerEligibility = null;
+  }
+
   async getListDoctor() {
 
     this.alerts = [];
@@ -290,6 +323,7 @@ export class WidgetAppointmentListComponent implements OnInit {
   }
 
    async searchAppointment() {
+     console.log("testeing")
     let { name, mr, doctor, birth } = await this.model;
 
     const doctorId = doctor ? doctor.doctor_id : '';
@@ -307,7 +341,7 @@ export class WidgetAppointmentListComponent implements OnInit {
       this.listAppointment();
     }
   }
-
+  
   onDateChange(val) {
     console.log("val", val);
     this.dateAppointment.date = val.date;
@@ -641,7 +675,7 @@ export class WidgetAppointmentListComponent implements OnInit {
       queueTypeId: queueTypeId,
       userId: this.user.id,
       source: sourceApps,
-      //userName: this.user.fullname,
+      userName: this.user.fullname,
     }
 
     this.resQueue = await this.queueService.createQueue(body).toPromise()

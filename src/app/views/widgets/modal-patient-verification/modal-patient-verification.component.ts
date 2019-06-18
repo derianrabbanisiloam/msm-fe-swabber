@@ -1,3 +1,4 @@
+import * as moment from 'moment';
 import { Component, OnInit, Input} from '@angular/core';
 import { PatientService } from '../../../services/patient.service';
 import { AppointmentService } from '../../../services/appointment.service';
@@ -54,13 +55,15 @@ export class ModalPatientVerificationComponent implements OnInit {
     if (!this.searchPatientModel) {
       this.searchPatientModel = {
         patientName: this.tempAppointmentSelected.contact_name,
-        patientBirth: this.tempAppointmentSelected.date_of_birth,
+        patientBirth: moment(this.tempAppointmentSelected.date_of_birth).format('DD-MM-YYYY'),
         hospitalId: this.tempAppointmentSelected.hospital_id,
       }; 
     }
     const hospitalId = this.searchPatientModel.hospitalId;
     const patientName = this.searchPatientModel.patientName;
-    const birthDate = this.searchPatientModel.patientBirth;
+    const dob = this.searchPatientModel.patientBirth.split('-');
+    const birthDate = dob[2] + '-' + dob[1] + '-' + dob[0];
+    
     this.patientService.searchPatientHope1(hospitalId, patientName, birthDate).subscribe(
       data => {
         this.searchLoader = false;
@@ -184,6 +187,10 @@ export class ModalPatientVerificationComponent implements OnInit {
       // add alert to array
       this.alerts.push(alert);
     });
+  }
+
+  close() {
+    this.activeModal.close();
   }
 
   cssAlertType(alert: Alert) {

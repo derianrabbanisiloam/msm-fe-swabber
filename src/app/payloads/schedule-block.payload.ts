@@ -11,6 +11,7 @@ export class addScheduleBlockPayload {
   }
   
   export class updateScheduleBlockPayload {
+    scheduleId?: string;
     fromDate: string;
       toDate: string;
       fromTime: string;

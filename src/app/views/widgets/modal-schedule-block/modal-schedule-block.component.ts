@@ -104,6 +104,7 @@ export class ModalScheduleBlockComponent implements OnInit {
     const reason = this.schBlockSelected.reason;
     const isIncludeWaitingList = this.schBlockSelected.is_include_waiting_list;
     this.updateSchBlockPayload = {
+      scheduleId: this.inputedParams.scheduleId,
       fromDate: fromDate,
       toDate: toDate,
       fromTime: fromTime,

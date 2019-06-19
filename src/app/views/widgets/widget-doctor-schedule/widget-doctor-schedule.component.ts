@@ -70,7 +70,7 @@ export class WidgetDoctorScheduleComponent implements OnInit {
       this.keywords = this.doctorService.searchDoctorSource2;
       this.doctorService.searchDoctorSource2 = null;
       await this.getLeaveHeader(this.keywords);
-      await this.generateDates();
+      await this.generateDates(this.initDate);
       await this.getSchedulesLogic(this.keywords);
     }
     
@@ -78,7 +78,7 @@ export class WidgetDoctorScheduleComponent implements OnInit {
       async(params) => {
         this.keywords = params;
         await this.getLeaveHeader(this.keywords);
-        await this.generateDates();
+        await this.generateDates(this.initDate);
         await this.getSchedulesLogic(this.keywords);
       }
     );
@@ -100,7 +100,7 @@ export class WidgetDoctorScheduleComponent implements OnInit {
       this.isForeign = true;
 
       this.getLeaveHeader(this.keywords);
-      this.generateDates();
+      this.generateDates(this.initDate);
       this.getSchedulesLogic(this.keywords);
     }   
   }
@@ -119,6 +119,8 @@ export class WidgetDoctorScheduleComponent implements OnInit {
   }
 
   async generateDates(selectedDate?: any) {
+
+    console.log(selectedDate, "selectedDate");
     this.dates = [];
     let date: any = selectedDate ? moment(selectedDate).startOf('week') : moment().startOf('week');
     let dateTemp: any;

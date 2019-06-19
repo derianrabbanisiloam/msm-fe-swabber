@@ -408,7 +408,7 @@ export class WidgetCreateAppointmentComponent implements OnInit {
         blockTimeStart = moment(`${appointmentDate} ${x.from_time}`);
         blockTimeEnd = moment(`${appointmentDate} ${x.to_time}`);
         console.log(x.from_time, x.to_time, appointmentDate, this.appList[i].appointment_id);
-        if (appTimeCompare >= blockTimeStart && appTimeCompare <= blockTimeEnd) {
+        if (appTimeCompare >= blockTimeStart && appTimeCompare < blockTimeEnd) {
           this.appList[i].is_blocked = true;
           this.appList[i].is_can_create = false;
           this.appList[i].is_can_cancel = false;

@@ -1,0 +1,228 @@
+#print-section {
+    display: none;
+  }
+  
+  .print-only {
+    display: none;
+  }
+  @media print {
+    #print-section {display: block;}
+    #siloam-image {
+      display: block;
+      margin-left: auto;
+      margin-right: auto;
+      width: 50%;
+    }
+  
+    input{border: 0px}
+  
+    #group-patient-validate {display: none}
+  
+    .print-only {
+      display: block;
+    }
+  }
+  :host(app-widget-mobile-validation) { width:100% }
+  ::ng-deep ngb-progressbar .progress .progress-bar{ background-color: #4D9B35 !important; color: white!important;}
+  .fo_container_list{
+    background: white;
+    border-radius: 4px;
+    border: none;
+    width: 25%;
+    height: fit-content;
+  }
+  
+  .first_row { margin-bottom: 1.5em; }
+  .fo_container_input_date { width: 15em;}
+  .fo_container_patient_detail.fo_container_patient_detail{ width: 50%}
+  .fo_container_list th{ border-bottom: 0.5px solid #C1C1C1}
+  .fo_container_list:not(:last-child){ margin-right: 1.5rem}
+  .fo_grey{ background: #EFEFEF}
+  .fo_list_header{ padding: 19px 16px; font-size: 15px; font-weight: bold; border-bottom: 0.5px solid #C1C1C1;}
+  .fo_list_content{
+    overflow-y: scroll; max-height: 450px}
+  .fo_list_verify{ border-top: 0.5px solid #C1C1C1; }
+  .fo_validation_filter{ padding: 5px 12px!important;}
+  .fo_container_container_list{ width: 100%}
+  .quota-list td {padding-left: 16px; font-size: 11px}
+  .quota-list tr:hover, .highlighted { background: #4D9B35; color: white}
+  .fo_validation_list_name{ text-transform: uppercase; font-weight: bold}
+  .fo_padding_16_side{ padding-left: 16px; padding-right: 16px}
+  .fo_padding_10_vertical{ padding-top: 10px; padding-bottom: 10px}
+  .fo_patient_detail_list span span { font-weight: bold}
+  ::ng-deep .fo_modal_70 .modal-dialog{ max-width: 70%; margin: 10% auto;}
+  
+  .search-patient-modal table thead th.th{
+    border-top: 0.5px solid #C1C1C1;
+    border-bottom: 0.5px solid #C1C1C1;
+  }
+  .search-patient-modal tbody tr:hover{
+    background: #4D9B35;
+    color: #FFFFFF;
+  }
+  .search-patient-modal.search-patient-modal {
+    padding: 0 0;
+  }
+  .fo_requirement:after{
+    content: '*';
+    color: red;
+  }
+  /*PATIENT DETAIL*/
+  .fo_patient_detail_input{
+    padding: 16px;
+  }
+  .fo_patient_detail_input .justify-content-between > div{
+    width: 100%;
+  }
+  .fo_list_content label{
+    font-size: 10px;
+  }
+  .fo_list_verify label{
+    font-size: 12px;
+  }
+  .fo_patient_detail_input .justify-content-between div:not(:last-child){
+    margin-right: 1rem;
+  }
+  .fo_patient_detail_first_row > div:not(:last-child){
+    margin-right: 10px;
+  }
+  .fo_patient_detail_fifth_row > div:not(:last-child){
+    margin-right: 10px;
+  }
+  .fo_patient_detail_fifth_row >div { width: 100%}
+  
+  
+  
+  textarea{
+    resize: none;
+    height: 7rem;
+  }
+  .fo_contact_detail > div:not(:last-child) {
+    margin-right: 20px;
+  }
+  .fo_contact_detail > div{ width: 100%}
+  .fo_tab_group label{
+    font-size: 10px;
+  }
+  .fo_tab_group .justify-content-between > div{
+    width: 100%;
+  }
+  .fo_tab_group .justify-content-between > div:not(:last-child){
+    margin-right: 10px;
+  }
+  .fo_list_verify{
+    padding: 16px;}
+  
+  .fo_list_verify button{ width: 10rem; height: 2.7rem; margin-left: 1rem}
+  .fo_btn_black{ background: black; color: white}
+  .fo_btn_grey{ background: #C1C1C1; color: white}
+  .fo_btn_green{ background: #4D9B35; color: white}
+  
+  .fo_btn_append { border: 1px solid #ced4da; border-radius: 0.25rem;}
+  .fo_btn_append button{ border: none}
+  .fo_btn_append input{
+    border: none;
+  }
+  
+  
+  .fo_confirmation_button.justify-content-center button{
+    margin: 2rem 1rem;
+    width: 9rem; height: 2.7rem;
+  }
+  .modal-body p { text-align: center}
+  ::ng-deep .fo_modal_confirmation .modal-dialog{
+    max-width: 20%;
+    margin: 10rem auto;
+  }
+  ::ng-deep .fo_modal_confirmation .modal-header{
+    padding: 16px;
+  }
+  
+  .fo_or_line{
+  
+    width: 100%;
+  }
+  .fo_or_line div{ height: 50%;border-bottom: #C1C1C1 0.5px solid;}
+  
+  .fo_patient_data tr:hover{
+    background: #4D9B35;
+    color: white;
+  }
+  
+  /*Custom CheckBox*/
+  
+  /* The container */
+  .check_box_container{
+    display: block;
+    position: relative;
+    padding-left: 35px;
+    margin-bottom: 12px;
+    cursor: pointer;
+    font-size: 22px;
+    -webkit-user-select: none;
+    -moz-user-select: none;
+    -ms-user-select: none;
+    user-select: none;
+  }
+  
+  /* Hide the browser's default checkbox */
+  .check_box_container input {
+    position: absolute;
+    opacity: 0;
+    cursor: pointer;
+  }
+  
+  /* Create a custom checkbox */
+  .checkmark {
+    position: absolute;
+    top: 0;
+    left: 0;
+    height: 14px;
+    width: 14px;
+    background-color: #eee;
+    border-radius: 4px;
+  }
+  
+  /* On mouse-over, add a grey background color */
+  .check_box_container:hover input ~ .checkmark {
+    background-color: #ccc;
+  }
+  
+  /* When the checkbox is checked, add a blue background */
+  .check_box_container input:checked ~ .checkmark {
+    background-color: #4D9B35;
+  }
+  
+  /* Create the checkmark/indicator (hidden when not checked) */
+  .checkmark:after {
+    content: "";
+    position: absolute;
+    display: none;
+  }
+  
+  /* Show the checkmark when checked */
+  .check_box_container input:checked ~ .checkmark:after {
+    display: block;
+  }
+  
+  /* Style the checkmark/indicator */
+  .check_box_container .checkmark:after {
+    left: 4px;
+    top: 1px;
+    width: 6px;
+    height: 10px;
+    border: solid white;
+    border-width: 0 1.5px 1.5px 0;
+    -webkit-transform: rotate(45deg);
+    -ms-transform: rotate(45deg);
+    transform: rotate(45deg);
+    border-radius: 4px;
+  }
+  
+  
+  
+  
+  .pagination {
+    padding: 10px 25px;
+  }
+  

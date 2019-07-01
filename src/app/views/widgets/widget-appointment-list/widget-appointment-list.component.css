@@ -1,4 +1,4 @@
-:host(arkcare-content-appointment-list) { width:100% }
+:host(app-widget-appointment-list) { width:100% }
 .fo_appointment_date{ width: 15%;}
 .fo_container_input_date{ margin-bottom: 2rem}
 .fo_container_input_date input { width: 200px}

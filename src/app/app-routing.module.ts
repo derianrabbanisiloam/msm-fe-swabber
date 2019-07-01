@@ -28,6 +28,11 @@ const routes: Routes = [
     loadChildren: './views/pages/page-base-appointment/page-base-appointment.module#PageBaseAppointmentModule',
   },
   {
+    path: 'mobile-validation',
+    canActivate: [AuthGuard],
+    loadChildren: './views/pages/page-mobile-validation/page-mobile-validation.module#PageMobileValidationModule',
+  },
+  {
     path: 'appointment-list',
     canActivate: [AuthGuard],
     loadChildren: './views/pages/page-appointment-list/page-appointment-list.module#PageAppointmentListModule',

@@ -15,6 +15,7 @@ export class PatientService {
 
   private contactUrl = environment.CALL_CENTER_SERVICE + '/contacts';
   private patientUrl = environment.FRONT_OFFICE_SERVICE + '/patients';
+  private contactFoUrl = environment.FRONT_OFFICE_SERVICE + '/contacts';
 
   private patientHopeUrl = environment.CALL_CENTER_SERVICE + '/patients/hope';
   private verifyPatientUrl = environment.CALL_CENTER_SERVICE + '/patients/verify';
@@ -30,6 +31,25 @@ export class PatientService {
   
   emitUpdateContact(params: boolean) {
     this.updateContactSource.next(params);
+  }
+
+  getAccountMobile(searchString, offset, limit){
+    let uri = `${this.contactFoUrl}/account/mobile`;
+
+    if(searchString){
+      uri = `${uri}?keywords=${searchString}&limit=${limit}&offset=${offset}`;
+    }else{
+      uri = `${uri}?limit=${limit}&offset=${offset}`;
+    }
+    
+    return this.http.get<any>(uri, httpOptions);
+  }
+
+  accountVerify(payload: any){
+    const url = `${this.contactFoUrl}/account/verify`;
+    const body = JSON.stringify(payload);
+    
+    return this.http.put<any>(url, body, httpOptions);
   }
 
   updateContact(contactId: string, updateContactPayload: any): Observable<any> {
@@ -71,8 +91,13 @@ export class PatientService {
     return this.http.post<any>(this.verifyPatientUrl, verifyPatientPayload, httpOptions);
   }
 
-  searchPatient(orgId: any, name: string, birth: string): Observable<any> {
-    const url = `${this.patientUrl}/hope/name/${name}/birthdate/${birth}/organization/${orgId}`;
+  searchPatient(name: string, birth: string, orgId?: any, ): Observable<any> {
+    let url = `${this.patientUrl}/hope/name/${name}/birthdate/${birth}`;
+    
+    if(orgId){
+      url = `${url}?organizationId=${orgId}`;
+    }
+    
     return this.http.get<any>(url, httpOptions);
   }
 
@@ -93,6 +118,13 @@ export class PatientService {
     const body = JSON.stringify(payload);
     
     return this.http.put<any>(url, body, httpOptions);
+  }
+
+  syncUpdatePatient(payload: any){
+    const url = `${this.patientUrl}/sync/update`;
+    const body = JSON.stringify(payload);
+    
+    return this.http.post<any>(url, body, httpOptions);
   }
   
 }

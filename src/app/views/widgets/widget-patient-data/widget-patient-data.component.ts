@@ -493,7 +493,7 @@ export class WidgetPatientDataComponent implements OnInit {
     this.showWaitMsg = true;
     this.showNotFoundMsg = false;
     
-    const suggestion = await this.patientService.searchPatient(this.hospital.orgId, name, birth)
+    const suggestion = await this.patientService.searchPatient(name, birth, this.hospital.orgId)
     .toPromise().then( res => {
       return res.data;
     }).catch( err => {

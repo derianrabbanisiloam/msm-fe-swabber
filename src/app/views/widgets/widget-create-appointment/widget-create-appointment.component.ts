@@ -141,6 +141,7 @@ export class WidgetCreateAppointmentComponent implements OnInit {
     this.emitVerifyApp();
     this.emitScheduleBlock();
     this.getCollectionAlert();
+    this.refreshPage();
   }
 
   async ngOnChanges() {
@@ -162,6 +163,7 @@ export class WidgetCreateAppointmentComponent implements OnInit {
     this.emitVerifyApp();
     this.emitScheduleBlock();
     this.getCollectionAlert();
+    this.refreshPage();
   }
 
   emitVerifyApp() {
@@ -172,6 +174,24 @@ export class WidgetCreateAppointmentComponent implements OnInit {
         await this.prepareAppList();
       }
     );
+  }
+
+  refreshPage(){
+    this.buttonCreateAdmission = false;
+    this.buttonPrintQueue = true;
+    this.buttonPatientLabel = true;
+    this.buttonCloseAdm = false;
+
+    this.resQueue = null;
+
+    this.txtPayer = true;
+    this.txtPayerNo = true;
+    this.txtPayerEligibility = true;
+
+    this.patientType = null;
+    this.payer = null;
+    this.payerNo = null;
+    this.payerEligibility = null;
   }
 
   async admissionType(){
@@ -733,6 +753,38 @@ export class WidgetCreateAppointmentComponent implements OnInit {
     }
   }
 
+  mrLocalProcess(payload: any){
+    const patient = this.patientService.createMrLocal(payload)
+    .toPromise().then(res => {
+      this.alertService.success(res.message, false, 3000);
+      return res.data; 
+    }).catch(err => {
+      this.alertService.error(err.error.message, false, 3000);
+      return null;
+    })
+    
+    return patient;
+  }
+
+  async buildMrLocal(detail, close, modal){
+    const body = {
+      patientHopeId: Number(detail.patient_hope_id),
+      organizationId: Number(this.hospital.orgId),
+      userId: this.user.id,
+      source: sourceApps,
+    }
+    
+    this.resMrLocal = await this.mrLocalProcess(body);
+    
+    if(this.resMrLocal){
+      this.selectedCheckIn.medical_record_number = this.resMrLocal.medical_record_number;
+      this.selectedCheckIn.patient_organization_id = this.resMrLocal.patient_organization_id;
+      await this.defaultPatientType(detail.patient_hope_id);
+      close.click();
+      this.open50(modal);
+    }
+  }
+
   processCreateAdmission(val){
     // Show loading bar
     
@@ -930,12 +982,6 @@ export class WidgetCreateAppointmentComponent implements OnInit {
 
   printQueueTicket(val) {
 
-    setTimeout (() => {
-      this.closeQue.click();
-      this.closeAdm.click();
-      this.ngOnInit();
-    }, 1000);
-
     const queueNo = this.resQueue.name;
     const isWalkin = val.is_walkin ? 'WALK IN' : 'APPOINTMENT';
     const patientName = val.contact_name;
@@ -1014,6 +1060,12 @@ export class WidgetCreateAppointmentComponent implements OnInit {
     };
     pdfMake.defaultFileName = 'report registration';
     pdfMake.createPdf(docDefinition).print();
+
+    setTimeout (() => {
+      this.closeQue.click();
+      this.closeAdm.click();
+      this.ngOnInit();
+    }, 1000);
 
   }
 

@@ -245,10 +245,14 @@ export class WidgetAppointmentListComponent implements OnInit {
 
     this.model.name = '';
     this.model.mr = '';
-    this.model.doctorName = '';
+    this.model.doctor = '';
     this.model.birth ='';
 
     this.resQueue = { name: null };
+
+    this.txtPayer = true;
+    this.txtPayerNo = true;
+    this.txtPayerEligibility = true;
 
     this.patientType = null;
     this.payer = null;
@@ -315,7 +319,7 @@ export class WidgetAppointmentListComponent implements OnInit {
     }).catch( err => {
       this.showWaitMsg = false;
       this.showNotFoundMsg = true;
-      this.alertService.error(err.error.message);
+      this.alertService.error(err.error.message, false, 5000);
       return [];
     });
 
@@ -323,8 +327,10 @@ export class WidgetAppointmentListComponent implements OnInit {
   }
 
    async searchAppointment() {
-     console.log("testeing")
+
     let { name, mr, doctor, birth } = await this.model;
+
+    console.log("doctor", doctor);
 
     const doctorId = doctor ? doctor.doctor_id : '';
     const arrBirth = birth ? birth.split('-') : '';
@@ -348,6 +354,7 @@ export class WidgetAppointmentListComponent implements OnInit {
     this.model = { hospital_id: '', name: '', mr: '', doctor: '' };
 
     this.offset = 0;
+    this.refreshPage();
     this.listAppointment();
   }
 
@@ -437,7 +444,7 @@ export class WidgetAppointmentListComponent implements OnInit {
   mrLocalProcess(payload: any){
     const patient = this.patientService.createMrLocal(payload)
     .toPromise().then(res => {
-      this.alertService.success(res.message);
+      this.alertService.success(res.message, false, 3000);
       return res.data; 
     }).catch(err => {
       this.alertService.error(err.error.message, false, 3000);
@@ -486,11 +493,12 @@ export class WidgetAppointmentListComponent implements OnInit {
     .toPromise().then( res =>{
       this.alertService.success(res.message, false, 3000);
     }).catch(err => {
-      this.alertService.error(err.error.message);
+      this.alertService.error(err.error.message, false, 3000);
     })
 
     setTimeout (() => {
       this.offset = 0;
+      this.refreshPage();
       this.listAppointment();
     }, 1000)
     
@@ -699,17 +707,11 @@ export class WidgetAppointmentListComponent implements OnInit {
   }
 
   closeClicked(){
+    this.refreshPage();
     this.listAppointment();
   }
 
   printQueueTicket(val) {
-
-    setTimeout (() => {
-      this.offset = 0;
-      this.closeQue.click();
-      this.closeAdm.click();
-      this.listAppointment();
-    }, 1000);
 
     const queueNo = this.resQueue.name;
     const isWalkin = val.is_walkin ? 'WALK IN' : 'APPOINTMENT';
@@ -790,6 +792,14 @@ export class WidgetAppointmentListComponent implements OnInit {
     pdfMake.defaultFileName = 'report registration';
     pdfMake.createPdf(docDefinition).print();
 
+    setTimeout (() => {
+      this.offset = 0;
+      this.closeQue.click();
+      this.closeAdm.click();
+      this.refreshPage();
+      this.listAppointment();
+    }, 1000);
+
   }
 
   getActiveAdmission(patientHopeId: any){
@@ -857,6 +867,12 @@ export class WidgetAppointmentListComponent implements OnInit {
   }
 
   private getDismissReason(reason: any): string {
+    this.buttonCreateAdmission = false;
+    this.buttonPrintQueue = true;
+    this.buttonPatientLabel = true;
+
+    this.refreshPage();
+    this.listAppointment();
 
     if (reason === ModalDismissReasons.ESC) {
       return 'by pressing ESC';

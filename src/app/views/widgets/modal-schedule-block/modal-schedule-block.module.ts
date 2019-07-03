@@ -3,6 +3,7 @@ import { CommonModule } from '@angular/common';
 
 import { ModalScheduleBlockComponent } from './modal-schedule-block.component';
 import { FormsModule, ReactiveFormsModule } from '@angular/forms';
+import { NgbAlertModule } from '@ng-bootstrap/ng-bootstrap';
 
 @NgModule({
   declarations: [
@@ -11,7 +12,8 @@ import { FormsModule, ReactiveFormsModule } from '@angular/forms';
   imports: [
     CommonModule,
     FormsModule,
-    ReactiveFormsModule
+    ReactiveFormsModule,
+    NgbAlertModule
   ], 
   exports: [
     ModalScheduleBlockComponent,

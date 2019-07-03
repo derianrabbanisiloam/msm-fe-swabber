@@ -8,7 +8,8 @@ import {
   addScheduleBlockPayload, updateScheduleBlockPayload, deleteScheduleBlockPayload
 } from '../../../payloads/schedule-block.payload';
 import { sourceApps } from '../../../variables/common.variable';
-
+import { AlertService } from '../../../services/alert.service';
+import { Alert, AlertType } from '../../../models/alerts/alert';
 
 @Component({
   selector: 'app-modal-schedule-block',
@@ -18,6 +19,7 @@ import { sourceApps } from '../../../variables/common.variable';
 export class ModalScheduleBlockComponent implements OnInit {
 
   @Input() inputedParams: any;
+  public alerts: Alert[] = [];
   public key: any = JSON.parse(localStorage.getItem('key'));
   public hospital = this.key.hospital;
   public user = this.key.user;
@@ -41,11 +43,13 @@ export class ModalScheduleBlockComponent implements OnInit {
   constructor(
     private modalService: NgbModal,
     public activeModal: NgbActiveModal,
-    private scheduleService: ScheduleService
+    private scheduleService: ScheduleService,
+    private alertService: AlertService,
   ) { }
 
   ngOnInit() {
     this.getScheduleBlock();
+    this.getCollectionAlert();
   }
 
   getScheduleBlock() {
@@ -103,25 +107,30 @@ export class ModalScheduleBlockComponent implements OnInit {
     const toTime = moment('1990-01-01 ' + this.schBlockSelected.th + ':' + this.schBlockSelected.tm).format('HH:mm');
     const reason = this.schBlockSelected.reason;
     const isIncludeWaitingList = this.schBlockSelected.is_include_waiting_list;
-    this.updateSchBlockPayload = {
-      scheduleId: this.inputedParams.scheduleId,
-      fromDate: fromDate,
-      toDate: toDate,
-      fromTime: fromTime,
-      toTime: toTime,
-      reason: reason,
-      isIncludeWaitingList: isIncludeWaitingList, 
-      userId: this.userId,
-      userName: this.userName,
-      source: this.source,
-    };
-    await this.scheduleService.updateScheduleBlock(scheduleBlockId, this.updateSchBlockPayload).toPromise().then(
-      data => {
-        this.scheduleService.emitScheduleBlock(true);
-        console.log(data);
-      }
-    );
-    this.getScheduleBlock();
+    this.checkBlockTime2(this.schBlockSelected.fh, this.schBlockSelected.fm, this.schBlockSelected.th, this.schBlockSelected.tm);
+
+    if(this.isValidBlock == true){
+      this.updateSchBlockPayload = {
+        scheduleId: this.inputedParams.scheduleId,
+        fromDate: fromDate,
+        toDate: toDate,
+        fromTime: fromTime,
+        toTime: toTime,
+        reason: reason,
+        isIncludeWaitingList: isIncludeWaitingList, 
+        userId: this.userId,
+        userName: this.userName,
+        source: this.source,
+      };
+      await this.scheduleService.updateScheduleBlock(scheduleBlockId, this.updateSchBlockPayload).toPromise().then(
+        data => {
+          this.scheduleService.emitScheduleBlock(true);
+          this.alertService.success('Schedule Blocks Updated', false, 3000);
+          console.log(data);
+        }
+      );
+      this.getScheduleBlock();
+    }
   }
 
   async deleteScheduleBlock() {
@@ -171,6 +180,54 @@ export class ModalScheduleBlockComponent implements OnInit {
         this.isValidBlock = true;
       }
     }
+  }
+
+  checkBlockTime2(fh, fm, th, tm) {
+    if (fh && fm && th && tm) {
+      const ft = moment('1990-01-01 ' + fh + ':' + fm).format('HH:mm');
+      const tt = moment('1990-01-01 ' + th + ':' + tm).format('HH:mm');
+      if (ft >= tt) {
+        this.editBlockErrMsg = 'From Time tidak boleh lebih besar dari To Time !';
+        this.isValidBlock = false;
+      }
+      else {
+        this.editBlockErrMsg = '';
+        this.isValidBlock = true;
+      }
+    }
+  }
+
+  async getCollectionAlert(){
+    this.alertService.getAlert().subscribe((alert: Alert) => {
+      if (!alert) {
+          // clear alerts when an empty alert is received
+          this.alerts = [];
+          return;
+      }
+      // add alert to array
+      this.alerts.push(alert);
+    });
+  }
+
+  cssAlertType(alert: Alert) {
+    if (!alert) {
+        return;
+    }
+
+    switch (alert.type) {
+      case AlertType.Success:
+        return 'success';
+      case AlertType.Error:
+        return 'danger';
+      case AlertType.Info:
+        return 'info';
+      case AlertType.Warning:
+        return 'warning';
+    }
+  }
+  
+  removeAlert(alert: Alert) {
+    this.alerts = this.alerts.filter(x => x !== alert);
   }
 
 }

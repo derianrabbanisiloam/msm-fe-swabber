@@ -112,11 +112,11 @@ export class ModalCreateAppointmentComponent implements OnInit {
     console.log(JSON.stringify(this.addAppPayload));
     await this.appointmentService.addAppointment(this.addAppPayload).toPromise().then(
       data => {
-        this.alertService.success('Success to create appointment', false, 5000);
+        this.alertService.success('Success to create appointment', false, 3000);
         this.appointmentService.emitCreateApp(true);
         setTimeout(() => {this.close();}, 2000);
       }, err => {
-        this.alertService.error(err.error.message, false, 5000);
+        this.alertService.error(err.error.message, false, 3000);
       }
     );
     this.isSubmitting = false;

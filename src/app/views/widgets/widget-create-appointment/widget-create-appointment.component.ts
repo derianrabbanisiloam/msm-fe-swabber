@@ -229,7 +229,7 @@ export class WidgetCreateAppointmentComponent implements OnInit {
     this.patientTypeList = await this.generalService.getPatientType()
     .toPromise().then( res => {
       if (res.status === 'OK' && res.data.length === 0) {
-        this.alertService.success('No List Doctor in This Hospital');
+        this.alertService.success('No List Doctor in This Hospital', false, 3000);
       }
       
       return res.data;
@@ -711,7 +711,7 @@ export class WidgetCreateAppointmentComponent implements OnInit {
     let appDate = dateFormatter(detail.appointment_date, true);
 
     if(now !== appDate){
-      this.alertService.error('This appointment cannot checkin in this day');
+      this.alertService.error('This appointment cannot checkin in this day', false, 3000);
     }else{
       if(!detail.medical_record_number){
         if(detail.patient_hope_id){
@@ -1212,6 +1212,4 @@ export class WidgetCreateAppointmentComponent implements OnInit {
   removeAlert(alert: Alert) {
     this.alerts = this.alerts.filter(x => x !== alert);
   }
-
-
 }

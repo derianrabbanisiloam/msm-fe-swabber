@@ -1,3 +1,8 @@
+a:hover {
+  cursor:pointer;
+  text-decoration: underline !important;
+}
+
 .content-doctor-schedule-group {
     /*height: 575px;*/
     /*overflow-y: scroll;*/

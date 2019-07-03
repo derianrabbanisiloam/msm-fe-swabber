@@ -108,6 +108,27 @@ export class ModalRescheduleAppointmentComponent implements OnInit {
     if (this.rescheduleAppPayload) {
       await this.rescheduleAppointment();    
     }
+    if(this.rescheduleSelected.note !== this.appointmentSelected.appointment_note){
+      await this.updateNotes();
+    }
+  }
+
+  async updateNotes(){
+    const appointmentId = this.appointmentSelected.appointment_id;
+    const model = {
+      notes: this.rescheduleSelected.note,
+      userName: this.user.fullname,
+      userId: this.user.id,
+      source: sourceApps,
+    };
+
+    await this.appointmentService.updateAppNotes(appointmentId, model).subscribe(
+      (data) => {
+        this.appointmentService.emitUpdateNotes(true);
+      }, error => {
+        this.appointmentService.emitUpdateNotes(false);
+      }
+    );
   }
 
   async rescheduleAppointment() {

@@ -2,3 +2,10 @@
     width: 55px;
     display: inline;
   }
+  
+  .block-error-msg {
+    color: red;
+    min-height: 25px;
+    font-weight: bold;
+    padding: 0;
+  }

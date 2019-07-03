@@ -94,6 +94,9 @@
       </div>
   </div>
   <div class="col-md-12 block-error-msg">{{ editBlockErrMsg }}</div>
+  <div *ngFor="let alert of alerts">
+    <ngb-alert *ngIf="alert" type="{{cssAlertType(alert)}}" (close)="removeAlert(alert)">{{ alert.message }}</ngb-alert>
+  </div>
 </div>
 
 <ng-template #content6 let-c="close" let-d="dismiss">

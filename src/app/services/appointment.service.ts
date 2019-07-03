@@ -30,6 +30,9 @@ export class AppointmentService {
   private verifyAppSource = new Subject<boolean>();
   public verifyAppSource$ = this.verifyAppSource.asObservable();
 
+  private updateNotesSource = new Subject<boolean>();
+  public updateNotesSource$ = this.updateNotesSource.asObservable();
+
   emitCreateApp(params: boolean) {
     this.createAppSource.next(params);
   }
@@ -40,6 +43,10 @@ export class AppointmentService {
 
   emitVerifyApp(params: boolean) {
     this.verifyAppSource.next(params);
+  }
+
+  emitUpdateNotes(params: boolean){
+    this.updateNotesSource.next(params);
   }
 
   addAppointment(payload: any): Observable<any> {
@@ -176,6 +183,13 @@ export class AppointmentService {
 
   verifyAppointment(verifyAppointmentPayload: any): Observable<any> {
     return this.http.post<any>(this.ccAppointmentUrl, verifyAppointmentPayload, httpOptions);
+  }
+
+  updateAppNotes(appointmentId: string, payload: any): Observable<any> {
+    const url = `${this.appointmentUrl}/${appointmentId}/notes`;
+    const body = JSON.stringify(payload);
+
+    return this.http.put<any>(url, body, httpOptions);
   }
 
   getTempAppointment(tempId: any){

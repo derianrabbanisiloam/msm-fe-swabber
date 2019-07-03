@@ -137,18 +137,32 @@ export class WidgetAppointmentListComponent implements OnInit {
     this.getPatientType();
     this.listAppointment();
     this.emitRescheduleApp();
+    this.emitUpdateNotes();
     this.emitUpdateContact();
     this.getCollectionAlert();
+  }
+
+  emitUpdateNotes() {
+    this.appointmentService.updateNotesSource$.subscribe(
+      result => {
+        if (result) {
+          this.alertService.success('Appointment successfully updated', false, 3000);
+          this.listAppointment();
+        } else {
+          this.alertService.error('Appointment fail updated', false, 3000);
+        }
+      }
+    );
   }
 
   emitRescheduleApp() {
     this.appointmentService.rescheduleAppSource$.subscribe(
       result => {
         if (result) {
-          this.alertService.success('Reschedule appointment berhasil', false, 5000);
+          this.alertService.success('Reschedule appointment berhasil', false, 3000);
           this.listAppointment();
         } else {
-          this.alertService.error('Gagal reschedule appointment', false, 5000);
+          this.alertService.error('Gagal reschedule appointment', false, 3000);
         }
       }
     );
@@ -158,10 +172,10 @@ export class WidgetAppointmentListComponent implements OnInit {
     this.patientService.updateContactSource$.subscribe(
       async (result) => {
         if (result) {
-          this.alertService.success('Ubah nomor HP berhasil', false, 5000);
+          this.alertService.success('Ubah nomor HP berhasil', false, 3000);
           await this.listAppointment();
         } else {
-          this.alertService.error('Gagal ubah nomor HP', false, 5000);
+          this.alertService.error('Gagal ubah nomor HP', false, 3000);
         }
       }
     );

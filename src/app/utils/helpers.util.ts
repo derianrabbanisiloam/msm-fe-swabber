@@ -30,3 +30,9 @@ export function localSpliter(date: any, isLocal: boolean) {
 
     return fullDate;
 }
+
+export function regionTime(timeZone = 7, data = new Date()) {
+    const milisecond = new Date(data).getTime() + (timeZone * 60 * 60 * 1000);
+    
+    return milisecond;
+  }

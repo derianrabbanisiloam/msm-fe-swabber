@@ -52,11 +52,12 @@
             (click)="openDoctorSchedule()">
       Reschedule
     </button>
+
     <div class="col-md-12" style="padding: 0;max-height: 350px;overflow-y: scroll">
-      <app-widget-doctor-schedule 
+      <app-widget-doctor-schedule [style.display]="flag" 
         (opScheduleSelected)="getScheduleData($event)">
       </app-widget-doctor-schedule>
-      <app-widget-create-appointment 
+      <app-widget-create-appointment [style.display]="flag" 
         *ngIf="opScheduleSelected"
         (opSlotSelected)="getSlotData($event)"
         [appointmentPayloadInput]="createAppInputData">

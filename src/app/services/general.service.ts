@@ -20,6 +20,12 @@ export class GeneralService {
   ) { }
 
   private generalUrl = environment.FRONT_OFFICE_SERVICE + '/generals/';
+  private generalOpAdminUrl = environment.OPADMIN_SERVICE + '/generals/';
+
+  getHospital(): Observable<any> {
+    const uri = `${this.generalOpAdminUrl}hospitals`;
+    return this.http.get<any>(uri, httpOptions);
+  }
 
   getAdmissionType(): Observable<any> {
     const uri = 'admission-type';

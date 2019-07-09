@@ -14,7 +14,7 @@ import { QueueService } from '../../../services/queue.service';
 import { ScheduleService } from '../../../services/schedule.service';
 import { PatientService } from '../../../services/patient.service';
 import { Alert, AlertType } from '../../../models/alerts/alert';
-import { sourceApps, queueType } from '../../../variables/common.variable';
+import { sourceApps, queueType, appointmentStatusId} from '../../../variables/common.variable';
 import { Router, ActivatedRoute } from '@angular/router';
 import { BoundElementProperty } from '@angular/compiler';
 import { 
@@ -36,6 +36,8 @@ export class WidgetAppointmentListComponent implements OnInit {
   public hospital = this.key.hospital;
   public user = this.key.user;
   public now = new Date();
+  public appStatusId = appointmentStatusId;
+  public qType = queueType; 
 
   public dateAppointment: any = {
     date: {
@@ -114,6 +116,10 @@ export class WidgetAppointmentListComponent implements OnInit {
   public resQueue: any;
   public resMrLocal: any;
   public roomDetail: any;
+
+  public history: any;
+  public flagHistory: boolean = false;
+  public nameHistory: string;
 
   constructor(
     private doctorService: DoctorService,
@@ -242,7 +248,7 @@ export class WidgetAppointmentListComponent implements OnInit {
     this.patientTypeList = await this.generalService.getPatientType()
     .toPromise().then( res => {
       if (res.status === 'OK' && res.data.length === 0) {
-        this.alertService.success('No List Doctor in This Hospital');
+        this.alertService.success('No List Doctor in This Hospital', false, 3000);
       }
       
       return res.data;
@@ -260,9 +266,9 @@ export class WidgetAppointmentListComponent implements OnInit {
     this.model.name = '';
     this.model.mr = '';
     this.model.doctor = '';
-    this.model.birth ='';
+    this.model.birth = '';
 
-    this.resQueue = { name: null };
+    this.resQueue = null;
 
     this.txtPayer = true;
     this.txtPayerNo = true;
@@ -281,12 +287,12 @@ export class WidgetAppointmentListComponent implements OnInit {
     this.doctorList = await this.doctorService.getListDoctor(this.hospital.id)
     .toPromise().then( res => {
       if (res.status === 'OK' && res.data.length === 0) {
-        this.alertService.success('No List Doctor in This Hospital');
+        this.alertService.success('No List Doctor in This Hospital', false, 3000);
       }
 
       return res.data;
     }).catch( err => {
-      this.alertService.error(err.error.message);
+      this.alertService.error(err.error.message, false, 3000);
       return [];
     });
   }
@@ -295,8 +301,6 @@ export class WidgetAppointmentListComponent implements OnInit {
     this.showWaitMsg = true;
     this.showNotFoundMsg = false;
 
-    console.log("this.dateAppointment.date", this.dateAppointment.date);
-    
     const { year, month, day } = this.dateAppointment.date;
     const date = year + '-' + month + '-' + day;
     const hospital = this.hospital.id;
@@ -315,12 +319,6 @@ export class WidgetAppointmentListComponent implements OnInit {
           res.data[i].custome_appointment_date = dateFormatter(res.data[i].appointment_date, true);
           res.data[i].custome_from_time = res.data[i].from_time.substring(0, 5);
           res.data[i].custome_to_time = res.data[i].to_time.substring(0, 5);
-
-          if(res.data[i].appointment_note){
-            res.data[i].note_short = res.data[i].appointment_note.length > 10 ? res.data[i].appointment_note.substr(0, 10)+"..." : res.data[i].appointment_note;
-          }else{
-            res.data[i].note_short = '';
-          }
         }
         
         this.showWaitMsg = false;
@@ -333,18 +331,14 @@ export class WidgetAppointmentListComponent implements OnInit {
     }).catch( err => {
       this.showWaitMsg = false;
       this.showNotFoundMsg = true;
-      this.alertService.error(err.error.message, false, 5000);
+      this.alertService.error(err.error.message, false, 3000);
       return [];
     });
-
-    console.log(this.appList, 'this.appList');
   }
 
    async searchAppointment() {
 
     let { name, mr, doctor, birth } = await this.model;
-
-    console.log("doctor", doctor);
 
     const doctorId = doctor ? doctor.doctor_id : '';
     const arrBirth = birth ? birth.split('-') : '';
@@ -363,7 +357,6 @@ export class WidgetAppointmentListComponent implements OnInit {
   }
   
   onDateChange(val) {
-    console.log("val", val);
     this.dateAppointment.date = val.date;
     this.model = { hospital_id: '', name: '', mr: '', doctor: '' };
 
@@ -375,7 +368,6 @@ export class WidgetAppointmentListComponent implements OnInit {
   async checkInAppointment(val, content) {
     this.selectedCheckIn = val;
     this.late = await this.checkIsLate(val.appointment_id);
-    console.log("this.late", this.late, "this.selectedCheckIn", this.selectedCheckIn)
     this.open(content);
   }
 
@@ -396,7 +388,6 @@ export class WidgetAppointmentListComponent implements OnInit {
   async defaultPatientType(patientHopeId: any){
     this.nationalIdTypeId = await this.patientService.getDefaultPatientType(patientHopeId).toPromise()
     .then(res => {
-      console.log("res default", res)
       if(res.data){
         return res.data.nationalIdTypeId; 
       }else{
@@ -439,7 +430,7 @@ export class WidgetAppointmentListComponent implements OnInit {
       let appDate = dateFormatter(detail.appointment_date, true);
 
       if(now !== appDate){
-        this.alertService.error('This appointment cannot checkin in this day');
+        this.alertService.error('This appointment cannot checkin in this day', false, 3000);
       }else{
         if(!detail.medical_record_number){
           if(detail.patient_hope_id){
@@ -469,7 +460,6 @@ export class WidgetAppointmentListComponent implements OnInit {
   }
 
   openRescheduleModal(appointmentSelected: any){
-    console.log("appointmentSelected", appointmentSelected);
     const modalRef = this.modalService.open(ModalRescheduleAppointmentComponent,  
       {windowClass: 'cc_modal_confirmation', size: 'lg'});
     modalRef.componentInstance.appointmentSelected = appointmentSelected;
@@ -520,8 +510,6 @@ export class WidgetAppointmentListComponent implements OnInit {
 
   changeCondition(event:any){
     const val = event.target.value;
-
-    console.log("val", val)
     let idx = null
 
     if(val == 'PRIVATE' || val == 'PASSPORT' || val == 'KITAS'){
@@ -557,14 +545,10 @@ export class WidgetAppointmentListComponent implements OnInit {
     }
 
     this.patientType = this.patientTypeList[idx];
-
-    console.log("this.patientType", this.patientType)
   }
 
   async createAdmission(val, activeModal){
     this.listActiveAdmission = await this.getActiveAdmission(val.patient_hope_id);
-
-    console.log("this.listActiveAdmission", this.listActiveAdmission)
 
     if(this.listActiveAdmission.length !== 0) {
       this.openconfirmation(activeModal);
@@ -610,7 +594,6 @@ export class WidgetAppointmentListComponent implements OnInit {
 
     this.admissionService.createAdmission(body).toPromise()
     .then( res => {
-      console.log("res create admission", res)
       this.buttonCreateAdmission = true;
       this.buttonPrintQueue = false;
       this.buttonCloseAdm = true;
@@ -621,6 +604,35 @@ export class WidgetAppointmentListComponent implements OnInit {
       this.alertService.error(err.error.message, false, 3000);
     })
 
+  }
+
+  newPatient(){
+    const params = { appointmentId: this.selectedCheckIn.appointment_id, };
+    this.router.navigate(['./patient-data'], { queryParams: params });
+  }
+
+  openLogHistory(val, content){
+    let history = val;
+    this.nameHistory = history.contact_name;
+    this.appointmentService.appointmentHistory(history.appointment_id).toPromise()
+      .then(data => {
+        let newData = data.data;
+        if(newData.length){
+          this.history = newData;
+          this.flagHistory = true;
+          this.opened(content);
+        }
+        else {
+          this.history = null;
+          this.flagHistory = false;
+          this.openedTwo(content);
+        }
+      }, err => {
+        this.history = null;
+        this.flagHistory = false;
+        this.openedTwo(content);
+      }
+    );
   }
   
   filePdfCreated(val){
@@ -707,8 +719,6 @@ export class WidgetAppointmentListComponent implements OnInit {
         this.alertService.error(err.error.message, false, 3000);
         return null;
       })
-      
-      console.log("this.resQueue", this.resQueue)
 
     this.roomDetail = await this.scheduleService.scheduleDetail(val.schedule_id)
     .toPromise().then(res => {
@@ -716,8 +726,6 @@ export class WidgetAppointmentListComponent implements OnInit {
     }).catch( err => {
       return null;
     })
-
-    console.log("this.roomDetail", this.roomDetail)
   }
 
   closeClicked(){
@@ -819,7 +827,6 @@ export class WidgetAppointmentListComponent implements OnInit {
   getActiveAdmission(patientHopeId: any){
     const active = this.admissionService.getActiveAdmission(patientHopeId)
     .toPromise().then(res => {
-      console.log("getActiveAdmission", res)
       return res.data;
     }).catch( err => {
       return [];
@@ -856,6 +863,10 @@ export class WidgetAppointmentListComponent implements OnInit {
     }
   }
 
+  removeAlert(alert: Alert) {
+    this.alerts = this.alerts.filter(x => x !== alert);
+  }
+
   open(content) {
     this.modalService.open(content).result.then((result) => {
       this.closeResult = `Closed with: ${result}`;
@@ -874,6 +885,24 @@ export class WidgetAppointmentListComponent implements OnInit {
 
   openconfirmation(content) {
     this.modalService.open(content, {windowClass: 'fo_modal_confirmation'}).result.then((result) => {
+      this.closeResult = `Closed with: ${result}`;
+    }, (reason) => {
+      this.closeResult = `Dismissed ${this.getDismissReason(reason)}`;
+    });
+  }
+
+  opened(content) {
+    this.modalService.open(content, {windowClass: 'log-history', size: 'lg'}).result.then((result) => {
+
+      this.closeResult = `Closed with: ${result}`;
+    }, (reason) => {
+      this.closeResult = `Dismissed ${this.getDismissReason(reason)}`;
+    });
+  }
+
+  openedTwo(content) {
+    this.modalService.open(content, {windowClass: 'log-history-2', size: 'lg'}).result.then((result) => {
+
       this.closeResult = `Closed with: ${result}`;
     }, (reason) => {
       this.closeResult = `Dismissed ${this.getDismissReason(reason)}`;

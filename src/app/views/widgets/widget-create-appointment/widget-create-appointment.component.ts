@@ -33,7 +33,7 @@ import { AlertService } from '../../../services/alert.service';
 import { Alert, AlertType } from '../../../models/alerts/alert';
 import { sourceApps, queueType } from '../../../variables/common.variable';
 import { QueueService } from '../../../services/queue.service';
-import { dateFormatter } from '../../../utils/helpers.util';
+import { dateFormatter, regionTime} from '../../../utils/helpers.util';
 import * as pdfMake from 'pdfmake/build/pdfmake';
 import * as pdfFonts from 'pdfmake/build/vfs_fonts';
 
@@ -108,6 +108,8 @@ export class WidgetCreateAppointmentComponent implements OnInit {
   public roomDetail: any;
   public detailTemp: any;
 
+  public isOpen: boolean = true;
+
   constructor(
     private router: Router,
     private activatedRoute: ActivatedRoute,
@@ -124,6 +126,7 @@ export class WidgetCreateAppointmentComponent implements OnInit {
 
   async ngOnInit() {
     await this.getQueryParams();
+    await this.enableWalkInChecker();
     await this.getSchedule();
     await this.getDoctorProfile();
     await this.getDoctorNotes();
@@ -145,7 +148,9 @@ export class WidgetCreateAppointmentComponent implements OnInit {
   }
 
   async ngOnChanges() {
+    console.log("makan hati");
     await this.getQueryParams();
+    await this.enableWalkInChecker();
     await this.getSchedule();
     await this.getDoctorProfile();
     await this.getDoctorNotes();
@@ -166,6 +171,15 @@ export class WidgetCreateAppointmentComponent implements OnInit {
     this.refreshPage();
   }
 
+  async enableWalkInChecker(){
+    const appointmentDate = this.appointmentPayload.appointmentDate;
+    const zone = this.hospital.zone; 
+    const dateNow = await regionTime(zone);
+    this.isOpen = new Date(dateNow) < new Date(appointmentDate) ? false : true;
+
+    console.log("this.isOpen", this.isOpen);
+  }
+
   emitVerifyApp() {
     this.appointmentService.verifyAppSource$.subscribe(
       async () => {
@@ -176,7 +190,7 @@ export class WidgetCreateAppointmentComponent implements OnInit {
     );
   }
 
-  refreshPage(){
+  async refreshPage(){
     this.buttonCreateAdmission = false;
     this.buttonPrintQueue = true;
     this.buttonPatientLabel = true;
@@ -192,6 +206,10 @@ export class WidgetCreateAppointmentComponent implements OnInit {
     this.payer = null;
     this.payerNo = null;
     this.payerEligibility = null;
+    
+    await this.getAppointmentList();
+    await this.prepareTimeSlot();
+    await this.prepareAppList();
   }
 
   async admissionType(){
@@ -278,7 +296,7 @@ export class WidgetCreateAppointmentComponent implements OnInit {
     const diff = moment(`${date} ${this.schedule.to_time}`).unix() - 
                   moment(`${date} ${this.schedule.from_time}`).unix();
     const diffMinutes = Math.round(diff / 60);
-    const { quota } = this.doctorProfile;
+    const { quota, walkin } = this.doctorProfile;
     const duration = Math.round(60 / quota);
     const slotLength = Math.round(diffMinutes / duration);
     const docType = this.doctorProfile.doctor_type_name;
@@ -332,11 +350,13 @@ export class WidgetCreateAppointmentComponent implements OnInit {
           note: '',
           note_long: '',
           note_short: '',
+          modified_name: '',
           modified_by: null,
           is_waiting_list: false,
           is_can_create: true,
           is_can_cancel: false,
           is_blocked: false,
+          is_walkin: i % quota < quota-walkin ? false : true,
         });
       }
     } else if (docType === this.doctorType.FCFS) {
@@ -360,11 +380,13 @@ export class WidgetCreateAppointmentComponent implements OnInit {
           note: '',
           note_long: '',
           note_short: '',
+          modified_name: '',
           modified_by: null,
           is_waiting_list: false,
           is_can_create: true,
           is_can_cancel: false,
           is_blocked: false,
+          is_walkin: false,
         });
       }
       const appListLength = this.appList.length;
@@ -387,11 +409,13 @@ export class WidgetCreateAppointmentComponent implements OnInit {
         note: '',
         note_long: '',
         note_short: '',
+        modified_name: '',
         modified_by: null,
         is_waiting_list: false,
         is_can_create: true,
         is_can_cancel: false,
         is_blocked: false,
+        is_walkin: false,
       });
     }
   }
@@ -417,6 +441,7 @@ export class WidgetCreateAppointmentComponent implements OnInit {
           this.appList[i].note = x.note;
           this.appList[i].note_long = x.note ? x.note : '';
           this.appList[i].note_short = x.note && x.note.length > 30 ? x.note.substr(0, 30) + '...' : x.note;
+          this.appList[i].modified_name = x.modified_name;
           this.appList[i].modified_by = x.modified_by;
           this.appList[i].is_waiting_list = x.is_waiting_list;
           this.appList[i].is_can_create = false;
@@ -464,6 +489,7 @@ export class WidgetCreateAppointmentComponent implements OnInit {
           note: x.note,
           note_long: x.note ? x.note : '',
           note_short: x.note && x.note.length > 30 ? x.note.substr(0, 30) + '...' : x.note,
+          modified_name: x.modified_name,
           modified_by: x.modified_by,
           is_waiting_list: x.is_waiting_list,
           is_can_create: false,
@@ -488,6 +514,7 @@ export class WidgetCreateAppointmentComponent implements OnInit {
       note: '',
       note_long: '',
       note_short: '',
+      modified_name: '',
       modified_by: null,
       is_waiting_list: true,
       is_can_create: isBlockWaitingList === false ? true : false,
@@ -561,7 +588,6 @@ export class WidgetCreateAppointmentComponent implements OnInit {
   }
 
   async openCreateAppModal(item: any) {
-    console.log("=======")
     await this.reserveSlotApp(item);
     const canReserved = await this.getReservedSlot(item);
     const data = {
@@ -953,7 +979,7 @@ export class WidgetCreateAppointmentComponent implements OnInit {
       queueTypeId: queueTypeId,
       userId: this.user.id,
       source: sourceApps,
-      //userName: this.user.fullname,
+      userName: this.user.fullname,
     }
 
     this.resQueue = await this.queueService.createQueue(body).toPromise()
@@ -976,8 +1002,13 @@ export class WidgetCreateAppointmentComponent implements OnInit {
     console.log("this.roomDetail", this.roomDetail)
   }
 
+  newPatient(){
+    const params = { appointmentId: this.selectedCheckIn.appointment_id, };
+    this.router.navigate(['./patient-data'], { queryParams: params });
+  }
+
   closeClicked(){
-    this.ngOnInit();
+    this.refreshPage();
   }
 
   printQueueTicket(val) {
@@ -1064,7 +1095,7 @@ export class WidgetCreateAppointmentComponent implements OnInit {
     setTimeout (() => {
       this.closeQue.click();
       this.closeAdm.click();
-      this.ngOnInit();
+      this.refreshPage();
     }, 1000);
 
   }
@@ -1095,7 +1126,7 @@ export class WidgetCreateAppointmentComponent implements OnInit {
   }
 
   private getDismissReason(reason: any): string {
-
+    this.refreshPage();
     if (reason === ModalDismissReasons.ESC) {
       return 'by pressing ESC';
     } else if (reason === ModalDismissReasons.BACKDROP_CLICK) {

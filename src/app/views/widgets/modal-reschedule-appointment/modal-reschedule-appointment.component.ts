@@ -30,6 +30,7 @@ export class ModalRescheduleAppointmentComponent implements OnInit {
   public editContactPayload: editContactPayload;
   public rescheduleAppPayload: rescheduleAppointmentPayload;
   public editModel: any = {};
+  public flag: string;
 
   constructor(
     private doctorService: DoctorService,
@@ -91,6 +92,8 @@ export class ModalRescheduleAppointmentComponent implements OnInit {
 
   openDoctorSchedule() {
     this.isOpenDoctorSchedule = this.isOpenDoctorSchedule ? false : true;
+    this.flag = this.isOpenDoctorSchedule ? 'block' : 'none';
+    this.opScheduleSelected = this.isOpenDoctorSchedule ? this.opScheduleSelected : null;
     const searchKeywords = {
       doctor: { 
         doctor_id: this.appointmentSelected.doctor_id,

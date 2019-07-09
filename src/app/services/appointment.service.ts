@@ -53,6 +53,11 @@ export class AppointmentService {
     return this.http.post<any>(this.ccAppointmentUrl, payload, httpOptions);
   }
 
+  appointmentHistory(appointment: any): Observable<any> {
+    const url = `${this.ccAppointmentUrl}/history/${appointment}`;
+    return this.http.get<any>(url, httpOptions);
+  }
+
   getListAppointment(date: any, hospital: string, name?: string, birth?: any, mr?: any, doctor?: string, limit?: number, offset?: number): Observable<any> {
 
     let uri = `/hospital/${hospital}?date=${date}`;

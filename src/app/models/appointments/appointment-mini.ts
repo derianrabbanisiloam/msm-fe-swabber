@@ -22,6 +22,7 @@ export class AppointmentMini {
     created_date: string;
     created_from: string;
     modified_by: string;
+    modified_name: string;
     modified_date: string;
     modified_from: string;
   }

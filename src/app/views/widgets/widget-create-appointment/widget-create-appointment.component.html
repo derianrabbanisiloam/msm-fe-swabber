@@ -53,15 +53,29 @@
         </thead>
         <tbody>
           <tr *ngFor="let app of appList; let i=index"
-              [ngClass]="{'cc_row_rescheduled': app.is_blocked == true}">
+              [ngClass]="{'cc_row_rescheduled': app.is_blocked == true || isOpen == false && app.is_walkin == true }">
             <td class="st-kolom-time">{{app.appointment_range_time}}</td>
             <td>{{app.no}}</td>
-            <td *ngIf="app.is_can_create && isOriginal" 
+            <td *ngIf="app.is_can_create && isOriginal && app.is_walkin == false" 
                 class="st-kolom-available"
                 (click)="openCreateAppModal(app)"><a>Available</a></td>
-            <td *ngIf="app.is_can_create && !isOriginal" 
+            <td *ngIf="app.is_can_create && isOriginal && app.is_walkin == true && isOpen == true" 
+                class="st-kolom-available"
+                (click)="openCreateAppModal(app)"><a>Available</a></td>
+            <td *ngIf="app.is_can_create && isOriginal && app.is_walkin == true && isOpen == false" 
+                class="st-kolom-available">
+                <span style="color:red;font-weight:bold">Not Yet Opened</span>
+            </td>
+            <td *ngIf="app.is_can_create && !isOriginal && app.is_walkin == false" 
                 class="st-kolom-available"
                 (click)="openCreateAppModal2(app)"><a>Available</a></td>
+            <td *ngIf="app.is_can_create && !isOriginal && app.is_walkin == true && isOpen == true" 
+                class="st-kolom-available"
+                (click)="openCreateAppModal2(app)"><a>Available</a></td>
+            <td *ngIf="app.is_can_create && !isOriginal && app.is_walkin == true && isOpen == false" 
+                class="st-kolom-available">
+                <span style="color:red;font-weight:bold">Not Yet Opened</span>
+            </td>
             <td *ngIf="!app.is_can_create">
               {{app.patient_name}}
               <span *ngIf="app.appointment_temp_id" class="newPatientIcon">
@@ -80,7 +94,9 @@
             <td>
               <a ngbPopover="{{app.note_long}}" popoverTitle="" triggers="mouseenter:mouseleave">{{app.note_short}}</a>
             </td>
-            <td>{{app.modified_by}}</td>
+            <td>
+                <a ngbPopover="{{app.modified_name}}" popoverTitle="" triggers="mouseenter:mouseleave">{{app.modified_name && app.modified_name.length > 10 ? app.modified_name.substr(0,10)+"..." : app.modified_name}}</a>
+            </td>
             <td class="st-kolom-button">
               <div *ngIf="!app.appointment_temp_id">
                 <div *ngIf="app.is_can_cancel && isOriginal && !app.admission_id" class="cell-img-nav d-flex justify-content-center">

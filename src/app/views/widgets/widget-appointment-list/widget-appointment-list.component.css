@@ -64,6 +64,16 @@ thead th a{ color: #1A2269; text-decoration: none}
   padding: 0;
 }
 
+::ng-deep .log-history .modal-dialog { 
+  max-width: 93%;
+  width: 93%;
+  margin-top: 7vw;
+}
+::ng-deep .log-history-2 .modal-dialog { 
+  max-width: 30%;
+  width: 30%;
+  margin-top: 7vw;
+}
 
 .cell-img-nav, .cell-img-nav-single {
  text-align: center;

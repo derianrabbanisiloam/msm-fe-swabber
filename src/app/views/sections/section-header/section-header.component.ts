@@ -1,5 +1,6 @@
 import { Component, OnInit } from '@angular/core';
 import { AuthGuard} from '../../../guard/auth.guard';
+import { environment } from '../../../../environments/environment';
 
 @Component({
   selector: 'app-section-header',
@@ -14,6 +15,9 @@ export class SectionHeaderComponent implements OnInit {
   public currentUser: any = {};
   public hospitals: any;
   public key: any = JSON.parse(localStorage.getItem('key'));
+
+  environment: any = environment.ENVIRONMENT_NAME;
+  appVersion: any = '2.0';
 
   constructor(public auth: AuthGuard) { }
 

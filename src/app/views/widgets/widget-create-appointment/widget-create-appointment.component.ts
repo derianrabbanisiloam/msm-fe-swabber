@@ -433,14 +433,14 @@ export class WidgetCreateAppointmentComponent implements OnInit {
           this.appList[i].appointment_temp_id = x.appointment_temporary_id;
           this.appList[i].admission_id = x.admission_id;
           this.appList[i].appointment_no = x.appointment_no;
-          this.appList[i].patient_name = x.patient_name;
-          this.appList[i].date_of_birth = moment(x.patient_birth).format('DD-MM-YYYY');
+          this.appList[i].patient_name = x.contact_name;
+          this.appList[i].date_of_birth = moment(x.birth_date).format('DD-MM-YYYY');
           this.appList[i].local_mr_no = x.medical_record_number;
-          this.appList[i].phone_no = x.patient_phone_number;
+          this.appList[i].phone_no = x.phone_number;
           this.appList[i].queue_no = x.queue_number;
-          this.appList[i].note = x.note;
-          this.appList[i].note_long = x.note ? x.note : '';
-          this.appList[i].note_short = x.note && x.note.length > 30 ? x.note.substr(0, 30) + '...' : x.note;
+          this.appList[i].note = x.appointment_note;
+          this.appList[i].note_long = x.appointment_note ? x.appointment_note : '';
+          this.appList[i].note_short = x.appointment_note && x.appointment_note.length > 30 ? x.appointment_note.substr(0, 30) + '...' : x.appointment_note;
           this.appList[i].modified_name = x.modified_name;
           this.appList[i].modified_by = x.modified_by;
           this.appList[i].is_waiting_list = x.is_waiting_list;
@@ -481,14 +481,14 @@ export class WidgetCreateAppointmentComponent implements OnInit {
           appointment_id: x.appointment_id,
           appointment_temp_id: x.appointment_temporary_id,
           admission_id: x.admission_id,
-          patient_name: x.patient_name,
-          date_of_birth: moment(x.patient_birth).format('DD-MM-YYYY'),
+          patient_name: x.contact_name,
+          date_of_birth: moment(x.birth_date).format('DD-MM-YYYY'),
           local_mr_no: x.medical_record_number,
-          phone_no: x.patient_phone_number,
+          phone_no: x.phone_number,
           queue_no: x.queue_number,
-          note: x.note,
-          note_long: x.note ? x.note : '',
-          note_short: x.note && x.note.length > 30 ? x.note.substr(0, 30) + '...' : x.note,
+          note: x.appointment_note,
+          note_long: x.appointment_note ? x.appointment_note : '',
+          note_short: x.appointment_note && x.appointment_note.length > 30 ? x.appointment_note.substr(0, 30) + '...' : x.appointment_note,
           modified_name: x.modified_name,
           modified_by: x.modified_by,
           is_waiting_list: x.is_waiting_list,
@@ -581,7 +581,6 @@ export class WidgetCreateAppointmentComponent implements OnInit {
   }
 
   confirmCancelAppointment(appointmentId: string, temp = false) {
-    console.log("temp", temp);
     const modalRef = this.modalService.open(ModalCancelAppointmentComponent);
     const payload = { appointmentId: appointmentId, temp: temp };
     modalRef.componentInstance.payload = payload;
@@ -589,6 +588,7 @@ export class WidgetCreateAppointmentComponent implements OnInit {
 
   async openCreateAppModal(item: any) {
     await this.reserveSlotApp(item);
+    console.log("item", item);
     const canReserved = await this.getReservedSlot(item);
     const data = {
       schedule_id: this.appointmentPayload.scheduleId,

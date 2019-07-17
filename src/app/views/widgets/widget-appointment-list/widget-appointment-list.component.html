@@ -38,19 +38,19 @@
         <td>
           <div class="inner-addon right-addon">
             <i class="glyphicon fa fa-search"></i>
-            <input type="text" class="form-control" placeholder="Search name" [(ngModel)]="model.name" (change)="searchAppointment()"/>
+            <input type="text" class="form-control" placeholder="Search name" [(ngModel)]="model.name" (change)="searchAppointment(true)"/>
           </div>
         </td>
         <td>
           <div class="inner-addon right-addon">
             <i class="glyphicon fa fa-search"></i>
-            <input type="text" class="form-control" placeholder="Search MR" [(ngModel)]="model.mr" (change)="searchAppointment()"/>
+            <input type="text" class="form-control" placeholder="Search MR" [(ngModel)]="model.mr" (change)="searchAppointment(true)"/>
           </div>
         </td>
         <td>
           <div class="inner-addon right-addon">
             <i class="glyphicon fa fa-search"></i>
-            <input [textMask]="{mask: mask_birth}" type="text" placeholder="Search dob" class="form-control" [(ngModel)]="model.birth" (change)="searchAppointment()" placeholder="dd-mm-yyyy"/>
+            <input [textMask]="{mask: mask_birth}" type="text" placeholder="Search dob" class="form-control" [(ngModel)]="model.birth" (change)="searchAppointment(true)" placeholder="dd-mm-yyyy"/>
           </div>
         </td>
         <td></td>
@@ -63,8 +63,8 @@
                 [(ngModel)]="model.doctor"
                 [data]="doctorList"
                 searchKeyword="name"
-                (selected)='searchAppointment()'
-                (inputCleared)='searchAppointment()'
+                (selected)='searchAppointment(true)'
+                (inputCleared)='searchAppointment(true)'
                 [itemTemplate]="itemTemplateDoctor"
                 [notFoundTemplate]="notFoundTemplate"> 
               </ng-autocomplete>

@@ -1,3 +1,16 @@
+export const SecretKey = 'janganbilangbilang';
+export const Jwt = 'rahasia';
+export const CHECK_IN = 'APPOINTMENT__CHECK_IN';
+export const CREATE_APP = 'APPOINTMENT__CREATE';
+export const CANCEL_APP = 'APPOINTMENT__CANCEL';
+export const RESCHEDULE_APP = 'APPOINTMENT__RESCHEDULE';
+export const QUEUE_NUMBER = 'QUEUE__CREATE_QUEUE';
+
+export const keySocket = {
+  APPOINTMENT: '/appointments',
+  QUEUE: '/queues'
+}
+
 export const appInfo = {
     //APPLICATION_ID: '6728f580-d2d4-4e57-ad87-17ee13389971',
     APPLICATION_ID: '4981bc49-24b4-4a31-bd44-02f675502ecc',

@@ -36,6 +36,14 @@ import { QueueService } from '../../../services/queue.service';
 import { dateFormatter, regionTime} from '../../../utils/helpers.util';
 import * as pdfMake from 'pdfmake/build/pdfmake';
 import * as pdfFonts from 'pdfmake/build/vfs_fonts';
+import socket from 'socket.io-client';
+import { 
+  SecretKey, Jwt, 
+  CHECK_IN, CREATE_APP, 
+  CANCEL_APP, RESCHEDULE_APP,
+  QUEUE_NUMBER, keySocket } from '../../../variables/common.variable';
+import Security from 'msm-kadapat';
+import { environment } from '../../../../environments/environment';
 
 @Component({
   selector: 'app-widget-create-appointment',
@@ -49,6 +57,8 @@ export class WidgetCreateAppointmentComponent implements OnInit {
   public hospital = this.key.hospital;
   public user = this.key.user;
   
+  private socket;
+  private socketTwo;
   public appointments: AppointmentMini[];
   public appList: any = [];
   public appListWaiting: any = [];
@@ -121,8 +131,22 @@ export class WidgetCreateAppointmentComponent implements OnInit {
     private alertService: AlertService,
     private patientService: PatientService,
     private admissionService: AdmissionService,
-    private queueService: QueueService,
-  ) { }
+    private queueService: QueueService
+  ) {
+    this.socket = socket(`${environment.WEB_SOCKET_SERVICE + keySocket.APPOINTMENT}`,  {
+      transports: ['websocket'],  
+      query: `data=${
+        Security.encrypt({ secretKey: SecretKey }, Jwt)
+        }&url=${environment.FRONT_OFFICE_SERVICE}`,
+      });
+    
+    this.socketTwo = socket(`${environment.WEB_SOCKET_SERVICE + keySocket.QUEUE}`,  {
+        transports: ['websocket'],  
+        query: `data=${
+          Security.encrypt({ secretKey: SecretKey }, Jwt)
+          }&url=${environment.FRONT_OFFICE_SERVICE}`,
+        });
+   }
 
   async ngOnInit() {
     await this.getQueryParams();
@@ -145,6 +169,70 @@ export class WidgetCreateAppointmentComponent implements OnInit {
     this.emitScheduleBlock();
     this.getCollectionAlert();
     this.refreshPage();
+
+    this.socket.on(CREATE_APP, (call) => {
+      if(call.data.schedule_id == this.appointmentPayload.scheduleId 
+        && call.data.appointment_date == this.appointmentPayload.appointmentDate){
+          this.appointments.push(call.data);
+          this.prepareAppList();
+      }
+    });
+    this.socket.on(CANCEL_APP, (call) => {
+      if(call.data.schedule_id == this.appointmentPayload.scheduleId 
+        && call.data.appointment_date == this.appointmentPayload.appointmentDate){
+          this.appointments = this.appointments.filter((value) => {
+          return value.appointment_id !== call.data.appointment_id;
+          });
+          this.prepareTimeSlot();
+          this.prepareAppList();
+      }
+    });
+    this.socket.on(CHECK_IN, (call) => {
+      if(call.data.schedule_id == this.appointmentPayload.scheduleId 
+        && call.data.appointment_date == this.appointmentPayload.appointmentDate){
+        this.appointments = this.appointments.map((value) => {
+          if (value.appointment_id === call.data.appointment_id) {
+            value.admission_id = call.data.admission_id;
+          }
+          return value;
+        });
+        this.prepareAppList();
+      }
+    });
+    this.socket.on(RESCHEDULE_APP, (call) => {
+      if(call.data.schedule_id == this.appointmentPayload.scheduleId 
+        && call.data.appointment_date == this.appointmentPayload.appointmentDate){
+          if(this.appointments.length){
+            this.appointments.map((value) => {
+              if (value.appointment_id === call.data.appointment_id) {
+                this.appointments = this.appointments.filter((value) => {
+                  return value.appointment_id !== call.data.appointment_id;
+                });
+                this.prepareTimeSlot();
+                this.prepareAppList();
+              } else if (value.appointment_id !== call.data.appointment_id) {
+                this.appointments.push(call.data);
+                this.prepareAppList();
+              }
+            });
+          } else {
+            this.appointments.push(call.data);
+            this.prepareAppList();
+          }
+      }
+    });
+    this.socketTwo.on(QUEUE_NUMBER, (call) => {
+      if(call.data.schedule_id == this.appointmentPayload.scheduleId 
+        && call.data.appointment_date == this.appointmentPayload.appointmentDate){
+        this.appointments = this.appointments.map((value) => {
+          if (value.appointment_id === call.data.appointment_id) {
+            value.queue_number = call.data.queue_number;
+          }
+          return value;
+        });
+        this.prepareAppList();
+      }
+    });
   }
 
   async ngOnChanges() {
@@ -433,14 +521,14 @@ export class WidgetCreateAppointmentComponent implements OnInit {
           this.appList[i].appointment_temp_id = x.appointment_temporary_id;
           this.appList[i].admission_id = x.admission_id;
           this.appList[i].appointment_no = x.appointment_no;
-          this.appList[i].patient_name = x.patient_name;
-          this.appList[i].date_of_birth = moment(x.patient_birth).format('DD-MM-YYYY');
+          this.appList[i].patient_name = x.contact_name;
+          this.appList[i].date_of_birth = moment(x.birth_date).format('DD-MM-YYYY');
           this.appList[i].local_mr_no = x.medical_record_number;
-          this.appList[i].phone_no = x.patient_phone_number;
+          this.appList[i].phone_no = x.phone_number;
           this.appList[i].queue_no = x.queue_number;
-          this.appList[i].note = x.note;
-          this.appList[i].note_long = x.note ? x.note : '';
-          this.appList[i].note_short = x.note && x.note.length > 30 ? x.note.substr(0, 30) + '...' : x.note;
+          this.appList[i].note = x.appointment_note;
+          this.appList[i].note_long = x.appointment_note ? x.appointment_note : '';
+          this.appList[i].note_short = x.appointment_note && x.appointment_note.length > 30 ? x.appointment_note.substr(0, 30) + '...' : x.appointment_note;
           this.appList[i].modified_name = x.modified_name;
           this.appList[i].modified_by = x.modified_by;
           this.appList[i].is_waiting_list = x.is_waiting_list;
@@ -481,14 +569,14 @@ export class WidgetCreateAppointmentComponent implements OnInit {
           appointment_id: x.appointment_id,
           appointment_temp_id: x.appointment_temporary_id,
           admission_id: x.admission_id,
-          patient_name: x.patient_name,
-          date_of_birth: moment(x.patient_birth).format('DD-MM-YYYY'),
+          patient_name: x.contact_name,
+          date_of_birth: moment(x.birth_date).format('DD-MM-YYYY'),
           local_mr_no: x.medical_record_number,
-          phone_no: x.patient_phone_number,
+          phone_no: x.phone_number,
           queue_no: x.queue_number,
-          note: x.note,
-          note_long: x.note ? x.note : '',
-          note_short: x.note && x.note.length > 30 ? x.note.substr(0, 30) + '...' : x.note,
+          note: x.appointment_note,
+          note_long: x.appointment_note ? x.appointment_note : '',
+          note_short: x.appointment_note && x.appointment_note.length > 30 ? x.appointment_note.substr(0, 30) + '...' : x.appointment_note,
           modified_name: x.modified_name,
           modified_by: x.modified_by,
           is_waiting_list: x.is_waiting_list,
@@ -845,10 +933,28 @@ export class WidgetCreateAppointmentComponent implements OnInit {
       source: sourceApps,
       userName: this.user.fullname,
     };
+    var dataPatient;
 
     this.admissionService.createAdmission(body).toPromise()
     .then( res => {
       console.log("res create admission", res)
+      dataPatient = {
+        schedule_id: val.schedule_id,
+        admission_id: res.data.admission_id,
+        admission_hope_id: res.data.admission_hope_id,
+        admission_no: res.data.admission_no,
+        payer_name: res.data.payer_name,
+        appointment_id: val.appointment_id,
+        appointment_date: val.appointment_date,
+        hospital_id: val.hospital_id,
+        doctor_id: val.doctor_id,
+        modified_name: res.data.modified_name,
+        modified_date: res.data.modified_date,
+        modified_from: res.data.modified_from,
+        modified_by: res.data.modified_by
+      }
+      // broadcast check-in
+      this.socket.emit(CHECK_IN, dataPatient);
       this.buttonCreateAdmission = true;
       this.buttonPrintQueue = false;
       this.buttonCloseAdm = true;
@@ -981,9 +1087,27 @@ export class WidgetCreateAppointmentComponent implements OnInit {
       source: sourceApps,
       userName: this.user.fullname,
     }
+    var dataPatient;
 
     this.resQueue = await this.queueService.createQueue(body).toPromise()
       .then( res => {
+        dataPatient = {
+          schedule_id: val.schedule_id,
+          appointment_id: val.appointment_id,
+          appointment_date: val.appointment_date,
+          hospital_id: val.hospital_id,
+          doctor_id: val.doctor_id,
+          queue_id: res.data.queue_id,
+          queue_number: res.data.name,
+          queue_type: res.data.queue_type_id,
+          queue_status_id: res.data.queue_status_id,
+          modified_name: res.data.modified_name,
+          modified_date: res.data.modified_date,
+          modified_from: res.data.modified_from,
+          modified_by: res.data.modified_by
+        }
+        // broadcast queue-number
+        this.socketTwo.emit(QUEUE_NUMBER, dataPatient);
         return res.data;
       }).catch(err => {
         this.alertService.error(err.error.message, false, 3000);

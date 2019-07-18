@@ -18,9 +18,12 @@ import { channelId, sourceApps, queueType } from '../../../variables/common.vari
 import { NgbModal, ModalDismissReasons } from '@ng-bootstrap/ng-bootstrap';
 import * as pdfMake from 'pdfmake/build/pdfmake';
 import * as pdfFonts from 'pdfmake/build/vfs_fonts';
-
 import * as $ from 'jquery';
 import { THIS_EXPR } from '@angular/compiler/src/output/output_ast';
+import socket from 'socket.io-client';
+import { SecretKey, Jwt, QUEUE_NUMBER, CHECK_IN, keySocket } from '../../../variables/common.variable';
+import Security from 'msm-kadapat';
+import { environment } from '../../../../environments/environment';
 
 @Component({
   selector: 'app-widget-patient-data',
@@ -119,6 +122,8 @@ export class WidgetPatientDataComponent implements OnInit {
 
   public resQueue: any;
   public roomDetail: any;
+  public socket;
+  public socketTwo;
 
   constructor(
     private generalService: GeneralService,
@@ -138,6 +143,20 @@ export class WidgetPatientDataComponent implements OnInit {
 
     this.model.district = { district_id: null };
     this.model.subdistrict = { sub_district_id: null };
+
+    this.socket = socket(`${environment.WEB_SOCKET_SERVICE + keySocket.APPOINTMENT}`,  {
+      transports: ['websocket'],  
+      query: `data=${
+        Security.encrypt({ secretKey: SecretKey }, Jwt)
+        }&url=${environment.FRONT_OFFICE_SERVICE}`,
+      });
+
+    this.socketTwo = socket(`${environment.WEB_SOCKET_SERVICE + keySocket.QUEUE}`,  {
+      transports: ['websocket'],  
+      query: `data=${
+        Security.encrypt({ secretKey: SecretKey }, Jwt)
+        }&url=${environment.FRONT_OFFICE_SERVICE}`,
+      });
   }
 
   ngOnInit() {
@@ -999,9 +1018,27 @@ export class WidgetPatientDataComponent implements OnInit {
     };
 
     console.log(JSON.stringify(body), "body create admission");
+    var dataPatient;
 
     this.admissionService.createAdmission(body).toPromise()
     .then( res => {
+      dataPatient = {
+        schedule_id: val.schedule_id,
+        admission_id: res.data.admission_id,
+        admission_hope_id: res.data.admission_hope_id,
+        admission_no: res.data.admission_no,
+        payer_name: res.data.payer_name,
+        appointment_id: val.appointment_id,
+        appointment_date: val.appointment_date,
+        hospital_id: val.hospital_id,
+        doctor_id: val.doctor_id,
+        modified_name: res.data.modified_name,
+        modified_date: res.data.modified_date,
+        modified_from: res.data.modified_from,
+        modified_by: res.data.modified_by
+      }
+      // broadcast check-in
+      this.socket.emit(CHECK_IN, dataPatient);
       console.log("res create admission", res)
       this.buttonCreateAdmission = true;
       this.buttonPrintQueue = false;
@@ -1200,9 +1237,27 @@ export class WidgetPatientDataComponent implements OnInit {
       source: sourceApps,
       userName: this.user.fullname,
     }
+    var dataPatient;
 
     this.resQueue = await this.queueService.createQueue(body).toPromise()
       .then( res => {
+        dataPatient = {
+          schedule_id: val.schedule_id,
+          appointment_id: val.appointment_id,
+          appointment_date: val.appointment_date,
+          hospital_id: val.hospital_id,
+          doctor_id: val.doctor_id,
+          queue_id: res.data.queue_id,
+          queue_number: res.data.name,
+          queue_type: res.data.queue_type_id,
+          queue_status_id: res.data.queue_status_id,
+          modified_name: res.data.modified_name,
+          modified_date: res.data.modified_date,
+          modified_from: res.data.modified_from,
+          modified_by: res.data.modified_by
+        }
+        // broadcast queue-number
+        this.socketTwo.emit(QUEUE_NUMBER, dataPatient);
         return res.data;
       }).catch(err => {
         this.alertService.error(err.error.message, false, 3000);

@@ -10,12 +10,12 @@ export class AppointmentMini {
     hospital_id: string;
     doctor_id: string;
     contact_id: string;
-    patient_name: string;
-    patient_birth: string;
+    contact_name: string;
+    birth_date: string;
     medical_record_number: string;
-    patient_phone_number: string;
+    phone_number: string;
     queue_number: string;
-    note: string;
+    appointment_note: string;
     is_waiting_list: boolean;
     appointment_status_id: number;
     created_by: string;

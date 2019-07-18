@@ -669,7 +669,6 @@ export class WidgetCreateAppointmentComponent implements OnInit {
   }
 
   confirmCancelAppointment(appointmentId: string, temp = false) {
-    console.log("temp", temp);
     const modalRef = this.modalService.open(ModalCancelAppointmentComponent);
     const payload = { appointmentId: appointmentId, temp: temp };
     modalRef.componentInstance.payload = payload;
@@ -677,6 +676,7 @@ export class WidgetCreateAppointmentComponent implements OnInit {
 
   async openCreateAppModal(item: any) {
     await this.reserveSlotApp(item);
+    console.log("item", item);
     const canReserved = await this.getReservedSlot(item);
     const data = {
       schedule_id: this.appointmentPayload.scheduleId,

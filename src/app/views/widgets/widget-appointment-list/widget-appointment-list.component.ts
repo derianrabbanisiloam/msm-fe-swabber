@@ -45,7 +45,7 @@ export class WidgetAppointmentListComponent implements OnInit {
   public user = this.key.user;
   public now = new Date();
   public appStatusId = appointmentStatusId;
-  public qType = queueType; 
+  public qType = queueType;  
 
   public dateAppointment: any = {
     date: {
@@ -256,7 +256,7 @@ export class WidgetAppointmentListComponent implements OnInit {
     this.page += 1;
     this.offset = this.page * 10;
     this.isCanPrevPage = this.offset === 0 ? false : true;
-    this.listAppointment();
+    this.searchAppointment(false);
   }
 
   prevPage() {
@@ -266,7 +266,7 @@ export class WidgetAppointmentListComponent implements OnInit {
     this.page -= 1;
     this.offset = this.page * 10;
     this.isCanPrevPage = this.offset === 0 ? false : true;
-    this.listAppointment();
+    this.searchAppointment(false);
   }
 
   async admissionType(){
@@ -402,8 +402,8 @@ export class WidgetAppointmentListComponent implements OnInit {
     });
   }
 
-   async searchAppointment() {
-
+   async searchAppointment(search?: boolean) {
+    this.offset = search ? 0 : this.offset; 
     let { name, mr, doctor, birth } = await this.model;
 
     const doctorId = doctor ? doctor.doctor_id : '';
@@ -412,8 +412,6 @@ export class WidgetAppointmentListComponent implements OnInit {
     name = name ? name.toLowerCase() : '';
     mr = mr ? mr.toLowerCase() : '';
     birth = arrBirth ? arrBirth[2] + '-' + arrBirth[1] + '-' + arrBirth[0] : '';
-
-    this.offset = 0;
 
     if (name || mr || doctorId || birth) {
       this.listAppointment(name, birth, mr, doctorId);

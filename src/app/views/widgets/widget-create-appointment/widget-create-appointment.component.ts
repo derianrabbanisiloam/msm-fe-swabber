@@ -199,26 +199,23 @@ export class WidgetCreateAppointmentComponent implements OnInit {
         this.prepareAppList();
       }
     });
-    this.socket.on(RESCHEDULE_APP, (call) => {
-      if(call.data.schedule_id == this.appointmentPayload.scheduleId 
-        && call.data.appointment_date == this.appointmentPayload.appointmentDate){
-          if(this.appointments.length){
-            this.appointments.map((value) => {
-              if (value.appointment_id === call.data.appointment_id) {
-                this.appointments = this.appointments.filter((value) => {
-                  return value.appointment_id !== call.data.appointment_id;
-                });
-                this.prepareTimeSlot();
-                this.prepareAppList();
-              } else if (value.appointment_id !== call.data.appointment_id) {
-                this.appointments.push(call.data);
-                this.prepareAppList();
-              }
+    this.socket.on(RESCHEDULE_APP,(call) => {
+      if(this.appointments.length){
+        this.appointments.map((value) => {
+          if (value.appointment_id === call.data.appointment_id) {
+            this.appointments = this.appointments.filter((value) => {
+              return value.appointment_id !== call.data.appointment_id;
             });
-          } else {
+            this.prepareTimeSlot();
+            this.prepareAppList();
+          } else if (value.appointment_id !== call.data.appointment_id && value.schedule_id === call.data.schedule_id) {
             this.appointments.push(call.data);
             this.prepareAppList();
           }
+        });
+      } else {
+        this.appointments.push(call.data);
+        this.prepareAppList();
       }
     });
     this.socketTwo.on(QUEUE_NUMBER, (call) => {

@@ -97,7 +97,7 @@
           <a *ngIf="!itr.admission_id" href="javascript:void(0)" (click)="openRescheduleModal(itr)">{{itr.contact_name}}
           </a>
           <span *ngIf="itr.admission_id">{{itr.contact_name}}</span>
-          <button type="button"
+          <button *ngIf="itr.is_logged" type="button"
             class="ms_btn_border ms_btn_darkgrey" 
             style="margin-left: 1.2vw; width: 1.3vw; height: 1.3vw;"
             (click)="openLogHistory(itr, modalHistory)">

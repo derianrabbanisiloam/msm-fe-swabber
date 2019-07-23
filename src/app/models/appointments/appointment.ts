@@ -24,6 +24,7 @@ export class Appointment {
     hospital_name: string;
     is_waiting_list: boolean;
     is_walkin: boolean;
+    is_logged: boolean;
     medical_record_number: number;
     modified_by: string;
     modified_date: string;

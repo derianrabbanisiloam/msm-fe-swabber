@@ -12,12 +12,11 @@ export const keySocket = {
 }
 
 export const appInfo = {
-    //APPLICATION_ID: '6728f580-d2d4-4e57-ad87-17ee13389971',
-    APPLICATION_ID: '4981bc49-24b4-4a31-bd44-02f675502ecc',
+    APPLICATION_ID: '6728f580-d2d4-4e57-ad87-17ee13389971',
     ROLE_ID: '4a868d3d-63a2-408e-8fdc-6e8bcf7a2f45',
 };
 
-export const sourceApps = '::ffff:10.83.146.145';
+export const sourceApps = 'FrontOffice';
 
 export const leaveType = [
     {

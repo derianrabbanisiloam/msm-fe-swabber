@@ -13,7 +13,7 @@ export const keySocket = {
 
 export const appInfo = {
     APPLICATION_ID: '6728f580-d2d4-4e57-ad87-17ee13389971',
-    ROLE_ID: '4a868d3d-63a2-408e-8fdc-6e8bcf7a2f45',
+    ROLE_ID: '263ebf52-9ea9-4e92-a4e9-f4a0a3366de8',
 };
 
 export const sourceApps = 'FrontOffice';

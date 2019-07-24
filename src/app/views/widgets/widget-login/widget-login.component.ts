@@ -67,7 +67,7 @@ export class WidgetLoginComponent implements OnInit {
     const roleId = this.roleId;
 
     const body = {
-      username,
+      userAccount: username,
       password,
       fullname,
       email,

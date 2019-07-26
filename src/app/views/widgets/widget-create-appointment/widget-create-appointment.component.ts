@@ -202,14 +202,14 @@ export class WidgetCreateAppointmentComponent implements OnInit {
     this.socket.on(RESCHEDULE_APP,(call) => {
       if(this.appointments.length){
         this.appointments.map((value) => {
-          if (value.appointment_id === call.data.appointment_id) {
+          if (value.appointment_id === call.data.after.appointment_id) {
             this.appointments = this.appointments.filter((value) => {
-              return value.appointment_id !== call.data.appointment_id;
+              return value.appointment_id !== call.data.after.appointment_id;;
             });
             this.prepareTimeSlot();
             this.prepareAppList();
-          } else if (value.appointment_id !== call.data.appointment_id && value.schedule_id === call.data.schedule_id) {
-            this.appointments.push(call.data);
+          } else if (value.appointment_id !== call.data.after.appointment_id && value.schedule_id === call.data.after.schedule_id) {
+            this.appointments.push(call.data.after);
             this.prepareAppList();
           }
         });
@@ -383,7 +383,8 @@ export class WidgetCreateAppointmentComponent implements OnInit {
     const diffMinutes = Math.round(diff / 60);
     const { quota, walkin } = this.doctorProfile;
     const duration = Math.round(60 / quota);
-    const slotLength = Math.round(diffMinutes / duration);
+    let slotLength = Math.round(diffMinutes / duration);
+    slotLength = this.doctorType.HOURLY_APPOINTMENT ? diffMinutes / 60 * quota : slotLength;
     const docType = this.doctorProfile.doctor_type_name;
     let no = 0;
     let fromTime; 
@@ -446,8 +447,9 @@ export class WidgetCreateAppointmentComponent implements OnInit {
       }
     } else if (docType === this.doctorType.FCFS) {
       for (let i=0, n=this.appointments.length; i<n; i++) {
+        no += 1;
         this.appList.push({
-          no: no + 1,
+          no: no,
           hospital_id: hospitalId,
           doctor_id: doctorId,
           appointment_range_time: appTime,
@@ -1111,7 +1113,15 @@ export class WidgetCreateAppointmentComponent implements OnInit {
         return null;
       })
       
-      console.log("this.resQueue", this.resQueue)
+    console.log("this.resQueue", this.resQueue)
+    
+    this.selectedCheckIn = await this.appointmentService.getAppointmentById(val.appointment_id).toPromise().then( res => {
+      return res.data[0];
+    }).catch( err => {
+      return null;
+    });
+      
+    console.log("this.selectedCheckIn", this.selectedCheckIn);
 
     this.roomDetail = await this.scheduleService.scheduleDetail(val.schedule_id)
     .toPromise().then(res => {

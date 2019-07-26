@@ -168,7 +168,6 @@ export class AppointmentService {
   getAppointmentByScheduleId(scheduleId: string, date: string, sortBy?: string, orderBy?: string): Observable<any> {
     const url = `${this.ccAppointmentUrl}?scheduleId=${scheduleId}&date=${date}&sortBy=${sortBy}&orderBy=${orderBy}`;
     // return of(APPOINTMENT);
-    console.log(url);
     return this.http.get<any>(url, httpOptions);
   }
 
@@ -200,7 +199,6 @@ export class AppointmentService {
   getTempAppointment(tempId: any){
     const url = `${this.ccAppointmentUrl}/temporary/${tempId}`;
     // return of(APPOINTMENT);
-    console.log(url);
     return this.http.get<any>(url, httpOptions);
   }
 

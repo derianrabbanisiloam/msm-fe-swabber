@@ -673,8 +673,8 @@ export class WidgetCreateAppointmentComponent implements OnInit {
     const data = {
       schedule_id: this.appointmentPayload.scheduleId,
       appointment_date: this.appointmentPayload.appointmentDate,
-      appointment_from_time: this.schedule.from_time,
-      appointment_to_time: this.schedule.to_time,
+      appointment_from_time: item.appointment_from_time,
+      appointment_to_time: item.appointment_to_time,
       hospital_id: this.schedule.hospital_id,
       doctor_id: this.schedule.doctor_id,
       appointment_no: item.appointment_no,
@@ -692,8 +692,8 @@ export class WidgetCreateAppointmentComponent implements OnInit {
     const data = {
       schedule_id: this.appointmentPayload.scheduleId,
       appointment_date: this.appointmentPayload.appointmentDate,
-      appointment_from_time: this.schedule.from_time,
-      appointment_to_time: this.schedule.to_time,
+      appointment_from_time: item.appointment_from_time,
+      appointment_to_time: item.appointment_to_time,
       hospital_id: this.schedule.hospital_id,
       doctor_id: this.schedule.doctor_id,
       appointment_no: item.appointment_no,

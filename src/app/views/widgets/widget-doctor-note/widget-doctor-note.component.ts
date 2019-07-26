@@ -305,9 +305,7 @@ export class WidgetDoctorNoteComponent implements OnInit {
 
   refreshNotes() {
     if (this.doctorUid == null || this.doctorUid == '' ) {
-      console.log('mmmmmmmm');
       if (this.dfRefresh == null || this.dfRefresh == '') {
-        console.log('lllllllllll');
         this.doctorService.getDoctorNotes(this.hospitalId, this.todayString, this.todayString)
         .subscribe(data => {
           this.doctorNotes = [];
@@ -318,7 +316,6 @@ export class WidgetDoctorNoteComponent implements OnInit {
           this.doctorNotes = [];
         });
       } else {
-        console.log('00000000000');
         this.doctorService.getDoctorNotes(this.hospitalId, this.dfRefresh, this.tfRefresh)
         .subscribe(data => {
           this.doctorNotes = [];
@@ -328,7 +325,6 @@ export class WidgetDoctorNoteComponent implements OnInit {
         });
       }
     } else {
-      console.log('kkkkkkkkkkk');
       this.doctorService.getDoctorNotes(this.hospitalId, this.dfRefresh, this.tfRefresh, this.doctorUid)
         .subscribe(data => {
           this.doctorNotes = [];

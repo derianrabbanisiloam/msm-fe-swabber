@@ -36,7 +36,7 @@
           </td>
           <td>{{ appointment.is_waiting_list }}</td>
           <td>{{ appointment.queue_number }}</td>
-          <td>{{ appointment.created_by }}</td>
+          <td>{{ appointment.created_name }}</td>
           <td>
             <textarea [(ngModel)]="rescheduleSelected.note">{{ appointment.appointment_note }}</textarea>
           </td>

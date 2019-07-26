@@ -89,8 +89,7 @@ export class WidgetBaseAppointmentComponent implements OnInit {
       doctor_id: item.doctor_id,
       name: item.name
     }
-
-    console.log("++++++", this.searchKeywords);
+    
     this.doctorService.changeSearchDoctor(this.searchKeywords);
     this.doctorService.searchDoctorSource2 = this.searchKeywords;
 

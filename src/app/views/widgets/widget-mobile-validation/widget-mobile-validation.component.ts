@@ -222,8 +222,6 @@ export class WidgetMobileValidationComponent implements OnInit {
       this.params.birth = this.selectedAccount.birth_date;
       this.isFound = false;
     }
-
-    console.log("this.patientList", this.patientList)
   }
 
   async getDetailAddress(from?: boolean) {
@@ -410,25 +408,19 @@ export class WidgetMobileValidationComponent implements OnInit {
         })
         
         this.model.district = district ? district : { district_id: null };   
-        console.log("this.model.district", this.model.district);
       }else{
         this.model.district = { district_id: null };
       }
 
       if(val.subDistrictId) {
-        console.log(val.subDistrictId, "val.subDistrictId");
-        
         const subdistrict = await this.generalService.getSubDistrict(null, val.subDistrictId)
         .toPromise().then( res => {
-          console.log("res.data", res.data)
           return res.data;
         }).catch( err => {
           return null;
         });
         
         this.model.subdistrict = subdistrict ? subdistrict : { sub_district_id: null };
-
-        console.log("this.model.subdistrict", this.model.subdistrict)
       }else{
         this.model.subdistrict = { sub_district_id: null };
       }
@@ -608,7 +600,6 @@ export class WidgetMobileValidationComponent implements OnInit {
         ...payload,
         patientOrganizationId: this.model.patientOrganizationId,
       };
-      console.log(JSON.stringify(body), "3");
       const result = await this.updatePatientComplete(body, this.model.patientId);
 
       if(result){
@@ -618,8 +609,6 @@ export class WidgetMobileValidationComponent implements OnInit {
           source: sourceApps,
           userName: this.user.fullname,
         };
-        
-        console.log(JSON.stringify(params), "verifyProcess");
         await this.accountVerify(params);
       }
     }
@@ -628,8 +617,6 @@ export class WidgetMobileValidationComponent implements OnInit {
 
   openPatientRegistration(){
 
-    console.log("this.selectedAccount", this.selectedAccount);
-
     const data = {
       contactId: this.selectedAccount.contact_id,
     };
@@ -637,20 +624,6 @@ export class WidgetMobileValidationComponent implements OnInit {
     const modalRef = this.modalService.open(ModalPatientRegistrationComponent, {windowClass: 'fo_modal_70'});
 
     modalRef.componentInstance.contactInfo = data;
-
-    // const data = {
-    //   schedule_id: this.appointmentPayload.scheduleId,
-    //   appointment_date: this.appointmentPayload.appointmentDate,
-    //   appointment_from_time: this.schedule.from_time,
-    //   appointment_to_time: this.schedule.to_time,
-    //   hospital_id: this.schedule.hospital_id,
-    //   doctor_id: this.schedule.doctor_id,
-    //   appointment_no: item.appointment_no,
-    //   is_waiting_list: item.is_waiting_list,
-    //   can_reserved: canReserved
-    // };
-    // const modalRef = this.modalService.open(ModalCreateAppointmentComponent);
-    // modalRef.componentInstance.appointmentInfo = data;
   }
 
   openconfirmation(content) {

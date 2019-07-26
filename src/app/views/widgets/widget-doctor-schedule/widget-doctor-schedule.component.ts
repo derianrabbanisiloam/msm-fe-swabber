@@ -119,8 +119,6 @@ export class WidgetDoctorScheduleComponent implements OnInit {
   }
 
   async generateDates(selectedDate?: any) {
-
-    console.log(selectedDate, "selectedDate");
     this.dates = [];
     let date: any = selectedDate ? moment(selectedDate).startOf('week') : moment().startOf('week');
     let dateTemp: any;
@@ -133,7 +131,6 @@ export class WidgetDoctorScheduleComponent implements OnInit {
     let leaveType: any;
     let doctorId: any;
     /** Kalo mau lanjutin pasang doctor leave, mulai dari sini ya */
-    console.log(selectedDate);
     for (let i=0, length=7; i<length; i++) {
       dateTemp = date.add(1, 'days');
       dateHeader = dateTemp.format('dddd, DD-MM-YYYY');
@@ -155,8 +152,6 @@ export class WidgetDoctorScheduleComponent implements OnInit {
     this.doctorService.getScheduleByDoctorId(doctorId, date, this.hospital.id)
       .subscribe(data => {
         this.doctorSchedules1 = data.data;
-
-        console.log("this.doctorSchedules1", this.doctorSchedules1);
         if (this.doctorSchedules1.length > 0) {
           this.showScheduleType2 = false;
           this.showScheduleType1 = true;
@@ -189,7 +184,6 @@ export class WidgetDoctorScheduleComponent implements OnInit {
 
   async getLeaveHeader(keywords: any) {
     const year = moment().format('YYYY');
-    console.log(keywords)
     const doctorId = keywords.doctor ? keywords.doctor.doctor_id : null;
     const areaId = keywords.area ? keywords.area.area_id : null;
     const hospitalId = !isEmpty(keywords.hospital) ? keywords.hospital.hospital_id : null;
@@ -201,7 +195,6 @@ export class WidgetDoctorScheduleComponent implements OnInit {
       areaId, 
       specialityId).toPromise().then(
       data => {
-        console.log(data);
         return data.data;
       }
     );
@@ -266,7 +259,6 @@ export class WidgetDoctorScheduleComponent implements OnInit {
   gotoCreateApp2(item: any, date: string) {
     const output = { ...item, date }
     this.opScheduleSelected.emit(output);
-    console.log(output);
   }
 
   gotoCreateApp3(item: any, date: string) {

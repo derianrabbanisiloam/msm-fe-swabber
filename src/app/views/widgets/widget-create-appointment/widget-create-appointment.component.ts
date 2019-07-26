@@ -381,8 +381,8 @@ export class WidgetCreateAppointmentComponent implements OnInit {
     const { quota, walkin } = this.doctorProfile;
     const duration = Math.round(60 / quota);
     let slotLength = Math.round(diffMinutes / duration);
-    slotLength = this.doctorType.HOURLY_APPOINTMENT ? diffMinutes / 60 * quota : slotLength;
     const docType = this.doctorProfile.doctor_type_name;
+    slotLength = (docType === this.doctorType.HOURLY_APPOINTMENT) ? diffMinutes / 60 * quota : slotLength;
     let no = 0;
     let fromTime; 
     let toTime;

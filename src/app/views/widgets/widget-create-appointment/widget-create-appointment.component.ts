@@ -233,7 +233,6 @@ export class WidgetCreateAppointmentComponent implements OnInit {
   }
 
   async ngOnChanges() {
-    console.log("makan hati");
     await this.getQueryParams();
     await this.enableWalkInChecker();
     await this.getSchedule();
@@ -261,8 +260,6 @@ export class WidgetCreateAppointmentComponent implements OnInit {
     const zone = this.hospital.zone; 
     const dateNow = await regionTime(zone);
     this.isOpen = new Date(dateNow) < new Date(appointmentDate) ? false : true;
-
-    console.log("this.isOpen", this.isOpen);
   }
 
   emitVerifyApp() {
@@ -539,7 +536,6 @@ export class WidgetCreateAppointmentComponent implements OnInit {
       this.scheduleBlocks.map(x => {
         blockTimeStart = moment(`${appointmentDate} ${x.from_time}`);
         blockTimeEnd = moment(`${appointmentDate} ${x.to_time}`);
-        console.log(x.from_time, x.to_time, appointmentDate, this.appList[i].appointment_id);
         if (appTimeCompare >= blockTimeStart && appTimeCompare < blockTimeEnd) {
           this.appList[i].is_blocked = true;
           this.appList[i].is_can_create = false;
@@ -660,8 +656,6 @@ export class WidgetCreateAppointmentComponent implements OnInit {
     await this.appointmentService.getTempAppointment(appointmentId).toPromise().then(
       data => {
         this.detailTemp = data.data;
-        
-        console.log(this.detailTemp, "this.detailTemp");
         const modalRef = this.modalService.open(ModalPatientVerificationComponent);modalRef.componentInstance.tempAppointmentSelected = this.detailTemp;
       }
     );
@@ -675,7 +669,6 @@ export class WidgetCreateAppointmentComponent implements OnInit {
 
   async openCreateAppModal(item: any) {
     await this.reserveSlotApp(item);
-    console.log("item", item);
     const canReserved = await this.getReservedSlot(item);
     const data = {
       schedule_id: this.appointmentPayload.scheduleId,
@@ -747,7 +740,6 @@ export class WidgetCreateAppointmentComponent implements OnInit {
     };
     await this.appointmentService.reserveSlotApp(payload).toPromise().then(
       data => {
-        console.log(data, 'Slot reserved');
         return data.data;
       }
     );
@@ -781,7 +773,6 @@ export class WidgetCreateAppointmentComponent implements OnInit {
   async defaultPatientType(patientHopeId: any){
     this.nationalIdTypeId = await this.patientService.getDefaultPatientType(patientHopeId).toPromise()
     .then(res => {
-      console.log("res default", res)
       if(res.data){
         return res.data.nationalIdTypeId; 
       }else{
@@ -846,7 +837,6 @@ export class WidgetCreateAppointmentComponent implements OnInit {
   getActiveAdmission(patientHopeId: any){
     const active = this.admissionService.getActiveAdmission(patientHopeId)
     .toPromise().then(res => {
-      console.log("getActiveAdmission", res)
       return res.data;
     }).catch( err => {
       return [];
@@ -856,9 +846,6 @@ export class WidgetCreateAppointmentComponent implements OnInit {
 
   async createAdmission(val, activeModal){
     this.listActiveAdmission = await this.getActiveAdmission(val.patient_hope_id);
-
-    console.log("this.listActiveAdmission", this.listActiveAdmission)
-
     if(this.listActiveAdmission.length !== 0) {
       this.openconfirmation(activeModal);
     }else{
@@ -936,7 +923,6 @@ export class WidgetCreateAppointmentComponent implements OnInit {
 
     this.admissionService.createAdmission(body).toPromise()
     .then( res => {
-      console.log("res create admission", res)
       dataPatient = {
         schedule_id: val.schedule_id,
         admission_id: res.data.admission_id,
@@ -983,8 +969,6 @@ export class WidgetCreateAppointmentComponent implements OnInit {
 
   changeCondition(event:any){
     const val = event.target.value;
-
-    console.log("val", val)
     let idx = null
 
     if(val == 'PRIVATE' || val == 'PASSPORT' || val == 'KITAS'){
@@ -1020,8 +1004,6 @@ export class WidgetCreateAppointmentComponent implements OnInit {
     }
 
     this.patientType = this.patientTypeList[idx];
-
-    console.log("this.patientType", this.patientType)
   }
 
   filePdfCreated(val){
@@ -1112,16 +1094,12 @@ export class WidgetCreateAppointmentComponent implements OnInit {
         this.alertService.error(err.error.message, false, 3000);
         return null;
       })
-      
-    console.log("this.resQueue", this.resQueue)
     
     this.selectedCheckIn = await this.appointmentService.getAppointmentById(val.appointment_id).toPromise().then( res => {
       return res.data[0];
     }).catch( err => {
       return null;
     });
-      
-    console.log("this.selectedCheckIn", this.selectedCheckIn);
 
     this.roomDetail = await this.scheduleService.scheduleDetail(val.schedule_id)
     .toPromise().then(res => {
@@ -1129,8 +1107,6 @@ export class WidgetCreateAppointmentComponent implements OnInit {
     }).catch( err => {
       return null;
     })
-
-    console.log("this.roomDetail", this.roomDetail)
   }
 
   newPatient(){

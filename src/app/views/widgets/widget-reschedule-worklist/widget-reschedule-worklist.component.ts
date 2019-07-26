@@ -122,14 +122,12 @@ export class WidgetRescheduleWorklistComponent implements OnInit {
           x.appointment_from_time = x.appointment_from_time.substr(0, 5);
           x.appointment_to_time = x.appointment_to_time.substr(0, 5);
         });
-        console.log(this.rescheduledAppointments)
         this.isCanNextPage = this.rescheduledAppointments.length >= 10 ? true: false;
       }
     );
   }
 
   openRescheduleModal(appointmentSelected: any) {
-    console.log("appointmentSelected", appointmentSelected);
     const modalRef = this.modalService.open(ModalRescheduleAppointmentComponent,  
       {windowClass: 'cc_modal_confirmation', size: 'lg'});
     modalRef.componentInstance.appointmentSelected = appointmentSelected;

@@ -46,12 +46,10 @@ export class ModalCancelAppointmentComponent implements OnInit {
 
     this.appointmentService.deleteAppointment(this.payload.appointmentId, body, this.payload.temp).subscribe(
       data => {
-        console.log(data);
         this.activeModal.close();
         this.alertService.success('Appointment canceled', false, 5000);
         this.appointmentService.emitCancelApp(true);
       }, err => {
-        console.log(err);
       }
     );
   }

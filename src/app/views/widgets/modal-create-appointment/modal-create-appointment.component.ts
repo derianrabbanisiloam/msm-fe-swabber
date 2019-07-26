@@ -112,7 +112,7 @@ export class ModalCreateAppointmentComponent implements OnInit {
       userName: this.userName,
       source: this.source
     };
-    console.log(JSON.stringify(this.addAppPayload));
+    
     await this.appointmentService.addAppointment(this.addAppPayload).toPromise().then(
       data => {
         this.alertService.success('Success to create appointment', false, 3000);
@@ -168,7 +168,7 @@ export class ModalCreateAppointmentComponent implements OnInit {
     if (e && Number(e.keyCode) !== 13) {
       return false;
     }
-    console.log(this.model);
+    
     const hospitalId = this.appointmentInfo.hospital_id;
     let birthDate = null;
     if (!this.model.localMrNo) {

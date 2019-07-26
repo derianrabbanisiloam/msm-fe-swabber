@@ -234,8 +234,6 @@ export class WidgetPatientDataComponent implements OnInit {
       }else{
         this.alertService.error('Appointment not found', false, 5000);
       }
-
-      console.log("this.selectedCheckIn", this.selectedCheckIn);
     }
   }
 
@@ -247,8 +245,6 @@ export class WidgetPatientDataComponent implements OnInit {
     }).catch( err => {
       return null;
     });
-
-    console.log("contact", contact);
 
     if(contact){
       this.contactDetail = contact;
@@ -587,7 +583,6 @@ export class WidgetPatientDataComponent implements OnInit {
       
       this.listSuggestionPatient = suggestion;
       this.showWaitMsg = false;
-      console.log("suggesstion", this.listSuggestionPatient);
     }else{
       this.showNotFoundMsg = true;
       this.showWaitMsg = false;
@@ -653,25 +648,19 @@ export class WidgetPatientDataComponent implements OnInit {
         })
         
         this.model.district = district ? district : { district_id: null };   
-        console.log("this.model.district", this.model.district);
       }else{
         this.model.district = { district_id: null };
       }
 
       if(val.subDistrictId) {
-        console.log(val.subDistrictId, "val.subDistrictId");
-        
         const subdistrict = await this.generalService.getSubDistrict(null, val.subDistrictId)
         .toPromise().then( res => {
-          console.log("res.data", res.data)
           return res.data;
         }).catch( err => {
           return null;
         });
         
         this.model.subdistrict = subdistrict ? subdistrict : { sub_district_id: null };
-
-        console.log("this.model.subdistrict", this.model.subdistrict)
       }else{
         this.model.subdistrict = { sub_district_id: null };
       }
@@ -697,11 +686,8 @@ export class WidgetPatientDataComponent implements OnInit {
       this.model.contactCity = val.str_contact_city;
 
       this.model.nationality = val.str_nationality;
-      console.log("cek national 1", val.str_nationality);
       this.model.nationalidType = val.str_national_id_type;
-      console.log("cek national 2", val.str_national_id_type);
       this.model.nationalIdNo = val.nationalIdNo;
-      console.log("cek national 3", val.nationalIdNo);
 
       this.model.permanentPostCode = val.permanentPostCode;
       this.model.permanentAddress = val.permanentAddress;
@@ -713,7 +699,6 @@ export class WidgetPatientDataComponent implements OnInit {
   checkFormCondition() {
 
     let valid = true;
-    console.log('Checking');
 
     let patientName = this.model.patientName ? this.model.patientName.trim() : "";
     let address = this.model.address ? this.model.address.trim() : "";
@@ -943,15 +928,12 @@ export class WidgetPatientDataComponent implements OnInit {
             patientOrganizationId: this.model.patientOrganizationId,
             appointmentId: this.appointmentId,  
           }
-
-          console.log(JSON.stringify(body), "1");
           this.createPatientComplete(body);
         }else{
           const body = {
             ...payload,
             appointmentId: this.appointmentId,
           };
-          console.log(JSON.stringify(body), "2");
           this.createPatientComplete(body);
         }
       }else{
@@ -961,10 +943,8 @@ export class WidgetPatientDataComponent implements OnInit {
             ...payload,
             patientOrganizationId: this.model.patientOrganizationId,
           };
-          console.log(JSON.stringify(body), "3");
           this.updatePatientComplete(body, this.model.patientId);
         }else{
-          console.log(JSON.stringify(payload), "4");
           this.createPatientComplete(payload);
         }
       }
@@ -974,7 +954,6 @@ export class WidgetPatientDataComponent implements OnInit {
   getActiveAdmission(patientHopeId: any){
     const active = this.admissionService.getActiveAdmission(patientHopeId)
     .toPromise().then(res => {
-      console.log("getActiveAdmission", res)
       return res.data;
     }).catch( err => {
       return [];
@@ -1017,7 +996,6 @@ export class WidgetPatientDataComponent implements OnInit {
       userName: this.user.fullname,
     };
 
-    console.log(JSON.stringify(body), "body create admission");
     var dataPatient;
 
     this.admissionService.createAdmission(body).toPromise()
@@ -1039,7 +1017,6 @@ export class WidgetPatientDataComponent implements OnInit {
       }
       // broadcast check-in
       this.socket.emit(CHECK_IN, dataPatient);
-      console.log("res create admission", res)
       this.buttonCreateAdmission = true;
       this.buttonPrintQueue = false;
       this.buttonCloseAdm = true;
@@ -1089,14 +1066,11 @@ export class WidgetPatientDataComponent implements OnInit {
     }
 
     this.patientType = this.patientTypeList[idx];
-
-    console.log("this.patientType", this.patientType)
   }
 
   async defaultPatientType(patientHopeId: any){
     this.nationalIdTypeId = await this.patientService.getDefaultPatientType(patientHopeId).toPromise()
     .then(res => {
-      console.log("res default", res)
       if(res.data){
         return res.data.nationalIdTypeId; 
       }else{
@@ -1151,8 +1125,6 @@ export class WidgetPatientDataComponent implements OnInit {
 
   async actionAdmission(activeModal){
     this.listActiveAdmission = await this.getActiveAdmission(this.selectedCheckIn.patient_hope_id);
-
-    console.log("this.listActiveAdmission", this.listActiveAdmission)
 
     if(this.listActiveAdmission.length !== 0) {
       this.openconfirmation(activeModal);
@@ -1264,16 +1236,12 @@ export class WidgetPatientDataComponent implements OnInit {
         return null;
       })
       
-      console.log("this.resQueue", this.resQueue)
-      
     this.selectedCheckIn = await this.appointmentService.getAppointmentById(val.appointment_id)
     .toPromise().then( res => {
       return res.data[0];
     }).catch( err => {
       return null;
     });
-    
-    console.log("this.selectedCheckIn", this.selectedCheckIn);
 
     this.roomDetail = await this.scheduleService.scheduleDetail(val.schedule_id)
     .toPromise().then(res => {
@@ -1281,8 +1249,6 @@ export class WidgetPatientDataComponent implements OnInit {
     }).catch( err => {
       return null;
     })
-
-    console.log("this.roomDetail", this.roomDetail)
   }
 
   printQueueTicket(val) {

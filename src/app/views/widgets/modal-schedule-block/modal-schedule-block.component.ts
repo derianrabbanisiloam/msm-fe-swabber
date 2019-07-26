@@ -89,11 +89,10 @@ export class ModalScheduleBlockComponent implements OnInit {
       userName: this.userName,
       source: this.source,
     };
-    console.log(this.addSchBlockPayload, 'ini');
+
     await this.scheduleService.addScheduleBlock(scheduleId, this.addSchBlockPayload).toPromise().then(
       data => {
         this.scheduleService.emitScheduleBlock(true);
-        console.log(data);
       }
     );
     this.getScheduleBlock();
@@ -126,7 +125,6 @@ export class ModalScheduleBlockComponent implements OnInit {
         data => {
           this.scheduleService.emitScheduleBlock(true);
           this.alertService.success('Schedule Blocks Updated', false, 3000);
-          console.log(data);
         }
       );
       this.getScheduleBlock();

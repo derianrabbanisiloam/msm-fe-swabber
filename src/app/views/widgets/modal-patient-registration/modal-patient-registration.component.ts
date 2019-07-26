@@ -68,7 +68,6 @@ export class ModalPatientRegistrationComponent implements OnInit {
   ) { }
 
   async ngOnInit() {
-    console.log("contactInfo", this.contactInfo);
     await this.getCity();
     await this.getNationalIdType();
     await this.getCountry();
@@ -171,8 +170,6 @@ export class ModalPatientRegistrationComponent implements OnInit {
     }).catch( err => {
       return null;
     });
-
-    console.log("contact", contact);
 
     if(contact){
       this.model.patientName = contact.name;
@@ -342,9 +339,7 @@ export class ModalPatientRegistrationComponent implements OnInit {
   }
 
   checkFormCondition() {
-
     let valid = true;
-    console.log('Checking');
 
     let patientName = this.model.patientName ? this.model.patientName.trim() : "";
     let address = this.model.address ? this.model.address.trim() : "";
@@ -542,9 +537,6 @@ export class ModalPatientRegistrationComponent implements OnInit {
       this.alertService.error('Please input all mandatory field', false, 5000);
     }else{
       const payload = this.loadPayload();
-
-      console.log(JSON.stringify(payload), "payload");
-
       this.syncUpdatePatient(payload);
     }  
   }

@@ -108,7 +108,6 @@ export class ModalPatientVerificationComponent implements OnInit {
         this.isSuccessCreateContact = true;
         this.patientHope = [];
         this.contactId = data.data.contact_id;
-        console.log(data);
       }, error => {
         this.createContactMsg = 'Gagal create new contact';
       }
@@ -124,11 +123,10 @@ export class ModalPatientVerificationComponent implements OnInit {
       userId: this.userId,
       source: this.source 
     };
-    console.log(payload, "verifyPatient");
+
     const mappingPatient = await this.patientService.verifyPatient(payload).toPromise().then(
       data => {
         this.contactId = data.data.contact_id;
-        console.log(data);
         return data.data;
       }
     );
@@ -160,13 +158,12 @@ export class ModalPatientVerificationComponent implements OnInit {
       userName: this.userName,
       source: this.source
     };
-    console.log(payload);
+
     await this.appointmentService.verifyAppointment(payload).toPromise().then(
       data => {
         this.isSuccessVerifyApp = true;
         this.alertService.success('Verifikasi appointment berhasil');
-        this.appointmentService.emitVerifyApp(true);
-        console.log(data);        
+        this.appointmentService.emitVerifyApp(true);        
       }, error => {
         this.alertService.error('Gagal verifikasi appointment');
       }

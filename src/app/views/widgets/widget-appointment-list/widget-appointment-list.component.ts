@@ -826,8 +826,6 @@ export class WidgetAppointmentListComponent implements OnInit {
       return null;
     });
     
-    console.log("this.selectedCheckIn", this.selectedCheckIn);
-    
     this.roomDetail = await this.scheduleService.scheduleDetail(val.schedule_id)
     .toPromise().then(res => {
       return res.data;

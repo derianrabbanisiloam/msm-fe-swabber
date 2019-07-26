@@ -83,7 +83,10 @@ export class ModalCreateAppointmentComponent implements OnInit {
   async createAppointment() {
     this.isSubmitting = true;
     const isValidForm = this.validateCreateAppointment();
-    if (isValidForm === false) return false;
+    if (isValidForm === false) { 
+      this.isSubmitting = false;
+      return false;
+    }
     const data = this.appointmentInfo;
     const { patientName, phoneNumber, address, note } = this.model;
     const dob = this.model.birthDate.split('-');

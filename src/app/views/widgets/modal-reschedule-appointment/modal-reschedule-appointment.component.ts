@@ -1,3 +1,4 @@
+import * as moment from 'moment';
 import { Component, OnInit, Input} from '@angular/core';
 import { DoctorService } from '../../../services/doctor.service';
 import { NgbActiveModal } from '@ng-bootstrap/ng-bootstrap';
@@ -49,6 +50,8 @@ export class ModalRescheduleAppointmentComponent implements OnInit {
     this.appointmentService.getAppointmentById(appointmentId).subscribe(
       data => {
         this.appointment = data.data[0];
+        this.appointment.created_date = moment(this.appointment.created_date).format('DD-MM-YYYY');
+        this.appointment.modified_date = moment(this.appointment.modified_date).format('DD-MM-YYYY');
         this.rescheduleSelected.note = this.appointment.appointment_note; 
         console.log("this.appointment", this.appointment);
       }

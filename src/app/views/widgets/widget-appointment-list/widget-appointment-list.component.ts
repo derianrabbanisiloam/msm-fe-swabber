@@ -177,7 +177,7 @@ export class WidgetAppointmentListComponent implements OnInit {
         && call.data.appointment_date == this.dateApp){
         this.appList = this.appList.map((value) => {
           if (value.appointment_id === call.data.appointment_id) {
-            value.appointment_status_id = '2';
+            value.appointment_status_id = appointmentStatusId.INACTIVE;
           }
           return value;
         });
@@ -819,7 +819,15 @@ export class WidgetAppointmentListComponent implements OnInit {
         this.alertService.error(err.error.message, false, 3000);
         return null;
       })
-
+      
+    this.selectedCheckIn = await this.appointmentService.getAppointmentById(val.appointment_id).toPromise().then( res => {
+      return res.data[0];
+    }).catch( err => {
+      return null;
+    });
+    
+    console.log("this.selectedCheckIn", this.selectedCheckIn);
+    
     this.roomDetail = await this.scheduleService.scheduleDetail(val.schedule_id)
     .toPromise().then(res => {
       return res.data;

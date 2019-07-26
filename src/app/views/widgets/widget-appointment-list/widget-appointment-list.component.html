@@ -111,15 +111,14 @@
         <td style="text-align: center; white-space: nowrap;">{{itr.custome_from_time}} - {{itr.custome_to_time}}</td>
         <td style="min-width: 8em">{{itr.doctor_name}}</td>
         <td class="kolom-type">
+          <div *ngIf = "itr.admission_id">
             <div *ngIf = "itr.is_walkin == true">
               <span style="background: #028883">WalkIn</span>
             </div>
             <div *ngIf = "itr.is_walkin == false">
               <span style="background: #1A2269">Appoin</span>
             </div>
-            <div *ngIf = "itr.is_walkin == null">
-              <span></span>
-            </div>
+          </div>
         </td>
         <td style="text-align: center">
           <div *ngIf = "itr.is_waiting_list">
@@ -144,7 +143,7 @@
              </div>
             </div>
 
-          <div class="span-canceled" *ngIf = "itr.appointment_status_id === '2' && !itr.expired">
+          <div class="span-canceled" *ngIf = "itr.appointment_status_id === appStatusId.INACTIVE && !itr.expired">
             <span class="">Canceled</span>
           </div>
           <div style="color: #C43D32; font-size: 10px; font-weight: bold" *ngIf = "itr.expired">
@@ -155,7 +154,7 @@
                   [disabled]="itr.admission_id && itr.expired">Complete<br>Check In
           </button>
 
-          <div *ngIf = "!itr.expired && itr.appointment_status_id !== '2' && !itr.admission_id">
+          <div *ngIf = "!itr.expired && itr.appointment_status_id !== appStatusId.INACTIVE && !itr.admission_id">
 
             <div class="cell-img-nav d-flex justify-content-center">
              <div (click)="checkInAppointment(itr, confirmCheckIn)">

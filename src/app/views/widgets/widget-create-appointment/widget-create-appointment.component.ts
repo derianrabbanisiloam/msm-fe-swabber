@@ -34,6 +34,9 @@ import { Alert, AlertType } from '../../../models/alerts/alert';
 import { sourceApps, queueType } from '../../../variables/common.variable';
 import { QueueService } from '../../../services/queue.service';
 import { dateFormatter, regionTime} from '../../../utils/helpers.util';
+import { 
+  ModalRescheduleAppointmentComponent 
+} from '../modal-reschedule-appointment/modal-reschedule-appointment.component';
 import * as pdfMake from 'pdfmake/build/pdfmake';
 import * as pdfFonts from 'pdfmake/build/vfs_fonts';
 import socket from 'socket.io-client';
@@ -167,6 +170,7 @@ export class WidgetCreateAppointmentComponent implements OnInit {
     this.emitCancelApp();
     this.emitVerifyApp();
     this.emitScheduleBlock();
+    this.emitRescheduleApp();
     this.getCollectionAlert();
     this.refreshPage();
 
@@ -251,6 +255,7 @@ export class WidgetCreateAppointmentComponent implements OnInit {
     this.emitCancelApp();
     this.emitVerifyApp();
     this.emitScheduleBlock();
+    this.emitRescheduleApp();
     this.getCollectionAlert();
     this.refreshPage();
   }
@@ -260,6 +265,18 @@ export class WidgetCreateAppointmentComponent implements OnInit {
     const zone = this.hospital.zone; 
     const dateNow = await regionTime(zone);
     this.isOpen = new Date(dateNow) < new Date(appointmentDate) ? false : true;
+  }
+
+  emitRescheduleApp() {
+    this.appointmentService.rescheduleAppSource$.subscribe(
+      result => {
+        if (result) {
+          this.alertService.success('Reschedule appointment berhasil', false, 3000);
+        } else {
+          this.alertService.error('Gagal reschedule appointment', false, 3000);
+        }
+      }
+    );
   }
 
   emitVerifyApp() {
@@ -639,6 +656,12 @@ export class WidgetCreateAppointmentComponent implements OnInit {
         this.doctorNotes = data.data;
       }
     );
+  }
+
+  openRescheduleModal(appointmentSelected: any){
+    const modalRef = this.modalService.open(ModalRescheduleAppointmentComponent,  
+      {windowClass: 'cc_modal_confirmation', size: 'lg'});
+    modalRef.componentInstance.appointmentSelected = appointmentSelected;
   }
 
   async getSchedule() {

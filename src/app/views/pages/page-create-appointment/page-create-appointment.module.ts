@@ -20,6 +20,9 @@ import { ModalCreateAppointmentComponent } from '../../widgets/modal-create-appo
 import { ModalCancelAppointmentModule } from '../../widgets/modal-cancel-appointment/modal-cancel-appointment.module';
 import { ModalCancelAppointmentComponent } from '../../widgets/modal-cancel-appointment/modal-cancel-appointment.component';
 
+import { ModalRescheduleAppointmentModule } from '../../widgets/modal-reschedule-appointment/modal-reschedule-appointment.module';
+import { ModalRescheduleAppointmentComponent } from '../../widgets/modal-reschedule-appointment/modal-reschedule-appointment.component'
+
 import { ModalSearchPatientModule } from '../../widgets/modal-search-patient/modal-search-patient.module';
 import { ModalSearchPatientComponent } from '../../widgets/modal-search-patient/modal-search-patient.component';
 
@@ -47,6 +50,7 @@ import { ModalPatientVerificationComponent } from '../../widgets/modal-patient-v
     ModalSearchPatientModule,
     ModalPatientVerificationModule,
     WidgetCreateAppointmentModule,
+    ModalRescheduleAppointmentModule,
     NgbPopoverModule,
     NguiAutoCompleteModule,
     
@@ -56,7 +60,8 @@ import { ModalPatientVerificationComponent } from '../../widgets/modal-patient-v
     ModalCreateAppointmentComponent,
     ModalSearchPatientComponent,
     ModalCancelAppointmentComponent,
-    ModalPatientVerificationComponent
+    ModalPatientVerificationComponent,
+    ModalRescheduleAppointmentComponent,
   ],
   exports: [
     PageCreateAppointmentComponent,

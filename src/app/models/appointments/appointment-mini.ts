@@ -42,5 +42,6 @@ export class AppointmentMini {
     schedule_id: string;
     to_time: string;
     identity_address: string;
+    number: number;
   }
   

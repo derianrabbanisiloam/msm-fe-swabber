@@ -260,9 +260,6 @@ export class WidgetAppointmentListComponent implements OnInit {
   }
 
   prevPage() {
-    const { year, month, day } = this.dateAppointment.date;
-    const date = year + '-' + month + '-' + day;
-
     this.page -= 1;
     this.offset = this.page * 10;
     this.isCanPrevPage = this.offset === 0 ? false : true;
@@ -367,7 +364,8 @@ export class WidgetAppointmentListComponent implements OnInit {
     this.showNotFoundMsg = false;
 
     const { year, month, day } = this.dateAppointment.date;
-    const date = year + '-' + month + '-' + day;
+    const strDate = year + '-' + month + '-' + day;
+    const date = dateFormatter(strDate, false);
     this.dateApp = date;
     const hospital = this.hospital.id;
 

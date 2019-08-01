@@ -165,8 +165,12 @@
           <td>{{app.local_mr_no}}</td>
           <td>{{app.phone_no}}</td>
           <td>{{app.queue_no}}</td>
-          <td>{{app.note}}</td>
-          <td>{{app.modified_by}}</td>
+          <td>
+            <a ngbPopover="{{app.note_long}}" popoverTitle="" triggers="mouseenter:mouseleave">{{app.note_short}}</a>
+          </td>
+          <td>
+            <a ngbPopover="{{app.modified_name}}" popoverTitle="" triggers="mouseenter:mouseleave">{{app.modified_name && app.modified_name.length > 10 ? app.modified_name.substr(0,10)+"..." : app.modified_name}}</a>
+          </td>
           <td class="st-kolom-button">
 
               <div *ngIf="!app.appointment_temp_id">

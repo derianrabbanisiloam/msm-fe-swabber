@@ -212,6 +212,7 @@ export class WidgetDoctorScheduleComponent implements OnInit {
     this.initDate = dateStart;
     this.keywords.date = dateStart;
     this.doctorService.changeSearchDoctor(this.keywords);
+    this.btnActive.thisWeek = moment(this.initDate).startOf('isoWeek').date() == moment().startOf('isoWeek').date() ? false : true;
   }
 
   async gotoNextWeek() {
@@ -222,7 +223,7 @@ export class WidgetDoctorScheduleComponent implements OnInit {
     this.generateDates(this.initDate);
     this.keywords.date = this.initDate;
     await this.doctorService.changeSearchDoctor(this.keywords);
-    this.btnActive.thisWeek = moment(this.initDate).startOf('isoWeek') == moment().startOf('isoWeek') ? false : true;
+    this.btnActive.thisWeek = moment(this.initDate).startOf('isoWeek').date() == moment().startOf('isoWeek').date() ? false : true;
     this.btnActive.nextWeek = true;
   }
 
@@ -234,7 +235,7 @@ export class WidgetDoctorScheduleComponent implements OnInit {
     this.generateDates(this.initDate);
     this.keywords.date = this.initDate;
     await this.doctorService.changeSearchDoctor(this.keywords);
-    this.btnActive.thisWeek = moment(this.initDate).startOf('isoWeek') == moment().startOf('isoWeek') ? false : true;
+    this.btnActive.thisWeek = moment(this.initDate).startOf('isoWeek').date() == moment().startOf('isoWeek').date() ? false : true;
     this.btnActive.prevWeek = true;
   }
 

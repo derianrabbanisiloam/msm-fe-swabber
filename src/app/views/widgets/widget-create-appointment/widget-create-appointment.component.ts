@@ -14,7 +14,7 @@ import { DoctorNote } from '../../../models/doctors/doctor-note';
 import { DoctorProfile } from '../../../models/doctors/doctor-profile';
 import { ScheduleBlock } from '../../../models/schedules/schedule-block';
 import { doctorType } from '../../../variables/common.variable';
-import { NgbModal, ModalDismissReasons } from '@ng-bootstrap/ng-bootstrap';
+import { NgbModalConfig, NgbModal, ModalDismissReasons } from '@ng-bootstrap/ng-bootstrap';
 import { 
   ModalCancelAppointmentComponent 
 } from '../modal-cancel-appointment/modal-cancel-appointment.component'
@@ -134,7 +134,8 @@ export class WidgetCreateAppointmentComponent implements OnInit {
     private alertService: AlertService,
     private patientService: PatientService,
     private admissionService: AdmissionService,
-    private queueService: QueueService
+    private queueService: QueueService,
+    modalSetting: NgbModalConfig,
   ) {
     this.socket = socket(`${environment.WEB_SOCKET_SERVICE + keySocket.APPOINTMENT}`,  {
       transports: ['websocket'],  
@@ -144,11 +145,14 @@ export class WidgetCreateAppointmentComponent implements OnInit {
       });
     
     this.socketTwo = socket(`${environment.WEB_SOCKET_SERVICE + keySocket.QUEUE}`,  {
-        transports: ['websocket'],  
-        query: `data=${
-          Security.encrypt({ secretKey: SecretKey }, Jwt)
-          }&url=${environment.FRONT_OFFICE_SERVICE}`,
-        });
+      transports: ['websocket'],  
+      query: `data=${
+        Security.encrypt({ secretKey: SecretKey }, Jwt)
+        }&url=${environment.FRONT_OFFICE_SERVICE}`,
+      });
+      
+      modalSetting.backdrop = 'static';
+      modalSetting.keyboard = false;
    }
 
   async ngOnInit() {
@@ -490,9 +494,14 @@ export class WidgetCreateAppointmentComponent implements OnInit {
           is_walkin: false,
         });
       }
-      const appListLength = this.appList.length;
+
+      let numberL;
+      numberL = Math.max.apply(Math, this.appointments.map(function(o) { return o.appointment_no }))
+      const appListLength = numberL;
+      no += 1;
+
       this.appList.push({
-        no: appListLength + 1,
+        no: no,
         hospital_id: hospitalId,
         doctor_id: doctorId,
         appointment_range_time: appListLength > 0 ? '' : appTime,
@@ -501,7 +510,7 @@ export class WidgetCreateAppointmentComponent implements OnInit {
         appointment_id: null,
         appointment_temp_id: null,
         admission_id: null,
-        appointment_no: appListLength,
+        appointment_no: numberL + 1,
         patient_name: null,
         date_of_birth: null,
         local_mr_no: null,
@@ -529,7 +538,25 @@ export class WidgetCreateAppointmentComponent implements OnInit {
     const appointmentDate = this.appointmentPayload.appointmentDate;
     for(let i=0, length=this.appList.length; i<length; i++) {
       this.appointments.map(x => {
-        if (Number(x.appointment_no) === i && x.is_waiting_list === false) {
+        if (Number(x.appointment_no) === i && x.is_waiting_list === false && this.doctorProfile.doctor_type_name !== this.doctorType.FCFS) {
+          this.appList[i].appointment_id = x.appointment_id;
+          this.appList[i].appointment_temp_id = x.appointment_temporary_id;
+          this.appList[i].admission_id = x.admission_id;
+          this.appList[i].appointment_no = x.appointment_no;
+          this.appList[i].patient_name = x.contact_name;
+          this.appList[i].date_of_birth = moment(x.birth_date).format('DD-MM-YYYY');
+          this.appList[i].local_mr_no = x.medical_record_number;
+          this.appList[i].phone_no = x.phone_number;
+          this.appList[i].queue_no = x.queue_number;
+          this.appList[i].note = x.appointment_note;
+          this.appList[i].note_long = x.appointment_note ? x.appointment_note : '';
+          this.appList[i].note_short = x.appointment_note && x.appointment_note.length > 30 ? x.appointment_note.substr(0, 30) + '...' : x.appointment_note;
+          this.appList[i].modified_name = x.modified_name;
+          this.appList[i].modified_by = x.modified_by;
+          this.appList[i].is_waiting_list = x.is_waiting_list;
+          this.appList[i].is_can_create = false;
+          this.appList[i].is_can_cancel = true;
+        }else if(Number(x.number) === i && x.is_waiting_list === false && this.doctorProfile.doctor_type_name === this.doctorType.FCFS){
           this.appList[i].appointment_id = x.appointment_id;
           this.appList[i].appointment_temp_id = x.appointment_temporary_id;
           this.appList[i].admission_id = x.admission_id;
@@ -631,6 +658,9 @@ export class WidgetCreateAppointmentComponent implements OnInit {
     await this.appointmentService.getAppointmentByScheduleId(scheduleId, date, sortBy, orderBy).toPromise().then(
       data => {
         this.appointments = data.data;
+        for(let i=0, length=this.appointments.length; i<length; i++){
+          this.appointments[i].number = i;
+        } 
       }
     );
   }
@@ -693,11 +723,12 @@ export class WidgetCreateAppointmentComponent implements OnInit {
   async openCreateAppModal(item: any) {
     await this.reserveSlotApp(item);
     const canReserved = await this.getReservedSlot(item);
+    const fromTime = item.appointment_from_time ? item.appointment_from_time : this.schedule.from_time;const toTime = item.appointment_to_time ? item.appointment_to_time : this.schedule.to_time; 
     const data = {
       schedule_id: this.appointmentPayload.scheduleId,
       appointment_date: this.appointmentPayload.appointmentDate,
-      appointment_from_time: item.appointment_from_time,
-      appointment_to_time: item.appointment_to_time,
+      appointment_from_time: fromTime,
+      appointment_to_time: toTime,
       hospital_id: this.schedule.hospital_id,
       doctor_id: this.schedule.doctor_id,
       appointment_no: item.appointment_no,
@@ -712,11 +743,12 @@ export class WidgetCreateAppointmentComponent implements OnInit {
   async openCreateAppModal2(item: any) {
     await this.reserveSlotApp(item);
     const canReserved = await this.getReservedSlot(item);
+    const fromTime = item.appointment_from_time ? item.appointment_from_time : this.schedule.from_time;const toTime = item.appointment_to_time ? item.appointment_to_time : this.schedule.to_time;
     const data = {
       schedule_id: this.appointmentPayload.scheduleId,
       appointment_date: this.appointmentPayload.appointmentDate,
-      appointment_from_time: item.appointment_from_time,
-      appointment_to_time: item.appointment_to_time,
+      appointment_from_time: fromTime,
+      appointment_to_time: toTime,
       hospital_id: this.schedule.hospital_id,
       doctor_id: this.schedule.doctor_id,
       appointment_no: item.appointment_no,

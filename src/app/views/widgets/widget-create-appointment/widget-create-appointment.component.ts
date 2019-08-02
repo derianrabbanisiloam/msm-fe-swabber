@@ -510,7 +510,7 @@ export class WidgetCreateAppointmentComponent implements OnInit {
         appointment_id: null,
         appointment_temp_id: null,
         admission_id: null,
-        appointment_no: numberL + 1,
+        appointment_no: this.appointments.length > 0 ? numberL + 1 : 0,
         patient_name: null,
         date_of_birth: null,
         local_mr_no: null,

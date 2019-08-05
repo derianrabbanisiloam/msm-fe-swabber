@@ -496,7 +496,7 @@ export class WidgetCreateAppointmentComponent implements OnInit {
       }
 
       let numberL;
-      numberL = Math.max.apply(Math, this.appointments.map(function(o) { return o.appointment_no }))
+      numberL = this.appointments.length > 0 ? Math.max.apply(Math, this.appointments.map(i => i.appointment_no)) : 0;
       const appListLength = numberL;
       no += 1;
 
@@ -510,7 +510,7 @@ export class WidgetCreateAppointmentComponent implements OnInit {
         appointment_id: null,
         appointment_temp_id: null,
         admission_id: null,
-        appointment_no: numberL + 1,
+        appointment_no: this.appointments.length > 0 ? numberL + 1 : 0,
         patient_name: null,
         date_of_birth: null,
         local_mr_no: null,
@@ -793,6 +793,7 @@ export class WidgetCreateAppointmentComponent implements OnInit {
       userId: this.userId,
       source: this.source,
     };
+
     await this.appointmentService.reserveSlotApp(payload).toPromise().then(
       data => {
         return data.data;

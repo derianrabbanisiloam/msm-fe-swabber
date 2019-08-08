@@ -226,7 +226,7 @@
         <button type="button" class="btn fo_btn_green"
                 (click)="confirmCheckInValue(selectedCheckIn, checkInOldPatient, confirmLocalMrCreate)"
                 (click)="c('Cross click')">Ok</button>
-        <div *ngIf="late">
+        <div *ngIf="late && selectedCheckIn.admission_id == null">
           <button type="button" class="btn fo_btn_blue" (click)="openRescheduleModal(selectedCheckIn)" (click)="c('Cross click')">Reschedule</button>
         </div>
         <button type="button" class="btn fo_btn_black" (click)="c('Cross click')">Cancel</button>

@@ -9,7 +9,7 @@
         <div class="btn" style="background: white; padding: 0.2vw 0.5vw" (click)="prevPage()">
           <img style="width: 1vw" src="../../../../assets/icons/ic_BackGreen@2x.png">
         </div>
-        <div>
+        <div *ngIf="doctorProfile.doctor_type_id !== '1'">
           <button class="btn btn-green" (click)="openScheduleBlockModal()">Manage Block</button>
         </div>
       </div>

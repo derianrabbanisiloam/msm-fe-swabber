@@ -218,7 +218,7 @@ export class WidgetAppointmentListComponent implements OnInit {
       result => {
         if (result) {
           this.alertService.success('Appointment successfully updated', false, 3000);
-          this.listAppointment();
+          this.searchAppointment(false);
         } else {
           this.alertService.error('Appointment fail updated', false, 3000);
         }
@@ -231,7 +231,7 @@ export class WidgetAppointmentListComponent implements OnInit {
       result => {
         if (result) {
           this.alertService.success('Reschedule appointment berhasil', false, 3000);
-          this.listAppointment();
+          this.searchAppointment(false);
         } else {
           this.alertService.error('Gagal reschedule appointment', false, 3000);
         }
@@ -244,7 +244,7 @@ export class WidgetAppointmentListComponent implements OnInit {
       async (result) => {
         if (result) {
           this.alertService.success('Ubah nomor HP berhasil', false, 3000);
-          await this.listAppointment();
+          await this.searchAppointment(false);;
         } else {
           this.alertService.error('Gagal ubah nomor HP', false, 3000);
         }
@@ -324,22 +324,21 @@ export class WidgetAppointmentListComponent implements OnInit {
     this.buttonPrintQueue = true;
     this.buttonPatientLabel = true;
     this.buttonCloseAdm = false;
-
-    this.model.name = '';
-    this.model.mr = '';
-    this.model.doctor = '';
-    this.model.birth = '';
-
     this.resQueue = null;
-
     this.txtPayer = true;
     this.txtPayerNo = true;
     this.txtPayerEligibility = true;
-
     this.patientType = null;
     this.payer = null;
     this.payerNo = null;
     this.payerEligibility = null;
+  }
+
+  clearSearch(){
+    this.model.name = '';
+    this.model.mr = '';
+    this.model.doctor = '';
+    this.model.birth = '';
   }
 
   async getListDoctor() {
@@ -419,12 +418,26 @@ export class WidgetAppointmentListComponent implements OnInit {
   }
   
   onDateChange(val) {
-    this.dateAppointment.date = val.date;
-    this.model = { hospital_id: '', name: '', mr: '', doctor: '' };
+    const { year, month, day } = val.date;
 
-    this.offset = 0;
-    this.refreshPage();
-    this.listAppointment();
+    if(year === 0 && month === 0 && day === 0){
+      this.clearSearch();
+      this.refreshPage();
+      this.appList = [];
+      this.alertService.error('Please Input Date', false, 3000);
+    }else{
+      this.dateAppointment = {
+        date: {
+          year: year,
+          month: month,
+          day: day,
+        }
+      };
+      this.offset = 0;
+      this.clearSearch();
+      this.refreshPage();
+      this.searchAppointment(false);
+    }
   }
 
   async checkInAppointment(val, content) {
@@ -563,9 +576,8 @@ export class WidgetAppointmentListComponent implements OnInit {
     })
 
     setTimeout (() => {
-      this.offset = 0;
       this.refreshPage();
-      this.listAppointment();
+      this.searchAppointment(false);
     }, 1000)
     
   }
@@ -832,11 +844,6 @@ export class WidgetAppointmentListComponent implements OnInit {
     })
   }
 
-  closeClicked(){
-    this.refreshPage();
-    this.listAppointment();
-  }
-
   printQueueTicket(val) {
 
     const queueNo = this.resQueue.name;
@@ -919,11 +926,10 @@ export class WidgetAppointmentListComponent implements OnInit {
     pdfMake.createPdf(docDefinition).print();
 
     setTimeout (() => {
-      this.offset = 0;
       this.closeQue.click();
       this.closeAdm.click();
       this.refreshPage();
-      this.listAppointment();
+      this.searchAppointment(false);
     }, 1000);
 
   }
@@ -1019,7 +1025,7 @@ export class WidgetAppointmentListComponent implements OnInit {
     this.buttonPatientLabel = true;
 
     this.refreshPage();
-    this.listAppointment();
+    this.searchAppointment(false);
 
     if (reason === ModalDismissReasons.ESC) {
       return 'by pressing ESC';

@@ -302,7 +302,7 @@
                   {{leave.schedule_type_id == 5? 'Sick Leave': ''}}
               </td>
               <td width="140px" style="text-align: center">{{leave.notes}}</td>
-              <td width="140px">{{leave.modified_by == undefined || leave.modified_by == null || leave.modified_by == '' ? '' : leave.modified_by}}</td>
+              <td width="140px">{{leave.modified_name == undefined || leave.modified_name == null || leave.modified_name == '' ? '' : leave.modified_name}}</td>
               <td style="width: 105px">
                 <span style="margin-right: 11px"></span>
                 <button type="button" class="btn-default" (click)="editDoctorLeaveModal(leave, editLeave)">

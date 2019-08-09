@@ -272,11 +272,11 @@
           <tbody>
           <tr *ngFor="let i=index; let doctor of doctorNotes" style="border: solid 0.5px #C1C1C1">
             <td width="60px">{{i+1}}</td>
-            <td width="250px">{{doctor.name}}</td>
+            <td width="250px">{{doctor.doctor_name}}</td>
             <td width="195px">{{doctor.from_date.substring(0,10).split('-')[2]+'-'+doctor.from_date.substring(0,10).split('-')[1]+'-'+doctor.from_date.substring(0,10).split('-')[0]}}</td>
             <td width="195px">{{doctor.to_date.substring(0,10).split('-')[2]+'-'+doctor.to_date.substring(0,10).split('-')[1]+'-'+doctor.to_date.substring(0,10).split('-')[0]}}</td>
             <td width="300px" style="text-align: left">{{doctor.note}}</td>
-            <td width="150px" style="text-align: center">{{doctor.modified_by}}</td>
+            <td width="150px" style="text-align: center">{{doctor.modified_name}}</td>
             <td style="width: 92px">
               <button type="button" class="btn-default" (click)="editDoctorNotesModal(doctor, editNote)">
                 <i class="fa fa-edit"></i>

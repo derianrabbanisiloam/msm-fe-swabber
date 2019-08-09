@@ -29,7 +29,6 @@ export class ModalSearchPatientComponent implements OnInit {
   }
 
   ngOnInit() {
-    console.log(this.searchKeywords)
     if (this.searchKeywords.localMrNo && this.searchKeywords.hospitalId) {
       this.getSearchedPatient2();
     } else {
@@ -68,7 +67,6 @@ export class ModalSearchPatientComponent implements OnInit {
 
   choosePatient(item: any) {
     this.patientService.changeSearchPatientHope(item);
-    // console.log(item);
   }
 
 }

@@ -120,7 +120,9 @@ export class WidgetDoctorScheduleComponent implements OnInit {
 
   async generateDates(selectedDate?: any) {
     this.dates = [];
-    let date: any = selectedDate ? moment(selectedDate).startOf('week') : moment().startOf('week');
+    let dateChoosed = selectedDate ? moment(selectedDate) : moment(); 
+    let now = dateChoosed.startOf('isoWeek').format('YYYY-MM-DD'); 
+    let date: any = now ? moment(now).startOf('week') : moment().startOf('week');
     let dateTemp: any;
     let dateHeader: any;
     let dateISO: any;

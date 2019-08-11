@@ -943,7 +943,7 @@ export class WidgetCreateAppointmentComponent implements OnInit {
 
   processCreateAdmission(val){
     // Show loading bar
-    
+    this.buttonCreateAdmission = true;
     this.isLoadingCreateAdmission = true;
 
     let payer = null;
@@ -952,7 +952,8 @@ export class WidgetCreateAppointmentComponent implements OnInit {
 
     if(!this.patientType){
       this.alertService.error('Select patient type', false, 3000);
-      this.isLoadingCreateAdmission = false
+      this.buttonCreateAdmission = false;
+      this.isLoadingCreateAdmission = false;
     }
 
     if(this.patientType.description === 'PAYER'){
@@ -1003,6 +1004,8 @@ export class WidgetCreateAppointmentComponent implements OnInit {
       this.isLoadingCreateAdmission = false;
       this.alertService.success(res.message, false, 3000);
     }).catch( err => {
+      this.buttonCreateAdmission = false;
+      this.isLoadingCreateAdmission = false;
       this.alertService.error(err.error.message, false, 3000);
     })
 
@@ -1123,7 +1126,15 @@ export class WidgetCreateAppointmentComponent implements OnInit {
       userId: this.user.id,
       source: sourceApps,
       userName: this.user.fullname,
-    }
+    };
+
+    this.roomDetail = await this.scheduleService.scheduleDetail(val.schedule_id)
+    .toPromise().then(res => {
+      return res.data;
+    }).catch( err => {
+      return null;
+    });
+
     var dataPatient;
 
     this.resQueue = await this.queueService.createQueue(body).toPromise()
@@ -1156,13 +1167,6 @@ export class WidgetCreateAppointmentComponent implements OnInit {
     }).catch( err => {
       return null;
     });
-
-    this.roomDetail = await this.scheduleService.scheduleDetail(val.schedule_id)
-    .toPromise().then(res => {
-      return res.data;
-    }).catch( err => {
-      return null;
-    })
   }
 
   newPatient(){

@@ -65,7 +65,7 @@ export class WidgetLoginComponent implements OnInit {
     const hospital = this.model.hospital;
     const applicationId = this.applicationId;
     const roleId = this.roleId;
-
+    
     const body = {
       userAccount: username,
       password,
@@ -73,7 +73,7 @@ export class WidgetLoginComponent implements OnInit {
       email,
       mobileNo,
       applicationId,
-      organizationId: 2,
+      organizationId: hospital.hope_organization_id,
       hospitalId: hospital.mobile_organization_id,
       axOrganizationId: hospital.ax_organization_id,
       roleId,

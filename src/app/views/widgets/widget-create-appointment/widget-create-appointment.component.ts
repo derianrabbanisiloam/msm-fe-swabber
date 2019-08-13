@@ -181,6 +181,7 @@ export class WidgetCreateAppointmentComponent implements OnInit {
       if(call.data.schedule_id == this.appointmentPayload.scheduleId 
         && call.data.appointment_date == this.appointmentPayload.appointmentDate){
           this.appointments.push(call.data);
+          this.prepareTimeSlot();
           this.prepareAppList();
       }
     });
@@ -619,11 +620,14 @@ export class WidgetCreateAppointmentComponent implements OnInit {
         });
       }
     });
-    const nextWlNo = Number(this.appList.length) + Number(this.appListWaiting.length);
+
+    let nextWlNo = 0;
+    nextWlNo = this.appListWaiting.length === 0 ? nextWlNo : Math.max.apply(Math, this.appListWaiting.map(function(o) { return o.appointment_no }));
+
     this.appListWaiting.push({
       no: no + 1,
       appointment_range_time: this.appListWaiting.length > 0 ? '' : appTime,
-      appointment_no: nextWlNo,
+      appointment_no: this.appListWaiting.length === 0 ? this.appList.length : nextWlNo + 1,
       appointment_id: null,
       appointment_temp_id: null,
       admission_id: null,

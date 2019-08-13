@@ -1127,6 +1127,7 @@ export class WidgetPatientDataComponent implements OnInit {
   }
 
   async actionAdmission(activeModal){
+    this.buttonCreateAdmission = true;
     this.listActiveAdmission = await this.getActiveAdmission(this.selectedCheckIn.patient_hope_id);
 
     if(this.listActiveAdmission.length !== 0) {
@@ -1219,7 +1220,7 @@ export class WidgetPatientDataComponent implements OnInit {
     }).catch( err => {
       return null;
     });
-    
+
     var dataPatient;
 
     this.resQueue = await this.queueService.createQueue(body).toPromise()

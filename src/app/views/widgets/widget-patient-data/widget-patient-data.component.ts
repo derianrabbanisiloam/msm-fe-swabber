@@ -736,29 +736,21 @@ export class WidgetPatientDataComponent implements OnInit {
     } else { $('.form-pr-subdistrict').removeClass('form-error'); }
     if (!this.model.nationality) { valid = false; $('.form-pr-nationality').addClass('form-error');
     } else { $('.form-pr-nationality').removeClass('form-error'); }
-    if (!homePhone && !officePhone && !mobileNo1 && !mobileNo2) {
-      valid = false
-      $('.form-pr-homeno').addClass('form-error');
-      $('.form-pr-officeno').addClass('form-error');
-      $('.form-pr-mobile1no').addClass('form-error');
-      $('.form-pr-mobile2no').addClass('form-error');
+    if(!mobileNo1) { 
+      valid = false; 
+      $('.form-pr-mobile1no').addClass('form-error'); 
     } else {
-      $('.form-pr-homeno input').attr('placeholder', '(Optional)');
-      $('.form-pr-homeno').removeClass('form-error');
-      $('.form-pr-officeno input').attr('placeholder', '(Optional)');
-      $('.form-pr-officeno').removeClass('form-error');
       $('.form-pr-mobile1no input').attr('placeholder', '(Optional)');
       $('.form-pr-mobile1no').removeClass('form-error');
-      $('.form-pr-mobile2no input').attr('placeholder', '(Optional)');
-      $('.form-pr-mobile2no').removeClass('form-error');
     }
+
     if (
       (!address ||
       !this.model.city ||
       !this.model.district.district_id ||
       !this.model.subdistrict.sub_district_id ||
       !this.model.nationality) ||
-      (!homePhone && !officePhone && !mobileNo1 && !mobileNo2)
+      !mobileNo1
     ) {
       valid = false
       $('.form-tab-contact').addClass('form-tab-error');

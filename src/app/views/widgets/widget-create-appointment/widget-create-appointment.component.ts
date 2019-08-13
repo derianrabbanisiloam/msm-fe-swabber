@@ -176,12 +176,12 @@ export class WidgetCreateAppointmentComponent implements OnInit {
     this.emitScheduleBlock();
     this.emitRescheduleApp();
     this.getCollectionAlert();
-    this.refreshPage();
 
     this.socket.on(CREATE_APP, (call) => {
       if(call.data.schedule_id == this.appointmentPayload.scheduleId 
         && call.data.appointment_date == this.appointmentPayload.appointmentDate){
           this.appointments.push(call.data);
+          this.prepareTimeSlot();
           this.prepareAppList();
       }
     });
@@ -261,7 +261,6 @@ export class WidgetCreateAppointmentComponent implements OnInit {
     this.emitScheduleBlock();
     this.emitRescheduleApp();
     this.getCollectionAlert();
-    this.refreshPage();
   }
 
   async enableWalkInChecker(){
@@ -309,10 +308,6 @@ export class WidgetCreateAppointmentComponent implements OnInit {
     this.payer = null;
     this.payerNo = null;
     this.payerEligibility = null;
-    
-    await this.getAppointmentList();
-    await this.prepareTimeSlot();
-    await this.prepareAppList();
   }
 
   async admissionType(){
@@ -625,11 +620,14 @@ export class WidgetCreateAppointmentComponent implements OnInit {
         });
       }
     });
-    const nextWlNo = Number(this.appList.length) + Number(this.appListWaiting.length);
+
+    let nextWlNo = 0;
+    nextWlNo = this.appListWaiting.length === 0 ? nextWlNo : Math.max.apply(Math, this.appListWaiting.map(function(o) { return o.appointment_no }));
+
     this.appListWaiting.push({
       no: no + 1,
       appointment_range_time: this.appListWaiting.length > 0 ? '' : appTime,
-      appointment_no: nextWlNo,
+      appointment_no: this.appListWaiting.length === 0 ? this.appList.length : nextWlNo + 1,
       appointment_id: null,
       appointment_temp_id: null,
       admission_id: null,
@@ -901,6 +899,8 @@ export class WidgetCreateAppointmentComponent implements OnInit {
   }
 
   async createAdmission(val, activeModal){
+    this.buttonCreateAdmission = true;
+
     this.listActiveAdmission = await this.getActiveAdmission(val.patient_hope_id);
     if(this.listActiveAdmission.length !== 0) {
       this.openconfirmation(activeModal);
@@ -1172,10 +1172,6 @@ export class WidgetCreateAppointmentComponent implements OnInit {
   newPatient(){
     const params = { appointmentId: this.selectedCheckIn.appointment_id, };
     this.router.navigate(['./patient-data'], { queryParams: params });
-  }
-
-  closeClicked(){
-    this.refreshPage();
   }
 
   printQueueTicket(val) {

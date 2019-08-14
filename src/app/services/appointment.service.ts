@@ -20,6 +20,7 @@ export class AppointmentService {
   private ccAppointmentUrl = environment.CALL_CENTER_SERVICE + '/appointments';
   private rescheduleUrl = environment.CALL_CENTER_SERVICE + '/appointments/reschedules';
   private reserveSlotAppUrl = environment.CALL_CENTER_SERVICE + '/appointments/reserved-slot';
+  private appointmentRescheduleCount = environment.CALL_CENTER_SERVICE + '/appointments/reschedules/count';
 
   private rescheduleAppSource = new Subject<boolean>();
   public rescheduleAppSource$ = this.rescheduleAppSource.asObservable();
@@ -55,6 +56,10 @@ export class AppointmentService {
 
   appointmentHistory(appointment: any): Observable<any> {
     const url = `${this.ccAppointmentUrl}/history/${appointment}`;
+    return this.http.get<any>(url, httpOptions);
+  }
+  getCountAppReschedule() {
+    const url = `${this.appointmentRescheduleCount}`;
     return this.http.get<any>(url, httpOptions);
   }
 

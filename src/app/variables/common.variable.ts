@@ -5,6 +5,7 @@ export const CREATE_APP = 'APPOINTMENT__CREATE';
 export const CANCEL_APP = 'APPOINTMENT__CANCEL';
 export const RESCHEDULE_APP = 'APPOINTMENT__RESCHEDULE';
 export const QUEUE_NUMBER = 'QUEUE__CREATE_QUEUE';
+export const APP_RESCHEDULE = 'APPOINTMENT_RESCHEDULE__COUNT';
 
 export const keySocket = {
   APPOINTMENT: '/appointments',

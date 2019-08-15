@@ -180,6 +180,9 @@ export class WidgetCreateAppointmentComponent implements OnInit {
     this.socket.on(CREATE_APP, (call) => {
       if(call.data.schedule_id == this.appointmentPayload.scheduleId 
         && call.data.appointment_date == this.appointmentPayload.appointmentDate){
+          if(this.doctorProfile.doctor_type_name === this.doctorType.FCFS){
+            call.data.number = this.appointments.length;
+          }
           this.appointments.push(call.data);
           this.prepareTimeSlot();
           this.prepareAppList();

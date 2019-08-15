@@ -168,7 +168,7 @@ export class ModalCreateAppointmentComponent implements OnInit {
     if (e && Number(e.keyCode) !== 13) {
       return false;
     }
-    
+
     const hospitalId = this.appointmentInfo.hospital_id;
     let birthDate = null;
     if (!this.model.localMrNo) {

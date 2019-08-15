@@ -939,6 +939,9 @@ export class WidgetCreateAppointmentComponent implements OnInit {
       this.selectedCheckIn.medical_record_number = this.resMrLocal.medical_record_number;
       this.selectedCheckIn.patient_organization_id = this.resMrLocal.patient_organization_id;
       await this.defaultPatientType(detail.patient_hope_id);
+      await this.getAppointmentList();
+      await this.prepareTimeSlot();
+      await this.prepareAppList();
       close.click();
       this.open50(modal);
     }

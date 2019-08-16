@@ -1,22 +1,10 @@
 import { Component, OnInit } from '@angular/core';
-import { Router } from '@angular/router';
-import { IMyDpOptions } from 'mydatepicker';
-import { NgbModal, ModalDismissReasons } from '@ng-bootstrap/ng-bootstrap';
+import { Router, ActivatedRoute } from '@angular/router';
 import { DoctorService } from '../../../services/doctor.service';
-import { AppointmentService } from '../../../services/appointment.service';
-import { AdmissionService } from '../../../services/admission.service';
 import { Doctor } from '../../../models/doctors/doctor';
-import { General } from '../../../models/generals/general';
-import { Appointment } from '../../../models/appointments/appointment';
-import { dateFormatter } from '../../../utils/helpers.util';
 import { AlertService } from '../../../services/alert.service';
-import { GeneralService } from '../../../services/general.service';
-import { QueueService } from '../../../services/queue.service';
-import { ScheduleService } from '../../../services/schedule.service';
-import { PatientService } from '../../../services/patient.service';
 import { Speciality } from '../../../models/specialities/speciality';
 import { Alert, AlertType } from '../../../models/alerts/alert';
-import { sourceApps, queueType } from '../../../variables/common.variable';
 import { isEmpty } from 'lodash';
 
 @Component({
@@ -41,16 +29,51 @@ export class WidgetBaseAppointmentComponent implements OnInit {
   };
 
   public showSchedule: boolean = false;
+  public searchAutoComplete: any;
 
   constructor(
     private doctorService: DoctorService,
     private alertService: AlertService,
+    private route: ActivatedRoute,
     private router: Router, 
   ) { }
 
-  ngOnInit() {
-    this.getListDoctor();
-    this.getSpecialities();
+  async ngOnInit() {
+    await this.getListDoctor();
+    await this.getSpecialities();
+    await this.fromBack();
+  }
+
+  fromBack(){
+    const type = this.route.snapshot.queryParams['type'];
+
+    if(type){
+      if(type === 'doctor'){
+        const searchKey = {
+          doctor_id: this.route.snapshot.queryParams['doctor_id'],
+          name: this.route.snapshot.queryParams['name'],
+        };
+  
+        const idx = this.doctorList.findIndex((a)=>{
+          return a.doctor_id === searchKey.doctor_id;
+        });
+  
+        this.searchAutoComplete = this.doctorList[idx]; 
+        this.searchSchedule1(searchKey);
+      }else{
+        const searchKey = {
+          speciality_id: this.route.snapshot.queryParams['speciality_id'],
+          speciality_name: this.route.snapshot.queryParams['speciality_name'],
+        };
+  
+        const idx = this.specialities.findIndex((a)=>{
+          return a.speciality_id === searchKey.speciality_id;
+        });
+        
+        this.model.speciality = this.specialities[idx];
+        this.searchSchedule2();
+      }
+    }
   }
 
   async getListDoctor() {
@@ -59,10 +82,6 @@ export class WidgetBaseAppointmentComponent implements OnInit {
 
     this.doctorList = await this.doctorService.getListDoctor(this.hospital.id)
     .toPromise().then( res => {
-      if (res.status === 'OK' && res.data.length === 0) {
-        this.alertService.success('No List Doctor in This Hospital');
-      }
-
       return res.data;
     }).catch( err => {
       this.alertService.error(err.error.message);
@@ -71,15 +90,19 @@ export class WidgetBaseAppointmentComponent implements OnInit {
   }
 
   async getSpecialities(specialityname = null, total = null) {
-    this.doctorService.getSpecialities(specialityname, total)
-      .subscribe(data => {
-        this.specialities = data.data;
-        this.specialities.map(x => {
-          x.speciality_name = isEmpty(x.speciality_name) ? '' : x.speciality_name;
-        });
-      }, err => {
-        this.specialities = [];
+    this.specialities = await this.doctorService.getSpecialities(specialityname, total)
+    .toPromise().then( res => {
+      return res.data;
+    }).catch( err => {
+      this.alertService.error(err.error.message);
+      return [];
+    });
+
+    if(this.specialities.length !== 0){
+      this.specialities.map(x => {
+        x.speciality_name = isEmpty(x.speciality_name) ? '' : x.speciality_name;
       });
+    }
   }
 
   searchSchedule1(item){
@@ -88,7 +111,15 @@ export class WidgetBaseAppointmentComponent implements OnInit {
     this.searchKeywords.doctor = {
       doctor_id: item.doctor_id,
       name: item.name
-    }
+    };
+
+    const searchKey = {
+      type: 'doctor',
+      doctor_id: item.doctor_id,
+      name: item.name
+    };
+    
+    localStorage.setItem('searchKey', JSON.stringify(searchKey));
     
     this.doctorService.changeSearchDoctor(this.searchKeywords);
     this.doctorService.searchDoctorSource2 = this.searchKeywords;
@@ -119,6 +150,14 @@ export class WidgetBaseAppointmentComponent implements OnInit {
         speciality_name: speciality.speciality_name,
       },
     };
+
+    const searchKey = {
+      type: 'spesialist',
+      speciality_id: speciality.speciality_id,
+      speciality_name: speciality.speciality_name,  
+    };
+    
+    localStorage.setItem('searchKey', JSON.stringify(searchKey));
 
     this.doctorService.changeSearchDoctor(this.searchKeywords);
     this.doctorService.searchDoctorSource2 = this.searchKeywords;

@@ -1328,7 +1328,8 @@ export class WidgetCreateAppointmentComponent implements OnInit {
   }
 
   prevPage() {
-    window.history.back();
+    const searchKey = JSON.parse(localStorage.getItem('searchKey'));
+    this.router.navigate(['./base-appointment'], { queryParams: searchKey });
   }
 
   openScheduleBlockModal() {

@@ -4,9 +4,10 @@
           <ng-template ngbTabContent>
               <div class="fo_create_input_panel">
                   <div class="fo_create_input d-flex justify-content-start">
-                    <div class="ng-autocomplete" class="angular-autocomplete">
+                    <div *ngIf="!searchAutoComplete" class="ng-autocomplete" class="angular-autocomplete">
                       <ng-autocomplete
                         placeHolder="Doctor name ..."
+                        [initialValue]="searchAutoComplete"
                         [(ngModel)]="model.doctor"
                         [data]="doctorList"
                         searchKeyword="name"
@@ -23,6 +24,27 @@
                         <div [innerHTML]="notFound"></div>
                       </ng-template>
                     </div>
+
+                    <div *ngIf="searchAutoComplete" class="ng-autocomplete" class="angular-autocomplete">
+                        <ng-autocomplete
+                          placeHolder="Doctor name ..."
+                          [initialValue]="searchAutoComplete"
+                          [(ngModel)]="model.doctor"
+                          [data]="doctorList"
+                          searchKeyword="name"
+                          (selected)='searchSchedule1($event)'
+                          [itemTemplate]="itemTemplateDoctor"
+                          [notFoundTemplate]="notFoundTemplate"> 
+                        </ng-autocomplete>
+                        
+                        <ng-template #itemTemplateDoctor let-item>
+                          <a [innerHTML]="item.name"></a>
+                        </ng-template>
+                        
+                        <ng-template #notFoundTemplate let-notFound>
+                          <div [innerHTML]="notFound"></div>
+                        </ng-template>
+                      </div>
                   </div>
                   <div class="">
                     <div class="alert alert-warning alert-msg-wait" *ngIf="showWaitMsg">
@@ -43,8 +65,7 @@
                       <div class=" form-group">
                         <select class="form-control" [(ngModel)]="model.speciality" name="speciality" (change)="searchSchedule2()" >
                           <option>-----</option>
-                          <option *ngFor="let sp of specialities" [ngValue]="sp">{{sp.speciality_name}}</option>
-                          <!-- <option *ngFor="let sp of specialities" [ngValue]="sp" [selected] = "sp.specialtyId == spesialist.specialtyId">{{sp.name}}</option> -->
+                          <option *ngFor="let sp of specialities" [ngValue]="sp" [selected] = "sp.speciality_id == model.speciality.speciality_id">{{sp.speciality_name}}</option>
                         </select>
                       </div>
                     </div>

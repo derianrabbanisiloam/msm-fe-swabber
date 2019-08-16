@@ -72,30 +72,58 @@ export class ModalScheduleBlockComponent implements OnInit {
     );    
   }
 
+  rangeTimeChecker(fromTime, toTime){
+    const fSplit = fromTime.split(':');
+    const tSplit = toTime.split(':');
+    const setFT = new Date(this.inputedParams.date).setUTCHours(fSplit[0], fSplit[1], 0, 0);
+    const setTT = new Date(this.inputedParams.date).setUTCHours(tSplit[0], tSplit[1], 0, 0);
+    let ft: any;
+    let tt: any;
+    let fTime: any;
+    let tTime: any;
+    let found: boolean = false;
+    for (let i=0; i<this.scheduleBlocks.length; i++) {
+      ft = this.scheduleBlocks[i].from_time.split(':');
+      tt = this.scheduleBlocks[i].to_time.split(':');
+      fTime = new Date(this.inputedParams.date).setUTCHours(ft[0], ft[1], 0, 0);
+      tTime = new Date(this.inputedParams.date).setUTCHours(tt[0], tt[1], 0, 0);
+      if(((setFT >= fTime) && (setFT < tTime)) || ((setTT > fTime) && (setTT <= tTime))){
+        found = true;
+      }
+    }
+    return found;
+  }
+
   async addScheduleBlock() {
     const scheduleId = this.inputedParams.scheduleId;
     const date = this.inputedParams.date;
     const fromTime = moment('1990-01-01 ' + this.blockModel.fh + ':' + this.blockModel.fm).format('HH:mm');
     const toTime = moment('1990-01-01 ' + this.blockModel.th + ':' + this.blockModel.tm).format('HH:mm');
-    const { reason, isIncludeWaitingList } = this.blockModel;
-    this.addSchBlockPayload = {
-      fromDate: date,
-      toDate: date,
-      fromTime: fromTime,
-      toTime: toTime,
-      reason: reason,
-      isIncludeWaitingList: isIncludeWaitingList, 
-      userId: this.userId,
-      userName: this.userName,
-      source: this.source,
-    };
+    const checkTime = await this.rangeTimeChecker(fromTime, toTime);
 
-    await this.scheduleService.addScheduleBlock(scheduleId, this.addSchBlockPayload).toPromise().then(
-      data => {
-        this.scheduleService.emitScheduleBlock(true);
-      }
-    );
-    this.getScheduleBlock();
+    if(checkTime){
+      this.addBlockErrMsg = 'This range time already exist, please select another range time !';
+    }else{
+      const { reason, isIncludeWaitingList } = this.blockModel;
+      this.addSchBlockPayload = {
+        fromDate: date,
+        toDate: date,
+        fromTime: fromTime,
+        toTime: toTime,
+        reason: reason,
+        isIncludeWaitingList: isIncludeWaitingList, 
+        userId: this.userId,
+        userName: this.userName,
+        source: this.source,
+      };
+
+      await this.scheduleService.addScheduleBlock(scheduleId, this.addSchBlockPayload).toPromise().then(
+        data => {
+          this.scheduleService.emitScheduleBlock(true);
+        }
+      );
+      this.getScheduleBlock();
+    }
   }
 
   async updateScheduleBlock() {

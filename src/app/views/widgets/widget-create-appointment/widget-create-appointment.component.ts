@@ -1145,6 +1145,8 @@ export class WidgetCreateAppointmentComponent implements OnInit {
 
     this.resQueue = await this.queueService.createQueue(body).toPromise()
       .then( res => {
+        this.buttonReguler = false;
+        this.buttonVIP = false;
         dataPatient = {
           schedule_id: val.schedule_id,
           appointment_id: val.appointment_id,
@@ -1164,6 +1166,8 @@ export class WidgetCreateAppointmentComponent implements OnInit {
         this.socketTwo.emit(QUEUE_NUMBER, dataPatient);
         return res.data;
       }).catch(err => {
+        this.buttonReguler = false;
+        this.buttonVIP = false;
         this.alertService.error(err.error.message, false, 3000);
         return null;
       })

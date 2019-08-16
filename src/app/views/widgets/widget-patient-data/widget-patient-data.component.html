@@ -880,10 +880,10 @@
       </div>
       <div class="modal-body">
         <div *ngIf="!resQueue" class="form-group" [ngStyle]="{'text-align': 'center'}">
-            <button class="btn btn-primary col-md-2"
+            <button class="btn btn-primary col-md-2" [disabled]="buttonReguler"
               (click)="printQueueAction(selectedCheckIn, true, close_button)">Reguler
               </button>
-            <button class="btn btn-success col-md-2"
+            <button class="btn btn-success col-md-2" [disabled]="buttonVIP"
               (click)="printQueueAction(selectedCheckIn, false, close_button)">VIP
             </button>
         </div>
@@ -893,8 +893,9 @@
       </div>
       <div class="modal-footer">
         <div class="form-group">
-          <ngb-alert *ngIf="successMessage2" type="success" (close)="successMessage2 = null">{{ successMessage2 }}</ngb-alert>
-          <ngb-alert *ngIf="errorMessage2" type="danger" (close)="errorMessage2 = null">{{ errorMessage2 }}</ngb-alert>
+          <div *ngFor="let alert of alerts">
+            <ngb-alert *ngIf="alert" type="{{cssAlertType(alert)}}" (close)="removeAlert(alert)">{{ alert.message }}</ngb-alert>
+          </div>
         </div>
         <h3 *ngIf="resQueue"> {{ resQueue.name }}</h3>
       </div>

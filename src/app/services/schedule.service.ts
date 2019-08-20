@@ -12,7 +12,7 @@ export class ScheduleService {
   constructor(
     private http: HttpClient
   ) { }
-  
+
   private opAdminScheduleUrl = environment.OPADMIN_SERVICE + '/schedules';
   private scheduleBlockUrl = environment.CALL_CENTER_SERVICE + '/schedules/block';
   private leaveUrl = environment.OPADMIN_SERVICE + '/doctors/leaves';
@@ -20,7 +20,7 @@ export class ScheduleService {
 
   private scheduleBlockSource = new Subject<boolean>();
   public scheduleBlockSource$ = this.scheduleBlockSource.asObservable();
-
+  
   emitScheduleBlock(params: boolean) {
     this.scheduleBlockSource.next(params);
   }

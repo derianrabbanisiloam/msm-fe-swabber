@@ -671,7 +671,8 @@ export class WidgetCreateAppointmentComponent implements OnInit {
     await this.appointmentService.getTempAppointment(appointmentId).toPromise().then(
       data => {
         this.detailTemp = data.data;
-        const modalRef = this.modalService.open(ModalPatientVerificationComponent);modalRef.componentInstance.tempAppointmentSelected = this.detailTemp;
+        const modalRef = this.modalService.open(ModalPatientVerificationComponent, { windowClass: 'modal_verification', size: 'lg'});
+        modalRef.componentInstance.tempAppointmentSelected = this.detailTemp;
       }
     );
   }

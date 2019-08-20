@@ -20,6 +20,22 @@
     </div>
   </div>
   
+  <div class="d-flex justify-content-center">
+    <span class="custom-message" *ngIf="confirmReschedule">This Appointment Must Reschedule</span>
+  </div>
+
+  <div style="margin: 15px" *ngIf="specialist">
+      <strong>Hospital Name: </strong>{{tempAppointmentSelected.hospital_name}}<br>
+      <strong>Doctor Name: </strong>{{tempAppointmentSelected.doctor_name}}<br>
+      <strong>Specialty: </strong>{{specialist}}<br>
+      <strong>Appointment Date: </strong>{{tempAppointmentSelected.appointment_date}}<br>
+      <strong>Appointment Time: </strong>{{tempAppointmentSelected.appointment_from_time}} - {{tempAppointmentSelected.appointment_to_time}}<br>
+      <strong>Notes:<br></strong>
+      <ul>
+        <li *ngFor="let note of doctorNotes" style="color:red;font-size:16px">{{note.note}}</li>
+      </ul>
+  </div>
+  
   <div *ngIf="(patientHope && !searchLoader)" class="scrollTable verifyTable">
     <table>
       <thead>
@@ -32,7 +48,7 @@
           <th>Address</th>
         </tr>
       </thead>
-      <tbody>
+      <tbody [ngClass]="{'disable': confirmReschedule}">
         <tr *ngFor="let p of patientHope" [ngClass]="{'selectedVerify': patientSelected && (p.name == patientSelected.name && p.mrNo == patientSelected.mrNo)}" (click)="setVerifyPatient(p)">
           <td>{{p.name}}</td>
           <td>{{p.mrNo}}</td>
@@ -45,14 +61,24 @@
     </table>
 
     <div>
-      <div *ngIf="!tempAppointmentSelected.contact_id" class="createContactContainer">
+      <div *ngIf="tempAppointmentSelected.contact_id" class="createContactContainer">
         Is the patient name is not there? Do you want to create new contact?
         <div class="d-flex justify-content-center">
-          <div class="btn ms_btn_green" (click)="openConfirmationModal(create_contact)">Create</div>
+          <div [ngClass]="{'disable': confirmReschedule}" class="btn ms_btn_green" *ngIf="patientHope.length" (click)="openConfirmationModal(create_contact)">Create</div>
+          <div [ngClass]="{'disable': confirmReschedule}" class="btn ms_btn_green_light" *ngIf="patientHope.length === 0" (click)="openConfirmationModal(move_to_appointment)">Create</div>
         </div>
       </div>
     </div>
   </div>
+
+  <div class="modal-footer d-flex justify-content-start">
+    you want reschedule this appointment ?
+    <button class="btn ms_btn_blue" (click)="openRescheduleModal(tempAppointmentSelected)"
+      style="padding: 0.3vw 0vw; width: 7vw; margin-left: 1vw">
+      Reschedule
+    </button>
+  </div>
+
   <div class="modal-footer">
     <button type="button" class="btn ms_btn_black" data-dismiss="modal" (click)="close()">Close</button>
     <button [ngClass]="{'disable': !patientSelected && !contactId}" type="button" 
@@ -86,29 +112,55 @@
 </div>
 </ng-template>
 
-<!-- Modal -->
-<ng-template #verify_patient_modal let-modal>
-<div class="modal-header">
-<div class="header-2 modal-padding">Verify Appointment Confirmation</div>
-</div>
-<div class="modal-body">
-<strong>Name:</strong> {{patientSelected.name}}<br>
-<strong>Birth Date:</strong> {{patientSelected.birthDate}}<br>
-<strong>Mobile No:</strong> {{patientSelected.mobileNo1}} <span *ngIf="patientSelected.mobileNo2">,</span> {{patientSelected.mobileNo2}}<br>
-<strong>MR No:</strong> {{patientSelected.mrNo}}<br>
-<strong>MR No Unit:</strong> {{patientSelected.mrNoUnit}}<br>
-Are you sure this <strong>Temporary Appointment</strong> belongs to this Patient ? This action can't be changed.
-</div>
-<div *ngIf="verifyAppLoader" class="loading-div">
-<img src="../../../../assets/icons/Logo-Animation---S(FAST).gif">
-</div>
-<div *ngFor="let alert of alerts">
-<ngb-alert *ngIf="alert" type="{{cssAlertType(alert)}}" (close)="removeAlert(alert)">{{ alert.message }}</ngb-alert>
-</div>
-<div *ngIf="!isSuccessVerifyApp" class="modal-footer">
-<button type="button" class="btn ms_btn_black" (click)="modal.close()">Cancel</button>
-<button class="btn ms_btn_green" [ngClass]="{'disable': verifyAppLoader}" (click)="verifyTempAppointment()">Confirm</button>
-</div>
-<div *ngIf="isSuccessVerifyApp" class="modal-footer">
-<button class="btn ms_btn_black" (click)="closeAll()">Close</button>
-</div>
+<ng-template #move_to_appointment let-modal>
+    <div class="modal-dialog" role="document" style="margin-top: 10%">
+      <div class="modal-content">
+        <div class="modal-header">
+          <div class="header-2 modal-padding">Create Contact Confirmation</div>
+        </div>
+        <div *ngIf="!isSuccessVerifyApp" class="modal-body">
+          Are you sure?
+        </div>
+        <div *ngIf="isSuccessVerifyApp" class="modal-body">
+          <p>Verification Appointment Successfully</p>
+        </div>
+        
+        <div *ngIf="!isSuccessVerifyApp" class="modal-footer">
+          <button type="button" class="btn ms_btn_black" (click)="modal.close()">Cancel</button>
+          <button class="btn ms_btn_green" (click)="verifyTempAppointmentTwo()">Confirm</button>
+        </div>
+
+        <div *ngIf="isSuccessVerifyApp" class="modal-footer">
+          <button class="btn ms_btn_black" (click)="closeAll()">Close</button>
+        </div>
+      </div>
+    </div>
+  </ng-template>
+
+  <!-- Modal -->
+  <ng-template #verify_patient_modal let-modal>
+    <div class="modal-header">
+      <div class="header-2 modal-padding">Verify Appointment Confirmation</div>
+    </div>
+    <div class="modal-body">
+      <strong>Name:</strong> {{patientSelected.name}}<br>
+      <strong>Birth Date:</strong> {{patientSelected.birthDate}}<br>
+      <strong>Mobile No:</strong> {{patientSelected.mobileNo1}} <span *ngIf="patientSelected.mobileNo2">,</span> {{patientSelected.mobileNo2}}<br>
+      <strong>MR No:</strong> {{patientSelected.mrNo}}<br>
+      <strong>MR No Unit:</strong> {{patientSelected.mrNoUnit}}<br>
+      Are you sure this <strong>Temporary Appointment</strong> belongs to this Patient ? This action can't be changed.
+    </div>
+    <div *ngIf="verifyAppLoader" class="loading-div">
+      <img src="../../../../assets/icons/Logo-Animation---S(FAST).gif">
+    </div>
+    <div *ngFor="let alert of alerts">
+      <ngb-alert *ngIf="alert" type="{{cssAlertType(alert)}}" (close)="removeAlert(alert)">{{ alert.message }}</ngb-alert>
+    </div>
+    <div *ngIf="!isSuccessVerifyApp" class="modal-footer">
+      <button type="button" class="btn ms_btn_black" (click)="modal.close()">Cancel</button>
+      <button class="btn ms_btn_green" [ngClass]="{'disable': flagConfirm}" (click)="verifyTempAppointment()">Confirm</button>
+    </div>
+    <div *ngIf="isSuccessVerifyApp" class="modal-footer">
+      <button class="btn ms_btn_black" (click)="closeAll()">Close</button>
+    </div>
+  </ng-template>

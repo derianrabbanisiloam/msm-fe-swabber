@@ -384,6 +384,7 @@ a{ text-decoration: none !important;}
   max-width: 30%;
   margin: 10rem auto;
 }
+
 ::ng-deep .fo_modal_confirmation .modal-body div {
   text-align: center;
 }

@@ -16,12 +16,18 @@ export class ScheduleService {
   private opAdminScheduleUrl = environment.OPADMIN_SERVICE + '/schedules';
   private scheduleBlockUrl = environment.CALL_CENTER_SERVICE + '/schedules/block';
   private leaveUrl = environment.OPADMIN_SERVICE + '/doctors/leaves';
+  private timeSlotUrl = environment.CALL_CENTER_SERVICE + '/schedules/time-slot/hospital';
 
   private scheduleBlockSource = new Subject<boolean>();
   public scheduleBlockSource$ = this.scheduleBlockSource.asObservable();
 
   emitScheduleBlock(params: boolean) {
     this.scheduleBlockSource.next(params);
+  }
+
+  getTimeSlotSchedule(hospitalId: string, doctorId: string, scheduleId: string, date: string){
+    const uri = `${this.timeSlotUrl}/${hospitalId}/doctor/${doctorId}/appointment-date/${date}?scheduleId=${scheduleId}`;
+    return this.http.get<any>(uri, httpOptions);
   }
 
   scheduleDetail(scheduleId: string): Observable<any> {

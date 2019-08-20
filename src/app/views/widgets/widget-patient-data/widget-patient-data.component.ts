@@ -1257,7 +1257,7 @@ export class WidgetPatientDataComponent implements OnInit {
     this.closeAdm.click();
 
     const queueNo = this.resQueue.name;
-    const isWalkin = val.is_walkin ? 'WALK IN' : 'APPOINTMENT';
+    const isWalkin = this.selectedCheckIn.is_walkin ? 'WALK IN' : 'APPOINTMENT';
     const patientName = val.contact_name;
     const doctorName = val.doctor_name;
 

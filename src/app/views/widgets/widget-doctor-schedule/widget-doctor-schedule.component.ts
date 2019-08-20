@@ -133,19 +133,29 @@ export class WidgetDoctorScheduleComponent implements OnInit {
     let leaveType: any;
     let doctorId: any;
     /** Kalo mau lanjutin pasang doctor leave, mulai dari sini ya */
+    let flag: any = null;
     for (let i=0, length=7; i<length; i++) {
       dateTemp = date.add(1, 'days');
       dateHeader = dateTemp.format('dddd, DD-MM-YYYY');
       dateISO = dateTemp.format('YYYY-MM-DD');
       dateDay = dateTemp.format('E');
 
-      this.leaves.map(x => {
-        isLeave = moment(dateISO) >= moment(x.from_date) && moment(dateISO) <= moment(x.to_date) ? true : false;
-        hospitalId = x.hospital_id;
-        leaveType = x.schedule_type_name;
-        doctorId = x.doctor_id;
-      });
-      
+      for ( let j=0, length=this.leaves.length; j<length; j++) {
+        if(dateISO !== flag) {
+          if(moment(dateISO) >= moment(this.leaves[j].from_date) && moment(dateISO) <= moment(this.leaves[j].to_date)) {
+            isLeave = true;
+            hospitalId = this.leaves[j].hospital_id;
+            leaveType = this.leaves[j].schedule_type_name;
+            doctorId = this.leaves[j].doctor_id;
+            flag = dateISO;
+          } else {
+            isLeave = false;
+            hospitalId = this.leaves[j].hospital_id;
+            leaveType = this.leaves[j].schedule_type_name;
+            doctorId = this.leaves[j].doctor_id;
+          }
+        }
+      }
       this.dates.push({ dateHeader, dateISO, dateDay, isLeave, hospitalId, leaveType, doctorId });
     }
   }

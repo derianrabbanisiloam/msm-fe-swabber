@@ -1,6 +1,8 @@
 import * as moment from 'moment';
 import { Component, OnInit, Input} from '@angular/core';
 import { PatientService } from '../../../services/patient.service';
+import { DoctorService } from '../../../services/doctor.service';
+import { ScheduleService } from '../../../services/schedule.service';
 import { AppointmentService } from '../../../services/appointment.service';
 import { PatientHope } from '../../../models/patients/patient-hope';
 import { NgbModal, NgbActiveModal } from '@ng-bootstrap/ng-bootstrap';
@@ -10,6 +12,7 @@ import { patientPayload } from '../../../payloads/patient.payload';
 import { channelId, sourceApps } from '../../../variables/common.variable';
 import { AlertService } from '../../../services/alert.service';
 import { Alert, AlertType } from '../../../models/alerts/alert';
+import { ModalRescheduleAppointmentComponent } from '../modal-reschedule-appointment/modal-reschedule-appointment.component';
 
 @Component({
   selector: 'app-modal-patient-verification',
@@ -36,6 +39,13 @@ export class ModalPatientVerificationComponent implements OnInit {
   public createContactMsg: string;
   public contactId: string;
   public alerts: Alert[] = [];
+  public flagConfirm: boolean = false;
+  public dataDoctor: any;
+  public specialist: any;
+  public schedule: any;
+  public doctorNotes: any = [];
+  public confirmReschedule: boolean;
+  public appointment: any = {};
 
   constructor(
     private patientService: PatientService,
@@ -43,11 +53,61 @@ export class ModalPatientVerificationComponent implements OnInit {
     private modalService: NgbModal,
     private activeModal: NgbActiveModal,
     private alertService: AlertService,
+    private doctorService: DoctorService,
+    private scheduleService: ScheduleService
   ) { }
 
-  ngOnInit() {
+  async ngOnInit() {
     this.searchPatient();
     this.getCollectionAlert();
+    this.emitRescheduleApp();
+    await this.getDoctorProfile();
+    await this.getDoctorNotes();
+    await this.getConfirmTemp();
+  }
+
+  async getDoctorProfile() {
+    const hospitalId = this.tempAppointmentSelected.hospital_id;
+    const doctorId = this.tempAppointmentSelected.doctor_id; 
+    this.doctorService.getDoctorProfileTwo(hospitalId, doctorId).subscribe(
+      data => {
+        this.dataDoctor = data.data;
+        this.specialist = this.dataDoctor[0].specialization_name_en;
+      }
+    )
+  }
+
+  async getDoctorNotes() {
+    const hospitalId = this.tempAppointmentSelected.hospital_id;
+    const doctorId = this.tempAppointmentSelected.doctor_id;
+    let fromDate:any = '', toDate: any = '';
+    fromDate = toDate = this.tempAppointmentSelected.appointment_date;
+
+    await this.doctorService.getDoctorNotes(hospitalId, fromDate, toDate, doctorId).toPromise().then(
+      data => {
+        this.doctorNotes = data.data.length === 0 ? null : data.data;
+      }
+    );
+  }
+
+  async getConfirmTemp() {
+    const appTempId = this.tempAppointmentSelected.appointment_temporary_id;
+    this.appointmentService.getConfirmRescheduleTemp(appTempId).subscribe(
+      data => {
+        this.confirmReschedule = data.data;
+      }
+    )
+  }
+
+  emitRescheduleApp() {
+    this.appointmentService.rescheduleAppSource$.subscribe(
+      async () => {
+        await this.searchPatient();
+        await this.getDoctorProfile();
+        await this.getDoctorNotes();
+        await this.getConfirmTemp();
+      }
+    );
   }
 
   searchPatient() {
@@ -135,6 +195,7 @@ export class ModalPatientVerificationComponent implements OnInit {
 
   public verifySubmit: boolean = false;
   async verifyTempAppointment() {
+    this.flagConfirm = true;
     const app = this.tempAppointmentSelected;
     if (!this.contactId) {
       await this.verifyPatient();
@@ -152,7 +213,7 @@ export class ModalPatientVerificationComponent implements OnInit {
       scheduleId: app.schedule_id,
       contactId: contactId,
       addressLine1: app.address_line_1,
-      channelId: app.channel_id.toString(),
+      channelId: app.channel_id,
       note: app.note,
       userId: this.userId,
       userName: this.userName,
@@ -162,10 +223,48 @@ export class ModalPatientVerificationComponent implements OnInit {
     await this.appointmentService.verifyAppointment(payload).toPromise().then(
       data => {
         this.isSuccessVerifyApp = true;
+        this.flagConfirm = false;
         this.alertService.success('Verifikasi appointment berhasil');
         this.appointmentService.emitVerifyApp(true);        
       }, error => {
+        this.flagConfirm = false;
         this.alertService.error('Gagal verifikasi appointment');
+      }
+    );
+  }
+
+  async verifyTempAppointmentTwo() {
+    this.flagConfirm = true;
+    const app = this.tempAppointmentSelected;
+    
+    const contactId = app.contact_id;
+    const payload: appointmentTemporaryPayload = {
+      appointmentTemporaryId: app.appointment_temporary_id,
+      appointmentDate: app.appointment_date,
+      appointmentFromTime: app.appointment_from_time,
+      appointmentToTime: app.appointment_to_time,
+      appointmentNo: app.appointment_no,
+      isWaitingList: app.is_waiting_list,
+      doctorId: app.doctor_id,
+      hospitalId: app.hospital_id,
+      scheduleId: app.schedule_id,
+      contactId: contactId,
+      addressLine1: app.address_line_1,
+      channelId: app.channel_id,
+      note: app.note,
+      userId: this.userId,
+      userName: this.userName,
+      source: this.source
+    };
+    await this.appointmentService.verifyAppointment(payload).toPromise().then(
+      data => {
+        this.isSuccessVerifyApp = true;
+        this.flagConfirm = false;
+        this.alertService.success('Verifikasi appointment berhasil');
+        this.appointmentService.emitVerifyApp(true);       
+      }, error => {
+        this.alertService.error('Gagal verifikasi appointment');
+        this.flagConfirm = false;
       }
     );
   }
@@ -209,6 +308,12 @@ export class ModalPatientVerificationComponent implements OnInit {
   
   removeAlert(alert: Alert) {
     this.alerts = this.alerts.filter(x => x !== alert);
+  }
+
+  openRescheduleModal(appointmentSelected: any) {
+    const modalRef = this.modalService.open(ModalRescheduleAppointmentComponent,  
+      {windowClass: 'cc_modal_confirmation', size: 'lg'});
+    modalRef.componentInstance.appointmentSelected = appointmentSelected;
   }
 
 }

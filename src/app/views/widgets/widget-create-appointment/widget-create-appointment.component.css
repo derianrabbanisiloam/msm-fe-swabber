@@ -378,6 +378,11 @@ a{ text-decoration: none !important;}
   text-align: right;
 }
 
+::ng-deep .modal_verification .modal-dialog { 
+  max-width: 40%;
+  width: 40%;
+  margin-top: 7vw;
+}
 
 .modal-body p { text-align: center}
 ::ng-deep .fo_modal_confirmation .modal-dialog{

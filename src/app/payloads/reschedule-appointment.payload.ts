@@ -1,8 +1,10 @@
 export class rescheduleAppointmentPayload {
-  appointmentId: string;
+  appointmentId?: string;
+  appointmentTemporaryId?:string;
   appointmentNo: number;
   appointmentDate: string;
   appointmentFromTime: string;
+  appointmentToTime: string;
   scheduleId: string;
   hospitalId: string;
   isWaitingList: boolean;

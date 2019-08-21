@@ -27,6 +27,11 @@ export class DoctorService {
   public searchDoctorSource$ = this.searchDoctorSource.asObservable();
   public searchDoctorSource2: any;
 
+  getDoctorProfileTwo(hospital: string, doctor: string): Observable<any> {
+    const url = `${this.doctorUrl}/profiles/hospital/${hospital}/doctor/${doctor}`;
+    return this.http.get<any>(url, httpOptions);
+  }
+
   changeSearchDoctor(params: any) {
     this.searchDoctorSource.next(params);
   }

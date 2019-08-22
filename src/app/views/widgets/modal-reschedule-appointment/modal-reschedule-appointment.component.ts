@@ -137,14 +137,23 @@ export class ModalRescheduleAppointmentComponent implements OnInit {
   }
 
   async updateAppointment() {
-    if (this.editModel.phoneNo) {
-      await this.updateContact();
-    } 
-    if (this.rescheduleAppPayload) {
-      await this.rescheduleAppointment();    
-    }
-    if(this.rescheduleSelected.note !== this.appointmentSelected.appointment_note){
-      await this.updateNotes();
+    const app = this.appointmentSelected;
+    
+    if(app.appointment_id){
+      if (this.editModel.phoneNo) {
+        await this.updateContact();
+      } 
+      if (this.rescheduleAppPayload) {
+        await this.rescheduleAppointment();    
+      }
+      if(this.rescheduleSelected.note !== this.appointmentSelected.appointment_note){
+        await this.updateNotes();
+      }
+    }else{
+      if (this.rescheduleAppPayload) {
+        await this.rescheduleAppointment();    
+      }
+      await this.updateDetailTemporaryApp();
     }
   }
 
@@ -192,6 +201,27 @@ export class ModalRescheduleAppointmentComponent implements OnInit {
         this.patientService.emitUpdateContact(true);
       }, error => {
         this.patientService.emitUpdateContact(false);
+      }
+    );
+  }
+
+  async updateDetailTemporaryApp(){
+    //to update detail of temporary appointment
+    
+    const tempAppId = this.appointmentSelected.appointment_temporary_id;
+    const model = {
+      phoneNumber: this.editModel.phoneNo,
+      note: this.rescheduleSelected.note,
+      userName: this.user.fullname,
+      userId: this.user.id,
+      source: sourceApps,
+    };
+
+    await this.appointmentService.updateDetailTemporaryApp(tempAppId, model).subscribe(
+      (data) => {
+        this.appointmentService.emitUpdateNotes(true);
+      }, error => {
+        this.appointmentService.emitUpdateNotes(false);
       }
     );
   }

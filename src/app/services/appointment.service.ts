@@ -50,6 +50,13 @@ export class AppointmentService {
     this.updateNotesSource.next(params);
   }
 
+  updateDetailTemporaryApp(tempAppId: any, payload: any): Observable<any> {
+    const url = `${this.ccAppointmentUrl}/temporary/${tempAppId}`;
+    const body = JSON.stringify(payload);
+    
+    return this.http.put<any>(url, body, httpOptions);
+  }
+
   getConfirmRescheduleTemp(appTemp: string) {
     const url = `${this.rescheduleUrl}/confirm?appointmentTemporaryId=${appTemp}`;
     return this.http.get<any>(url, httpOptions);

@@ -179,6 +179,7 @@ export class WidgetCreateAppointmentComponent implements OnInit {
     this.emitRescheduleApp();
     this.getCollectionAlert();
 
+    //scoket create appointment
     this.socket.on(CREATE_APP, (call) => {
       if(call.data.schedule_id == this.appointmentPayload.scheduleId 
         && call.data.appointment_date == this.appointmentPayload.appointmentDate){
@@ -186,6 +187,8 @@ export class WidgetCreateAppointmentComponent implements OnInit {
           this.dataProcessing();
       }
     });
+
+    //socket cancel appointment
     this.socket.on(CANCEL_APP, (call) => {
       if(call.data.schedule_id == this.appointmentPayload.scheduleId 
         && call.data.appointment_date == this.appointmentPayload.appointmentDate){
@@ -195,6 +198,8 @@ export class WidgetCreateAppointmentComponent implements OnInit {
           this.dataProcessing();
       }
     });
+
+    //socket checkin appointment
     this.socket.on(CHECK_IN, (call) => {
       if(call.data.schedule_id == this.appointmentPayload.scheduleId 
         && call.data.appointment_date == this.appointmentPayload.appointmentDate){
@@ -207,24 +212,42 @@ export class WidgetCreateAppointmentComponent implements OnInit {
         this.dataProcessing();
       }
     });
+
+    //socket reschedule appointment
     this.socket.on(RESCHEDULE_APP,(call) => {
       if(this.appointments.length){
+        let flag: any = '';
         this.appointments.map((value) => {
-          if (value.appointment_id === call.data.after.appointment_id) {
-            this.appointments = this.appointments.filter((value) => {
-              return value.appointment_id !== call.data.after.appointment_id;;
-            });
-            this.dataProcessing();
-          } else if (value.appointment_id !== call.data.after.appointment_id && value.schedule_id === call.data.after.schedule_id) {
-            this.appointments.push(call.data.after);
-            this.dataProcessing();
-          }
+          if (value.appointment_id === call.data.after.appointment_id
+            && value.schedule_id !== call.data.after.schedule_id) {
+              this.appointments = this.appointments.filter((value) => {
+                return value.appointment_id !== call.data.after.appointment_id;
+              });
+              this.dataProcessing();
+          } else if (value.appointment_id !== call.data.after.appointment_id 
+              && value.schedule_id === call.data.after.schedule_id 
+              && flag !== call.data.after.appointment_id) {
+                flag = call.data.after.appointment_id;
+                this.appointments.push(call.data.after);
+                this.dataProcessing();
+          } else if (value.appointment_id === call.data.after.appointment_id 
+              && value.schedule_id === call.data.after.schedule_id 
+              && flag !== call.data.after.appointment_id) {
+                flag = call.data.after.appointment_id;
+                this.appointments = this.appointments.filter((value) => {
+                  return value.appointment_id !== call.data.after.appointment_id;
+                });
+                this.appointments.push(call.data.after);
+                this.dataProcessing();
+            }
         });
       } else {
         this.appointments.push(call.data);
         this.dataProcessing();
       }
     });
+
+    //scoket queue number
     this.socketTwo.on(QUEUE_NUMBER, (call) => {
       if(call.data.schedule_id == this.appointmentPayload.scheduleId 
         && call.data.appointment_date == this.appointmentPayload.appointmentDate){
@@ -728,8 +751,17 @@ export class WidgetCreateAppointmentComponent implements OnInit {
           }
         });
       } else {
-        this.appList[idx.appointment_no].patient_name = null;
-        this.appList[idx.appointment_no].is_can_create = true;
+        if(this.doctorProfile.doctor_type_id === '1'){ //first come first serve
+          this.appList.map( x => {
+            if (x.appointment_no === idx.appointment_no) {
+              x.patient_name = null;
+              x.is_can_create = true;  
+            }
+          });
+        }else{
+          this.appList[idx.appointment_no].patient_name = null;
+          this.appList[idx.appointment_no].is_can_create = true;
+        }
       }
     }
     idx = item;
@@ -742,8 +774,17 @@ export class WidgetCreateAppointmentComponent implements OnInit {
         }
       });
     } else {
-      this.appList[idx.appointment_no].patient_name = this.appointmentPayloadInput.name;
-      this.appList[idx.appointment_no].is_can_create = false;
+      if(this.doctorProfile.doctor_type_id === '1'){  //first come first serve
+        this.appList.map( x => {
+          if (x.appointment_no === idx.appointment_no) {
+            x.patient_name = this.appointmentPayloadInput.name;
+            x.is_can_create = false;  
+          }
+        });
+      }else{
+        this.appList[idx.appointment_no].patient_name = this.appointmentPayloadInput.name;
+        this.appList[idx.appointment_no].is_can_create = false;
+      }
     }
     this.opSlotSelected.emit(data);
   }

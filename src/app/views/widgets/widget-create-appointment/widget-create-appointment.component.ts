@@ -219,24 +219,26 @@ export class WidgetCreateAppointmentComponent implements OnInit {
         let flag: any = '';
         this.appointments.map((value) => {
           if (value.appointment_id === call.data.after.appointment_id
-            && value.schedule_id !== call.data.after.schedule_id) {
+            && value.schedule_id !== call.data.after.schedule_id) { //for appointment move to other schedule
               this.appointments = this.appointments.filter((value) => {
                 return value.appointment_id !== call.data.after.appointment_id;
               });
               this.dataProcessing();
-          } else if (value.appointment_id !== call.data.after.appointment_id 
-              && value.schedule_id === call.data.after.schedule_id 
-              && flag !== call.data.after.appointment_id) {
-                flag = call.data.after.appointment_id;
-                this.appointments.push(call.data.after);
-                this.dataProcessing();
-          } else if (value.appointment_id === call.data.after.appointment_id 
-              && value.schedule_id === call.data.after.schedule_id 
-              && flag !== call.data.after.appointment_id) {
+          } else if (value.schedule_id === call.data.after.schedule_id
+              && value.appointment_id === call.data.after.appointment_id
+              && value.schedule_id === call.data.before.schedule_id 
+              && value.appointment_id !== flag) { //for appointment move to the slot time with same schedule
                 flag = call.data.after.appointment_id;
                 this.appointments = this.appointments.filter((value) => {
                   return value.appointment_id !== call.data.after.appointment_id;
                 });
+                this.appointments.push(call.data.after);
+                this.dataProcessing();
+          } else if (value.appointment_id !== call.data.after.appointment_id 
+              && value.schedule_id === call.data.after.schedule_id
+              && value.schedule_id !== call.data.before.schedule_id 
+              && value.appointment_id !== flag) { //for appointment move to this schedule
+                flag = call.data.after.appointment_id;
                 this.appointments.push(call.data.after);
                 this.dataProcessing();
             }

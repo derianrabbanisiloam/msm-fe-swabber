@@ -73,7 +73,11 @@
     margin-left: 2rem;
   }
   
-  
+  ::ng-deep .modal_queue .modal-dialog { 
+    max-width: 40%;
+    width: 40%;
+    margin-top: 7vw;
+  }
   
   ::ng-deep .fo_modal_search .modal-content{ border: none}
   ::ng-deep .fo_modal_search .modal-dialog{

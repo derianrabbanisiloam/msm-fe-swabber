@@ -36,16 +36,7 @@ export class WidgetPatientDataComponent implements OnInit {
   public user = this.key.user;
 
   public model: any = {};
-  public listSex: General[] = [
-    {
-      description: 'Male',
-      value: '1',
-    },
-    {
-      description: 'Female',
-      value: '2',
-    },
-  ];
+  public listSex: General[] = []; 
   public listTitle: General[];
   public listReligion: General[];
   public listMarital: General[];
@@ -137,7 +128,7 @@ export class WidgetPatientDataComponent implements OnInit {
     private scheduleService: ScheduleService,
     private router: Router,
   ) {
-    this.model.sex = { value: '1' };
+    this.model.sex = {};
     this.model.CentralRegDate = dateFormatter(new Date(), true);
     this.model.registerDate = this.model.CentralRegDate;
 
@@ -458,6 +449,10 @@ export class WidgetPatientDataComponent implements OnInit {
       }).catch( err => {
         return [];
       })
+
+      if(this.listSubdistrict.length != 0){
+        this.model.subdistrict = this.listSubdistrict[0];
+      }
     }
     
     if(subDistrictId){
@@ -695,17 +690,23 @@ export class WidgetPatientDataComponent implements OnInit {
       this.model.payerIdNo = val.payerIdNo;
     }
   }
+  
+  isEmpty(obj) {
+    for(var key in obj) {
+        if(obj.hasOwnProperty(key))
+            return false;
+    }
+    return true;
+  }
 
   checkFormCondition() {
 
     let valid = true;
 
     let patientName = this.model.patientName ? this.model.patientName.trim() : "";
+    let sex = this.isEmpty(this.model.sex) ? null : this.model.sex; 
     let address = this.model.address ? this.model.address.trim() : "";
-    let homePhone = this.model.homePhone ? this.model.homePhone.trim() : "";
-    let officePhone = this.model.officePhone ? this.model.officePhone.trim() : "";
     let mobileNo1 = this.model.mobileNo1 ? this.model.mobileNo1.trim() : "";
-    let mobileNo2 = this.model.mobileNo2 ? this.model.mobileNo2.trim() : "";
     let contactName = this.model.contactName ? this.model.contactName.trim() : "";
     let contactMobile = this.model.contactMobile ? this.model.contactMobile.trim() : "";
     let contactPhone = this.model.contactPhone ? this.model.contactPhone.trim(): "";
@@ -723,7 +724,7 @@ export class WidgetPatientDataComponent implements OnInit {
       if  (now < bod) { valid = false; $('.form-pr-bdate').addClass('form-error');
       } else { $('.form-pr-bdate').removeClass('form-error'); }
     }
-    if (!this.model.sex) { valid = false; $('.form-pr-sex').addClass('form-error');
+    if (!sex) { valid = false; $('.form-pr-sex').addClass('form-error');
     } else { $('.form-pr-sex').removeClass('form-error'); }
     // Contact Detail
     if (!address) { valid = false; $('.form-pr-address').addClass('form-error');
@@ -1187,7 +1188,7 @@ export class WidgetPatientDataComponent implements OnInit {
   }
 
   printQueue(content, close){
-    this.open(content);
+    this.modalService.open(content, { windowClass: 'modal_queue', size: 'lg'});
     this.closeAdm = close;
   }
 

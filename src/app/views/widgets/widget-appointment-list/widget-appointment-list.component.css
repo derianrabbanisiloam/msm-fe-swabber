@@ -41,6 +41,12 @@ thead th a{ color: #1A2269; text-decoration: none}
   margin-right: 14px;
 }
 
+::ng-deep .modal_queue .modal-dialog { 
+  max-width: 40%;
+  width: 40%;
+  margin-top: 7vw;
+}
+
 .fo_btn_admission{ height: 2.7rem; width: 12rem;
   border: none; border-radius: 2px;
   font-size: 14px;

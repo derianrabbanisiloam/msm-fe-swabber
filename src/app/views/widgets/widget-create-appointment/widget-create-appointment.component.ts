@@ -1119,7 +1119,7 @@ export class WidgetCreateAppointmentComponent implements OnInit {
 
 
   printQueue(content, close){
-    this.open(content);
+    this.modalService.open(content, { windowClass: 'modal_queue', size: 'lg'});
     this.closeAdm = close;
   }
   

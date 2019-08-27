@@ -64,8 +64,7 @@
       <div *ngIf="tempAppointmentSelected.contact_id" class="createContactContainer">
         Is the patient name is not there? Do you want to create new contact?
         <div class="d-flex justify-content-center">
-          <div [ngClass]="{'disable': confirmReschedule}" class="btn ms_btn_green" *ngIf="patientHope.length" (click)="openConfirmationModal(create_contact)">Create</div>
-          <div [ngClass]="{'disable': confirmReschedule}" class="btn ms_btn_green_light" *ngIf="patientHope.length === 0" (click)="openConfirmationModal(move_to_appointment)">Create</div>
+          <div [ngClass]="{'disable': confirmReschedule}" class="btn ms_btn_green_light" (click)="openConfirmationModal(move_to_appointment)">Create</div>
         </div>
       </div>
     </div>

@@ -1,10 +1,11 @@
-import { Component, OnInit, Input} from '@angular/core';
+import { Component, OnInit, Input } from '@angular/core';
 import { ModalUtil } from '../../../utils/modal.util';
 import { NgbActiveModal } from '@ng-bootstrap/ng-bootstrap';
 import { AppointmentService } from '../../../services/appointment.service';
 import { AlertService } from '../../../services/alert.service';
 import { Alert, AlertType } from '../../../models/alerts/alert';
 import { sourceApps } from '../../../variables/common.variable';
+import { environment } from '../../../../environments/environment';
 
 @Component({
   selector: 'app-modal-cancel-appointment',
@@ -12,7 +13,7 @@ import { sourceApps } from '../../../variables/common.variable';
   styleUrls: ['./modal-cancel-appointment.component.css']
 })
 export class ModalCancelAppointmentComponent implements OnInit {
-
+  public assetPath = environment.ASSET_PATH;
   @Input() payload: any;
   public key: any = JSON.parse(localStorage.getItem('key'));
   public user = this.key.user;
@@ -38,10 +39,10 @@ export class ModalCancelAppointmentComponent implements OnInit {
   }
 
   deleteAppointment() {
-    const body = { 
-      userId: this.userId, 
+    const body = {
+      userId: this.userId,
       userName: this.userName,
-      source: this.source 
+      source: this.source
     };
 
     this.appointmentService.deleteAppointment(this.payload.appointmentId, body, this.payload.temp).subscribe(
@@ -54,12 +55,12 @@ export class ModalCancelAppointmentComponent implements OnInit {
     );
   }
 
-  async getCollectionAlert(){
+  async getCollectionAlert() {
     this.alertService.getAlert().subscribe((alert: Alert) => {
       if (!alert) {
-          // clear alerts when an empty alert is received
-          this.alerts = [];
-          return;
+        // clear alerts when an empty alert is received
+        this.alerts = [];
+        return;
       }
       // add alert to array
       this.alerts.push(alert);
@@ -68,7 +69,7 @@ export class ModalCancelAppointmentComponent implements OnInit {
 
   cssAlertType(alert: Alert) {
     if (!alert) {
-        return;
+      return;
     }
 
     switch (alert.type) {
@@ -82,7 +83,7 @@ export class ModalCancelAppointmentComponent implements OnInit {
         return 'warning';
     }
   }
-  
+
   removeAlert(alert: Alert) {
     this.alerts = this.alerts.filter(x => x !== alert);
   }

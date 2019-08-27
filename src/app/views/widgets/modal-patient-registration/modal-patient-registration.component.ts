@@ -13,6 +13,7 @@ import { Alert, AlertType } from '../../../models/alerts/alert';
 import { channelId, sourceApps } from '../../../variables/common.variable';
 import * as moment from 'moment';
 import * as $ from 'jquery';
+import { environment } from '../../../../environments/environment';
 
 
 @Component({
@@ -23,7 +24,7 @@ import * as $ from 'jquery';
 export class ModalPatientRegistrationComponent implements OnInit {
 
   @Input() contactInfo: any;
-
+  public assetPath = environment.ASSET_PATH;
   public key: any = JSON.parse(localStorage.getItem('key'));
   public hospital = this.key.hospital;
   public user = this.key.user;
@@ -57,7 +58,7 @@ export class ModalPatientRegistrationComponent implements OnInit {
   public mask_birth = [/\d/, /\d/, '-', /\d/, /\d/, '-', /\d/, /\d/, /\d/, /\d/];
   public mask = [/\d/, /\d/, /\d/, /\d/, /\d/, /\d/, /\d/, /\d/, /\d/, /\d/, /\d/, /\d/, /\d/];
 
-  public isButtonSave : boolean = false;
+  public isButtonSave: boolean = false;
 
   constructor(
     private generalService: GeneralService,
@@ -81,127 +82,127 @@ export class ModalPatientRegistrationComponent implements OnInit {
     await this.getContact(this.contactInfo.contactId);
   }
 
-  async getCity(){
+  async getCity() {
     this.listCity = await this.generalService.getCity()
-    .toPromise().then( res => {
-      return res.data;
-    }).catch( err => {
-      return [];
-    })
+      .toPromise().then(res => {
+        return res.data;
+      }).catch(err => {
+        return [];
+      })
   }
 
-  async getPayer(){
+  async getPayer() {
     this.listPayer = await this.generalService.getPayer(this.hospital.orgId)
-    .toPromise().then( res => {
-      return res.data;
-    }).catch( err => {
-      return [];
-    })
+      .toPromise().then(res => {
+        return res.data;
+      }).catch(err => {
+        return [];
+      })
   }
 
-  async getCountry(){
+  async getCountry() {
     this.listCountry = await this.generalService.getCountry()
-     .toPromise().then( res => {
-       return res.data;
-     }).catch( err => {
-       return [];
-     })
+      .toPromise().then(res => {
+        return res.data;
+      }).catch(err => {
+        return [];
+      })
   }
 
-  async getNationalIdType(){
+  async getNationalIdType() {
     this.listNationalIdType = await this.generalService.getNationalityIdType()
-     .toPromise().then( res => {
-       return res.data;
-     }).catch( err => {
-       return [];
-     })
+      .toPromise().then(res => {
+        return res.data;
+      }).catch(err => {
+        return [];
+      })
   }
 
-  async getSex(){
+  async getSex() {
     this.listSex = await this.generalService.getGender()
-     .toPromise().then( res => {
-       return res.data;
-     }).catch( err => {
-       return [];
-     })
+      .toPromise().then(res => {
+        return res.data;
+      }).catch(err => {
+        return [];
+      })
   }
 
-  async getMarital(){
+  async getMarital() {
     this.listMarital = await this.generalService.getMaritalStatus()
-     .toPromise().then( res => {
-       return res.data;
-     }).catch( err => {
-       return [];
-     })
+      .toPromise().then(res => {
+        return res.data;
+      }).catch(err => {
+        return [];
+      })
   }
 
-  async getTitle(){
+  async getTitle() {
     this.listTitle = await this.generalService.getTitle()
-     .toPromise().then( res => {
-       return res.data;
-     }).catch( err => {
-       return [];
-     })
+      .toPromise().then(res => {
+        return res.data;
+      }).catch(err => {
+        return [];
+      })
   }
 
-  async getReligion(){
+  async getReligion() {
     this.listReligion = await this.generalService.getReligion()
-     .toPromise().then( res => {
-       return res.data;
-     }).catch( err => {
-       return [];
-     })
+      .toPromise().then(res => {
+        return res.data;
+      }).catch(err => {
+        return [];
+      })
   }
 
-  async getBloodType(){
+  async getBloodType() {
     this.listBloodType = await this.generalService.getBloodType()
-     .toPromise().then( res => {
-       return res.data;
-     }).catch( err => {
-       return [];
-     })
+      .toPromise().then(res => {
+        return res.data;
+      }).catch(err => {
+        return [];
+      })
   }
 
-  async getContact(contactId: string){
+  async getContact(contactId: string) {
 
     const contact = await this.patientService.getContact(contactId)
-    .toPromise().then( res => {
-      return res.data;
-    }).catch( err => {
-      return null;
-    });
+      .toPromise().then(res => {
+        return res.data;
+      }).catch(err => {
+        return null;
+      });
 
-    if(contact){
+    if (contact) {
       this.model.patientName = contact.name;
       this.model.address = contact.current_address;
       this.model.mobileNo1 = contact.phone_number_1;
       this.model.birth = moment(contact.birth_date).format('DD-MM-YYYY');
 
-      if(contact.city_id){
-        const idx = this.listCity.findIndex((a)=>{
+      if (contact.city_id) {
+        const idx = this.listCity.findIndex((a) => {
           return a.city_id === contact.city_id;
         })
-        
-        this.model.city = (idx >= 0) ? { city_id: this.listCity[idx].city_id, name: this.listCity[idx].name } : { city_id: null, name: ''}; 
-      }else{
+
+        this.model.city = (idx >= 0) ? { city_id: this.listCity[idx].city_id, name: this.listCity[idx].name } : { city_id: null, name: '' };
+      } else {
         this.model.city = { city_id: null, name: '' };
       }
 
-      this.model.district = contact.district_id ? { district_id : contact.district_id } : { district_id: null };
-      this.model.subdistrict = contact.sub_district_id ? { sub_district_id : contact.sub_district_id } : { sub_district_id: null };
+      this.model.district = contact.district_id ? { district_id: contact.district_id } : { district_id: null };
+      this.model.subdistrict = contact.sub_district_id ? { sub_district_id: contact.sub_district_id } : { sub_district_id: null };
 
-      if(contact.country_id){
-        const idx = this.listCountry.findIndex((a)=>{
+      if (contact.country_id) {
+        const idx = this.listCountry.findIndex((a) => {
           return a.country_id === contact.country_id;
         })
-        
-        this.model.nationality = (idx >= 0) ? { country_id: this.listCountry[idx].country_id, name: this.listCountry[idx].name } : { country_id: null, name: ''}; 
-      }else{
+
+        this.model.nationality = (idx >= 0) ? { country_id: this.listCountry[idx].country_id, name: this.listCountry[idx].name } : { country_id: null, name: '' };
+      } else {
         this.model.nationality = { country_id: null, name: '' };
       }
-      
-      this.model.sex =  contact.gender_id ? { value: contact.gender_id } : this.model.sex;
-    }else{
+
+      this.model.sex = contact.gender_id ? { value: contact.gender_id } : this.model.sex;
+    } else {
       this.alertService.error('Contact not found', false, 5000);
     }
   }
@@ -215,85 +216,85 @@ export class ModalPatientRegistrationComponent implements OnInit {
     this.listDistrict = [];
     this.listSubdistrict = [];
 
-    if(from) {
+    if (from) {
       const cityId = this.model.city.city_id;
       const districtId = this.model.district.district_id;
       const subdistrictId = this.model.subdistrict.sub_district_id;
 
       this.listDistrict = await this.generalService.getDistrict(cityId)
-      .toPromise().then( res => {
-        return res.data;
-      }).catch( err => {
-        return [];
-      })
+        .toPromise().then(res => {
+          return res.data;
+        }).catch(err => {
+          return [];
+        })
 
-      if(this.listDistrict.length !== 0){
-        if(!districtId) {
+      if (this.listDistrict.length !== 0) {
+        if (!districtId) {
           this.model.district = this.listDistrict[0];
-        }else{
+        } else {
           this.model.district = this.model.district;
         }
       }
 
       this.listSubdistrict = await this.generalService.getSubDistrict(this.model.district.district_id)
-        .toPromise().then( res => {
+        .toPromise().then(res => {
           return res.data;
-        }).catch( err => {
+        }).catch(err => {
           return [];
         })
 
-      if(this.listSubdistrict.length !== 0){
-        if(!subdistrictId) {
+      if (this.listSubdistrict.length !== 0) {
+        if (!subdistrictId) {
           this.model.subdistrict = this.listSubdistrict[0];
-        }else{
+        } else {
           this.model.subdistrict = this.model.subdistrict;
         }
       }
 
-    }else{
+    } else {
       const cityId = this.model.city.city_id;
-      
+
       this.listDistrict = await this.generalService.getDistrict(cityId)
-      .toPromise().then( res => {
-        return res.data;
-      }).catch( err => {
-        return [];
-      })
-      
-      if(this.listDistrict.length !== 0){
+        .toPromise().then(res => {
+          return res.data;
+        }).catch(err => {
+          return [];
+        })
+
+      if (this.listDistrict.length !== 0) {
         this.model.district = this.listDistrict[0];
       }
 
       this.listSubdistrict = await this.generalService.getSubDistrict(this.model.district.district_id)
-      .toPromise().then( res => {
-        return res.data;
-      }).catch( err => {
-        return [];
-      })
+        .toPromise().then(res => {
+          return res.data;
+        }).catch(err => {
+          return [];
+        })
 
-      if(this.listSubdistrict.length != 0){
+      if (this.listSubdistrict.length != 0) {
         this.model.subdistrict = this.listSubdistrict[0];
       }
     }
   }
 
-  async getSubdistrict(districtId = null, subDistrictId = null){
-    if(districtId){
+  async getSubdistrict(districtId = null, subDistrictId = null) {
+    if (districtId) {
       this.listSubdistrict = await this.generalService.getSubDistrict(districtId)
-      .toPromise().then( res => {
-        return res.data;
-      }).catch( err => {
-        return [];
-      })
+        .toPromise().then(res => {
+          return res.data;
+        }).catch(err => {
+          return [];
+        })
     }
-    
-    if(subDistrictId){
+
+    if (subDistrictId) {
       this.model.subdistrict = await this.generalService.getSubDistrict(districtId, subDistrictId)
-      .toPromise().then( res => {
-        return res.data;
-      }).catch( err => {
-        return { sub_district_id: null };
-      })
+        .toPromise().then(res => {
+          return res.data;
+        }).catch(err => {
+          return { sub_district_id: null };
+        })
     }
   }
 
@@ -301,11 +302,11 @@ export class ModalPatientRegistrationComponent implements OnInit {
 
     const str_subdistrict = event.target.value;
 
-    const idx = this.listSubdistrict.findIndex((a)=>{
+    const idx = this.listSubdistrict.findIndex((a) => {
       return a.name == str_subdistrict
     })
 
-    if(idx >= 0) {
+    if (idx >= 0) {
       this.model.subdistrict = this.listSubdistrict[idx];
     }
 
@@ -315,25 +316,25 @@ export class ModalPatientRegistrationComponent implements OnInit {
     this.listSubdistrict = [];
 
     const str_district = event.target.value;
-    
-    const idx = this.listDistrict.findIndex((a)=>{ 
+
+    const idx = this.listDistrict.findIndex((a) => {
       return a.name == str_district;
     })
-    
-    if(idx >= 0) {
+
+    if (idx >= 0) {
       this.model.district = this.listDistrict[idx];
     }
-    
+
     const districtId = this.model.district.district_id;
 
-    if(districtId) {
+    if (districtId) {
       this.getSubdistrict(districtId);
     }
   }
 
   reset() {
     this.model = {};
-    this.model.sex = { value: ''};
+    this.model.sex = { value: '' };
     this.listDistrict = [];
     this.listSubdistrict = [];
   }
@@ -349,33 +350,42 @@ export class ModalPatientRegistrationComponent implements OnInit {
     let mobileNo2 = this.model.mobileNo2 ? this.model.mobileNo2.trim() : "";
     let contactName = this.model.contactName ? this.model.contactName.trim() : "";
     let contactMobile = this.model.contactMobile ? this.model.contactMobile.trim() : "";
-    let contactPhone = this.model.contactPhone ? this.model.contactPhone.trim(): "";
+    let contactPhone = this.model.contactPhone ? this.model.contactPhone.trim() : "";
 
-    if (!patientName) { valid = false; $('.form-pr-name').addClass('form-error');
+    if (!patientName) {
+      valid = false; $('.form-pr-name').addClass('form-error');
     } else {
       $('.form-pr-name').removeClass('form-error');
     }
 
-    if (!this.model.birth) { valid = false; $('.form-pr-bdate').addClass('form-error');
+    if (!this.model.birth) {
+      valid = false; $('.form-pr-bdate').addClass('form-error');
     } else if (this.model.birth) {
       let paramDate = this.model.birth.split('-');
       let bod = new Date(paramDate[2] + '-' + paramDate[1] + '- ' + paramDate[0])
       let now = new Date();
-      if  (now < bod) { valid = false; $('.form-pr-bdate').addClass('form-error');
+      if (now < bod) {
+        valid = false; $('.form-pr-bdate').addClass('form-error');
       } else { $('.form-pr-bdate').removeClass('form-error'); }
     }
-    if (!this.model.sex) { valid = false; $('.form-pr-sex').addClass('form-error');
+    if (!this.model.sex) {
+      valid = false; $('.form-pr-sex').addClass('form-error');
     } else { $('.form-pr-sex').removeClass('form-error'); }
     // Contact Detail
-    if (!address) { valid = false; $('.form-pr-address').addClass('form-error');
+    if (!address) {
+      valid = false; $('.form-pr-address').addClass('form-error');
     } else { $('.form-pr-address').removeClass('form-error'); }
-    if (!this.model.city) { valid = false; $('.form-pr-city').addClass('form-error');
+    if (!this.model.city) {
+      valid = false; $('.form-pr-city').addClass('form-error');
     } else { $('.form-pr-city').removeClass('form-error'); }
-    if (!this.model.district.district_id) { valid = false; $('.form-pr-district').addClass('form-error');
+    if (!this.model.district.district_id) {
+      valid = false; $('.form-pr-district').addClass('form-error');
     } else { $('.form-pr-district').removeClass('form-error'); }
-    if (!this.model.subdistrict.sub_district_id) { valid = false; $('.form-pr-subdistrict').addClass('form-error');
+    if (!this.model.subdistrict.sub_district_id) {
+      valid = false; $('.form-pr-subdistrict').addClass('form-error');
     } else { $('.form-pr-subdistrict').removeClass('form-error'); }
-    if (!this.model.nationality) { valid = false; $('.form-pr-nationality').addClass('form-error');
+    if (!this.model.nationality) {
+      valid = false; $('.form-pr-nationality').addClass('form-error');
     } else { $('.form-pr-nationality').removeClass('form-error'); }
     if (!homePhone && !officePhone && !mobileNo1 && !mobileNo2) {
       valid = false
@@ -395,10 +405,10 @@ export class ModalPatientRegistrationComponent implements OnInit {
     }
     if (
       (!address ||
-      !this.model.city ||
-      !this.model.district.district_id ||
-      !this.model.subdistrict.sub_district_id ||
-      !this.model.nationality) ||
+        !this.model.city ||
+        !this.model.district.district_id ||
+        !this.model.subdistrict.sub_district_id ||
+        !this.model.nationality) ||
       (!homePhone && !officePhone && !mobileNo1 && !mobileNo2)
     ) {
       valid = false
@@ -409,7 +419,7 @@ export class ModalPatientRegistrationComponent implements OnInit {
     // Emergency Contact
     if (!contactName) {
       valid = false; $('.form-pr-contactname').addClass('form-error')
-    }else {
+    } else {
       $('.form-pr-contactname').removeClass('form-error');
     }
     if (!contactMobile && !contactPhone) {
@@ -442,18 +452,18 @@ export class ModalPatientRegistrationComponent implements OnInit {
     return valid;
   }
 
-  charRemove(str: any){
-    if(str){
+  charRemove(str: any) {
+    if (str) {
       str = str.replace('(+62)', '0');
       str = str.replace(/_/g, '');
-      str = str.replace( / /g, '');
-      str = str.replace( / /g, '');
-      str = str.substr(0,2) == '00' ? str.substr(1) : str;
+      str = str.replace(/ /g, '');
+      str = str.replace(/ /g, '');
+      str = str.substr(0, 2) == '00' ? str.substr(1) : str;
     }
     return str;
   }
 
-  loadPayload(){
+  loadPayload() {
     const arr_birth = this.model.birth.split('-');
 
     const payload = {
@@ -502,24 +512,24 @@ export class ModalPatientRegistrationComponent implements OnInit {
       source: sourceApps,
       userName: this.user.fullname,
     }
-    
+
     return payload;
   }
 
-  async syncUpdatePatient(body: any){
+  async syncUpdatePatient(body: any) {
     const result = await this.patientService.syncUpdatePatient(body)
-    .toPromise().then( res => {
-      this.alertService.success(res.message, false, 5000);
-      return res.data;  
-    }).catch( err => {
-      this.alertService.error(err.error.message, false, 5000);
-      return null;
-    })
+      .toPromise().then(res => {
+        this.alertService.success(res.message, false, 5000);
+        return res.data;
+      }).catch(err => {
+        this.alertService.error(err.error.message, false, 5000);
+        return null;
+      })
 
-    if(result){
+    if (result) {
       this.isButtonSave = false;
-      setTimeout(() => {this.close();}, 2000);
-    }else{
+      setTimeout(() => { this.close(); }, 2000);
+    } else {
       this.isButtonSave = false;
     }
   }
@@ -529,24 +539,24 @@ export class ModalPatientRegistrationComponent implements OnInit {
     isValid = this.checkFormCondition(); // return true if valid (there is no empty mandatory)
 
     let x = this;
-    $('.form-error').bind('input click change', function() {
+    $('.form-error').bind('input click change', function () {
       x.checkFormCondition();
     });
 
     if (!isValid) {
       this.alertService.error('Please input all mandatory field', false, 5000);
-    }else{
+    } else {
       const payload = this.loadPayload();
       this.syncUpdatePatient(payload);
-    }  
+    }
   }
 
   async getCollectionAlert() {
     this.alertService.getAlert().subscribe((alert: Alert) => {
       if (!alert) {
-          // clear alerts when an empty alert is received
-          this.alerts = [];
-          return;
+        // clear alerts when an empty alert is received
+        this.alerts = [];
+        return;
       }
       // add alert to array
       this.alerts.push(alert);

@@ -31,12 +31,13 @@ import { environment } from '../../../../environments/environment';
   styleUrls: ['./widget-patient-data.component.css']
 })
 export class WidgetPatientDataComponent implements OnInit {
+  public assetPath = environment.ASSET_PATH;
   public key: any = JSON.parse(localStorage.getItem('key'));
   public hospital = this.key.hospital;
   public user = this.key.user;
 
   public model: any = {};
-  public listSex: General[] = []; 
+  public listSex: General[] = [];
   public listTitle: General[];
   public listReligion: General[];
   public listMarital: General[];
@@ -58,13 +59,13 @@ export class WidgetPatientDataComponent implements OnInit {
   public isSuccessCreatePatient: boolean = false;
   public isSuccessCreateAdmission: boolean = false;
   public isLoadingCreateAdmission: boolean = false;
-  public isButtonSave : boolean = false;
+  public isButtonSave: boolean = false;
 
   public listActiveAdmission: any;
 
   public showWaitMsg: boolean = true;
   public showNotFoundMsg: boolean = false;
-  
+
   // Input mask
   public mask_birth = [/\d/, /\d/, '-', /\d/, /\d/, '-', /\d/, /\d/, /\d/, /\d/];
   public mask = [/\d/, /\d/, /\d/, /\d/, /\d/, /\d/, /\d/, /\d/, /\d/, /\d/, /\d/, /\d/, /\d/];
@@ -135,19 +136,19 @@ export class WidgetPatientDataComponent implements OnInit {
     this.model.district = { district_id: null };
     this.model.subdistrict = { sub_district_id: null };
 
-    this.socket = socket(`${environment.WEB_SOCKET_SERVICE + keySocket.APPOINTMENT}`,  {
-      transports: ['websocket'],  
+    this.socket = socket(`${environment.WEB_SOCKET_SERVICE + keySocket.APPOINTMENT}`, {
+      transports: ['websocket'],
       query: `data=${
         Security.encrypt({ secretKey: SecretKey }, Jwt)
         }&url=${environment.FRONT_OFFICE_SERVICE}`,
-      });
+    });
 
-    this.socketTwo = socket(`${environment.WEB_SOCKET_SERVICE + keySocket.QUEUE}`,  {
-      transports: ['websocket'],  
+    this.socketTwo = socket(`${environment.WEB_SOCKET_SERVICE + keySocket.QUEUE}`, {
+      transports: ['websocket'],
       query: `data=${
         Security.encrypt({ secretKey: SecretKey }, Jwt)
         }&url=${environment.FRONT_OFFICE_SERVICE}`,
-      });
+    });
   }
 
   ngOnInit() {
@@ -167,191 +168,191 @@ export class WidgetPatientDataComponent implements OnInit {
     this.getCollectionAlert();
   }
 
-  async getPatientType(){
+  async getPatientType() {
     this.patientTypeList = await this.generalService.getPatientType()
-    .toPromise().then( res => {
-      return res.data;
-    }).catch( err => {
-      return [];
-    })
+      .toPromise().then(res => {
+        return res.data;
+      }).catch(err => {
+        return [];
+      })
   }
 
-  async getReferral(){
+  async getReferral() {
     this.listReferral = await this.generalService.getReferralType()
-    .toPromise().then( res => {
-      return res.data;
-    }).catch( err => {
-      return [];
-    })
+      .toPromise().then(res => {
+        return res.data;
+      }).catch(err => {
+        return [];
+      })
 
-    const idx = this.listReferral.findIndex((i)=>{
+    const idx = this.listReferral.findIndex((i) => {
       return i.value === '1';
     })
 
     this.selectedReferral = this.listReferral[idx];
   }
 
-  async admissionType(){
+  async admissionType() {
     this.admissionTypeList = await this.generalService.getAdmissionType()
-    .toPromise().then( res => {
-      return res.data;
-    }).catch( err => {
-      return [];
-    })
+      .toPromise().then(res => {
+        return res.data;
+      }).catch(err => {
+        return [];
+      })
 
-    const idx = this.admissionTypeList.findIndex((i)=>{
+    const idx = this.admissionTypeList.findIndex((i) => {
       return i.value === '1';
     })
-    
+
     this.selectedAdmissionType = this.admissionTypeList[idx];
   }
 
-  async isAppointment(){
+  async isAppointment() {
     this.appointmentId = this.route.snapshot.queryParams['appointmentId'];
 
-    if(this.appointmentId){
+    if (this.appointmentId) {
       this.isFromAppointmentList = true;
 
       const appointment = await this.appointmentService.getAppointmentById(this.appointmentId)
-      .toPromise().then( res => {
-        return res.data[0];
-      }).catch( err => {
-        return null;
-      });
+        .toPromise().then(res => {
+          return res.data[0];
+        }).catch(err => {
+          return null;
+        });
 
-      if(appointment){
+      if (appointment) {
         this.selectedCheckIn = appointment;
         this.getContact(this.selectedCheckIn.contact_id);
-      }else{
+      } else {
         this.alertService.error('Appointment not found', false, 5000);
       }
     }
   }
 
-  async getContact(contactId: string){
+  async getContact(contactId: string) {
 
     const contact = await this.patientService.getContact(contactId)
-    .toPromise().then( res => {
-      return res.data;
-    }).catch( err => {
-      return null;
-    });
+      .toPromise().then(res => {
+        return res.data;
+      }).catch(err => {
+        return null;
+      });
 
-    if(contact){
+    if (contact) {
       this.contactDetail = contact;
       this.model.patientName = contact.name;
       this.model.address = contact.current_address;
       this.model.mobileNo1 = contact.phone_number_1;
       this.model.birth = dateFormatter(contact.birth_date, true);
 
-      if(contact.city_id){
-        const idx = this.listCity.findIndex((a)=>{
+      if (contact.city_id) {
+        const idx = this.listCity.findIndex((a) => {
           return a.city_id === contact.city_id;
         })
-        
-        this.model.city = (idx >= 0) ? { city_id: this.listCity[idx].city_id, name: this.listCity[idx].name } : { city_id: null, name: ''}; 
-      }else{
+
+        this.model.city = (idx >= 0) ? { city_id: this.listCity[idx].city_id, name: this.listCity[idx].name } : { city_id: null, name: '' };
+      } else {
         this.model.city = { city_id: null, name: '' };
       }
 
-      this.model.district = contact.district_id ? { district_id : contact.district_id } : { district_id: null };
-      this.model.subdistrict = contact.sub_district_id ? { sub_district_id : contact.sub_district_id } : { sub_district_id: null };
+      this.model.district = contact.district_id ? { district_id: contact.district_id } : { district_id: null };
+      this.model.subdistrict = contact.sub_district_id ? { sub_district_id: contact.sub_district_id } : { sub_district_id: null };
 
-      if(contact.country_id){
-        const idx = this.listCountry.findIndex((a)=>{
+      if (contact.country_id) {
+        const idx = this.listCountry.findIndex((a) => {
           return a.country_id === contact.country_id;
         })
-        
-        this.model.nationality = (idx >= 0) ? { country_id: this.listCountry[idx].country_id, name: this.listCountry[idx].name } : { country_id: null, name: ''}; 
-      }else{
+
+        this.model.nationality = (idx >= 0) ? { country_id: this.listCountry[idx].country_id, name: this.listCountry[idx].name } : { country_id: null, name: '' };
+      } else {
         this.model.nationality = { country_id: null, name: '' };
       }
-      
-      this.model.sex =  contact.gender_id ? { value: contact.gender_id } : this.model.sex;
-    }else{
+
+      this.model.sex = contact.gender_id ? { value: contact.gender_id } : this.model.sex;
+    } else {
       this.alertService.error('Contact not found', false, 5000);
     }
   }
 
-  async getCity(){
+  async getCity() {
     this.listCity = await this.generalService.getCity()
-    .toPromise().then( res => {
-      return res.data;
-    }).catch( err => {
-      return [];
-    })
+      .toPromise().then(res => {
+        return res.data;
+      }).catch(err => {
+        return [];
+      })
   }
 
-  async getPayer(){
+  async getPayer() {
     this.listPayer = await this.generalService.getPayer(this.hospital.orgId)
-    .toPromise().then( res => {
-      return res.data;
-    }).catch( err => {
-      return [];
-    })
+      .toPromise().then(res => {
+        return res.data;
+      }).catch(err => {
+        return [];
+      })
   }
 
-  async getCountry(){
+  async getCountry() {
     this.listCountry = await this.generalService.getCountry()
-     .toPromise().then( res => {
-       return res.data;
-     }).catch( err => {
-       return [];
-     })
+      .toPromise().then(res => {
+        return res.data;
+      }).catch(err => {
+        return [];
+      })
   }
 
-  async getNationalIdType(){
+  async getNationalIdType() {
     this.listNationalIdType = await this.generalService.getNationalityIdType()
-     .toPromise().then( res => {
-       return res.data;
-     }).catch( err => {
-       return [];
-     })
+      .toPromise().then(res => {
+        return res.data;
+      }).catch(err => {
+        return [];
+      })
   }
 
-  async getSex(){
+  async getSex() {
     this.listSex = await this.generalService.getGender()
-     .toPromise().then( res => {
-       return res.data;
-     }).catch( err => {
-       return [];
-     })
+      .toPromise().then(res => {
+        return res.data;
+      }).catch(err => {
+        return [];
+      })
   }
 
-  async getMarital(){
+  async getMarital() {
     this.listMarital = await this.generalService.getMaritalStatus()
-     .toPromise().then( res => {
-       return res.data;
-     }).catch( err => {
-       return [];
-     })
+      .toPromise().then(res => {
+        return res.data;
+      }).catch(err => {
+        return [];
+      })
   }
 
-  async getTitle(){
+  async getTitle() {
     this.listTitle = await this.generalService.getTitle()
-     .toPromise().then( res => {
-       return res.data;
-     }).catch( err => {
-       return [];
-     })
+      .toPromise().then(res => {
+        return res.data;
+      }).catch(err => {
+        return [];
+      })
   }
 
-  async getReligion(){
+  async getReligion() {
     this.listReligion = await this.generalService.getReligion()
-     .toPromise().then( res => {
-       return res.data;
-     }).catch( err => {
-       return [];
-     })
+      .toPromise().then(res => {
+        return res.data;
+      }).catch(err => {
+        return [];
+      })
   }
 
-  async getBloodType(){
+  async getBloodType() {
     this.listBloodType = await this.generalService.getBloodType()
-     .toPromise().then( res => {
-       return res.data;
-     }).catch( err => {
-       return [];
-     })
+      .toPromise().then(res => {
+        return res.data;
+      }).catch(err => {
+        return [];
+      })
   }
 
   async getDetailAddress(from?: boolean) {
@@ -359,109 +360,109 @@ export class WidgetPatientDataComponent implements OnInit {
     this.listSubdistrict = []
     this.listSubdistrict = []
 
-    if(from) {
+    if (from) {
       const cityId = this.model.city.city_id;
       const districtId = this.model.district.district_id;
       const subdistrictId = this.model.subdistrict.sub_district_id;
 
       this.listDistrict = await this.generalService.getDistrict(cityId)
-      .toPromise().then( res => {
-        return res.data;
-      }).catch( err => {
-        return [];
-      })
+        .toPromise().then(res => {
+          return res.data;
+        }).catch(err => {
+          return [];
+        })
 
-      if(this.listDistrict.length !== 0){
-        if(!districtId) {
+      if (this.listDistrict.length !== 0) {
+        if (!districtId) {
           this.model.district = this.listDistrict[0];
-        }else{
+        } else {
           this.model.district = this.model.district;
         }
       }
 
       this.listSubdistrict = await this.generalService.getSubDistrict(this.model.district.district_id)
-        .toPromise().then( res => {
+        .toPromise().then(res => {
           return res.data;
-        }).catch( err => {
+        }).catch(err => {
           return [];
         })
 
-      if(this.listSubdistrict.length !== 0){
-        if(!subdistrictId) {
+      if (this.listSubdistrict.length !== 0) {
+        if (!subdistrictId) {
           this.model.subdistrict = this.listSubdistrict[0];
-        }else{
+        } else {
           this.model.subdistrict = this.model.subdistrict;
         }
       }
 
-    }else{
+    } else {
       const cityId = this.model.city.city_id;
-      
+
       this.listDistrict = await this.generalService.getDistrict(cityId)
-      .toPromise().then( res => {
-        return res.data;
-      }).catch( err => {
-        return [];
-      })
-      
-      if(this.listDistrict.length !== 0){
+        .toPromise().then(res => {
+          return res.data;
+        }).catch(err => {
+          return [];
+        })
+
+      if (this.listDistrict.length !== 0) {
         this.model.district = this.listDistrict[0];
       }
 
       this.listSubdistrict = await this.generalService.getSubDistrict(this.model.district.district_id)
-      .toPromise().then( res => {
-        return res.data;
-      }).catch( err => {
-        return [];
-      })
+        .toPromise().then(res => {
+          return res.data;
+        }).catch(err => {
+          return [];
+        })
 
-      if(this.listSubdistrict.length != 0){
+      if (this.listSubdistrict.length != 0) {
         this.model.subdistrict = this.listSubdistrict[0];
       }
     }
   }
 
-  async getDistrict(cityId = null, districtId = null){
-    if(cityId){
+  async getDistrict(cityId = null, districtId = null) {
+    if (cityId) {
       this.listDistrict = await this.generalService.getDistrict(cityId)
-      .toPromise().then( res => {
-        return res.data;
-      }).catch( err => {
-        return [];
-      })
+        .toPromise().then(res => {
+          return res.data;
+        }).catch(err => {
+          return [];
+        })
     }
-    
-    if(districtId){
+
+    if (districtId) {
       this.model.district = await this.generalService.getDistrict(cityId, districtId).toPromise()
-      .then( res => {
-        return res.data;
-      }).catch( err => {
-        return { district_id: null };
-      })
+        .then(res => {
+          return res.data;
+        }).catch(err => {
+          return { district_id: null };
+        })
     }
   }
 
-  async getSubdistrict(districtId = null, subDistrictId = null){
-    if(districtId){
+  async getSubdistrict(districtId = null, subDistrictId = null) {
+    if (districtId) {
       this.listSubdistrict = await this.generalService.getSubDistrict(districtId)
-      .toPromise().then( res => {
-        return res.data;
-      }).catch( err => {
-        return [];
-      })
+        .toPromise().then(res => {
+          return res.data;
+        }).catch(err => {
+          return [];
+        })
 
-      if(this.listSubdistrict.length != 0){
+      if (this.listSubdistrict.length != 0) {
         this.model.subdistrict = this.listSubdistrict[0];
       }
     }
-    
-    if(subDistrictId){
+
+    if (subDistrictId) {
       this.model.subdistrict = await this.generalService.getSubDistrict(districtId, subDistrictId)
-      .toPromise().then( res => {
-        return res.data;
-      }).catch( err => {
-        return { sub_district_id: null };
-      })
+        .toPromise().then(res => {
+          return res.data;
+        }).catch(err => {
+          return { sub_district_id: null };
+        })
     }
   }
 
@@ -469,18 +470,18 @@ export class WidgetPatientDataComponent implements OnInit {
     this.listSubdistrict = [];
 
     const str_district = event.target.value;
-    
-    const idx = this.listDistrict.findIndex((a)=>{ 
+
+    const idx = this.listDistrict.findIndex((a) => {
       return a.name == str_district;
     })
-    
-    if(idx >= 0) {
+
+    if (idx >= 0) {
       this.model.district = this.listDistrict[idx];
     }
-    
+
     const districtId = this.model.district.district_id;
 
-    if(districtId) {
+    if (districtId) {
       this.getSubdistrict(districtId);
     }
   }
@@ -489,76 +490,76 @@ export class WidgetPatientDataComponent implements OnInit {
 
     const str_subdistrict = event.target.value;
 
-    const idx = this.listSubdistrict.findIndex((a)=>{
+    const idx = this.listSubdistrict.findIndex((a) => {
       return a.name == str_subdistrict
     })
 
-    if(idx >= 0) {
+    if (idx >= 0) {
       this.model.subdistrict = this.listSubdistrict[idx];
     }
 
   }
 
-  async actionSearch(name: any, birth: any){
+  async actionSearch(name: any, birth: any) {
     this.showWaitMsg = true;
     this.showNotFoundMsg = false;
-    
+
     const suggestion = await this.patientService.searchPatient(name, birth, this.hospital.orgId)
-    .toPromise().then( res => {
-      return res.data;
-    }).catch( err => {
-      this.showNotFoundMsg = true;
-      this.showWaitMsg = false;
-      return [];
-    })
+      .toPromise().then(res => {
+        return res.data;
+      }).catch(err => {
+        this.showNotFoundMsg = true;
+        this.showWaitMsg = false;
+        return [];
+      })
 
-    if(suggestion.length !== 0){
-      let idx_sex, idx_city, idx_contact_city, idx_religion, 
-      idx_bloodType, idx_nationality, idx_national_id_type, idx_birth_plcae, idx_title, 
-      idx_marital, idx_permanent_city = -1;
+    if (suggestion.length !== 0) {
+      let idx_sex, idx_city, idx_contact_city, idx_religion,
+        idx_bloodType, idx_nationality, idx_national_id_type, idx_birth_plcae, idx_title,
+        idx_marital, idx_permanent_city = -1;
 
-      for(var i = 0; i < suggestion.length; i++) {
-        idx_religion = suggestion[i].religionId ? this.listReligion.findIndex((a)=>{ 
+      for (var i = 0; i < suggestion.length; i++) {
+        idx_religion = suggestion[i].religionId ? this.listReligion.findIndex((a) => {
           return Number(a.value) === suggestion[i].religionId;
         }) : idx_religion;
 
-        idx_sex = suggestion[i].sexId ? this.listSex.findIndex((a)=>{
+        idx_sex = suggestion[i].sexId ? this.listSex.findIndex((a) => {
           return Number(a.value) === suggestion[i].sexId;
         }) : idx_sex;
-        
-        idx_bloodType = suggestion[i].bloodTypeId ? this.listBloodType.findIndex((a)=>{
+
+        idx_bloodType = suggestion[i].bloodTypeId ? this.listBloodType.findIndex((a) => {
           return Number(a.value) === suggestion[i].bloodTypeId;
         }) : idx_bloodType;
 
-        idx_nationality = suggestion[i].nationalityId ? this.listCountry.findIndex((a)=>{
+        idx_nationality = suggestion[i].nationalityId ? this.listCountry.findIndex((a) => {
           return a.country_id === suggestion[i].nationalityId;
         }) : idx_nationality;
-        
-        idx_city = suggestion[i].cityId ? this.listCity.findIndex((a)=>{
-          return a.city_id === suggestion[i].cityId;
-        }) : idx_city; 
 
-        idx_contact_city = suggestion[i].contactCityId ? this.listCity.findIndex((a)=>{
+        idx_city = suggestion[i].cityId ? this.listCity.findIndex((a) => {
+          return a.city_id === suggestion[i].cityId;
+        }) : idx_city;
+
+        idx_contact_city = suggestion[i].contactCityId ? this.listCity.findIndex((a) => {
           return a.city_id === suggestion[i].contactCityId;
         }) : idx_contact_city;
-        
-        idx_permanent_city = suggestion[i].permanentCityId ? this.listCity.findIndex((a)=>{
-          return a.city_id === suggestion[i].permanentCityId;
-        }) : idx_permanent_city; 
 
-        idx_birth_plcae = suggestion[i].birthPlaceId ? this.listCity.findIndex((a)=>{
+        idx_permanent_city = suggestion[i].permanentCityId ? this.listCity.findIndex((a) => {
+          return a.city_id === suggestion[i].permanentCityId;
+        }) : idx_permanent_city;
+
+        idx_birth_plcae = suggestion[i].birthPlaceId ? this.listCity.findIndex((a) => {
           return a.city_id === suggestion[i].birthPlaceId;
         }) : idx_birth_plcae;
-        
-        idx_title = suggestion[i].titleId ? this.listTitle.findIndex((a)=>{
+
+        idx_title = suggestion[i].titleId ? this.listTitle.findIndex((a) => {
           return Number(a.value) === suggestion[i].titleId;
         }) : idx_title;
 
-        idx_marital = suggestion[i].maritalStatusId ? this.listMarital.findIndex((a)=>{
+        idx_marital = suggestion[i].maritalStatusId ? this.listMarital.findIndex((a) => {
           return Number(a.value) === suggestion[i].maritalStatusId;
         }) : idx_marital;
-        
-        idx_national_id_type = suggestion[i].nationalIdTypeId ? this.listNationalIdType.findIndex((a)=>{
+
+        idx_national_id_type = suggestion[i].nationalIdTypeId ? this.listNationalIdType.findIndex((a) => {
           return Number(a.value) === suggestion[i].nationalIdTypeId;
         }) : idx_national_id_type;
 
@@ -575,16 +576,16 @@ export class WidgetPatientDataComponent implements OnInit {
         suggestion[i].str_marital = (idx_marital >= 0) ? this.listMarital[idx_marital] : '';
         suggestion[i].str_national_id_type = (idx_national_id_type >= 0) ? this.listNationalIdType[idx_national_id_type] : '';
       }
-      
+
       this.listSuggestionPatient = suggestion;
       this.showWaitMsg = false;
-    }else{
+    } else {
       this.showNotFoundMsg = true;
       this.showWaitMsg = false;
     }
   }
 
-  searchPatient(name: any, birth: any){
+  searchPatient(name: any, birth: any) {
     this.listInputUser = [];
     this.listSuggestionPatient = [];
 
@@ -597,14 +598,14 @@ export class WidgetPatientDataComponent implements OnInit {
   }
 
   findMatchPatient(content) {
-    if(!this.model.patientName || !this.model.birth) {
-      if(!this.model.patientName) {
+    if (!this.model.patientName || !this.model.birth) {
+      if (!this.model.patientName) {
         this.alertService.error('Please input patient name', false, 5000);
       }
-      if(!this.model.birth) {
+      if (!this.model.birth) {
         this.alertService.error('Please input patient birthdate', false, 5000);
       }
-    }else{
+    } else {
       this.searchPatient(this.model.patientName, this.model.birth);
       this.openLarge(content);
     }
@@ -614,7 +615,7 @@ export class WidgetPatientDataComponent implements OnInit {
     this.model.viewedBirthDate = null;
     this.listInputUser = [];
 
-    if(isFromHope) {
+    if (isFromHope) {
       this.model.patientId = val.patientId;
       this.model.patientOrganizationId = val.patientOrganizationId;
       this.model.createDate = val.createDate;
@@ -623,7 +624,7 @@ export class WidgetPatientDataComponent implements OnInit {
       this.model.mrlocal = val.localMrNo;
       this.model.birth = val.viewedBirthDate;
       this.model.patientName = val.name;
-      this.model.fatherName =  val.fatherName;
+      this.model.fatherName = val.fatherName;
       this.model.motherName = val.motherName;
       this.model.spouseName = val.spouseName;
       this.model.birthPlace = val.str_birth_place;
@@ -634,32 +635,32 @@ export class WidgetPatientDataComponent implements OnInit {
       this.model.address = val.address;
       this.model.city = val.str_city;
 
-      if(val.districtId) {
+      if (val.districtId) {
         const district = await this.generalService.getDistrict(null, val.districtId)
-        .toPromise().then( res => {
-          return res.data;  
-        }).catch( err => {
-          return null;
-        })
-        
-        this.model.district = district ? district : { district_id: null };   
-      }else{
+          .toPromise().then(res => {
+            return res.data;
+          }).catch(err => {
+            return null;
+          })
+
+        this.model.district = district ? district : { district_id: null };
+      } else {
         this.model.district = { district_id: null };
       }
 
-      if(val.subDistrictId) {
+      if (val.subDistrictId) {
         const subdistrict = await this.generalService.getSubDistrict(null, val.subDistrictId)
-        .toPromise().then( res => {
-          return res.data;
-        }).catch( err => {
-          return null;
-        });
-        
+          .toPromise().then(res => {
+            return res.data;
+          }).catch(err => {
+            return null;
+          });
+
         this.model.subdistrict = subdistrict ? subdistrict : { sub_district_id: null };
-      }else{
+      } else {
         this.model.subdistrict = { sub_district_id: null };
       }
-      
+
       await this.getDetailAddress(true);
 
       this.model.postCode = val.postCode;
@@ -690,11 +691,11 @@ export class WidgetPatientDataComponent implements OnInit {
       this.model.payerIdNo = val.payerIdNo;
     }
   }
-  
+
   isEmpty(obj) {
-    for(var key in obj) {
-        if(obj.hasOwnProperty(key))
-            return false;
+    for (var key in obj) {
+      if (obj.hasOwnProperty(key))
+        return false;
     }
     return true;
   }
@@ -704,42 +705,51 @@ export class WidgetPatientDataComponent implements OnInit {
     let valid = true;
 
     let patientName = this.model.patientName ? this.model.patientName.trim() : "";
-    let sex = this.isEmpty(this.model.sex) ? null : this.model.sex; 
+    let sex = this.isEmpty(this.model.sex) ? null : this.model.sex;
     let address = this.model.address ? this.model.address.trim() : "";
     let mobileNo1 = this.model.mobileNo1 ? this.model.mobileNo1.trim() : "";
     let contactName = this.model.contactName ? this.model.contactName.trim() : "";
     let contactMobile = this.model.contactMobile ? this.model.contactMobile.trim() : "";
-    let contactPhone = this.model.contactPhone ? this.model.contactPhone.trim(): "";
+    let contactPhone = this.model.contactPhone ? this.model.contactPhone.trim() : "";
 
-    if (!patientName) { valid = false; $('.form-pr-name').addClass('form-error');
+    if (!patientName) {
+      valid = false; $('.form-pr-name').addClass('form-error');
     } else {
       $('.form-pr-name').removeClass('form-error');
     }
 
-    if (!this.model.birth) { valid = false; $('.form-pr-bdate').addClass('form-error');
+    if (!this.model.birth) {
+      valid = false; $('.form-pr-bdate').addClass('form-error');
     } else if (this.model.birth) {
       let paramDate = this.model.birth.split('-');
       let bod = new Date(paramDate[2] + '-' + paramDate[1] + '- ' + paramDate[0])
       let now = new Date();
-      if  (now < bod) { valid = false; $('.form-pr-bdate').addClass('form-error');
+      if (now < bod) {
+        valid = false; $('.form-pr-bdate').addClass('form-error');
       } else { $('.form-pr-bdate').removeClass('form-error'); }
     }
-    if (!sex) { valid = false; $('.form-pr-sex').addClass('form-error');
+    if (!sex) {
+      valid = false; $('.form-pr-sex').addClass('form-error');
     } else { $('.form-pr-sex').removeClass('form-error'); }
     // Contact Detail
-    if (!address) { valid = false; $('.form-pr-address').addClass('form-error');
+    if (!address) {
+      valid = false; $('.form-pr-address').addClass('form-error');
     } else { $('.form-pr-address').removeClass('form-error'); }
-    if (!this.model.city) { valid = false; $('.form-pr-city').addClass('form-error');
+    if (!this.model.city) {
+      valid = false; $('.form-pr-city').addClass('form-error');
     } else { $('.form-pr-city').removeClass('form-error'); }
-    if (!this.model.district.district_id) { valid = false; $('.form-pr-district').addClass('form-error');
+    if (!this.model.district.district_id) {
+      valid = false; $('.form-pr-district').addClass('form-error');
     } else { $('.form-pr-district').removeClass('form-error'); }
-    if (!this.model.subdistrict.sub_district_id) { valid = false; $('.form-pr-subdistrict').addClass('form-error');
+    if (!this.model.subdistrict.sub_district_id) {
+      valid = false; $('.form-pr-subdistrict').addClass('form-error');
     } else { $('.form-pr-subdistrict').removeClass('form-error'); }
-    if (!this.model.nationality) { valid = false; $('.form-pr-nationality').addClass('form-error');
+    if (!this.model.nationality) {
+      valid = false; $('.form-pr-nationality').addClass('form-error');
     } else { $('.form-pr-nationality').removeClass('form-error'); }
-    if(!mobileNo1) { 
-      valid = false; 
-      $('.form-pr-mobile1no').addClass('form-error'); 
+    if (!mobileNo1) {
+      valid = false;
+      $('.form-pr-mobile1no').addClass('form-error');
     } else {
       $('.form-pr-mobile1no input').attr('placeholder', '(Optional)');
       $('.form-pr-mobile1no').removeClass('form-error');
@@ -747,10 +757,10 @@ export class WidgetPatientDataComponent implements OnInit {
 
     if (
       (!address ||
-      !this.model.city ||
-      !this.model.district.district_id ||
-      !this.model.subdistrict.sub_district_id ||
-      !this.model.nationality) ||
+        !this.model.city ||
+        !this.model.district.district_id ||
+        !this.model.subdistrict.sub_district_id ||
+        !this.model.nationality) ||
       !mobileNo1
     ) {
       valid = false
@@ -761,7 +771,7 @@ export class WidgetPatientDataComponent implements OnInit {
     // Emergency Contact
     if (!contactName) {
       valid = false; $('.form-pr-contactname').addClass('form-error')
-    }else {
+    } else {
       $('.form-pr-contactname').removeClass('form-error');
     }
     if (!contactMobile && !contactPhone) {
@@ -794,7 +804,7 @@ export class WidgetPatientDataComponent implements OnInit {
     return valid;
   }
 
-  loadPayload(){
+  loadPayload() {
     const arr_birth = this.model.birth.split('-');
 
     const payload = {
@@ -847,52 +857,52 @@ export class WidgetPatientDataComponent implements OnInit {
   }
 
 
-  charRemove(str: any){
-    if(str){
+  charRemove(str: any) {
+    if (str) {
       str = str.replace('(+62)', '0');
       str = str.replace(/_/g, '');
-      str = str.replace( / /g, '');
-      str = str.replace( / /g, '');
-      str = str.substr(0,2) == '00' ? str.substr(1) : str;
+      str = str.replace(/ /g, '');
+      str = str.replace(/ /g, '');
+      str = str.substr(0, 2) == '00' ? str.substr(1) : str;
     }
     return str;
   }
 
-  closeClicked(){
+  closeClicked() {
 
   }
 
-  async createPatientComplete(body: any){
+  async createPatientComplete(body: any) {
     const result = await this.patientService.createPatientComplete(body)
-    .toPromise().then( res => {
-      this.alertService.success(res.message, false, 5000);
-      return res.data;  
-    }).catch( err => {
-      this.alertService.error(err.error.message, false, 5000);
-      return null;
-    })
+      .toPromise().then(res => {
+        this.alertService.success(res.message, false, 5000);
+        return res.data;
+      }).catch(err => {
+        this.alertService.error(err.error.message, false, 5000);
+        return null;
+      })
 
-    if(result){
+    if (result) {
       this.model.mrlocal = result.medical_record_number;
       this.model.patientOrganizationId = result.patient_organization_id;
-      
-      this.buttonCreateAdmission = this.isFromAppointmentList ? false : true;  
+
+      this.buttonCreateAdmission = this.isFromAppointmentList ? false : true;
       this.isSuccessCreatePatient = true;
       this.isButtonSave = false;
-    }else{
+    } else {
       this.isButtonSave = false;
     }
   }
 
-  async updatePatientComplete(body: any, params: any){
+  async updatePatientComplete(body: any, params: any) {
     const result = await this.patientService.updatePatientComplete(body, params)
-    .toPromise().then( res => {
-      this.alertService.success(res.message, false, 5000);
-      return res.data;  
-    }).catch( err => {
-      this.alertService.error(err.error.message, false, 5000);
-      return null;
-    })
+      .toPromise().then(res => {
+        this.alertService.success(res.message, false, 5000);
+        return res.data;
+      }).catch(err => {
+        this.alertService.error(err.error.message, false, 5000);
+        return null;
+      })
 
     this.isButtonSave = false;
   }
@@ -903,58 +913,58 @@ export class WidgetPatientDataComponent implements OnInit {
     isValid = this.checkFormCondition(); // return true if valid (there is no empty mandatory)
 
     let x = this;
-    $('.form-error').bind('input click change', function() {
+    $('.form-error').bind('input click change', function () {
       x.checkFormCondition();
     });
 
     if (!isValid) {
       this.alertService.error('Please input all mandatory field', false, 5000);
-    }else{
+    } else {
       const payload = this.loadPayload();
 
-      if(this.isFromAppointmentList){
+      if (this.isFromAppointmentList) {
         this.isButtonSave = true;
-        if(this.model.patientId && this.model.patientOrganizationId){
+        if (this.model.patientId && this.model.patientOrganizationId) {
           const body = {
             ...payload,
             patientHopeId: this.model.patientId,
             patientOrganizationId: this.model.patientOrganizationId,
-            appointmentId: this.appointmentId,  
+            appointmentId: this.appointmentId,
           }
           this.createPatientComplete(body);
-        }else{
+        } else {
           const body = {
             ...payload,
             appointmentId: this.appointmentId,
           };
           this.createPatientComplete(body);
         }
-      }else{
+      } else {
         this.isButtonSave = true;
-        if(this.model.patientId && this.model.patientOrganizationId){
+        if (this.model.patientId && this.model.patientOrganizationId) {
           const body = {
             ...payload,
             patientOrganizationId: this.model.patientOrganizationId,
           };
           this.updatePatientComplete(body, this.model.patientId);
-        }else{
+        } else {
           this.createPatientComplete(payload);
         }
       }
-    }  
+    }
   }
 
-  getActiveAdmission(patientHopeId: any){
+  getActiveAdmission(patientHopeId: any) {
     const active = this.admissionService.getActiveAdmission(patientHopeId)
-    .toPromise().then(res => {
-      return res.data;
-    }).catch( err => {
-      return [];
-    });
+      .toPromise().then(res => {
+        return res.data;
+      }).catch(err => {
+        return [];
+      });
     return active;
   }
 
-  processCreateAdmission(val){
+  processCreateAdmission(val) {
     // Show loading bar
     this.buttonCreateAdmission = true;
     this.isLoadingCreateAdmission = true;
@@ -963,14 +973,14 @@ export class WidgetPatientDataComponent implements OnInit {
     let payerNo = null;
     let payerEligibility = null;
 
-    if(!this.patientType){
+    if (!this.patientType) {
       this.alertService.error('Select patient type', false, 3000);
       this.isLoadingCreateAdmission = false;
       this.buttonCreateAdmission = false;
     }
 
-    if(this.patientType.description === 'PAYER'){
-      if(this.payer && this.payer.payer_id){
+    if (this.patientType.description === 'PAYER') {
+      if (this.payer && this.payer.payer_id) {
         payer = this.payer.payer_id;
         payerNo = this.payerNo;
         payerEligibility = this.payerEligibility
@@ -993,43 +1003,43 @@ export class WidgetPatientDataComponent implements OnInit {
     var dataPatient;
 
     this.admissionService.createAdmission(body).toPromise()
-    .then( res => {
-      dataPatient = {
-        schedule_id: val.schedule_id,
-        admission_id: res.data.admission_id,
-        admission_hope_id: res.data.admission_hope_id,
-        admission_no: res.data.admission_no,
-        payer_name: res.data.payer_name,
-        appointment_id: val.appointment_id,
-        appointment_date: val.appointment_date,
-        hospital_id: val.hospital_id,
-        doctor_id: val.doctor_id,
-        modified_name: res.data.modified_name,
-        modified_date: res.data.modified_date,
-        modified_from: res.data.modified_from,
-        modified_by: res.data.modified_by
-      }
-      // broadcast check-in
-      this.socket.emit(CHECK_IN, dataPatient);
-      this.buttonCreateAdmission = true;
-      this.buttonPrintQueue = false;
-      this.buttonCloseAdm = true;
-      this.buttonPatientLabel = false;
-      this.isLoadingCreateAdmission = false;
-      this.alertService.success(res.message, false, 5000);
-    }).catch( err => {
-      this.buttonCreateAdmission = false;
-      this.isLoadingCreateAdmission = false;
-      this.alertService.error(err.error.message, false, 5000);
-    })
+      .then(res => {
+        dataPatient = {
+          schedule_id: val.schedule_id,
+          admission_id: res.data.admission_id,
+          admission_hope_id: res.data.admission_hope_id,
+          admission_no: res.data.admission_no,
+          payer_name: res.data.payer_name,
+          appointment_id: val.appointment_id,
+          appointment_date: val.appointment_date,
+          hospital_id: val.hospital_id,
+          doctor_id: val.doctor_id,
+          modified_name: res.data.modified_name,
+          modified_date: res.data.modified_date,
+          modified_from: res.data.modified_from,
+          modified_by: res.data.modified_by
+        }
+        // broadcast check-in
+        this.socket.emit(CHECK_IN, dataPatient);
+        this.buttonCreateAdmission = true;
+        this.buttonPrintQueue = false;
+        this.buttonCloseAdm = true;
+        this.buttonPatientLabel = false;
+        this.isLoadingCreateAdmission = false;
+        this.alertService.success(res.message, false, 5000);
+      }).catch(err => {
+        this.buttonCreateAdmission = false;
+        this.isLoadingCreateAdmission = false;
+        this.alertService.error(err.error.message, false, 5000);
+      })
 
   }
 
-  changeCondition(event:any){
+  changeCondition(event: any) {
     const val = event.target.value;
     let idx = null
 
-    if(val == 'PRIVATE' || val == 'PASSPORT' || val == 'KITAS'){
+    if (val == 'PRIVATE' || val == 'PASSPORT' || val == 'KITAS') {
       this.txtPayer = true;
       this.txtPayerNo = true;
       this.txtPayerEligibility = true;
@@ -1038,25 +1048,25 @@ export class WidgetPatientDataComponent implements OnInit {
       this.payerNo = null;
       this.payerEligibility = null;
 
-      if(val == 'PRIVATE'){
-        idx = this.patientTypeList.findIndex((a)=>{
+      if (val == 'PRIVATE') {
+        idx = this.patientTypeList.findIndex((a) => {
           return a.description == "PRIVATE";
         })
-      }else if(val == 'KITAS'){
-        idx = this.patientTypeList.findIndex((a)=>{
+      } else if (val == 'KITAS') {
+        idx = this.patientTypeList.findIndex((a) => {
           return a.description == "KITAS";
         })
-      }else if(val == 'PASSPORT'){
-        idx = this.patientTypeList.findIndex((a)=>{
+      } else if (val == 'PASSPORT') {
+        idx = this.patientTypeList.findIndex((a) => {
           return a.description == "PASSPORT";
         })
       }
-    }else{
+    } else {
       this.txtPayer = false;
       this.txtPayerNo = false;
       this.txtPayerEligibility = false;
 
-      idx = this.patientTypeList.findIndex((a)=>{
+      idx = this.patientTypeList.findIndex((a) => {
         return a.description == "PAYER";
       })
     }
@@ -1064,95 +1074,95 @@ export class WidgetPatientDataComponent implements OnInit {
     this.patientType = this.patientTypeList[idx];
   }
 
-  async defaultPatientType(patientHopeId: any){
+  async defaultPatientType(patientHopeId: any) {
     this.nationalIdTypeId = await this.patientService.getDefaultPatientType(patientHopeId).toPromise()
-    .then(res => {
-      if(res.data){
-        return res.data.nationalIdTypeId; 
-      }else{
+      .then(res => {
+        if (res.data) {
+          return res.data.nationalIdTypeId;
+        } else {
+          return '';
+        }
+      }).catch(err => {
         return '';
-      }
-    }).catch(err => {
-      return '';
-    })
+      })
 
     let idx = null;
-    
-    if(this.nationalIdTypeId){
-      if(this.nationalIdTypeId == 3){
+
+    if (this.nationalIdTypeId) {
+      if (this.nationalIdTypeId == 3) {
         //Passport
-        idx = this.patientTypeList.findIndex((a)=>{
+        idx = this.patientTypeList.findIndex((a) => {
           return a.description == "PASSPORT";
         })
-      }else if(this.nationalIdTypeId == 4){
+      } else if (this.nationalIdTypeId == 4) {
         //KITAS
-        idx = this.patientTypeList.findIndex((a)=>{
+        idx = this.patientTypeList.findIndex((a) => {
           return a.description == "KITAS";
         })
-      }else{
+      } else {
         //Private
-        idx = this.patientTypeList.findIndex((a)=>{
+        idx = this.patientTypeList.findIndex((a) => {
           return a.description == "PRIVATE";
         })
       }
-    }else{
-      idx = this.patientTypeList.findIndex((a)=>{
+    } else {
+      idx = this.patientTypeList.findIndex((a) => {
         return a.description == "PRIVATE";
       })
     }
     this.patientType = this.patientTypeList[idx];
   }
 
-  async createAdmission(content){
+  async createAdmission(content) {
     this.nationalIdTypeId = '';
-    
+
     this.selectedCheckIn = await this.appointmentService.getAppointmentById(this.appointmentId)
-    .toPromise().then( res => {
-      return res.data[0];
-    }).catch( err => {
-      return null;
-    });
-    
+      .toPromise().then(res => {
+        return res.data[0];
+      }).catch(err => {
+        return null;
+      });
+
     this.selectedCheckIn.custome_birth_date = dateFormatter(this.selectedCheckIn.birth_date, true);
-    
+
     await this.defaultPatientType(this.selectedCheckIn.patient_hope_id);
     this.openAdmission(content);
   }
 
-  async actionAdmission(activeModal){
+  async actionAdmission(activeModal) {
     this.buttonCreateAdmission = true;
     this.listActiveAdmission = await this.getActiveAdmission(this.selectedCheckIn.patient_hope_id);
 
-    if(this.listActiveAdmission.length !== 0) {
+    if (this.listActiveAdmission.length !== 0) {
       this.openconfirmation(activeModal);
-    }else{
+    } else {
       this.processCreateAdmission(this.selectedCheckIn);
     }
   }
 
-  filePdfCreated(val){
-    const { 
-      patientName, sex, phone, admissionNo, admissionDate, 
+  filePdfCreated(val) {
+    const {
+      patientName, sex, phone, admissionNo, admissionDate,
       alias, mrNoFormatted, barcode, age, admissionTime,
       doctorName, payer, patientType, labelBirth,
     } = val;
 
     const detailPayer = payer ? payer : patientType;
     const strName = patientName.toUpperCase();
-    const strAge = age.toLowerCase();  
-    let doctorPayer = doctorName+' / '+detailPayer;
-        doctorPayer = doctorPayer.substr(0,55);
+    const strAge = age.toLowerCase();
+    let doctorPayer = doctorName + ' / ' + detailPayer;
+    doctorPayer = doctorPayer.substr(0, 55);
 
     pdfMake.vfs = pdfFonts.pdfMake.vfs;
 
     const docDefinition = {
-      pageSize:  { width: 292.283, height: 98.031},
-      pageMargins: [ 0, 0, 0, 0 ],
+      pageSize: { width: 292.283, height: 98.031 },
+      pageMargins: [0, 0, 0, 0],
       content: [
-        { text: strName, style: 'header', bold: true , fontSize: 10, noWrap: true },
-        { text: 'Sex: '+sex+' / Ph: '+phone, style: 'header', bold: true , fontSize: 10, noWrap: true },
-        { text: 'MR No: '+alias+'.'+mrNoFormatted+' / DOB: '+labelBirth+' ('+strAge+') ', style: 'header', bold: true, fontSize: 10 },
-        { text: admissionNo+' '+admissionDate+' '+admissionTime, style: 'header' , fontSize: 9},
+        { text: strName, style: 'header', bold: true, fontSize: 10, noWrap: true },
+        { text: 'Sex: ' + sex + ' / Ph: ' + phone, style: 'header', bold: true, fontSize: 10, noWrap: true },
+        { text: 'MR No: ' + alias + '.' + mrNoFormatted + ' / DOB: ' + labelBirth + ' (' + strAge + ') ', style: 'header', bold: true, fontSize: 10 },
+        { text: admissionNo + ' ' + admissionDate + ' ' + admissionTime, style: 'header', fontSize: 9 },
         { text: doctorPayer, style: 'header', fontSize: 9 },
         {
           image: barcode,
@@ -1172,31 +1182,31 @@ export class WidgetPatientDataComponent implements OnInit {
     pdfMake.createPdf(docDefinition).print();
   }
 
-  async printPatientLabel(val){
+  async printPatientLabel(val) {
     const contentPdf = await this.admissionService.getPatientLabel(val.appointment_id).toPromise()
-    .then( res => {
-      return res.data;
-    }).catch(err =>{
-      return null;
-    })
+      .then(res => {
+        return res.data;
+      }).catch(err => {
+        return null;
+      })
 
-    if(contentPdf){
+    if (contentPdf) {
       await this.filePdfCreated(contentPdf);
-    }else{
+    } else {
       this.alertService.error('Cannot print patient label', false, 5000);
     }
   }
 
-  printQueue(content, close){
-    this.modalService.open(content, { windowClass: 'modal_queue', size: 'lg'});
+  printQueue(content, close) {
+    this.modalService.open(content, { windowClass: 'modal_queue', size: 'lg' });
     this.closeAdm = close;
   }
 
-  async printQueueAction(val, isReguler, content){
+  async printQueueAction(val, isReguler, content) {
     this.buttonReguler = true;
     this.buttonVIP = true;
     this.closeQue = content;
-    
+
     const queueTypeId = isReguler ? queueType.REG : queueType.VIP;
 
     const body = {
@@ -1208,16 +1218,16 @@ export class WidgetPatientDataComponent implements OnInit {
     };
 
     this.roomDetail = await this.scheduleService.scheduleDetail(val.schedule_id)
-    .toPromise().then(res => {
-      return res.data;
-    }).catch( err => {
-      return null;
-    });
+      .toPromise().then(res => {
+        return res.data;
+      }).catch(err => {
+        return null;
+      });
 
     var dataPatient;
 
     this.resQueue = await this.queueService.createQueue(body).toPromise()
-      .then( res => {
+      .then(res => {
         this.buttonReguler = false;
         this.buttonVIP = false;
         dataPatient = {
@@ -1244,13 +1254,13 @@ export class WidgetPatientDataComponent implements OnInit {
         this.alertService.error(err.error.message, false, 3000);
         return null;
       })
-      
+
     this.selectedCheckIn = await this.appointmentService.getAppointmentById(val.appointment_id)
-    .toPromise().then( res => {
-      return res.data[0];
-    }).catch( err => {
-      return null;
-    });
+      .toPromise().then(res => {
+        return res.data[0];
+      }).catch(err => {
+        return null;
+      });
   }
 
   printQueueTicket(val) {
@@ -1266,17 +1276,17 @@ export class WidgetPatientDataComponent implements OnInit {
     let wing = '';
     let room = '';
 
-    if(this.roomDetail){
+    if (this.roomDetail) {
       floor = this.roomDetail.floor_name ? this.roomDetail.floor_name : floor;
       wing = this.roomDetail.wing_name ? this.roomDetail.wing_name : wing;
-      room = this.roomDetail.room_name ? this.roomDetail.room_name : room; 
+      room = this.roomDetail.room_name ? this.roomDetail.room_name : room;
     }
-    
+
     pdfMake.vfs = pdfFonts.pdfMake.vfs;
-    
+
     const docDefinition = {
-      pageSize:  { width: 252.283, height: 200},
-      pageMargins: [ 0, 10, 10, 10 ],
+      pageSize: { width: 252.283, height: 200 },
+      pageMargins: [0, 10, 10, 10],
       content: [
         {
           text: 'Your Queue Number',
@@ -1287,24 +1297,24 @@ export class WidgetPatientDataComponent implements OnInit {
         {
           text: queueNo,
           style: 'header',
-          fontSize: 30 ,
+          fontSize: 30,
           margin: [0, 5, 0, 5]
         },
         {
-          text: 'Floor : '+floor+' , Wing : '+wing+' , Room : '+room,
+          text: 'Floor : ' + floor + ' , Wing : ' + wing + ' , Room : ' + room,
           margin: [0, 0, 0, 0],
           alignment: 'center',
           fontSize: 10,
           bold: true
         },
         {
-          text: 'Patient Name : '+patientName,
+          text: 'Patient Name : ' + patientName,
           margin: [0, 5, 0, 5],
           alignment: 'center',
           fontSize: 10
         },
         {
-          text: 'Doctor Name : '+doctorName,
+          text: 'Doctor Name : ' + doctorName,
           margin: [0, 0, 0, 5],
           alignment: 'center',
           fontSize: 10
@@ -1336,7 +1346,7 @@ export class WidgetPatientDataComponent implements OnInit {
     pdfMake.createPdf(docDefinition).print();
 
     //redirect to create appointment
-    const params = { id: this.selectedCheckIn.schedule_id, date: this.selectedCheckIn.appointment_date};
+    const params = { id: this.selectedCheckIn.schedule_id, date: this.selectedCheckIn.appointment_date };
     this.router.navigate(['./create-appointment'], { queryParams: params });
 
   }
@@ -1350,7 +1360,7 @@ export class WidgetPatientDataComponent implements OnInit {
   }
 
   openAdmission(content) {
-    this.modalService.open(content, {windowClass: 'fo_create_admission_body'}).result.then((result) => {
+    this.modalService.open(content, { windowClass: 'fo_create_admission_body' }).result.then((result) => {
       this.closeResult = `Closed with: ${result}`;
     }, (reason) => {
       this.closeResult = `Dismissed ${this.getDismissReason(reason)}`;
@@ -1358,7 +1368,7 @@ export class WidgetPatientDataComponent implements OnInit {
   }
 
   openconfirmation(content) {
-    this.modalService.open(content, {windowClass: 'fo_modal_confirmation'}).result.then((result) => {
+    this.modalService.open(content, { windowClass: 'fo_modal_confirmation' }).result.then((result) => {
       this.closeResult = `Closed with: ${result}`;
     }, (reason) => {
       this.closeResult = `Dismissed ${this.getDismissReason(reason)}`;
@@ -1366,7 +1376,7 @@ export class WidgetPatientDataComponent implements OnInit {
   }
 
   openLarge(content) {
-    this.modalService.open(content, {windowClass: 'fo_modal_search'}).result.then((result) => {
+    this.modalService.open(content, { windowClass: 'fo_modal_search' }).result.then((result) => {
       this.closeResult = `Closed with: ${result}`;
     }, (reason) => {
       this.closeResult = `Dismissed ${this.getDismissReason(reason)}`;
@@ -1379,7 +1389,7 @@ export class WidgetPatientDataComponent implements OnInit {
 
   reset() {
     this.model = {};
-    this.model.sex = { value: ''};
+    this.model.sex = { value: '' };
     this.listDistrict = [];
     this.listSubdistrict = [];
   }
@@ -1391,16 +1401,16 @@ export class WidgetPatientDataComponent implements OnInit {
     } else if (reason === ModalDismissReasons.BACKDROP_CLICK) {
       return 'by clicking on a backdrop';
     } else {
-      return  `with: ${reason}`;
+      return `with: ${reason}`;
     }
   }
 
   async getCollectionAlert() {
     this.alertService.getAlert().subscribe((alert: Alert) => {
       if (!alert) {
-          // clear alerts when an empty alert is received
-          this.alerts = [];
-          return;
+        // clear alerts when an empty alert is received
+        this.alerts = [];
+        return;
       }
       // add alert to array
       this.alerts.push(alert);

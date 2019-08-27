@@ -1,6 +1,7 @@
 import { Component, OnInit } from '@angular/core';
 import { DoctorHospital } from '../../../models/doctors/doctor-hospital';
 import { DoctorService } from '../../../services/doctor.service';
+import { environment } from '../../../../environments/environment';
 
 @Component({
   selector: 'app-widget-view-quota',
@@ -8,15 +9,16 @@ import { DoctorService } from '../../../services/doctor.service';
   styleUrls: ['./widget-view-quota.component.css']
 })
 export class WidgetViewQuotaComponent implements OnInit {
+  public assetPath = environment.ASSET_PATH;
 
   public doctorHospitals: DoctorHospital = new DoctorHospital;
   public doctorQuota: DoctorHospital[];
   public showWaitMsg = true;
   public showNotFoundMsg = false;
 
-	public allItems: any [];
-	public pager: any = {};
-  public pagedItems: any [];
+  public allItems: any[];
+  public pager: any = {};
+  public pagedItems: any[];
 
   public tempDoctorQuota: any = [];
   public key: any = JSON.parse(localStorage.getItem('key'));
@@ -32,22 +34,22 @@ export class WidgetViewQuotaComponent implements OnInit {
     const hospital = this.key.hospital;
 
     this.doctorQuota = await this.doctorService.getDoctorQuota(hospital.id)
-    .toPromise().then(res => {
-      if (res.status === 'OK') {
-        if (res.data.length !== 0) {
-          this.tempDoctorQuota = res.data;
-          this.allItems = res.data;
-          this.setPage(1);
+      .toPromise().then(res => {
+        if (res.status === 'OK') {
+          if (res.data.length !== 0) {
+            this.tempDoctorQuota = res.data;
+            this.allItems = res.data;
+            this.setPage(1);
+          } else {
+            this.showNotFoundMsg = true;
+          }
+          this.showWaitMsg = false;
+          return res.data;
         } else {
           this.showNotFoundMsg = true;
+          return [];
         }
-        this.showWaitMsg = false;
-        return res.data;
-      } else {
-        this.showNotFoundMsg = true;
-        return [];
-      }
-    });
+      });
   }
 
   searchDoctor(str: any) {
@@ -64,13 +66,13 @@ export class WidgetViewQuotaComponent implements OnInit {
 
 
   setPage(page: number) {
-		if (page < 1 || page > this.pager.totalPages) {
-			return;
+    if (page < 1 || page > this.pager.totalPages) {
+      return;
     }
-		// get pager object from service
-  this.pager =  this.doctorService.getPager(this.allItems.length, page);
+    // get pager object from service
+    this.pager = this.doctorService.getPager(this.allItems.length, page);
 
-		// get current page of items
-  this.pagedItems = this.allItems.slice(this.pager.startIndex, this.pager.endIndex + 1);
-	}
+    // get current page of items
+    this.pagedItems = this.allItems.slice(this.pager.startIndex, this.pager.endIndex + 1);
+  }
 }

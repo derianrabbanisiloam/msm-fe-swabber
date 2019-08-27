@@ -10,6 +10,7 @@ import { NgbDateFRParserFormatter } from '../widget-doctor-leave/ngb-date-fr-par
 import { Subject } from 'rxjs';
 import Swal from 'sweetalert2';
 import * as moment from 'moment';
+import { environment } from '../../../../environments/environment';
 
 @Component({
   selector: 'app-widget-doctor-note',
@@ -19,7 +20,7 @@ import * as moment from 'moment';
 })
 export class WidgetDoctorNoteComponent implements OnInit {
   /* For Alert Message */
-
+  public assetPath = environment.ASSET_PATH;
   constructor(
     private doctorService: DoctorService,
     private modalService: NgbModal,
@@ -111,7 +112,7 @@ export class WidgetDoctorNoteComponent implements OnInit {
       dateFormat: 'dd/mm/yyyy',
       height: '27px',
       width: '240px',
-      disableUntil: {year: this.yesterday[0], month: this.yesterday[1], day: this.yesterday[2]}
+      disableUntil: { year: this.yesterday[0], month: this.yesterday[1], day: this.yesterday[2] }
     };
 
     this.myDateRangePickerOptionsTwo = {
@@ -163,7 +164,7 @@ export class WidgetDoctorNoteComponent implements OnInit {
     } else if (reason === ModalDismissReasons.BACKDROP_CLICK) {
       return 'by clicking on a backdrop';
     } else {
-      return  `with: ${reason}`;
+      return `with: ${reason}`;
     }
   }
 
@@ -214,25 +215,25 @@ export class WidgetDoctorNoteComponent implements OnInit {
     this.tfRefresh = this.model.toDate;
 
     this.doctorService.postDoctorNotes(this.hospitalId, this.model)
-        .subscribe(data => {
-          Swal.fire({
-            position: 'top-end',
-            type: 'success',
-            title: 'Success',
-            showConfirmButton: false,
-            timer: 1500
-          });
-          this.note = '';
-          this.from_to_post = null;
-          this.refreshNotes();
-        }, err => {
-          Swal.fire({
-            type: 'error',
-            title: 'Oops...',
-            text: 'Something went wrong!',
-            timer: 1500
-          });
+      .subscribe(data => {
+        Swal.fire({
+          position: 'top-end',
+          type: 'success',
+          title: 'Success',
+          showConfirmButton: false,
+          timer: 1500
         });
+        this.note = '';
+        this.from_to_post = null;
+        this.refreshNotes();
+      }, err => {
+        Swal.fire({
+          type: 'error',
+          title: 'Oops...',
+          text: 'Something went wrong!',
+          timer: 1500
+        });
+      });
   }
 
   getDoctorNotes(): void {
@@ -304,25 +305,25 @@ export class WidgetDoctorNoteComponent implements OnInit {
   }
 
   refreshNotes() {
-    if (this.doctorUid == null || this.doctorUid == '' ) {
+    if (this.doctorUid == null || this.doctorUid == '') {
       if (this.dfRefresh == null || this.dfRefresh == '') {
         this.doctorService.getDoctorNotes(this.hospitalId, this.todayString, this.todayString)
-        .subscribe(data => {
-          this.doctorNotes = [];
-          this.doctorNotes = data.data;
-          this.from_date_notes = null;
-          this.to_date_notes = null;
-        }, err => {
-          this.doctorNotes = [];
-        });
+          .subscribe(data => {
+            this.doctorNotes = [];
+            this.doctorNotes = data.data;
+            this.from_date_notes = null;
+            this.to_date_notes = null;
+          }, err => {
+            this.doctorNotes = [];
+          });
       } else {
         this.doctorService.getDoctorNotes(this.hospitalId, this.dfRefresh, this.tfRefresh)
-        .subscribe(data => {
-          this.doctorNotes = [];
-          this.doctorNotes = data.data;
-        }, err => {
-          this.doctorNotes = [];
-        });
+          .subscribe(data => {
+            this.doctorNotes = [];
+            this.doctorNotes = data.data;
+          }, err => {
+            this.doctorNotes = [];
+          });
       }
     } else {
       this.doctorService.getDoctorNotes(this.hospitalId, this.dfRefresh, this.tfRefresh, this.doctorUid)
@@ -365,24 +366,24 @@ export class WidgetDoctorNoteComponent implements OnInit {
     this.modelEdit.source = this.dummyMACAddress;
 
     this.doctorService.editDoctorNotes(this.hospitalId, noteId, this.modelEdit)
-        .subscribe(data => {
-          Swal.fire({
-            position: 'top-end',
-            type: 'success',
-            title: 'Success',
-            showConfirmButton: false,
-            timer: 1500
-          });
-          this.refreshNotes();
-        }, err => {
-          Swal.fire({
-            type: 'error',
-            title: 'Oops...',
-            text: 'Something went wrong!',
-            timer: 1500
-          });
-          this._error.next(`Failed`);
+      .subscribe(data => {
+        Swal.fire({
+          position: 'top-end',
+          type: 'success',
+          title: 'Success',
+          showConfirmButton: false,
+          timer: 1500
         });
+        this.refreshNotes();
+      }, err => {
+        Swal.fire({
+          type: 'error',
+          title: 'Oops...',
+          text: 'Something went wrong!',
+          timer: 1500
+        });
+        this._error.next(`Failed`);
+      });
   }
 
   editDoctorNotesModal(val, content) {
@@ -420,24 +421,24 @@ export class WidgetDoctorNoteComponent implements OnInit {
       source: this.dummyMACAddress
     };
     this.doctorService.deleteDoctorNotes(this.hospitalId, this.selectedDeleteNote.doctor_note_id, modal)
-        .subscribe(data => {
-          Swal.fire({
-            position: 'top-end',
-            type: 'success',
-            title: 'Success',
-            showConfirmButton: false,
-            timer: 1500
-          });
-          this.refreshNotes();
-        }, err => {
-          Swal.fire({
-            type: 'error',
-            title: 'Oops...',
-            text: 'Something went wrong!',
-            timer: 1500
-          });
-          this._error.next(`Failed`);
+      .subscribe(data => {
+        Swal.fire({
+          position: 'top-end',
+          type: 'success',
+          title: 'Success',
+          showConfirmButton: false,
+          timer: 1500
         });
+        this.refreshNotes();
+      }, err => {
+        Swal.fire({
+          type: 'error',
+          title: 'Oops...',
+          text: 'Something went wrong!',
+          timer: 1500
+        });
+        this._error.next(`Failed`);
+      });
   }
 
   clearNgModelDate(): void {

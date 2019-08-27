@@ -11,7 +11,7 @@ import { PatientService } from '../../../services/patient.service';
 import { channelId, sourceApps } from '../../../variables/common.variable';
 import { AlertService } from '../../../services/alert.service';
 import { Alert, AlertType } from '../../../models/alerts/alert';
-
+import { environment } from '../../../../environments/environment';
 
 @Component({
   selector: 'app-modal-create-appointment',
@@ -21,7 +21,7 @@ import { Alert, AlertType } from '../../../models/alerts/alert';
 export class ModalCreateAppointmentComponent implements OnInit {
 
   @Input() appointmentInfo: any;
-
+  public assetPath = environment.ASSET_PATH;
   public key: any = JSON.parse(localStorage.getItem('key'));
   public hospital = this.key.hospital;
   public user = this.key.user;
@@ -72,9 +72,9 @@ export class ModalCreateAppointmentComponent implements OnInit {
   ngAfterContentChecked() {
   }
 
-  ngAfterViewChecked() {}
+  ngAfterViewChecked() { }
 
-  ngAfterViewInit() {}
+  ngAfterViewInit() { }
 
   close() {
     this.activeModal.close();
@@ -83,7 +83,7 @@ export class ModalCreateAppointmentComponent implements OnInit {
   async createAppointment() {
     this.isSubmitting = true;
     const isValidForm = this.validateCreateAppointment();
-    if (isValidForm === false) { 
+    if (isValidForm === false) {
       this.isSubmitting = false;
       return false;
     }
@@ -101,7 +101,7 @@ export class ModalCreateAppointmentComponent implements OnInit {
       doctorId: data.doctor_id,
       scheduleId: data.schedule_id,
       isWaitingList: data.is_waiting_list,
-      patientHopeId: patientHopeId, 
+      patientHopeId: patientHopeId,
       name: patientName,
       birthDate: birthDate,
       phoneNumber1: this.filterizePhoneNumber(phoneNumber),
@@ -112,12 +112,12 @@ export class ModalCreateAppointmentComponent implements OnInit {
       userName: this.userName,
       source: this.source
     };
-    
+
     await this.appointmentService.addAppointment(this.addAppPayload).toPromise().then(
       data => {
         this.alertService.success('Success to create appointment', false, 3000);
         this.appointmentService.emitCreateApp(true);
-        setTimeout(() => {this.close();}, 2000);
+        setTimeout(() => { this.close(); }, 2000);
       }, err => {
         this.alertService.error(err.error.message, false, 3000);
       }
@@ -180,7 +180,7 @@ export class ModalCreateAppointmentComponent implements OnInit {
       birthDate: birthDate,
       localMrNo: this.model.localMrNo,
     }
-    const modalRef = this.modalService.open(ModalSearchPatientComponent, {windowClass: 'modal-searchPatient', size: 'lg'});
+    const modalRef = this.modalService.open(ModalSearchPatientComponent, { windowClass: 'modal-searchPatient', size: 'lg' });
     modalRef.componentInstance.searchKeywords = { ...params, hospitalId };
   }
 
@@ -190,7 +190,7 @@ export class ModalCreateAppointmentComponent implements OnInit {
     this.isLock = false;
   }
 
-  validateCreateAppointment () {
+  validateCreateAppointment() {
     let isValid = true;
     const { patientName, phoneNumber } = this.model;
     if (!this.checkDatePickerIsValid()) {
@@ -198,13 +198,13 @@ export class ModalCreateAppointmentComponent implements OnInit {
     } else {
       $('.form-ca-dob').removeClass('form-error');
     }
-    if ( !patientName) {
+    if (!patientName) {
       $('.form-ca-patientname').addClass('form-error');
       isValid = false;
     } else {
       $('.form-ca-patientname').removeClass('form-error');
     }
-    if( !phoneNumber) {
+    if (!phoneNumber) {
       $('.form-ca-phoneno').addClass('form-error');
       isValid = false;
     } else {
@@ -218,12 +218,12 @@ export class ModalCreateAppointmentComponent implements OnInit {
     return phoneNumber;
   }
 
-  async getCollectionAlert(){
+  async getCollectionAlert() {
     this.alertService.getAlert().subscribe((alert: Alert) => {
       if (!alert) {
-          // clear alerts when an empty alert is received
-          this.alerts = [];
-          return;
+        // clear alerts when an empty alert is received
+        this.alerts = [];
+        return;
       }
       // add alert to array
       this.alerts.push(alert);
@@ -232,7 +232,7 @@ export class ModalCreateAppointmentComponent implements OnInit {
 
   cssAlertType(alert: Alert) {
     if (!alert) {
-        return;
+      return;
     }
 
     switch (alert.type) {
@@ -246,7 +246,7 @@ export class ModalCreateAppointmentComponent implements OnInit {
         return 'warning';
     }
   }
-  
+
   removeAlert(alert: Alert) {
     this.alerts = this.alerts.filter(x => x !== alert);
   }

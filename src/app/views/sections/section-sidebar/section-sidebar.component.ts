@@ -11,19 +11,19 @@ import { environment } from '../../../../environments/environment';
   styleUrls: ['./section-sidebar.component.css']
 })
 export class SectionSidebarComponent implements OnInit {
-
+  public assetPath = environment.ASSET_PATH;
   public countAppRes: number;
   private socket;
 
   constructor(
     private appointmentService: AppointmentService,
-  ) { 
-    this.socket = socket(`${environment.WEB_SOCKET_SERVICE + keySocket.APPOINTMENT}`,  {
-      transports: ['websocket'],  
+  ) {
+    this.socket = socket(`${environment.WEB_SOCKET_SERVICE + keySocket.APPOINTMENT}`, {
+      transports: ['websocket'],
       query: `data=${
         Security.encrypt({ secretKey: SecretKey }, Jwt)
         }&url=${environment.CALL_CENTER_SERVICE}`,
-      });
+    });
   }
 
   ngOnInit() {
@@ -33,7 +33,7 @@ export class SectionSidebarComponent implements OnInit {
     });
   }
 
-  countRechedule(){
+  countRechedule() {
     this.appointmentService.getCountAppReschedule().subscribe(
       data => {
         this.countAppRes = data.data;

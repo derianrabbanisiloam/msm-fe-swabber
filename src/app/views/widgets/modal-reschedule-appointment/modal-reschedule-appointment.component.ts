@@ -1,5 +1,5 @@
 import * as moment from 'moment';
-import { Component, OnInit, Input} from '@angular/core';
+import { Component, OnInit, Input } from '@angular/core';
 import { DoctorService } from '../../../services/doctor.service';
 import { NgbActiveModal } from '@ng-bootstrap/ng-bootstrap';
 import { AppointmentService } from '../../../services/appointment.service';
@@ -8,7 +8,7 @@ import { Appointment } from '../../../models/appointments/appointment';
 import { editContactPayload } from '../../../payloads/edit-contact.payload';
 import { rescheduleAppointmentPayload } from '../../../payloads/reschedule-appointment.payload';
 import { sourceApps, channelId } from '../../../variables/common.variable';
-
+import { environment } from '../../../../environments/environment';
 
 @Component({
   selector: 'app-modal-reschedule-appointment',
@@ -16,7 +16,7 @@ import { sourceApps, channelId } from '../../../variables/common.variable';
   styleUrls: ['./modal-reschedule-appointment.component.css']
 })
 export class ModalRescheduleAppointmentComponent implements OnInit {
-
+  public assetPath = environment.ASSET_PATH;
   @Input() appointmentSelected: any;
   public key: any = JSON.parse(localStorage.getItem('key'));
   public hospital = this.key.hospital;
@@ -47,11 +47,11 @@ export class ModalRescheduleAppointmentComponent implements OnInit {
   async getAppointmentById() {
     const app = this.appointmentSelected;
 
-    if(app.appointment_id){
+    if (app.appointment_id) {
       this.appointmentService.getAppointmentById(app.appointment_id).subscribe(
         data => {
           this.appointment = data.data[0];
-          this.appointment.birth_date = moment(this.appointment.birth_date).format('DD-MM-YYYY'); 
+          this.appointment.birth_date = moment(this.appointment.birth_date).format('DD-MM-YYYY');
           this.appointment.created_date = moment(this.appointment.created_date).format('DD-MM-YYYY');
           this.appointment.modified_date = moment(this.appointment.modified_date).format('DD-MM-YYYY');
           this.appointment.appointment_date = moment(this.appointment.appointment_date).format('DD-MM-YYYY');
@@ -59,8 +59,8 @@ export class ModalRescheduleAppointmentComponent implements OnInit {
           this.appointment.to_time = this.appointment.to_time.substring(0, 5);
           this.rescheduleSelected.note = this.appointment.appointment_note;
         }
-      );   
-    }else{
+      );
+    } else {
       this.appointment = {
         appointment_temp_id: app.appointment_temporary_id,
         contact_name: app.contact_name,
@@ -81,7 +81,7 @@ export class ModalRescheduleAppointmentComponent implements OnInit {
 
       }
       this.rescheduleSelected.note = this.appointment.appointment_note;
-      this.editModel.phoneNo = this.appointment.phone_number; 
+      this.editModel.phoneNo = this.appointment.phone_number;
     }
   }
 
@@ -96,7 +96,7 @@ export class ModalRescheduleAppointmentComponent implements OnInit {
     this.createAppInputData = {
       scheduleId: data.schedule_id,
       appointmentDate: data.date,
-      name: name, 
+      name: name,
     };
   }
 
@@ -118,8 +118,8 @@ export class ModalRescheduleAppointmentComponent implements OnInit {
       source: sourceApps,
     };
 
-    app.appointment_id ? this.rescheduleAppPayload.appointmentId = app.appointment_id : 
-    this.rescheduleAppPayload.appointmentTemporaryId = app.appointment_temporary_id;
+    app.appointment_id ? this.rescheduleAppPayload.appointmentId = app.appointment_id :
+      this.rescheduleAppPayload.appointmentTemporaryId = app.appointment_temporary_id;
   }
 
   openDoctorSchedule() {
@@ -127,7 +127,7 @@ export class ModalRescheduleAppointmentComponent implements OnInit {
     this.flag = this.isOpenDoctorSchedule ? 'block' : 'none';
     this.opScheduleSelected = this.isOpenDoctorSchedule ? this.opScheduleSelected : null;
     const searchKeywords = {
-      doctor: { 
+      doctor: {
         doctor_id: this.appointmentSelected.doctor_id,
         name: this.appointmentSelected.doctor_name,
       },
@@ -138,26 +138,26 @@ export class ModalRescheduleAppointmentComponent implements OnInit {
 
   async updateAppointment() {
     const app = this.appointmentSelected;
-    
-    if(app.appointment_id){
+
+    if (app.appointment_id) {
       if (this.editModel.phoneNo) {
         await this.updateContact();
-      } 
-      if (this.rescheduleAppPayload) {
-        await this.rescheduleAppointment();    
       }
-      if(this.rescheduleSelected.note !== this.appointmentSelected.appointment_note){
+      if (this.rescheduleAppPayload) {
+        await this.rescheduleAppointment();
+      }
+      if (this.rescheduleSelected.note !== this.appointmentSelected.appointment_note) {
         await this.updateNotes();
       }
-    }else{
+    } else {
       if (this.rescheduleAppPayload) {
-        await this.rescheduleAppointment();    
+        await this.rescheduleAppointment();
       }
       await this.updateDetailTemporaryApp();
     }
   }
 
-  async updateNotes(){
+  async updateNotes() {
     const appointmentId = this.appointmentSelected.appointment_id;
     const model = {
       notes: this.rescheduleSelected.note,
@@ -205,9 +205,9 @@ export class ModalRescheduleAppointmentComponent implements OnInit {
     );
   }
 
-  async updateDetailTemporaryApp(){
+  async updateDetailTemporaryApp() {
     //to update detail of temporary appointment
-    
+
     const tempAppId = this.appointmentSelected.appointment_temporary_id;
     const model = {
       phoneNumber: this.editModel.phoneNo,

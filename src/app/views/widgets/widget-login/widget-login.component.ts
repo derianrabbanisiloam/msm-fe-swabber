@@ -6,6 +6,7 @@ import { AlertService } from '../../../services/alert.service';
 import { Alert, AlertType } from '../../../models/alerts/alert';
 import { HospitalSSO } from '../../../models/hospitals/sso.hospital';
 import { appInfo } from '../../../variables/common.variable';
+import { environment } from '../../../../environments/environment';
 
 @Component({
   selector: 'app-widget-login',
@@ -13,6 +14,7 @@ import { appInfo } from '../../../variables/common.variable';
   styleUrls: ['./widget-login.component.css']
 })
 export class WidgetLoginComponent implements OnInit {
+  public assetPath = environment.ASSET_PATH;
   public model: any = {};
   public loading = false;
   public returnUrl: string;
@@ -41,9 +43,9 @@ export class WidgetLoginComponent implements OnInit {
 
   async getListHopital() {
     this.hospitalList = await this.hospitalService.getSSOHospital()
-    .toPromise().then(res => {
-      return res.data;
-    });
+      .toPromise().then(res => {
+        return res.data;
+      });
   }
 
   showToggleBox(source: string) {
@@ -65,7 +67,7 @@ export class WidgetLoginComponent implements OnInit {
     const hospital = this.model.hospital;
     const applicationId = this.applicationId;
     const roleId = this.roleId;
-    
+
     const body = {
       userAccount: username,
       password,
@@ -80,11 +82,11 @@ export class WidgetLoginComponent implements OnInit {
     };
 
     await this.userService.signUp(body)
-    .toPromise().then(res => {
-      this.alertService.success(res.message);
-    }).catch(err => {
-      this.alertService.error(err.error.message);
-    });
+      .toPromise().then(res => {
+        this.alertService.success(res.message);
+      }).catch(err => {
+        this.alertService.error(err.error.message);
+      });
   }
 
   async login() {
@@ -101,57 +103,57 @@ export class WidgetLoginComponent implements OnInit {
     };
 
     await this.userService.signIn(body)
-    .toPromise().then(res => {
-      if (res.status == 'OK') {
+      .toPromise().then(res => {
+        if (res.status == 'OK') {
 
-        const collections = [];
+          const collections = [];
 
-        for (let i = 0; i < res.data.length; i++) {
-          collections.push({
-            id: res.data[i].hospital_id,
-            orgId: res.data[i].hospital_hope_id,
-            name : res.data[i].name,
-            alias: res.data[i].alias,
-            zone: res.data[i].time_zone,
-          });
+          for (let i = 0; i < res.data.length; i++) {
+            collections.push({
+              id: res.data[i].hospital_id,
+              orgId: res.data[i].hospital_hope_id,
+              name: res.data[i].name,
+              alias: res.data[i].alias,
+              zone: res.data[i].time_zone,
+            });
+          }
+
+          const key = {
+            user: {
+              id: res.data[0].user_id,
+              username: res.data[0].user_name,
+              fullname: res.data[0].full_name,
+            },
+            hospital: {
+              id: res.data[0].hospital_id,
+              orgId: res.data[0].hospital_hope_id,
+              name: res.data[0].name,
+              alias: res.data[0].alias,
+              zone: res.data[0].time_zone,
+            },
+            collection: collections,
+          };
+
+          localStorage.setItem('key', JSON.stringify(key));
+
+          this.router.navigate([this.returnUrl]);
+        } else {
+          this.alertService.error(`Username or/and Password wrong`);
         }
 
-        const key = {
-          user: {
-            id: res.data[0].user_id,
-            username: res.data[0].user_name,
-            fullname: res.data[0].full_name,
-          },
-          hospital: {
-            id: res.data[0].hospital_id,
-            orgId: res.data[0].hospital_hope_id,
-            name: res.data[0].name,
-            alias: res.data[0].alias,
-            zone: res.data[0].time_zone,
-          },
-          collection: collections,
-        };
-
-        localStorage.setItem('key', JSON.stringify(key));
-
-        this.router.navigate([this.returnUrl]);
-      } else {
-        this.alertService.error(`Username or/and Password wrong`);
-      }
-
-      this.loading = false;
-    }).catch(err => {
-      this.loading = false;
-      this.alertService.error(err.error.message);
-    });
+        this.loading = false;
+      }).catch(err => {
+        this.loading = false;
+        this.alertService.error(err.error.message);
+      });
   }
 
   async getCollectionAlert() {
     this.alertService.getAlert().subscribe((alert: Alert) => {
       if (!alert) {
-          // clear alerts when an empty alert is received
-          this.alerts = [];
-          return;
+        // clear alerts when an empty alert is received
+        this.alerts = [];
+        return;
       }
       // add alert to array
       this.alerts.push(alert);

@@ -10,6 +10,7 @@ import { dateFormatter, localSpliter } from '../../../utils/helpers.util';
 import { AlertService } from '../../../services/alert.service';
 import { Alert, AlertType } from '../../../models/alerts/alert';
 import { sourceApps } from '../../../variables/common.variable';
+import { environment } from '../../../../environments/environment';
 
 @Component({
   selector: 'app-widget-send-notification',
@@ -17,7 +18,7 @@ import { sourceApps } from '../../../variables/common.variable';
   styleUrls: ['./widget-send-notification.component.css']
 })
 export class WidgetSendNotificationComponent implements OnInit {
-
+  public assetPath = environment.ASSET_PATH;
   public notificationType: General[];
   public doctorList: Doctor[];
   public doctorSelected: Doctor;
@@ -56,15 +57,15 @@ export class WidgetSendNotificationComponent implements OnInit {
     this.alerts = [];
 
     this.notificationType = await this.generalService.getNotificationType()
-    .toPromise().then(res => {
-      if (res.status === 'OK' && res.data.length === 0) {
-        this.alertService.success('No List notification type');
-      }
-      return res.data;
-    }).catch( err => {
-      this.alertService.error(err.error.message);
-      return [];
-    });
+      .toPromise().then(res => {
+        if (res.status === 'OK' && res.data.length === 0) {
+          this.alertService.success('No List notification type');
+        }
+        return res.data;
+      }).catch(err => {
+        this.alertService.error(err.error.message);
+        return [];
+      });
   }
 
   async getListDoctor() {
@@ -74,24 +75,24 @@ export class WidgetSendNotificationComponent implements OnInit {
     this.alerts = [];
 
     this.doctorList = await this.doctorService.getListDoctor(hospital.id)
-    .toPromise().then( res => {
-      if (res.status === 'OK' && res.data.length === 0) {
-        this.alertService.success('No List Doctor in This Hospital');
-      }
+      .toPromise().then(res => {
+        if (res.status === 'OK' && res.data.length === 0) {
+          this.alertService.success('No List Doctor in This Hospital');
+        }
 
-      return res.data;
-    }).catch( err => {
-      this.alertService.error(err.error.message);
-      return [];
-    });
+        return res.data;
+      }).catch(err => {
+        this.alertService.error(err.error.message);
+        return [];
+      });
   }
 
   async getCollectionAlert() {
     this.alertService.getAlert().subscribe((alert: Alert) => {
       if (!alert) {
-          // clear alerts when an empty alert is received
-          this.alerts = [];
-          return;
+        // clear alerts when an empty alert is received
+        this.alerts = [];
+        return;
       }
       // add alert to array
       this.alerts.push(alert);
@@ -143,27 +144,27 @@ export class WidgetSendNotificationComponent implements OnInit {
 
     this.alerts = [];
     this.patientList = await this.appointmentService.getListReceiver(doctorId, date, hospital.id)
-    .toPromise().then( res => {
-      if (res.status === 'OK' && res.data.length === 0) {
-        this.showNotFoundMsg = true;
-      } else {
-        for (let i = 0, { length } = res.data; i < length; i++) {
-          res.data[i].selected = false;
+      .toPromise().then(res => {
+        if (res.status === 'OK' && res.data.length === 0) {
+          this.showNotFoundMsg = true;
+        } else {
+          for (let i = 0, { length } = res.data; i < length; i++) {
+            res.data[i].selected = false;
+          }
+          this.showTable = true;
         }
-        this.showTable = true;
-      }
-      this.showWaitMsg = false;
+        this.showWaitMsg = false;
 
-      return res.data;
-    }).catch(err => {
-      this.showWaitMsg = false;
-      this.showNotFoundMsg = true;
-      return [];
-    });
+        return res.data;
+      }).catch(err => {
+        this.showWaitMsg = false;
+        this.showNotFoundMsg = true;
+        return [];
+      });
   }
 
   selectAll() {
-    for (let i = 0, { length } = this.patientList;  i < length; i += 1) {
+    for (let i = 0, { length } = this.patientList; i < length; i += 1) {
       this.patientList[i].selected = this.selectedAll;
     }
   }
@@ -218,7 +219,7 @@ export class WidgetSendNotificationComponent implements OnInit {
     this.alerts = [];
 
     await this.notificationService.sendNotification(payload)
-      .toPromise().then( res => {
+      .toPromise().then(res => {
         if (res.status === 'OK') {
           this.alertService.success(res.message);
         } else {
@@ -227,26 +228,26 @@ export class WidgetSendNotificationComponent implements OnInit {
       }).catch(err => {
         this.alertService.error(err.error.message);
       });
+  }
+
+  cssAlertType(alert: Alert) {
+    if (!alert) {
+      return;
     }
 
-    cssAlertType(alert: Alert) {
-      if (!alert) {
-          return;
-      }
-
-      switch (alert.type) {
-        case AlertType.Success:
-          return 'success';
-        case AlertType.Error:
-          return 'danger';
-        case AlertType.Info:
-          return 'info';
-        case AlertType.Warning:
-          return 'warning';
-      }
+    switch (alert.type) {
+      case AlertType.Success:
+        return 'success';
+      case AlertType.Error:
+        return 'danger';
+      case AlertType.Info:
+        return 'info';
+      case AlertType.Warning:
+        return 'warning';
     }
+  }
 
-    removeAlert(alert: Alert) {
-      this.alerts = this.alerts.filter(x => x !== alert);
-    }
+  removeAlert(alert: Alert) {
+    this.alerts = this.alerts.filter(x => x !== alert);
+  }
 }

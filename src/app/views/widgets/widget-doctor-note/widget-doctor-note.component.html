@@ -3,7 +3,8 @@
     <div class="col-md-4 offset-8 alert-message-top" *ngIf="successMessage || errorMessageConnection">
       <ngb-alert *ngIf="successMessage" type="success" (close)="successMessage = null">{{ successMessage }}</ngb-alert>
       <ngb-alert *ngIf="errorMessageConnection" type="danger" (close)="errorMessageConnection = null">
-        {{errorMessageConnection}} <a class="btn btn-light btn-sm" href="" target="_parent" [routerLink]="['/doctor-notes']">Try again</a>
+        {{errorMessageConnection}} <a class="btn btn-light btn-sm" href="" target="_parent"
+          [routerLink]="['/doctor-notes']">Try again</a>
       </ngb-alert>
     </div>
 
@@ -16,29 +17,26 @@
     <ng-template #content let-c="close" let-x="dismiss">
       <div class="modal-header">
         <h4 class="modal-title">Add Doctor Notes</h4>
-        <button type="button" class="close" #close_button aria-label="Close" (click)="clear($event)" (click)="x('Cross click')">
+        <button type="button" class="close" #close_button aria-label="Close" (click)="clear($event)"
+          (click)="x('Cross click')">
           <span aria-hidden="true">&times;</span>
         </button>
       </div>
       <div class="modal-body">
         <div class="col-md-12">
-          <form  class="form-horizontal" [formGroup]="postDoctorNotesForm" novalidate>
+          <form class="form-horizontal" [formGroup]="postDoctorNotesForm" novalidate>
             <div class="row">
               <div class="col-md-12">
                 <div class="ng-autocomplete" class="angular-autocomplete">
-                  <ng-autocomplete
-                    placeHolder="Search Doctor by name ..."
-                    [data]="doctors"
-                    searchKeyword="name"
-                    (selected)='searchDoctorTwo($event)'
-                    [itemTemplate]="itemTemplateDoctor"
-                    [notFoundTemplate]="notFoundTemplate"> 
+                  <ng-autocomplete placeHolder="Search Doctor by name ..." [data]="doctors" searchKeyword="name"
+                    (selected)='searchDoctorTwo($event)' [itemTemplate]="itemTemplateDoctor"
+                    [notFoundTemplate]="notFoundTemplate">
                   </ng-autocomplete>
-                  
+
                   <ng-template #itemTemplateDoctor let-item>
                     <a [innerHTML]="item.name"></a>
                   </ng-template>
-                  
+
                   <ng-template #notFoundTemplate let-notFound>
                     <div [innerHTML]="notFound"></div>
                   </ng-template>
@@ -58,12 +56,13 @@
                       <img src="assets/v2-images/ic_Calendar.png" style="width: 1.2rem; height: 1rem; cursor: pointer;"/>
                     </button>
                   </div>-->
-                  <my-date-range-picker name="mydaterange" [options]="myDateRangePickerOptions" formControlName="from_to_pn" [(ngModel)]="from_to_post">
+                  <my-date-range-picker name="mydaterange" [options]="myDateRangePickerOptions"
+                    formControlName="from_to_pn" [(ngModel)]="from_to_post">
                   </my-date-range-picker>
                 </div>
               </div>
 
-              
+
             </div>
 
 
@@ -71,21 +70,23 @@
               <div class="col-md-12">
                 <label>Note</label>
                 <textarea rows="5" formControlName="note"
-                          [style.box-shadow] = "errorFieldNotes && !notes ? '0 0 10px #eb3a3a' : ''"
-                          [(ngModel)]="note"
-                          class="form-control custom_select" maxlength="250"></textarea>
+                  [style.box-shadow]="errorFieldNotes && !notes ? '0 0 10px #eb3a3a' : ''" [(ngModel)]="note"
+                  class="form-control custom_select" maxlength="250"></textarea>
               </div>
             </div>
             <div class="row">
               <div class="col-md-12" style="text-align: right;margin-top:15px">
-                <button class="btn btn-light btn-outline-dark" [hidden]="postDoctorNotesForm.valid && doctorIdSelectedTwo">Add Note</button>
+                <button class="btn btn-light btn-outline-dark"
+                  [hidden]="postDoctorNotesForm.valid && doctorIdSelectedTwo">Add Note</button>
                 <button class="btn create-btn" [hidden]="!(postDoctorNotesForm.valid && doctorIdSelectedTwo)"
-                        (click)="postDoctorNotes()" (click)="x('Cross click')">Add Note</button>
+                  (click)="postDoctorNotes()" (click)="x('Cross click')">Add Note</button>
               </div>
 
               <div class="col-md-12">
-                <ngb-alert *ngIf="successMessageTwo" type="success" (close)="successMessageTwo = null">{{ successMessageTwo }}</ngb-alert>
-                <ngb-alert *ngIf="errorMessage" type="danger" (close)="errorMessage = null">{{ errorMessage }}</ngb-alert>
+                <ngb-alert *ngIf="successMessageTwo" type="success" (close)="successMessageTwo = null">
+                  {{ successMessageTwo }}</ngb-alert>
+                <ngb-alert *ngIf="errorMessage" type="danger" (close)="errorMessage = null">{{ errorMessage }}
+                </ngb-alert>
               </div>
             </div>
           </form>
@@ -96,7 +97,8 @@
     <ng-template #editNote let-c="close" let-x="dismiss">
       <div class="modal-header">
         <h4 class="modal-title">Add Doctor Notes</h4>
-        <button type="button" #close_button class="close" aria-label="Close" (click)="clear($event)" (click)="x('Cross click')">
+        <button type="button" #close_button class="close" aria-label="Close" (click)="clear($event)"
+          (click)="x('Cross click')">
           <span aria-hidden="true">&times;</span>
         </button>
       </div>
@@ -105,8 +107,7 @@
           <div class="row">
             <div class="col-md-12">
               <label>Doctor</label>
-              <input [(ngModel)]="selectedEditNote.doctor_name"
-                     placeholder="Search Doctor by name ..." readonly>
+              <input [(ngModel)]="selectedEditNote.doctor_name" placeholder="Search Doctor by name ..." readonly>
             </div>
           </div>
           <!--<span>{{this.selectedEditNote.fromDate}}</span>-->
@@ -115,32 +116,34 @@
               <label>Valid Date</label>
               <div class="input-group" style="width: 125px">
                 <!--<input type="text" [(ngModel)]="this.selectedEditNote.fromDate">-->
-                <input class="input-hidden" [style.box-shadow] = "!fromDateEdit ? '0 0 10px #eb3a3a' : ''" class="form-control custom_select" placeholder="dd-mm-yyyy"
-                       name="fromDate" [(ngModel)]="fromDateEdit"
-                       maxlength="10" [maxDate]="toDateEdit" #dp ngbDatepicker #o="ngbDatepicker">
+                <input class="input-hidden" [style.box-shadow]="!fromDateEdit ? '0 0 10px #eb3a3a' : ''"
+                  class="form-control custom_select" placeholder="dd-mm-yyyy" name="fromDate" [(ngModel)]="fromDateEdit"
+                  maxlength="10" [maxDate]="toDateEdit" #dp ngbDatepicker #o="ngbDatepicker">
                 <button class="input-group-addon" (click)="o.toggle()" type="button">
-                  <img src="../../../../assets/icons/calendar-icon.svg" style="width: 1.2rem; height: 1rem; cursor: pointer;"/>
+                  <img src="{{assetPath}}icons/calendar-icon.svg"
+                    style="width: 1.2rem; height: 1rem; cursor: pointer;" />
                 </button>
               </div>
             </div>
 
             <div class="col-md-4">
               <label>&nbsp;</label>
-              <div class="input-group" style="width: 125px" *ngIf="!fromDateEdit"  ngbTooltip="Select a from date first">
-                <input class="form-control custom_select" [disabled]="!fromDateEdit"
-                       placeholder="dd-mm-yyyy"
-                       name="ep" [(ngModel)]="toDateEdit" [minDate]="fromDateEdit" ngbDatepicker #p="ngbDatepicker">
-                <button class="input-group-addon" placement="top" [disabled]="!fromDateEdit" (click)="p.toggle()" type="button">
-                  <img *ngIf="!fromDateEdit" src="../../../../assets/icons/calendar-icon.svg" style="width: 1.2rem; height: 1rem; cursor: pointer;"/>
+              <div class="input-group" style="width: 125px" *ngIf="!fromDateEdit" ngbTooltip="Select a from date first">
+                <input class="form-control custom_select" [disabled]="!fromDateEdit" placeholder="dd-mm-yyyy" name="ep"
+                  [(ngModel)]="toDateEdit" [minDate]="fromDateEdit" ngbDatepicker #p="ngbDatepicker">
+                <button class="input-group-addon" placement="top" [disabled]="!fromDateEdit" (click)="p.toggle()"
+                  type="button">
+                  <img *ngIf="!fromDateEdit" src="{{assetPath}}icons/calendar-icon.svg"
+                    style="width: 1.2rem; height: 1rem; cursor: pointer;" />
                 </button>
               </div>
               <div class="input-group clear" style="notewidth: 125px" *ngIf="fromDateEdit">
-                <input id="input-hidden" class="form-control custom_select" [style.box-shadow] = "!toDateEdit  ? '0 0 10px #eb3a3a' : ''"
-                       placeholder="dd-mm-yyyy" maxlength="10"
-                       name="toDate" [(ngModel)]="toDateEdit"
-                       [minDate]="fromDateEdit" ngbDatepicker #q="ngbDatepicker">
+                <input id="input-hidden" class="form-control custom_select"
+                  [style.box-shadow]="!toDateEdit  ? '0 0 10px #eb3a3a' : ''" placeholder="dd-mm-yyyy" maxlength="10"
+                  name="toDate" [(ngModel)]="toDateEdit" [minDate]="fromDateEdit" ngbDatepicker #q="ngbDatepicker">
                 <button class="input-group-addon" placement="top" (click)="q.toggle()" type="button">
-                  <img *ngIf="fromDateEdit" src="../../../../assets/icons/calendar-icon.svg" style="width: 1.2rem; height: 1rem; cursor: pointer;"/>
+                  <img *ngIf="fromDateEdit" src="{{assetPath}}icons/calendar-icon.svg"
+                    style="width: 1.2rem; height: 1rem; cursor: pointer;" />
                 </button>
               </div>
             </div>
@@ -150,10 +153,8 @@
           <div class="row">
             <div class="col-md-12">
               <label>Note</label>
-              <textarea rows="5"
-                        [style.box-shadow] = "!selectedEditNote.note ? '0 0 10px #eb3a3a' : ''"
-                        [(ngModel)]="selectedEditNote.note"
-                        class="form-control custom_select" maxlength="250"></textarea>
+              <textarea rows="5" [style.box-shadow]="!selectedEditNote.note ? '0 0 10px #eb3a3a' : ''"
+                [(ngModel)]="selectedEditNote.note" class="form-control custom_select" maxlength="250"></textarea>
             </div>
           </div>
           <div class="row">
@@ -162,7 +163,8 @@
             </div>
 
             <div class="col-md-12">
-              <ngb-alert *ngIf="successMessageTwo" type="success" (close)="successMessageTwo = null">{{ successMessageTwo }}</ngb-alert>
+              <ngb-alert *ngIf="successMessageTwo" type="success" (close)="successMessageTwo = null">
+                {{ successMessageTwo }}</ngb-alert>
               <ngb-alert *ngIf="errorMessage" type="danger" (close)="errorMessage = null">{{ errorMessage }}</ngb-alert>
             </div>
           </div>
@@ -180,8 +182,9 @@
       <div class="modal-body">
         <p>Are you sure to delete this note?</p>
         <div class="confirmation_button d-flex justify-content-center">
-          <button type="button" class="btn fo_btn_black" (click)="deleteDoctorNotes()" (click)="c('Cross click')">Ok</button>
-          <button type="button" class="btn fo_btn_green"(click)="c('Cross click')">Cancel</button>
+          <button type="button" class="btn fo_btn_black" (click)="deleteDoctorNotes()"
+            (click)="c('Cross click')">Ok</button>
+          <button type="button" class="btn fo_btn_green" (click)="c('Cross click')">Cancel</button>
         </div>
       </div>
     </ng-template>
@@ -190,50 +193,47 @@
   <div class="row">
     <div class="col-md-12">
 
-      <form  class="form-horizontal" [formGroup]="getViewDoctorNotesForm" novalidate>
+      <form class="form-horizontal" [formGroup]="getViewDoctorNotesForm" novalidate>
 
         <div class="row">
           <div class="col-md-3">
             <label>Doctor</label>
-              <div class="ng-autocomplete" class="angular-autocomplete">
-                <ng-autocomplete
-                  placeHolder="Search Doctor by name ..."
-                  [data]="doctors"
-                  searchKeyword="name"
-                  (selected)='searchDoctorOne($event)'
-                  [itemTemplate]="itemTemplateDoctor"
-                  [notFoundTemplate]="notFoundTemplate"> 
-                </ng-autocomplete>
-                
-                <ng-template #itemTemplateDoctor let-item>
-                  <a [innerHTML]="item.name"></a>
-                </ng-template>
-                
-                <ng-template #notFoundTemplate let-notFound>
-                  <div [innerHTML]="notFound"></div>
-                </ng-template>
-                </div>
+            <div class="ng-autocomplete" class="angular-autocomplete">
+              <ng-autocomplete placeHolder="Search Doctor by name ..." [data]="doctors" searchKeyword="name"
+                (selected)='searchDoctorOne($event)' [itemTemplate]="itemTemplateDoctor"
+                [notFoundTemplate]="notFoundTemplate">
+              </ng-autocomplete>
+
+              <ng-template #itemTemplateDoctor let-item>
+                <a [innerHTML]="item.name"></a>
+              </ng-template>
+
+              <ng-template #notFoundTemplate let-notFound>
+                <div [innerHTML]="notFound"></div>
+              </ng-template>
             </div>
+          </div>
 
           <div class="col-md-6">
             <div style="width: 150px;float: left;">
               <label class="text-unprintable">From - To</label>
-              <my-date-range-picker name="mydaterange" [options]="myDateRangePickerOptionsTwo" formControlName="from_to_date" [(ngModel)]="from_to_view">
+              <my-date-range-picker name="mydaterange" [options]="myDateRangePickerOptionsTwo"
+                formControlName="from_to_date" [(ngModel)]="from_to_view">
               </my-date-range-picker>
             </div>
 
             <div style="width: 150px;float: left;margin-left: 130px;padding-top: 22px">
               <button class="btn search-btn" [hidden]="getViewDoctorNotesForm.valid">Search</button>
-              <button class="btn search-btn"
-                      [hidden]="!getViewDoctorNotesForm.valid"
-                      (click)="getDoctorNotes()">Search</button>
+              <button class="btn search-btn" [hidden]="!getViewDoctorNotesForm.valid"
+                (click)="getDoctorNotes()">Search</button>
             </div>
 
           </div>
 
           <div class="col-md-3" style="padding: 25px 0 0 0;text-align: right">
             <div>
-              <button class="btn create-btn" (click)="open(content)" (click)="clear()" ><img src="../../../../assets/icons/ic_AddLeave.png"> Add Doctor Note</button>
+              <button class="btn create-btn" (click)="open(content)" (click)="clear()"><img
+                  src="{{assetPath}}icons/ic_AddLeave.png"> Add Doctor Note</button>
             </div>
           </div>
         </div>
@@ -251,42 +251,47 @@
         </div>
         <table class="fixed_header">
           <thead style="background: white">
-          <tr>
-            <th colspan="7" style="font-size: 20px; display:block; width: 100%"><strong>Today's Note  |  {{todayStringTwo}}</strong></th>
-          </tr>
-          <tr>
-            <th width="60px">No.</th>
-            <th width="250px">Doctor</th>
-            <th width="195px">Valid From</th>
-            <th width="195px">Valid To</th>
-            <th width="320px" style="text-align: center">Notes</th>
-            <th width="150px" style="text-align: center">Modified by</th>
-            <th style="text-align: center; width: 105px">Action</th>
-          </tr>
+            <tr>
+              <th colspan="7" style="font-size: 20px; display:block; width: 100%"><strong>Today's Note |
+                  {{todayStringTwo}}</strong></th>
+            </tr>
+            <tr>
+              <th width="60px">No.</th>
+              <th width="250px">Doctor</th>
+              <th width="195px">Valid From</th>
+              <th width="195px">Valid To</th>
+              <th width="320px" style="text-align: center">Notes</th>
+              <th width="150px" style="text-align: center">Modified by</th>
+              <th style="text-align: center; width: 105px">Action</th>
+            </tr>
           </thead>
           <tbody *ngIf="doctorNotes === [] || doctorNotes === null">
-          <tr>
-            <td colspan="7">result not found</td>
-          </tr>
+            <tr>
+              <td colspan="7">result not found</td>
+            </tr>
           </tbody>
           <tbody>
-          <tr *ngFor="let i=index; let doctor of doctorNotes" style="border: solid 0.5px #C1C1C1">
-            <td width="60px">{{i+1}}</td>
-            <td width="250px">{{doctor.doctor_name}}</td>
-            <td width="195px">{{doctor.from_date.substring(0,10).split('-')[2]+'-'+doctor.from_date.substring(0,10).split('-')[1]+'-'+doctor.from_date.substring(0,10).split('-')[0]}}</td>
-            <td width="195px">{{doctor.to_date.substring(0,10).split('-')[2]+'-'+doctor.to_date.substring(0,10).split('-')[1]+'-'+doctor.to_date.substring(0,10).split('-')[0]}}</td>
-            <td width="300px" style="text-align: left">{{doctor.note}}</td>
-            <td width="150px" style="text-align: center">{{doctor.modified_name}}</td>
-            <td style="width: 92px">
-              <button type="button" class="btn-default" (click)="editDoctorNotesModal(doctor, editNote)">
-                <i class="fa fa-edit"></i>
-              </button>
-              <span style="margin-right: 10px"></span>
-              <button type="button" class="btn-default" (click)="deleteDoctorNotesModal(doctor, deleteNote)">
-                <i class="fa fa-trash"></i>
-              </button>
-            </td>
-          </tr>
+            <tr *ngFor="let i=index; let doctor of doctorNotes" style="border: solid 0.5px #C1C1C1">
+              <td width="60px">{{i+1}}</td>
+              <td width="250px">{{doctor.doctor_name}}</td>
+              <td width="195px">
+                {{doctor.from_date.substring(0,10).split('-')[2]+'-'+doctor.from_date.substring(0,10).split('-')[1]+'-'+doctor.from_date.substring(0,10).split('-')[0]}}
+              </td>
+              <td width="195px">
+                {{doctor.to_date.substring(0,10).split('-')[2]+'-'+doctor.to_date.substring(0,10).split('-')[1]+'-'+doctor.to_date.substring(0,10).split('-')[0]}}
+              </td>
+              <td width="300px" style="text-align: left">{{doctor.note}}</td>
+              <td width="150px" style="text-align: center">{{doctor.modified_name}}</td>
+              <td style="width: 92px">
+                <button type="button" class="btn-default" (click)="editDoctorNotesModal(doctor, editNote)">
+                  <i class="fa fa-edit"></i>
+                </button>
+                <span style="margin-right: 10px"></span>
+                <button type="button" class="btn-default" (click)="deleteDoctorNotesModal(doctor, deleteNote)">
+                  <i class="fa fa-trash"></i>
+                </button>
+              </td>
+            </tr>
           </tbody>
         </table>
 

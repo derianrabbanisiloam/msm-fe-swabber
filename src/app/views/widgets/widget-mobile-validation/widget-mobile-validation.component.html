@@ -5,39 +5,36 @@
 <div class="d-flex justify-content-start fo_container_container_list">
   <div class="fo_validation_list fo_container_list shadow-4">
     <div class="">
-      <table class="table" >
+      <table class="table">
         <thead>
           <tr>
             <th class="fo_list_header">Mobile Account</th>
           </tr>
         </thead>
         <tbody>
-        <tr id="filter-quota" class="fo_grey">
-          <td class="fo_validation_filter">
-            <div class="input-group">
-              <input class="form-control input-patient"
-                     placeholder="Filter by Phone Number"
-                     name="searchString"
-                     [(ngModel)]="keywords.searchString"
-                     (change)="getListAccount()"
-                     ngbTooltip="Press 'Enter' to Search">
-            </div>
-          </td>
-        </tr>
-        <tr>
-          <td *ngIf="showNotFoundMsg" colspan="1">Displaying no data</td>
-          <td *ngIf="showWaitMsg" colspan="1"><ngb-progressbar value="1000">Loading...</ngb-progressbar>
-          </td>
-        </tr>
+          <tr id="filter-quota" class="fo_grey">
+            <td class="fo_validation_filter">
+              <div class="input-group">
+                <input class="form-control input-patient" placeholder="Filter by Phone Number" name="searchString"
+                  [(ngModel)]="keywords.searchString" (change)="getListAccount()" ngbTooltip="Press 'Enter' to Search">
+              </div>
+            </td>
+          </tr>
+          <tr>
+            <td *ngIf="showNotFoundMsg" colspan="1">Displaying no data</td>
+            <td *ngIf="showWaitMsg" colspan="1">
+              <ngb-progressbar value="1000">Loading...</ngb-progressbar>
+            </td>
+          </tr>
         </tbody>
 
         <tbody class="quota-list">
-        <tr *ngFor = "let itr of accountList">
-          <td (click)="choosedAccount(itr)">
-            <div class="fo_validation_list_name">{{itr.name}}</div>
-            <div class="fo_validation_list_date">{{itr.birth_date}} - {{itr.phone_number_1}}</div>
-          </td>
-        </tr>
+          <tr *ngFor="let itr of accountList">
+            <td (click)="choosedAccount(itr)">
+              <div class="fo_validation_list_name">{{itr.name}}</div>
+              <div class="fo_validation_list_date">{{itr.birth_date}} - {{itr.phone_number_1}}</div>
+            </td>
+          </tr>
 
         </tbody>
       </table>
@@ -50,90 +47,97 @@
   <div class="fo_container_list shadow-4" *ngIf="patientList">
 
     <div class="">
-      <table class="table" >
+      <table class="table">
         <thead>
-        <tr>
-          <th class="fo_list_header">Patient Data</th>
-        </tr>
+          <tr>
+            <th class="fo_list_header">Patient Data</th>
+          </tr>
         </thead>
 
         <tbody class="fo_patient_data" *ngIf="patientList && isFound">
-        <tr *ngFor = "let itr of patientList" [class.highlighted]= "itr.patientOrganizationId == currentPatientHope">
-          <td style="padding: 8px 16px" (click)="choosedPatient(itr)">
-            <label class="bold">{{itr.name}}</label>
-            <br>
-            <label>{{itr.birthDate}}</label>
-            <br>
-            <label>{{itr.alias}}</label>
-          </td>
-        </tr>
-        <tr>
-          <td>
-            <form>
-              <div style="text-align: center">
-                <button class="btn fo_btn_green" style="width: 16rem; height: 2.7rem" (click)="openPatientRegistration()">Register as New Patient</button>
-              </div>
-            </form>
-          </td>
-        </tr>
+          <tr *ngFor="let itr of patientList" [class.highlighted]="itr.patientOrganizationId == currentPatientHope">
+            <td style="padding: 8px 16px" (click)="choosedPatient(itr)">
+              <label class="bold">{{itr.name}}</label>
+              <br>
+              <label>{{itr.birthDate}}</label>
+              <br>
+              <label>{{itr.alias}}</label>
+            </td>
+          </tr>
+          <tr>
+            <td>
+              <form>
+                <div style="text-align: center">
+                  <button class="btn fo_btn_green" style="width: 16rem; height: 2.7rem"
+                    (click)="openPatientRegistration()">Register as New Patient</button>
+                </div>
+              </form>
+            </td>
+          </tr>
         </tbody>
 
         <tbody *ngIf="patientList && !isFound">
-        <tr style="background: #FFEEED">
-          <td>
-            <div style="text-align: center">
-              <img src="../../../../assets/icons/ic_NoResult@2x.png" style="height: 2.4rem;width: 2.4rem;">
-            </div>
-            <div class="body-text" style="text-align: center; color: #6E6E6E">
-              Patient data not found, <br> Please search or register as a new patient</div>
-          </td>
-        </tr>
-        <tr>
-          <td>
-            <form name="form" (ngSubmit)="f.form.valid && searchPatient(searchPatientModal)" #f="ngForm" novalidate>
-              <div class="form-group d-flex justify-content-between">
-                <div style="margin-right: 8px">
-                  <label class="fo_requirement">Name</label>
-                  <input type="text" class="form-control" placeholder="Patient Name..." name="patient" [(ngModel)]="params.name" required>
-                </div>
-                <div class="">
-                  <label class="fo_requirement">Birth Date</label>
-                  <div class="d-flex justify-content-between">
-                    <input [textMask]="{mask: mask_birth}" type="text" name="birth" placeholder="Search dob" class="form-control" [(ngModel)]="params.birth" placeholder="dd-mm-yyyy"/>
-                    <button class="btn" style="margin-left: 8px; background: #1A2269" [disabled]="submitting">
-                      <img style="width: 15px; height: 15px" src="../../../../assets/icons/ic_Search_white@2x.png">
-                    </button>
+          <tr style="background: #FFEEED">
+            <td>
+              <div style="text-align: center">
+                <img src="{{assetPath}}icons/ic_NoResult@2x.png" style="height: 2.4rem;width: 2.4rem;">
+              </div>
+              <div class="body-text" style="text-align: center; color: #6E6E6E">
+                Patient data not found, <br> Please search or register as a new patient</div>
+            </td>
+          </tr>
+          <tr>
+            <td>
+              <form name="form" (ngSubmit)="f.form.valid && searchPatient(searchPatientModal)" #f="ngForm" novalidate>
+                <div class="form-group d-flex justify-content-between">
+                  <div style="margin-right: 8px">
+                    <label class="fo_requirement">Name</label>
+                    <input type="text" class="form-control" placeholder="Patient Name..." name="patient"
+                      [(ngModel)]="params.name" required>
+                  </div>
+                  <div class="">
+                    <label class="fo_requirement">Birth Date</label>
+                    <div class="d-flex justify-content-between">
+                      <input [textMask]="{mask: mask_birth}" type="text" name="birth" placeholder="Search dob"
+                        class="form-control" [(ngModel)]="params.birth" placeholder="dd-mm-yyyy" />
+                      <button class="btn" style="margin-left: 8px; background: #1A2269" [disabled]="submitting">
+                        <img style="width: 15px; height: 15px" src="{{assetPath}}icons/ic_Search_white@2x.png">
+                      </button>
 
+                    </div>
                   </div>
                 </div>
-              </div>
-              <div class="form-group">
-                <div class="">
-                  <div *ngIf="f.submitted && !params.name" class="alert-danger form-field-error-msg">Name must be filled</div>
-                  <div *ngIf="f.submitted && !params.birth" class="alert-danger form-field-error-msg">Birth date must be filled</div>
-                  <div *ngIf="!f.submitted && params.name && !params.birth" class="alert-danger form-field-error-msg">Birth date must be filled</div>
+                <div class="form-group">
+                  <div class="">
+                    <div *ngIf="f.submitted && !params.name" class="alert-danger form-field-error-msg">Name must be
+                      filled</div>
+                    <div *ngIf="f.submitted && !params.birth" class="alert-danger form-field-error-msg">Birth date must
+                      be filled</div>
+                    <div *ngIf="!f.submitted && params.name && !params.birth" class="alert-danger form-field-error-msg">
+                      Birth date must be filled</div>
+                  </div>
                 </div>
-              </div>
 
-              <div class="d-flex justify-content-between">
-                <div class="fo_or_line" >
-                  <div></div>
+                <div class="d-flex justify-content-between">
+                  <div class="fo_or_line">
+                    <div></div>
+                  </div>
+                  <div style="padding: 1rem; color: #6E6E6E">
+                    OR
+                  </div>
+                  <div class="fo_or_line">
+                    <div></div>
+                  </div>
                 </div>
-                <div style="padding: 1rem; color: #6E6E6E">
-                  OR
-                </div>
-                <div class="fo_or_line">
-                  <div></div>
-                </div>
-              </div>
 
 
-              <div style="text-align: center">
-                <button class="btn fo_btn_green" style="width: 16rem; height: 2.7rem" type="button" (click)="openPatientRegistration()">Register as New Patient</button>
-              </div>
-            </form>
-          </td>
-        </tr>
+                <div style="text-align: center">
+                  <button class="btn fo_btn_green" style="width: 16rem; height: 2.7rem" type="button"
+                    (click)="openPatientRegistration()">Register as New Patient</button>
+                </div>
+              </form>
+            </td>
+          </tr>
         </tbody>
       </table>
     </div>
@@ -155,38 +159,24 @@
             <div class="form-group">
               <label for="patient_name" class="fo_requirement">Name</label>
               <div>
-                <input
-                  class="form-control"
-                  placeholder="Full Name"
-                  type="text"
-                  id="patientName"
-                  name="patientName"
+                <input class="form-control" placeholder="Full Name" type="text" id="patientName" name="patientName"
                   [(ngModel)]="model.patientName">
               </div>
             </div>
             <div class="form-group d-flex justify-content-between">
               <div class="">
                 <label for="birth_place" class="fo_requirement">Tempat Lahir</label>
-                <input auto-complete
-                       class="form-control"
-                       placeholder="Birth Place"
-                       value-formatter="name"
-                       list-formatter="name"
-                       [match-formatted]="true"
-                       min-chars="1"
-                       z-index="2"
-                       [source]="listCity"
-                       type="text"
-                       id="birthPlace"
-                       name="birthPlace"
-                       auto-select-first-item="true"
-                       [(ngModel)] = "model.birthPlace">
+                <input auto-complete class="form-control" placeholder="Birth Place" value-formatter="name"
+                  list-formatter="name" [match-formatted]="true" min-chars="1" z-index="2" [source]="listCity"
+                  type="text" id="birthPlace" name="birthPlace" auto-select-first-item="true"
+                  [(ngModel)]="model.birthPlace">
               </div>
               <div class="">
                 <label for="birth_date" class="fo_requirement">Birth date</label>
                 <div class="">
                   <div class="fo_btn_append input-group">
-                    <input [textMask]="{mask: mask_birth}" type="text" name="birth" placeholder="Search dob" class="form-control" [(ngModel)]="model.birth" placeholder="dd-mm-yyyy"/>
+                    <input [textMask]="{mask: mask_birth}" type="text" name="birth" placeholder="Search dob"
+                      class="form-control" [(ngModel)]="model.birth" placeholder="dd-mm-yyyy" />
                   </div>
                 </div>
               </div>
@@ -194,97 +184,69 @@
             <div class="form-group d-flex justify-content-between">
               <div class="">
                 <label for="sex">Jenis Kelamin</label>
-                <select id="sex" class="form-control"  [(ngModel)]="model.sex" name="sex" required>
-                  <option *ngFor = "let itr of listSex" [ngValue]="itr">
+                <select id="sex" class="form-control" [(ngModel)]="model.sex" name="sex" required>
+                  <option *ngFor="let itr of listSex" [ngValue]="itr">
                     {{itr.description}}
                   </option>
                 </select>
               </div>
               <div class="">
                 <label for="marital_status">Status</label>
-                <select id="marital" class="form-control"  [(ngModel)]="model.maritalStatus" name="marital">
-                    <option *ngFor = "let itr of listMarital" [ngValue]="itr">{{itr.description}}</option>
+                <select id="marital" class="form-control" [(ngModel)]="model.maritalStatus" name="marital">
+                  <option *ngFor="let itr of listMarital" [ngValue]="itr">{{itr.description}}</option>
                 </select>
               </div>
             </div>
             <div class="form-group d-flex justify-content-between">
               <div class="">
                 <label for="nationality" class="fo_requirement">Kebangsaan</label>
-                <input auto-complete
-                       class="form-control"
-                       placeholder="Nationality"
-                       value-formatter="name"
-                       list-formatter="name"
-                       [match-formatted]="true"
-                       min-chars="1"
-                       z-index="2"
-                       [source]="listCountry"
-                       type="text"
-                       id="nationality"
-                       name="nationality"
-                       auto-select-first-item="true"
-                       [(ngModel)] = "model.nationality">
+                <input auto-complete class="form-control" placeholder="Nationality" value-formatter="name"
+                  list-formatter="name" [match-formatted]="true" min-chars="1" z-index="2" [source]="listCountry"
+                  type="text" id="nationality" name="nationality" auto-select-first-item="true"
+                  [(ngModel)]="model.nationality">
               </div>
               <div class="">
                 <label for="nationality" class="">Agama</label>
-                <select id="religion" class="form-control"  [(ngModel)]="model.religion" name="religion">
-                    <option *ngFor = "let itr of listReligion" [ngValue]="itr">{{itr.description}}</option>
-                  </select>
+                <select id="religion" class="form-control" [(ngModel)]="model.religion" name="religion">
+                  <option *ngFor="let itr of listReligion" [ngValue]="itr">{{itr.description}}</option>
+                </select>
               </div>
             </div>
             <div class="form-group d-flex justify-content-between">
               <div class="">
                 <label for="nohome">No. Telp. Rumah</label>
-                <input type="text"
-                  [textMask]="{mask: mask}"
-                  class="form-control"
-                  id="homePhone"
-                  [(ngModel)]="model.homePhone"
-                  name="homePhone" placeholder="(Optional)">
+                <input type="text" [textMask]="{mask: mask}" class="form-control" id="homePhone"
+                  [(ngModel)]="model.homePhone" name="homePhone" placeholder="(Optional)">
               </div>
               <div class="">
                 <label for="nooffice">No. Telp. Kantor</label>
-                <input type="text" class="form-control"
-                  [textMask]="{mask: mask}"
-                  id="officePhone"
-                  [(ngModel)]="model.officePhone"
-                  name="officePhone" placeholder="(Optional)">
+                <input type="text" class="form-control" [textMask]="{mask: mask}" id="officePhone"
+                  [(ngModel)]="model.officePhone" name="officePhone" placeholder="(Optional)">
               </div>
             </div>
             <div class="form-group d-flex justify-content-between">
               <div class="">
                 <label for="noHp1">No. HP 1</label>
-                <input type="text"
-                  [textMask]="{mask: mask}"
-                  class="form-control"
-                  id="mobileNo1"
-                  [(ngModel)]="model.mobileNo1"
-                  name="mobileNo1" placeholder="(Optional)">
+                <input type="text" [textMask]="{mask: mask}" class="form-control" id="mobileNo1"
+                  [(ngModel)]="model.mobileNo1" name="mobileNo1" placeholder="(Optional)">
               </div>
               <div class="">
                 <label for="noHp2">No. HP 2</label>
-                <input type="text"
-                  [textMask]="{mask: mask}"
-                  class="form-control"
-                  id="mobileNo2"
-                  [(ngModel)]="model.mobileNo2"
-                  name="mobileNo2" placeholder="(Optional)">
+                <input type="text" [textMask]="{mask: mask}" class="form-control" id="mobileNo2"
+                  [(ngModel)]="model.mobileNo2" name="mobileNo2" placeholder="(Optional)">
               </div>
             </div>
             <div class="form-group d-flex justify-content-between">
               <div class="">
                 <label for="notes">Kartu Identitas Yang Digunakan</label>
-                <select id="nationalidType" class="form-control"
-                        [(ngModel)]="model.nationalidType" name="nationalidType">
-                  <option *ngFor = "let itr of listNationalIdType" [ngValue]="itr">{{itr.description}}</option>
+                <select id="nationalidType" class="form-control" [(ngModel)]="model.nationalidType"
+                  name="nationalidType">
+                  <option *ngFor="let itr of listNationalIdType" [ngValue]="itr">{{itr.description}}</option>
                 </select>
               </div>
               <div class="">
                 <label for="notes">No Identitas</label>
-                <input type="text"
-                  class="form-control"
-                  id="nationalIdNo"
-                  [(ngModel)]="model.nationalIdNo"
+                <input type="text" class="form-control" id="nationalIdNo" [(ngModel)]="model.nationalIdNo"
                   name="nationalIdNo" placeholder="(Optional)">
               </div>
             </div>
@@ -293,64 +255,43 @@
             <div class="form-group d-flex justify-content-between">
               <div class="">
                 <label for="notes">Alamat (sesuai ID)</label>
-                <textarea class="form-control" s="2" id="comment"  
-                [(ngModel)]="model.permanentAddress" name="permanentAddress" 
-                id="permanentAddress" placeholder="(Optional)">
+                <textarea class="form-control" s="2" id="comment" [(ngModel)]="model.permanentAddress"
+                  name="permanentAddress" id="permanentAddress" placeholder="(Optional)">
                 </textarea>
               </div>
               <div class="">
                 <label for="notes">Kab/Kota</label>
-                <input auto-complete
-                       class="form-control"
-                       placeholder="City"
-                       value-formatter="name"
-                       list-formatter="name"
-                       [match-formatted]="true"
-                       min-chars="1"
-                       z-index="2"
-                       [source]="listCity"
-                       type="text"
-                       id="city"
-                       name="city"
-                       required
-                       auto-select-first-item="true"
-                       [(ngModel)] = "model.city"
-                       (change) = "getDetailAddress()">
+                <input auto-complete class="form-control" placeholder="City" value-formatter="name"
+                  list-formatter="name" [match-formatted]="true" min-chars="1" z-index="2" [source]="listCity"
+                  type="text" id="city" name="city" required auto-select-first-item="true" [(ngModel)]="model.city"
+                  (change)="getDetailAddress()">
               </div>
             </div>
             <div class="form-group d-flex justify-content-between">
               <div class="">
                 <label for="notes">Kecamatan</label>
-                <select id="district"
-                  class="form-control"
-                  (change)= "findSubdistrict($event)"
-                  name="district"
-                  required>
-                  <option *ngFor = "let itr of listDistrict" [ngValue]="itr" [selected]="itr.district_id == model.district.district_id">{{itr.name}}</option>
+                <select id="district" class="form-control" (change)="findSubdistrict($event)" name="district" required>
+                  <option *ngFor="let itr of listDistrict" [ngValue]="itr"
+                    [selected]="itr.district_id == model.district.district_id">{{itr.name}}</option>
                 </select>
               </div>
               <div class=" ">
                 <label for="notes">Kelurahan</label>
-                <select id="subdistrict" class="form-control" name="subdistrict"
-                (change)= "selectSubdistrict($event)" required>
-                  <option *ngFor = "let itr of listSubdistrict" [ngValue]="itr" [selected]="itr.sub_district_id == model.subdistrict.sub_district_id">{{itr.name}}</option>
+                <select id="subdistrict" class="form-control" name="subdistrict" (change)="selectSubdistrict($event)"
+                  required>
+                  <option *ngFor="let itr of listSubdistrict" [ngValue]="itr"
+                    [selected]="itr.sub_district_id == model.subdistrict.sub_district_id">{{itr.name}}</option>
                 </select>
               </div>
               <div class=" ">
                 <label for="notes">Kode Pos</label>
-                <input type="text"
-                       class="form-control"
-                       id="postCode"
-                       [(ngModel)]="model.postCode"
-                       name="postCode"
-                >
+                <input type="text" class="form-control" id="postCode" [(ngModel)]="model.postCode" name="postCode">
               </div>
             </div>
             <div class="form-group">
               <div class="">
                 <label for="notes">Alamat Domisili</label>
-                  <textarea class="form-control" id="comment"  
-                  [(ngModel)]="model.address" name="address" id="address">
+                <textarea class="form-control" id="comment" [(ngModel)]="model.address" name="address" id="address">
                   </textarea>
               </div>
             </div>
@@ -359,54 +300,37 @@
             <div class="form-group d-flex justify-content-between">
               <div class="">
                 <label for="notes">Nama Ayah</label>
-                <input type="text"
-                       class="form-control"
-                       id="fatherName"
-                       [(ngModel)]="model.fatherName"
-                       name="fatherName"
-                >
+                <input type="text" class="form-control" id="fatherName" [(ngModel)]="model.fatherName"
+                  name="fatherName">
               </div>
               <div class="">
                 <label for="notes">Nama Ibu</label>
-                <input type="text"
-                       class="form-control"
-                       id="motherName"
-                       [(ngModel)]="model.motherName"
-                       name="motherName"
-                >
+                <input type="text" class="form-control" id="motherName" [(ngModel)]="model.motherName"
+                  name="motherName">
               </div>
             </div>
             <div class="form-group d-flex justify-content-between">
               <div class="">
                 <label for="notes">Nama Pasangan</label>
-                <input type="text"
-                       class="form-control"
-                       id="spouseName"
-                       [(ngModel)]="model.spouseName"
-                       name="spouseName"
-                >
+                <input type="text" class="form-control" id="spouseName" [(ngModel)]="model.spouseName"
+                  name="spouseName">
               </div>
               <div>
-                
+
               </div>
             </div>
             <div class="form-group">
               <div class="">
                 <label for="notes">Alamat Email</label>
-                <input type="email"
-                       class="form-control"
-                       id="emailAddress"
-                       [(ngModel)]="model.email"
-                       name="emailAddress"
-                >
+                <input type="email" class="form-control" id="emailAddress" [(ngModel)]="model.email"
+                  name="emailAddress">
               </div>
             </div>
           </div>
           <div>
             <div class="form-group">
               <label for="scanKTP">Scan KTP</label>
-              <input type="file" accept="image/*"
-                     class="form-control-file" id="scanKTP" (change)="readUrl($event)">
+              <input type="file" accept="image/*" class="form-control-file" id="scanKTP" (change)="readUrl($event)">
             </div>
             <div class="form-group">
               <img *ngIf="url" [src]="url" height="100px" width="100px">
@@ -417,7 +341,8 @@
       <div class="fo_list_verify">
         <div class="form-group">
           <label *ngFor="let itr of listCheckBox" class="check_box_container">
-            <input type="checkbox" [(ngModel)]="itr.state" [ngModelOptions]="{standalone: true}" (ngModelChange)="setButtonState()"/>{{itr.label}}
+            <input type="checkbox" [(ngModel)]="itr.state" [ngModelOptions]="{standalone: true}"
+              (ngModelChange)="setButtonState()" />{{itr.label}}
             <span class="checkmark"></span>
           </label>
         </div>
@@ -433,8 +358,7 @@
             </button> -->
           </div>
           <div class=" ">
-            <button type="button" [disabled]="buttonVerify"
-                    class="btn fo_btn_green" (click)="verify(confirmVerify)" >
+            <button type="button" [disabled]="buttonVerify" class="btn fo_btn_green" (click)="verify(confirmVerify)">
               &nbsp; Verify
             </button>
           </div>
@@ -446,13 +370,13 @@
 </div>
 
 <div class="pagination">
-    <button *ngIf="isCanPrevPage" (click)="prevPage()" class="btn ms_btn_blue">
-        <img src="../../../../assets/icons/ic_ArrowRight_White.png"> Prev 
-     </button>
-     <span style="width:10px">&nbsp;</span>
-     <button *ngIf="isCanNextPage" (click)="nextPage()" class="btn ms_btn_blue">
-         Next <img src="../../../../assets/icons/ic_ArrowLeft_White.png"> 
-     </button>
+  <button *ngIf="isCanPrevPage" (click)="prevPage()" class="btn ms_btn_blue">
+    <img src="{{assetPath}}icons/ic_ArrowRight_White.png"> Prev
+  </button>
+  <span style="width:10px">&nbsp;</span>
+  <button *ngIf="isCanNextPage" (click)="nextPage()" class="btn ms_btn_blue">
+    Next <img src="{{assetPath}}assets/icons/ic_ArrowLeft_White.png">
+  </button>
 </div>
 
 
@@ -471,15 +395,15 @@
 
 <ng-template #searchPatientModal let-c="close" let-d="dismiss">
   <div class="modal-header fo_list_header">
-      <div class="header-2">List Patient From Hope</div>
-      <button type="button" class="close" aria-label="Close" (click)="c('Cross click')">
-        <span aria-hidden="true">&times;</span>
-      </button>
-    </div>
+    <div class="header-2">List Patient From Hope</div>
+    <button type="button" class="close" aria-label="Close" (click)="c('Cross click')">
+      <span aria-hidden="true">&times;</span>
+    </button>
+  </div>
 
   <div class="modal-body search-patient-modal">
     <div class="">
-      <div class="" >
+      <div class="">
         <table class="table table-bordered">
           <thead class="fo_header_grey">
             <th>Mr No</th>
@@ -508,8 +432,8 @@
             </tr>
             <tr>
               <td *ngIf="showNotFoundMsgSrc" colspan="7" style="color: #6E6E6E; text-align: center">
-                <img style="width: 27px;height: 27px" 
-                src="../../../../assets/icons/ic_NoResult@2x.png">Displaying no data
+                <img style="width: 27px;height: 27px" src="{{assetPath}}icons/ic_NoResult@2x.png">Displaying no
+                data
               </td>
               <td *ngIf="showWaitMsgSrc" colspan="7">
                 <ngb-progressbar value="1000">Loading...</ngb-progressbar>
@@ -519,7 +443,7 @@
         </table>
       </div>
     </div>
-    </div>
+  </div>
 </ng-template>
 
 <!-- <section class="full-width" id="group-patient-validate">
@@ -558,7 +482,7 @@
 
 
 
-  <!-- <div id="print-section">
+<!-- <div id="print-section">
     <img id="siloam-image" src="../../../assets/aaa-images/logo_siloam.png">
     <div id="content-print">
       <form style="margin:30px" id="form-print-registration">

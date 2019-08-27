@@ -1335,6 +1335,10 @@ export class WidgetPatientDataComponent implements OnInit {
     pdfMake.defaultFileName = 'report registration';
     pdfMake.createPdf(docDefinition).print();
 
+    //redirect to create appointment
+    const params = { id: this.selectedCheckIn.schedule_id, date: this.selectedCheckIn.appointment_date};
+    this.router.navigate(['./create-appointment'], { queryParams: params });
+
   }
 
   open(content) {

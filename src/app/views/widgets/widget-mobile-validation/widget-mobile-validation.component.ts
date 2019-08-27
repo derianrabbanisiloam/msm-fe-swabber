@@ -9,12 +9,13 @@ import { General } from '../../../models/generals/general';
 import { Country } from '../../../models/generals/country';
 import { channelId, sourceApps } from '../../../variables/common.variable';
 import { NgbModal, ModalDismissReasons } from '@ng-bootstrap/ng-bootstrap';
-import { 
-  ModalPatientRegistrationComponent 
+import {
+  ModalPatientRegistrationComponent
 } from '../modal-patient-registration/modal-patient-registration.component';
 import { AlertService } from '../../../services/alert.service';
 import { Alert, AlertType } from '../../../models/alerts/alert';
 import * as moment from 'moment';
+import { environment } from '../../../../environments/environment';
 
 @Component({
   selector: 'app-widget-mobile-validation',
@@ -22,13 +23,13 @@ import * as moment from 'moment';
   styleUrls: ['./widget-mobile-validation.component.css']
 })
 export class WidgetMobileValidationComponent implements OnInit {
-  
+  public assetPath = environment.ASSET_PATH;
   public key: any = JSON.parse(localStorage.getItem('key'));
   public hospital = this.key.hospital;
   public user = this.key.user;
 
   public accountList: AccountMobile[];
-  public keywords = { offset: 0, limit: 10, searchString: ''};
+  public keywords = { offset: 0, limit: 10, searchString: '' };
 
   private page: number = 0;
   public isCanPrevPage: boolean = false;
@@ -66,8 +67,8 @@ export class WidgetMobileValidationComponent implements OnInit {
 
   public listCheckBox = [
     { label: 'Data diri yang dimasukkan sudah sama dengan data KTP', state: false },
-    { label: 'KTP adalah KTP Pasien', state: false},
-    { label: 'Email adalah email pasien', state: false}
+    { label: 'KTP adalah KTP Pasien', state: false },
+    { label: 'Email adalah email pasien', state: false }
   ];
 
   public buttonVerify: boolean = true;
@@ -114,110 +115,110 @@ export class WidgetMobileValidationComponent implements OnInit {
     this.getListAccount();
   }
 
-  async getNationalIdType(){
+  async getNationalIdType() {
     this.listNationalIdType = await this.generalService.getNationalityIdType()
-     .toPromise().then( res => {
-       return res.data;
-     }).catch( err => {
-       return [];
-     })
+      .toPromise().then(res => {
+        return res.data;
+      }).catch(err => {
+        return [];
+      })
   }
 
-  async getReligion(){
+  async getReligion() {
     this.listReligion = await this.generalService.getReligion()
-     .toPromise().then( res => {
-       return res.data;
-     }).catch( err => {
-       return [];
-     })
+      .toPromise().then(res => {
+        return res.data;
+      }).catch(err => {
+        return [];
+      })
   }
 
-  async getCountry(){
+  async getCountry() {
     this.listCountry = await this.generalService.getCountry()
-     .toPromise().then( res => {
-       return res.data;
-     }).catch( err => {
-       return [];
-     })
+      .toPromise().then(res => {
+        return res.data;
+      }).catch(err => {
+        return [];
+      })
   }
 
-  async getMarital(){
+  async getMarital() {
     this.listMarital = await this.generalService.getMaritalStatus()
-     .toPromise().then( res => {
-       return res.data;
-     }).catch( err => {
-       return [];
-     })
+      .toPromise().then(res => {
+        return res.data;
+      }).catch(err => {
+        return [];
+      })
   }
 
-  async getSex(){
+  async getSex() {
     this.listSex = await this.generalService.getGender()
-     .toPromise().then( res => {
-       return res.data;
-     }).catch( err => {
-       return [];
-     })
+      .toPromise().then(res => {
+        return res.data;
+      }).catch(err => {
+        return [];
+      })
   }
 
-  async getCity(){
+  async getCity() {
     this.listCity = await this.generalService.getCity()
-    .toPromise().then( res => {
-      return res.data;
-    }).catch( err => {
-      return [];
-    })
+      .toPromise().then(res => {
+        return res.data;
+      }).catch(err => {
+        return [];
+      })
   }
 
-  async getListAccount(){
+  async getListAccount() {
     const { searchString = '', offset = 0, limit = 10 } = this.keywords;
-    
+
     this.accountList = await this.patientService.getAccountMobile(searchString, offset, limit)
-    .toPromise().then( res => {
+      .toPromise().then(res => {
 
-      this.isCanNextPage = res.data.length >= 10 ? true: false;
+        this.isCanNextPage = res.data.length >= 10 ? true : false;
 
-      if(res.data.length !== 0){
-        for (let i = 0, { length } = res.data; i < length; i += 1) {
-          res.data[i].birth_date = moment(res.data[i].birth_date).format('DD-MM-YYYY');
+        if (res.data.length !== 0) {
+          for (let i = 0, { length } = res.data; i < length; i += 1) {
+            res.data[i].birth_date = moment(res.data[i].birth_date).format('DD-MM-YYYY');
+          }
+
+          this.showNotFoundMsg = false;
+          this.showWaitMsg = false;
+        } else {
+          this.showNotFoundMsg = true;
+          this.showWaitMsg = false;
         }
-
-        this.showNotFoundMsg = false;
-        this.showWaitMsg = false;
-      }else{
+        return res.data;
+      }).catch(err => {
         this.showNotFoundMsg = true;
         this.showWaitMsg = false;
-      }
-      return res.data;
-    }).catch( err => {
-      this.showNotFoundMsg = true;
-      this.showWaitMsg = false;
-      return [];
-    });
+        return [];
+      });
   }
 
-  choosedAccount(val){
+  choosedAccount(val) {
     this.selectedAccount = val;
     this.getPatientHope();
   }
 
-  async getPatientHope(){
+  async getPatientHope() {
     const arrBirth = this.selectedAccount.birth_date.split('-');
     const birth = `${arrBirth[2]}-${arrBirth[1]}-${arrBirth[0]}`;
-    const name = this.selectedAccount.name; 
-    
-    this.patientList = await this.patientService.searchPatient(name, birth, this.hospital.orgId)
-    .toPromise().then( res => {
-      return res.data;
-    }).catch( err => {
-      return [];
-    });
+    const name = this.selectedAccount.name;
 
-    if(this.patientList.length != 0){
-      for(let i = 0, { length } = this.patientList; i < length; i += 1){
+    this.patientList = await this.patientService.searchPatient(name, birth, this.hospital.orgId)
+      .toPromise().then(res => {
+        return res.data;
+      }).catch(err => {
+        return [];
+      });
+
+    if (this.patientList.length != 0) {
+      for (let i = 0, { length } = this.patientList; i < length; i += 1) {
         this.patientList[i].birthDate = moment(this.patientList[i].birthDate).format('DD-MM-YYYY');
       }
       this.isFound = true;
-    }else{
+    } else {
       this.params.name = this.selectedAccount.name;
       this.params.birth = this.selectedAccount.birth_date;
       this.isFound = false;
@@ -228,63 +229,63 @@ export class WidgetMobileValidationComponent implements OnInit {
     this.listDistrict = [];
     this.listSubdistrict = [];
 
-    if(from) {
+    if (from) {
       const cityId = this.model.city.city_id;
       const districtId = this.model.district.district_id;
       const subdistrictId = this.model.subdistrict.sub_district_id;
 
       this.listDistrict = await this.generalService.getDistrict(cityId)
-      .toPromise().then( res => {
-        return res.data;
-      }).catch( err => {
-        return [];
-      })
+        .toPromise().then(res => {
+          return res.data;
+        }).catch(err => {
+          return [];
+        })
 
-      if(this.listDistrict.length !== 0){
-        if(!districtId) {
+      if (this.listDistrict.length !== 0) {
+        if (!districtId) {
           this.model.district = this.listDistrict[0];
-        }else{
+        } else {
           this.model.district = this.model.district;
         }
       }
 
       this.listSubdistrict = await this.generalService.getSubDistrict(this.model.district.district_id)
-        .toPromise().then( res => {
+        .toPromise().then(res => {
           return res.data;
-        }).catch( err => {
+        }).catch(err => {
           return [];
         })
 
-      if(this.listSubdistrict.length !== 0){
-        if(!subdistrictId) {
+      if (this.listSubdistrict.length !== 0) {
+        if (!subdistrictId) {
           this.model.subdistrict = this.listSubdistrict[0];
-        }else{
+        } else {
           this.model.subdistrict = this.model.subdistrict;
         }
       }
 
-    }else{
+    } else {
       const cityId = this.model.city.city_id;
-      
+
       this.listDistrict = await this.generalService.getDistrict(cityId)
-      .toPromise().then( res => {
-        return res.data;
-      }).catch( err => {
-        return [];
-      })
-      
-      if(this.listDistrict.length !== 0){
+        .toPromise().then(res => {
+          return res.data;
+        }).catch(err => {
+          return [];
+        })
+
+      if (this.listDistrict.length !== 0) {
         this.model.district = this.listDistrict[0];
       }
 
       this.listSubdistrict = await this.generalService.getSubDistrict(this.model.district.district_id)
-      .toPromise().then( res => {
-        return res.data;
-      }).catch( err => {
-        return [];
-      })
+        .toPromise().then(res => {
+          return res.data;
+        }).catch(err => {
+          return [];
+        })
 
-      if(this.listSubdistrict.length !== 0){
+      if (this.listSubdistrict.length !== 0) {
         this.model.subdistrict = this.listSubdistrict[0];
       }
     }
@@ -299,20 +300,20 @@ export class WidgetMobileValidationComponent implements OnInit {
     this.showNotFoundMsgSrc = false;
 
     this.suggestionList = await this.patientService.searchPatient(name, birth, this.hospital.orgId)
-    .toPromise().then( res => {
-      return res.data;
-    }).catch( err => {
-      return [];
-    });
+      .toPromise().then(res => {
+        return res.data;
+      }).catch(err => {
+        return [];
+      });
 
-    if(this.suggestionList.length !== 0){
-      for(let i = 0, { length } = this.suggestionList; i < length; i += 1){
+    if (this.suggestionList.length !== 0) {
+      for (let i = 0, { length } = this.suggestionList; i < length; i += 1) {
         this.suggestionList[i].isThisOrg = (Number(this.hospital.orgId) === this.suggestionList[i].organizationId) ? true : false;
         this.suggestionList[i].birthDate = moment(this.suggestionList[i].birthDate).format('DD-MM-YYYY');
       }
       this.showWaitMsgSrc = false;
       this.showNotFoundMsgSrc = false;
-    }else{
+    } else {
       this.showWaitMsgSrc = false;
       this.showNotFoundMsgSrc = true;
     }
@@ -320,151 +321,151 @@ export class WidgetMobileValidationComponent implements OnInit {
     this.openModal70(modal);
   }
 
-  async choosedPatient(val){
+  async choosedPatient(val) {
     this.currentPatientHope = val.patientOrganizationId;
     this.detailPatient = val;
 
-    let idx_sex, idx_city, idx_contact_city, idx_religion, 
-      idx_bloodType, idx_nationality, idx_national_id_type, idx_birth_place, idx_title, 
+    let idx_sex, idx_city, idx_contact_city, idx_religion,
+      idx_bloodType, idx_nationality, idx_national_id_type, idx_birth_place, idx_title,
       idx_marital, idx_permanent_city = -1;
-      
-      idx_city = val.cityId ? this.listCity.findIndex((a)=>{
-        return a.city_id === val.cityId;
-      }) : idx_city;
 
-      idx_birth_place = val.birthPlaceId ? this.listCity.findIndex((a)=>{
-        return a.city_id === val.birthPlaceId;
-      }) : idx_birth_place;
+    idx_city = val.cityId ? this.listCity.findIndex((a) => {
+      return a.city_id === val.cityId;
+    }) : idx_city;
 
-      idx_sex = val.sexId ? this.listSex.findIndex((a)=>{
-        return Number(a.value) === val.sexId;
-      }) : idx_sex;
+    idx_birth_place = val.birthPlaceId ? this.listCity.findIndex((a) => {
+      return a.city_id === val.birthPlaceId;
+    }) : idx_birth_place;
 
-      idx_marital = val.maritalStatusId ? this.listMarital.findIndex((a)=>{
-        return Number(a.value) === val.maritalStatusId;
-      }) : idx_marital;
+    idx_sex = val.sexId ? this.listSex.findIndex((a) => {
+      return Number(a.value) === val.sexId;
+    }) : idx_sex;
 
-      idx_nationality = val.nationalityId ? this.listCountry.findIndex((a)=>{
-        return a.country_id === val.nationalityId;
-      }) : idx_nationality;
+    idx_marital = val.maritalStatusId ? this.listMarital.findIndex((a) => {
+      return Number(a.value) === val.maritalStatusId;
+    }) : idx_marital;
 
-      idx_religion = val.religionId ? this.listReligion.findIndex((a)=>{ 
-        return Number(a.value) === val.religionId;
-      }) : idx_religion;
+    idx_nationality = val.nationalityId ? this.listCountry.findIndex((a) => {
+      return a.country_id === val.nationalityId;
+    }) : idx_nationality;
 
-      idx_national_id_type = val.nationalIdTypeId ? this.listNationalIdType.findIndex((a)=>{
-        return Number(a.value) === val.nationalIdTypeId;
-      }) : idx_national_id_type;
+    idx_religion = val.religionId ? this.listReligion.findIndex((a) => {
+      return Number(a.value) === val.religionId;
+    }) : idx_religion;
 
-      this.model.patientName = val.name;
-      this.model.birth = val.birthDate;
-      this.model.address = val.address;
-      this.model.fatherName =  val.fatherName;
-      this.model.motherName = val.motherName;
-      this.model.spouseName = val.spouseName;
-      this.model.homePhone = val.homePhoneNo;
-      this.model.officePhone = val.officePhoneNo;
-      this.model.mobileNo1 = val.mobileNo1;
-      this.model.mobileNo2 = val.mobileNo2;
-      this.model.email = val.emailAddress;
-      this.model.nationalIdNo = val.nationalIdNo;
-      this.model.permanentAddress = val.permanentAddress;
-      this.model.permanentCity = val.permanentCityId;
-      this.model.mrCentral = val.mrNo;
-      this.model.postCode = val.postCode;
-      this.model.patientId = val.patientId;
-      this.model.patientOrganizationId = val.patientOrganizationId;
-      this.model.organizationId = val.organizationId;
-      this.model.hospitalId = val.hospitalId;
-      this.model.title = val.titleId;
-      this.model.permanentPostCode = val.permanentPostCode;
-      this.model.bloodType = val.bloodTypeId;
-      this.model.contactName = val.contactName;
-      this.model.contactAddress = val.contactAddress;
-      this.model.contactCity = val.contactCityId;
-      this.model.contactPhone = val.contactPhoneNo;
-      this.model.contactMobile = val.contactMobileNo;
-      this.model.contactEmail = val.contactEmailAddress;
-      this.model.allergy = val.allergy;
-      this.model.payer = val.payerId;
-      this.model.payerIdNo = val.payerId;
-      this.model.notes = val.notes;
-      this.model.mrlocal = (Number(this.hospital.orgId) === val.organizationId) ? val.localMrNo : '-';
+    idx_national_id_type = val.nationalIdTypeId ? this.listNationalIdType.findIndex((a) => {
+      return Number(a.value) === val.nationalIdTypeId;
+    }) : idx_national_id_type;
 
-      this.model.city = (idx_city >= 0) ? this.listCity[idx_city] : '';
-      this.model.birthPlace = (idx_birth_place >= 0) ? this.listCity[idx_birth_place] : '';
-      this.model.sex = (idx_sex >= 0) ? this.listSex[idx_sex] : '';
-      this.model.maritalStatus = (idx_marital >= 0) ? this.listMarital[idx_marital] : '';
-      this.model.nationality = (idx_nationality >= 0) ? this.listCountry[idx_nationality] : '';
-      this.model.religion = (idx_religion >= 0) ? this.listReligion[idx_religion] : ''; 
-      this.model.nationalidType = (idx_national_id_type >= 0) ? this.listNationalIdType[idx_national_id_type] : '';
-      
-      if(val.districtId) {
-        const district = await this.generalService.getDistrict(null, val.districtId)
-        .toPromise().then( res => {
-          return res.data;  
-        }).catch( err => {
+    this.model.patientName = val.name;
+    this.model.birth = val.birthDate;
+    this.model.address = val.address;
+    this.model.fatherName = val.fatherName;
+    this.model.motherName = val.motherName;
+    this.model.spouseName = val.spouseName;
+    this.model.homePhone = val.homePhoneNo;
+    this.model.officePhone = val.officePhoneNo;
+    this.model.mobileNo1 = val.mobileNo1;
+    this.model.mobileNo2 = val.mobileNo2;
+    this.model.email = val.emailAddress;
+    this.model.nationalIdNo = val.nationalIdNo;
+    this.model.permanentAddress = val.permanentAddress;
+    this.model.permanentCity = val.permanentCityId;
+    this.model.mrCentral = val.mrNo;
+    this.model.postCode = val.postCode;
+    this.model.patientId = val.patientId;
+    this.model.patientOrganizationId = val.patientOrganizationId;
+    this.model.organizationId = val.organizationId;
+    this.model.hospitalId = val.hospitalId;
+    this.model.title = val.titleId;
+    this.model.permanentPostCode = val.permanentPostCode;
+    this.model.bloodType = val.bloodTypeId;
+    this.model.contactName = val.contactName;
+    this.model.contactAddress = val.contactAddress;
+    this.model.contactCity = val.contactCityId;
+    this.model.contactPhone = val.contactPhoneNo;
+    this.model.contactMobile = val.contactMobileNo;
+    this.model.contactEmail = val.contactEmailAddress;
+    this.model.allergy = val.allergy;
+    this.model.payer = val.payerId;
+    this.model.payerIdNo = val.payerId;
+    this.model.notes = val.notes;
+    this.model.mrlocal = (Number(this.hospital.orgId) === val.organizationId) ? val.localMrNo : '-';
+
+    this.model.city = (idx_city >= 0) ? this.listCity[idx_city] : '';
+    this.model.birthPlace = (idx_birth_place >= 0) ? this.listCity[idx_birth_place] : '';
+    this.model.sex = (idx_sex >= 0) ? this.listSex[idx_sex] : '';
+    this.model.maritalStatus = (idx_marital >= 0) ? this.listMarital[idx_marital] : '';
+    this.model.nationality = (idx_nationality >= 0) ? this.listCountry[idx_nationality] : '';
+    this.model.religion = (idx_religion >= 0) ? this.listReligion[idx_religion] : '';
+    this.model.nationalidType = (idx_national_id_type >= 0) ? this.listNationalIdType[idx_national_id_type] : '';
+
+    if (val.districtId) {
+      const district = await this.generalService.getDistrict(null, val.districtId)
+        .toPromise().then(res => {
+          return res.data;
+        }).catch(err => {
           return null;
         })
-        
-        this.model.district = district ? district : { district_id: null };   
-      }else{
-        this.model.district = { district_id: null };
-      }
 
-      if(val.subDistrictId) {
-        const subdistrict = await this.generalService.getSubDistrict(null, val.subDistrictId)
-        .toPromise().then( res => {
+      this.model.district = district ? district : { district_id: null };
+    } else {
+      this.model.district = { district_id: null };
+    }
+
+    if (val.subDistrictId) {
+      const subdistrict = await this.generalService.getSubDistrict(null, val.subDistrictId)
+        .toPromise().then(res => {
           return res.data;
-        }).catch( err => {
+        }).catch(err => {
           return null;
         });
-        
-        this.model.subdistrict = subdistrict ? subdistrict : { sub_district_id: null };
-      }else{
-        this.model.subdistrict = { sub_district_id: null };
-      }
 
-      await this.getDetailAddress(true);
+      this.model.subdistrict = subdistrict ? subdistrict : { sub_district_id: null };
+    } else {
+      this.model.subdistrict = { sub_district_id: null };
+    }
+
+    await this.getDetailAddress(true);
   }
 
   findSubdistrict(event: any) {
     this.listSubdistrict = [];
 
     const str_district = event.target.value;
-    
-    const idx = this.listDistrict.findIndex((a)=>{ 
+
+    const idx = this.listDistrict.findIndex((a) => {
       return a.name == str_district;
     })
-    
-    if(idx >= 0) {
+
+    if (idx >= 0) {
       this.model.district = this.listDistrict[idx];
     }
-    
+
     const districtId = this.model.district.district_id;
 
-    if(districtId) {
+    if (districtId) {
       this.getSubdistrict(districtId);
     }
   }
 
-  async getSubdistrict(districtId = null, subDistrictId = null){
-    if(districtId){
+  async getSubdistrict(districtId = null, subDistrictId = null) {
+    if (districtId) {
       this.listSubdistrict = await this.generalService.getSubDistrict(districtId)
-      .toPromise().then( res => {
-        return res.data;
-      }).catch( err => {
-        return [];
-      })
+        .toPromise().then(res => {
+          return res.data;
+        }).catch(err => {
+          return [];
+        })
     }
-    
-    if(subDistrictId){
+
+    if (subDistrictId) {
       this.model.subdistrict = await this.generalService.getSubDistrict(districtId, subDistrictId)
-      .toPromise().then( res => {
-        return res.data;
-      }).catch( err => {
-        return { sub_district_id: null };
-      })
+        .toPromise().then(res => {
+          return res.data;
+        }).catch(err => {
+          return { sub_district_id: null };
+        })
     }
   }
 
@@ -472,46 +473,46 @@ export class WidgetMobileValidationComponent implements OnInit {
 
     const str_subdistrict = event.target.value;
 
-    const idx = this.listSubdistrict.findIndex((a)=>{
+    const idx = this.listSubdistrict.findIndex((a) => {
       return a.name == str_subdistrict
     })
 
-    if(idx >= 0) {
+    if (idx >= 0) {
       this.model.subdistrict = this.listSubdistrict[idx];
     }
 
   }
 
-  setButtonState(){
+  setButtonState() {
     let counter = 0;
-    
-    for(let i = 0, { length } = this.listCheckBox; i < length; i += 1){
-      if(this.listCheckBox[i].state === true) {
+
+    for (let i = 0, { length } = this.listCheckBox; i < length; i += 1) {
+      if (this.listCheckBox[i].state === true) {
         counter++;
       }
     }
 
-    if(counter >= 3) {
+    if (counter >= 3) {
       this.buttonVerify = false;
       this.buttonPrint = false;
-    }else{
+    } else {
       this.buttonVerify = true;
       this.buttonPrint = true;
     }
   }
 
-  charRemove(str: any){
-    if(str){
+  charRemove(str: any) {
+    if (str) {
       str = str.replace('(+62)', '0');
       str = str.replace(/_/g, '');
-      str = str.replace( / /g, '');
-      str = str.replace( / /g, '');
-      str = str.substr(0,2) == '00' ? str.substr(1) : str;
+      str = str.replace(/ /g, '');
+      str = str.replace(/ /g, '');
+      str = str.substr(0, 2) == '00' ? str.substr(1) : str;
     }
     return str;
   }
 
-  loadPayload(){
+  loadPayload() {
     const arr_birth = this.model.birth.split('-');
 
     const payload = {
@@ -563,46 +564,46 @@ export class WidgetMobileValidationComponent implements OnInit {
     return payload;
   }
 
-  async updatePatientComplete(body: any, params: any){
+  async updatePatientComplete(body: any, params: any) {
     const result = await this.patientService.updatePatientComplete(body, params)
-    .toPromise().then( res => {
-      this.alertService.success(res.message, false, 5000);
-      return res.data;  
-    }).catch( err => {
-      this.alertService.error(err.error.message, false, 5000);
-      return null;
-    })
+      .toPromise().then(res => {
+        this.alertService.success(res.message, false, 5000);
+        return res.data;
+      }).catch(err => {
+        this.alertService.error(err.error.message, false, 5000);
+        return null;
+      })
 
     return result;
   }
 
-  verify(modal){
+  verify(modal) {
     this.openconfirmation(modal);
   }
 
-  async accountVerify(body: any){
+  async accountVerify(body: any) {
     const result = await this.patientService.accountVerify(body)
-    .toPromise().then( res => {
-      this.alertService.success(res.message, false, 5000);
-      return res.data;  
-    }).catch( err => {
-      this.alertService.error(err.error.message, false, 5000);
-      return null;
-    })
+      .toPromise().then(res => {
+        this.alertService.success(res.message, false, 5000);
+        return res.data;
+      }).catch(err => {
+        this.alertService.error(err.error.message, false, 5000);
+        return null;
+      })
   }
 
-  async verifyProcess(){
+  async verifyProcess() {
     //update hope and mysiloam
     const payload = this.loadPayload();
 
-    if(this.model.patientId && this.model.patientOrganizationId){
+    if (this.model.patientId && this.model.patientOrganizationId) {
       const body = {
         ...payload,
         patientOrganizationId: this.model.patientOrganizationId,
       };
       const result = await this.updatePatientComplete(body, this.model.patientId);
 
-      if(result){
+      if (result) {
         const params = {
           contactId: this.selectedAccount.contact_id,
           userId: this.user.id,
@@ -615,19 +616,19 @@ export class WidgetMobileValidationComponent implements OnInit {
 
   }
 
-  openPatientRegistration(){
+  openPatientRegistration() {
 
     const data = {
       contactId: this.selectedAccount.contact_id,
     };
-    
-    const modalRef = this.modalService.open(ModalPatientRegistrationComponent, {windowClass: 'fo_modal_70'});
+
+    const modalRef = this.modalService.open(ModalPatientRegistrationComponent, { windowClass: 'fo_modal_70' });
 
     modalRef.componentInstance.contactInfo = data;
   }
 
   openconfirmation(content) {
-    this.modalService.open(content, {windowClass: 'fo_modal_confirmation'}).result.then((result) => {
+    this.modalService.open(content, { windowClass: 'fo_modal_confirmation' }).result.then((result) => {
       this.closeResult = `Closed with: ${result}`;
     }, (reason) => {
       this.closeResult = `Dismissed ${this.getDismissReason(reason)}`;
@@ -635,7 +636,7 @@ export class WidgetMobileValidationComponent implements OnInit {
   }
 
   openModal70(content) {
-    this.modalService.open(content, {windowClass: 'fo_modal_70'}).result.then((result) => {
+    this.modalService.open(content, { windowClass: 'fo_modal_70' }).result.then((result) => {
       this.closeResult = `Closed with: ${result}`;
     }, (reason) => {
       this.closeResult = `Dismissed ${this.getDismissReason(reason)}`;
@@ -649,16 +650,16 @@ export class WidgetMobileValidationComponent implements OnInit {
     } else if (reason === ModalDismissReasons.BACKDROP_CLICK) {
       return 'by clicking on a backdrop';
     } else {
-      return  `with: ${reason}`;
+      return `with: ${reason}`;
     }
   }
 
   async getCollectionAlert() {
     this.alertService.getAlert().subscribe((alert: Alert) => {
       if (!alert) {
-          // clear alerts when an empty alert is received
-          this.alerts = [];
-          return;
+        // clear alerts when an empty alert is received
+        this.alerts = [];
+        return;
       }
       // add alert to array
       this.alerts.push(alert);

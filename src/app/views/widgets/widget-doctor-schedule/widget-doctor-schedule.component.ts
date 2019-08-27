@@ -1,4 +1,4 @@
-import { Component, OnInit, Input, Output, EventEmitter} from '@angular/core';
+import { Component, OnInit, Input, Output, EventEmitter } from '@angular/core';
 import { Router, ActivatedRoute } from '@angular/router';
 import { DoctorSchedule } from '../../../models/doctors/doctor-schedules';
 import { DoctorSchedule2 } from '../../../models/doctors/doctor-schedules-2';
@@ -7,6 +7,7 @@ import { ScheduleService } from '../../../services/schedule.service';
 import * as moment from 'moment';
 import { IMyDpOptions } from 'mydatepicker';
 import { isEmpty } from 'lodash';
+import { environment } from '../../../../environments/environment';
 
 @Component({
   selector: 'app-widget-doctor-schedule',
@@ -14,7 +15,7 @@ import { isEmpty } from 'lodash';
   styleUrls: ['./widget-doctor-schedule.component.css']
 })
 export class WidgetDoctorScheduleComponent implements OnInit {
-
+  public assetPath = environment.ASSET_PATH;
   @Output() public opScheduleSelected = new EventEmitter<any>();
 
   public key: any = JSON.parse(localStorage.getItem('key'));
@@ -40,9 +41,9 @@ export class WidgetDoctorScheduleComponent implements OnInit {
   private leaves = [];
 
   public datePickerModel: any = {
-    date: { 
-      year: parseInt(moment().format('YYYY')), 
-      month: parseInt(moment().format('MM')), 
+    date: {
+      year: parseInt(moment().format('YYYY')),
+      month: parseInt(moment().format('MM')),
       day: parseInt(moment().format('DD'))
     }
   };
@@ -51,8 +52,8 @@ export class WidgetDoctorScheduleComponent implements OnInit {
     dateFormat: 'dd/mm/yyyy',
     firstDayOfWeek: 'mo',
     sunHighlight: true,
-    height:'27px',
-    width:'150px',
+    height: '27px',
+    width: '150px',
     showInputField: true,
   };
 
@@ -62,7 +63,7 @@ export class WidgetDoctorScheduleComponent implements OnInit {
     private router: Router,
     private activatedRoute: ActivatedRoute,
   ) {
-     
+
   }
 
   async ngOnInit() {
@@ -73,9 +74,9 @@ export class WidgetDoctorScheduleComponent implements OnInit {
       await this.generateDates(this.initDate);
       await this.getSchedulesLogic(this.keywords);
     }
-    
+
     this.doctorService.searchDoctorSource$.subscribe(
-      async(params) => {
+      async (params) => {
         this.keywords = params;
         await this.getLeaveHeader(this.keywords);
         await this.generateDates(this.initDate);
@@ -102,7 +103,7 @@ export class WidgetDoctorScheduleComponent implements OnInit {
       this.getLeaveHeader(this.keywords);
       this.generateDates(this.initDate);
       this.getSchedulesLogic(this.keywords);
-    }   
+    }
   }
 
   getSchedulesLogic(keywords: any) {
@@ -120,8 +121,8 @@ export class WidgetDoctorScheduleComponent implements OnInit {
 
   async generateDates(selectedDate?: any) {
     this.dates = [];
-    let dateChoosed = selectedDate ? moment(selectedDate) : moment(); 
-    let now = dateChoosed.startOf('isoWeek').format('YYYY-MM-DD'); 
+    let dateChoosed = selectedDate ? moment(selectedDate) : moment();
+    let now = dateChoosed.startOf('isoWeek').format('YYYY-MM-DD');
     let date: any = now ? moment(now).startOf('week') : moment().startOf('week');
     let dateTemp: any;
     let dateHeader: any;
@@ -134,15 +135,15 @@ export class WidgetDoctorScheduleComponent implements OnInit {
     let doctorId: any;
     /** Kalo mau lanjutin pasang doctor leave, mulai dari sini ya */
     let flag: any = null;
-    for (let i=0, length=7; i<length; i++) {
+    for (let i = 0, length = 7; i < length; i++) {
       dateTemp = date.add(1, 'days');
       dateHeader = dateTemp.format('dddd, DD-MM-YYYY');
       dateISO = dateTemp.format('YYYY-MM-DD');
       dateDay = dateTemp.format('E');
 
-      for ( let j=0, length=this.leaves.length; j<length; j++) {
-        if(dateISO !== flag) {
-          if(moment(dateISO) >= moment(this.leaves[j].from_date) && moment(dateISO) <= moment(this.leaves[j].to_date)) {
+      for (let j = 0, length = this.leaves.length; j < length; j++) {
+        if (dateISO !== flag) {
+          if (moment(dateISO) >= moment(this.leaves[j].from_date) && moment(dateISO) <= moment(this.leaves[j].to_date)) {
             isLeave = true;
             hospitalId = this.leaves[j].hospital_id;
             leaveType = this.leaves[j].schedule_type_name;
@@ -202,14 +203,14 @@ export class WidgetDoctorScheduleComponent implements OnInit {
     const specialityId = keywords.speciality ? keywords.speciality.speciality_id : null;
     this.leaves = await this.scheduleService.getLeaveHeader(
       year,
-      hospitalId, 
-      doctorId, 
-      areaId, 
+      hospitalId,
+      doctorId,
+      areaId,
       specialityId).toPromise().then(
-      data => {
-        return data.data;
-      }
-    );
+        data => {
+          return data.data;
+        }
+      );
   }
 
   gotoDate(dateSelected: any) {

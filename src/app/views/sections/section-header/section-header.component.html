@@ -1,14 +1,14 @@
 <div class="ms_fixed_header">
-  <div id="header"class="shadow-4">
+  <div id="header" class="shadow-4">
 
     <div id="header_logo" class="d-flex justify-content-start">
-      <img src="../../../../assets/icons/ic_Logo_FrontOffice@2x.png">
+      <img src="{{assetPath}}icons/ic_Logo_FrontOffice@2x.png">
       <div class="ms_logo_right">
         <div>
           <h2>{{environment}} <small>v{{appVersion}}</small></h2>
-        </div>  
+        </div>
         <div>
-            {{currentHospital.name}}
+          {{currentHospital.name}}
         </div>
       </div>
     </div>
@@ -17,27 +17,32 @@
     <div class="header_right">
       <div class="queue-caller">
         <button data-toggle="modal" data-target="#myModal" (click)="getAllQueue()">
-          <img style="height: 2rem; width: 2rem; margin-right: 0.5rem" src="../../../../assets/icons/ic_Call Queue-1@2x.png">
+          <img style="height: 2rem; width: 2rem; margin-right: 0.5rem" src="{{assetPath}}icons/ic_Call Queue-1@2x.png">
           <span>Call queue</span>
         </button>
       </div>
 
       <div id="header_account" class="header-3">
-        <img style="height: 2.8rem; width: 2.8rem; margin-right: 1rem" src="../../../../assets/icons/ic_UserFemale.png">
-        <a><div>{{currentUser.fullname}}</div></a>
+        <img style="height: 2.8rem; width: 2.8rem; margin-right: 1rem" src="{{assetPath}}icons/ic_UserFemale.png">
+        <a>
+          <div>{{currentUser.fullname}}</div>
+        </a>
       </div>
 
       <div ngbDropdown class="d-inline-block hospital-option">
-          <button id="dropdownBasic1" ngbDropdownToggle>{{currentHospital.alias}}</button>
-          <div ngbDropdownMenu aria-labelledby="dropdownBasic1">
-            <a class="dropdown-item" *ngFor="let h of hospitals" (click)="changeOrg(h.id)" href="" target="_parent" [routerLink]="['/']"> {{h.alias}}
-            </a>
-          </div>
+        <button id="dropdownBasic1" ngbDropdownToggle>{{currentHospital.alias}}</button>
+        <div ngbDropdownMenu aria-labelledby="dropdownBasic1">
+          <a class="dropdown-item" *ngFor="let h of hospitals" (click)="changeOrg(h.id)" href="" target="_parent"
+            [routerLink]="['/']"> {{h.alias}}
+          </a>
         </div>
+      </div>
 
       <div *ngIf="auth.isLoggedIn()" id="header_signio" class="header-3">
-        <img class="icon" src="../../../../assets/icons/ic_SignOut.png">
-        <a [routerLink]="['/login']"><div>SIGN OUT</div></a>
+        <img class="icon" src="{{assetPath}}icons/ic_SignOut.png">
+        <a [routerLink]="['/login']">
+          <div>SIGN OUT</div>
+        </a>
       </div>
 
     </div>

@@ -14,21 +14,22 @@ import { QueueService } from '../../../services/queue.service';
 import { ScheduleService } from '../../../services/schedule.service';
 import { PatientService } from '../../../services/patient.service';
 import { Alert, AlertType } from '../../../models/alerts/alert';
-import { sourceApps, queueType, appointmentStatusId} from '../../../variables/common.variable';
+import { sourceApps, queueType, appointmentStatusId } from '../../../variables/common.variable';
 import { Router, ActivatedRoute } from '@angular/router';
 import { BoundElementProperty } from '@angular/compiler';
-import { 
-  ModalRescheduleAppointmentComponent 
+import {
+  ModalRescheduleAppointmentComponent
 } from '../modal-reschedule-appointment/modal-reschedule-appointment.component';
 import { RescheduleAppointment } from '../../../models/appointments/reschedule-appointment';
 import * as pdfMake from 'pdfmake/build/pdfmake';
 import * as pdfFonts from 'pdfmake/build/vfs_fonts';
 import socket from 'socket.io-client';
-import { 
-  SecretKey, Jwt, 
-  CHECK_IN, CREATE_APP, 
+import {
+  SecretKey, Jwt,
+  CHECK_IN, CREATE_APP,
   CANCEL_APP, RESCHEDULE_APP,
-  QUEUE_NUMBER, keySocket } from '../../../variables/common.variable';
+  QUEUE_NUMBER, keySocket
+} from '../../../variables/common.variable';
 import Security from 'msm-kadapat';
 import { environment } from '../../../../environments/environment';
 
@@ -39,13 +40,13 @@ import { environment } from '../../../../environments/environment';
 })
 
 export class WidgetAppointmentListComponent implements OnInit {
-
+  public assetPath = environment.ASSET_PATH;
   public key: any = JSON.parse(localStorage.getItem('key'));
   public hospital = this.key.hospital;
   public user = this.key.user;
   public now = new Date();
   public appStatusId = appointmentStatusId;
-  public qType = queueType;  
+  public qType = queueType;
 
   public dateAppointment: any = {
     date: {
@@ -74,7 +75,7 @@ export class WidgetAppointmentListComponent implements OnInit {
   public admissionTypeList: General[];
   public selectedAdmissionType: General;
 
-  public model: any = {hospital_id: '', name: '', mr: '', doctor: ''};
+  public model: any = { hospital_id: '', name: '', mr: '', doctor: '' };
 
   public appList: Appointment[];
   public selectedCheckIn: any;
@@ -144,20 +145,20 @@ export class WidgetAppointmentListComponent implements OnInit {
     private patientService: PatientService,
     private route: ActivatedRoute,
     private router: Router,
-  ) { 
-    this.socket = socket(`${environment.WEB_SOCKET_SERVICE + keySocket.APPOINTMENT}`,  {
-      transports: ['websocket'],  
+  ) {
+    this.socket = socket(`${environment.WEB_SOCKET_SERVICE + keySocket.APPOINTMENT}`, {
+      transports: ['websocket'],
       query: `data=${
         Security.encrypt({ secretKey: SecretKey }, Jwt)
         }&url=${environment.FRONT_OFFICE_SERVICE}`,
-      });
-    
-    this.socketTwo = socket(`${environment.WEB_SOCKET_SERVICE + keySocket.QUEUE}`,  {
-        transports: ['websocket'],  
-        query: `data=${
-          Security.encrypt({ secretKey: SecretKey }, Jwt)
-          }&url=${environment.FRONT_OFFICE_SERVICE}`,
-        });
+    });
+
+    this.socketTwo = socket(`${environment.WEB_SOCKET_SERVICE + keySocket.QUEUE}`, {
+      transports: ['websocket'],
+      query: `data=${
+        Security.encrypt({ secretKey: SecretKey }, Jwt)
+        }&url=${environment.FRONT_OFFICE_SERVICE}`,
+    });
   }
 
   ngOnInit() {
@@ -172,9 +173,9 @@ export class WidgetAppointmentListComponent implements OnInit {
     this.emitUpdateContact();
     this.getCollectionAlert();
 
-    this.socket.on(CANCEL_APP,(call) => {
-      if(call.data.hospital_id == this.hospital.id 
-        && call.data.appointment_date == this.dateApp){
+    this.socket.on(CANCEL_APP, (call) => {
+      if (call.data.hospital_id == this.hospital.id
+        && call.data.appointment_date == this.dateApp) {
         this.appList = this.appList.map((value) => {
           if (value.appointment_id === call.data.appointment_id) {
             value.appointment_status_id = appointmentStatusId.INACTIVE;
@@ -184,8 +185,8 @@ export class WidgetAppointmentListComponent implements OnInit {
       }
     });
     this.socket.on(CHECK_IN, (call) => {
-      if(call.data.hospital_id == this.hospital.id 
-        && call.data.appointment_date == this.dateApp){
+      if (call.data.hospital_id == this.hospital.id
+        && call.data.appointment_date == this.dateApp) {
         this.appList = this.appList.map((value) => {
           if (value.appointment_id === call.data.appointment_id) {
             value.admission_id = call.data.admission_id;
@@ -198,19 +199,19 @@ export class WidgetAppointmentListComponent implements OnInit {
       }
     });
     this.socketTwo.on(QUEUE_NUMBER, (call) => {
-      if(call.data.hospital_id == this.hospital.id 
-        && call.data.appointment_date == this.dateApp){
-          this.appList = this.appList.map((value) => {
-            if (value.appointment_id === call.data.appointment_id) {
-              value.queue_number = call.data.queue_number;
-              value.queue_id = call.data.queue_id;
-              value.queue_type = call.data.queue_type;
-            }
-            return value;
-          });
+      if (call.data.hospital_id == this.hospital.id
+        && call.data.appointment_date == this.dateApp) {
+        this.appList = this.appList.map((value) => {
+          if (value.appointment_id === call.data.appointment_id) {
+            value.queue_number = call.data.queue_number;
+            value.queue_id = call.data.queue_id;
+            value.queue_type = call.data.queue_type;
+          }
+          return value;
+        });
       }
     });
-    
+
   }
 
   emitUpdateNotes() {
@@ -266,30 +267,30 @@ export class WidgetAppointmentListComponent implements OnInit {
     this.searchAppointment(false);
   }
 
-  async admissionType(){
+  async admissionType() {
     this.admissionTypeList = await this.generalService.getAdmissionType()
-    .toPromise().then( res => {
-      return res.data;
-    }).catch( err => {
-      return [];
-    })
+      .toPromise().then(res => {
+        return res.data;
+      }).catch(err => {
+        return [];
+      })
 
-    const idx = this.admissionTypeList.findIndex((i)=>{
+    const idx = this.admissionTypeList.findIndex((i) => {
       return i.value === '1';
     })
 
     this.selectedAdmissionType = this.admissionTypeList[idx];
   }
 
-  async getReferral(){
+  async getReferral() {
     this.listReferral = await this.generalService.getReferralType()
-    .toPromise().then( res => {
-      return res.data;
-    }).catch( err => {
-      return [];
-    })
+      .toPromise().then(res => {
+        return res.data;
+      }).catch(err => {
+        return [];
+      })
 
-    const idx = this.listReferral.findIndex((i)=>{
+    const idx = this.listReferral.findIndex((i) => {
       return i.value === '1';
     })
 
@@ -297,29 +298,29 @@ export class WidgetAppointmentListComponent implements OnInit {
 
   }
 
-  async getPayer(){
+  async getPayer() {
     this.listPayer = await this.generalService.getPayer(this.hospital.orgId)
-    .toPromise().then( res => {
-      return res.data;
-    }).catch( err => {
-      return [];
-    })
+      .toPromise().then(res => {
+        return res.data;
+      }).catch(err => {
+        return [];
+      })
   }
 
-  async getPatientType(){
+  async getPatientType() {
     this.patientTypeList = await this.generalService.getPatientType()
-    .toPromise().then( res => {
-      if (res.status === 'OK' && res.data.length === 0) {
-        this.alertService.success('No List Doctor in This Hospital', false, 3000);
-      }
-      
-      return res.data;
-    }).catch( err => {
-      return [];
-    })
+      .toPromise().then(res => {
+        if (res.status === 'OK' && res.data.length === 0) {
+          this.alertService.success('No List Doctor in This Hospital', false, 3000);
+        }
+
+        return res.data;
+      }).catch(err => {
+        return [];
+      })
   }
 
-  refreshPage(){
+  refreshPage() {
     this.buttonCreateAdmission = false;
     this.buttonPrintQueue = true;
     this.buttonPatientLabel = true;
@@ -334,7 +335,7 @@ export class WidgetAppointmentListComponent implements OnInit {
     this.payerEligibility = null;
   }
 
-  clearSearch(){
+  clearSearch() {
     this.model.name = '';
     this.model.mr = '';
     this.model.doctor = '';
@@ -346,19 +347,19 @@ export class WidgetAppointmentListComponent implements OnInit {
     this.alerts = [];
 
     this.doctorList = await this.doctorService.getListDoctor(this.hospital.id)
-    .toPromise().then( res => {
-      if (res.status === 'OK' && res.data.length === 0) {
-        this.alertService.success('No List Doctor in This Hospital', false, 3000);
-      }
+      .toPromise().then(res => {
+        if (res.status === 'OK' && res.data.length === 0) {
+          this.alertService.success('No List Doctor in This Hospital', false, 3000);
+        }
 
-      return res.data;
-    }).catch( err => {
-      this.alertService.error(err.error.message, false, 3000);
-      return [];
-    });
+        return res.data;
+      }).catch(err => {
+        this.alertService.error(err.error.message, false, 3000);
+        return [];
+      });
   }
 
-  async listAppointment(name = '', birth= '', mr= '', doctor= '') {
+  async listAppointment(name = '', birth = '', mr = '', doctor = '') {
     this.showWaitMsg = true;
     this.showNotFoundMsg = false;
 
@@ -372,35 +373,35 @@ export class WidgetAppointmentListComponent implements OnInit {
     const offset = this.offset;
 
     this.appList = await this.appointmentService.getListAppointment(date, hospital, name, birth, mr, doctor, limit, offset)
-    .toPromise().then( res => {
-      if (res.status === 'OK') {
-        
-        this.isCanNextPage = res.data.length >= 10 ? true: false;
+      .toPromise().then(res => {
+        if (res.status === 'OK') {
 
-        for (let i = 0, { length } = res.data; i < length; i += 1) {
-          res.data[i].custome_birth_date = dateFormatter(res.data[i].birth_date, true);
-          res.data[i].custome_appointment_date = dateFormatter(res.data[i].appointment_date, true);
-          res.data[i].custome_from_time = res.data[i].from_time.substring(0, 5);
-          res.data[i].custome_to_time = res.data[i].to_time.substring(0, 5);
+          this.isCanNextPage = res.data.length >= 10 ? true : false;
+
+          for (let i = 0, { length } = res.data; i < length; i += 1) {
+            res.data[i].custome_birth_date = dateFormatter(res.data[i].birth_date, true);
+            res.data[i].custome_appointment_date = dateFormatter(res.data[i].appointment_date, true);
+            res.data[i].custome_from_time = res.data[i].from_time.substring(0, 5);
+            res.data[i].custome_to_time = res.data[i].to_time.substring(0, 5);
+          }
+
+          this.showWaitMsg = false;
+          this.showNotFoundMsg = false;
+        } else {
+          this.showWaitMsg = false;
+          this.showNotFoundMsg = true;
         }
-        
-        this.showWaitMsg = false;
-        this.showNotFoundMsg = false;
-      }else{
+        return res.data;
+      }).catch(err => {
         this.showWaitMsg = false;
         this.showNotFoundMsg = true;
-      }
-      return res.data;
-    }).catch( err => {
-      this.showWaitMsg = false;
-      this.showNotFoundMsg = true;
-      this.alertService.error(err.error.message, false, 3000);
-      return [];
-    });
+        this.alertService.error(err.error.message, false, 3000);
+        return [];
+      });
   }
 
-   async searchAppointment(search?: boolean) {
-    this.offset = search ? 0 : this.offset; 
+  async searchAppointment(search?: boolean) {
+    this.offset = search ? 0 : this.offset;
     let { name, mr, doctor, birth } = await this.model;
 
     const doctorId = doctor ? doctor.doctor_id : '';
@@ -416,16 +417,16 @@ export class WidgetAppointmentListComponent implements OnInit {
       this.listAppointment();
     }
   }
-  
+
   onDateChange(val) {
     const { year, month, day } = val.date;
 
-    if(year === 0 && month === 0 && day === 0){
+    if (year === 0 && month === 0 && day === 0) {
       this.clearSearch();
       this.refreshPage();
       this.appList = [];
       this.alertService.error('Please Input Date', false, 3000);
-    }else{
+    } else {
       this.dateAppointment = {
         date: {
           year: year,
@@ -446,111 +447,111 @@ export class WidgetAppointmentListComponent implements OnInit {
     this.open(content);
   }
 
-  checkIsLate(appointmentId: string){
+  checkIsLate(appointmentId: string) {
     const msg = this.appointmentService.isLate(appointmentId)
-    .toPromise().then( res => {
-      if(res.data){
-        return `${res.data.hours} Jam, ${res.data.minutes} Menit, ${res.data.seconds} Detik!!`;
-      }else{
+      .toPromise().then(res => {
+        if (res.data) {
+          return `${res.data.hours} Jam, ${res.data.minutes} Menit, ${res.data.seconds} Detik!!`;
+        } else {
+          return '';
+        }
+      }).catch(err => {
         return '';
-      }
-    }).catch(err => {
-      return '';
-    })
+      })
     return msg;
   }
 
-  async defaultPatientType(patientHopeId: any){
+  async defaultPatientType(patientHopeId: any) {
     this.nationalIdTypeId = await this.patientService.getDefaultPatientType(patientHopeId).toPromise()
-    .then(res => {
-      if(res.data){
-        return res.data.nationalIdTypeId; 
-      }else{
+      .then(res => {
+        if (res.data) {
+          return res.data.nationalIdTypeId;
+        } else {
+          return '';
+        }
+      }).catch(err => {
         return '';
-      }
-    }).catch(err => {
-      return '';
-    })
+      })
 
     let idx = null;
-    
-    if(this.nationalIdTypeId){
-      if(this.nationalIdTypeId == 3){
+
+    if (this.nationalIdTypeId) {
+      if (this.nationalIdTypeId == 3) {
         //Passport
-        idx = this.patientTypeList.findIndex((a)=>{
+        idx = this.patientTypeList.findIndex((a) => {
           return a.description == "PASSPORT";
         })
-      }else if(this.nationalIdTypeId == 4){
+      } else if (this.nationalIdTypeId == 4) {
         //KITAS
-        idx = this.patientTypeList.findIndex((a)=>{
+        idx = this.patientTypeList.findIndex((a) => {
           return a.description == "KITAS";
         })
-      }else{
+      } else {
         //Private
-        idx = this.patientTypeList.findIndex((a)=>{
+        idx = this.patientTypeList.findIndex((a) => {
           return a.description == "PRIVATE";
         })
       }
-    }else{
-      idx = this.patientTypeList.findIndex((a)=>{
+    } else {
+      idx = this.patientTypeList.findIndex((a) => {
         return a.description == "PRIVATE";
       })
     }
     this.patientType = this.patientTypeList[idx];
   }
-  
-  async confirmCheckInValue(detail, checkInModal, mrLocalModal){
-      this.nationalIdTypeId = '';
-      let now = dateFormatter(new Date(), true);
-      let appDate = dateFormatter(detail.appointment_date, true);
 
-      if(now !== appDate){
-        this.alertService.error('This appointment cannot checkin in this day', false, 3000);
-      }else{
-        if(!detail.medical_record_number){
-          if(detail.patient_hope_id){
-            this.open(mrLocalModal);
-          }else{
-            const params = { appointmentId: detail.appointment_id, };
-            this.router.navigate(['./patient-data'], { queryParams: params });
-          }
-        }else{
-          await this.defaultPatientType(detail.patient_hope_id);
-          this.open50(checkInModal);
+  async confirmCheckInValue(detail, checkInModal, mrLocalModal) {
+    this.nationalIdTypeId = '';
+    let now = dateFormatter(new Date(), true);
+    let appDate = dateFormatter(detail.appointment_date, true);
+
+    if (now !== appDate) {
+      this.alertService.error('This appointment cannot checkin in this day', false, 3000);
+    } else {
+      if (!detail.medical_record_number) {
+        if (detail.patient_hope_id) {
+          this.open(mrLocalModal);
+        } else {
+          const params = { appointmentId: detail.appointment_id, };
+          this.router.navigate(['./patient-data'], { queryParams: params });
         }
+      } else {
+        await this.defaultPatientType(detail.patient_hope_id);
+        this.open50(checkInModal);
       }
+    }
   }
 
-  mrLocalProcess(payload: any){
+  mrLocalProcess(payload: any) {
     const patient = this.patientService.createMrLocal(payload)
-    .toPromise().then(res => {
-      this.alertService.success(res.message, false, 3000);
-      return res.data; 
-    }).catch(err => {
-      this.alertService.error(err.error.message, false, 3000);
-      return null;
-    })
-    
+      .toPromise().then(res => {
+        this.alertService.success(res.message, false, 3000);
+        return res.data;
+      }).catch(err => {
+        this.alertService.error(err.error.message, false, 3000);
+        return null;
+      })
+
     return patient;
   }
 
-  openRescheduleModal(appointmentSelected: any){
-    const modalRef = this.modalService.open(ModalRescheduleAppointmentComponent,  
-      {windowClass: 'cc_modal_confirmation', size: 'lg'});
+  openRescheduleModal(appointmentSelected: any) {
+    const modalRef = this.modalService.open(ModalRescheduleAppointmentComponent,
+      { windowClass: 'cc_modal_confirmation', size: 'lg' });
     modalRef.componentInstance.appointmentSelected = appointmentSelected;
   }
-  
-  async buildMrLocal(detail, close, modal){
+
+  async buildMrLocal(detail, close, modal) {
     const body = {
       patientHopeId: Number(detail.patient_hope_id),
       organizationId: Number(this.hospital.orgId),
       userId: this.user.id,
       source: sourceApps,
     }
-    
+
     this.resMrLocal = await this.mrLocalProcess(body);
-    
-    if(this.resMrLocal){
+
+    if (this.resMrLocal) {
       this.selectedCheckIn.medical_record_number = this.resMrLocal.medical_record_number;
       this.selectedCheckIn.patient_organization_id = this.resMrLocal.patient_organization_id;
       await this.defaultPatientType(detail.patient_hope_id);
@@ -558,35 +559,35 @@ export class WidgetAppointmentListComponent implements OnInit {
       this.open50(modal);
     }
   }
-  
-  cancelAppointment(val, content){
+
+  cancelAppointment(val, content) {
     this.selectedCancel = val;
     this.openconfirmation(content);
   }
 
-  cancelProcess(val){
+  cancelProcess(val) {
     const appointmentId = val.appointment_id;
     const body = { userId: this.user.id, source: sourceApps };
-    
-    this.appointmentService.deleteAppointment(appointmentId, body)
-    .toPromise().then( res =>{
-      this.alertService.success(res.message, false, 3000);
-    }).catch(err => {
-      this.alertService.error(err.error.message, false, 3000);
-    })
 
-    setTimeout (() => {
+    this.appointmentService.deleteAppointment(appointmentId, body)
+      .toPromise().then(res => {
+        this.alertService.success(res.message, false, 3000);
+      }).catch(err => {
+        this.alertService.error(err.error.message, false, 3000);
+      })
+
+    setTimeout(() => {
       this.refreshPage();
       this.searchAppointment(false);
     }, 1000)
-    
+
   }
 
-  changeCondition(event:any){
+  changeCondition(event: any) {
     const val = event.target.value;
     let idx = null
 
-    if(val == 'PRIVATE' || val == 'PASSPORT' || val == 'KITAS'){
+    if (val == 'PRIVATE' || val == 'PASSPORT' || val == 'KITAS') {
       this.txtPayer = true;
       this.txtPayerNo = true;
       this.txtPayerEligibility = true;
@@ -595,25 +596,25 @@ export class WidgetAppointmentListComponent implements OnInit {
       this.payerNo = null;
       this.payerEligibility = null;
 
-      if(val == 'PRIVATE'){
-        idx = this.patientTypeList.findIndex((a)=>{
+      if (val == 'PRIVATE') {
+        idx = this.patientTypeList.findIndex((a) => {
           return a.description == "PRIVATE";
         })
-      }else if(val == 'KITAS'){
-        idx = this.patientTypeList.findIndex((a)=>{
+      } else if (val == 'KITAS') {
+        idx = this.patientTypeList.findIndex((a) => {
           return a.description == "KITAS";
         })
-      }else if(val == 'PASSPORT'){
-        idx = this.patientTypeList.findIndex((a)=>{
+      } else if (val == 'PASSPORT') {
+        idx = this.patientTypeList.findIndex((a) => {
           return a.description == "PASSPORT";
         })
       }
-    }else{
+    } else {
       this.txtPayer = false;
       this.txtPayerNo = false;
       this.txtPayerEligibility = false;
 
-      idx = this.patientTypeList.findIndex((a)=>{
+      idx = this.patientTypeList.findIndex((a) => {
         return a.description == "PAYER";
       })
     }
@@ -621,18 +622,18 @@ export class WidgetAppointmentListComponent implements OnInit {
     this.patientType = this.patientTypeList[idx];
   }
 
-  async createAdmission(val, activeModal){
+  async createAdmission(val, activeModal) {
     this.buttonCreateAdmission = true;
     this.listActiveAdmission = await this.getActiveAdmission(val.patient_hope_id);
 
-    if(this.listActiveAdmission.length !== 0) {
+    if (this.listActiveAdmission.length !== 0) {
       this.openconfirmation(activeModal);
-    }else{
+    } else {
       this.processCreateAdmission(val);
     }
   }
 
-  processCreateAdmission(val){
+  processCreateAdmission(val) {
     // Show loading bar
     this.buttonCreateAdmission = true;
     this.isLoadingCreateAdmission = true;
@@ -641,14 +642,14 @@ export class WidgetAppointmentListComponent implements OnInit {
     let payerNo = null;
     let payerEligibility = null;
 
-    if(!this.patientType){
+    if (!this.patientType) {
       this.alertService.error('Select patient type', false, 3000);
       this.buttonCreateAdmission = false;
       this.isLoadingCreateAdmission = false;
     }
 
-    if(this.patientType.description === 'PAYER'){
-      if(this.payer && this.payer.payer_id){
+    if (this.patientType.description === 'PAYER') {
+      if (this.payer && this.payer.payer_id) {
         payer = this.payer.payer_id;
         payerNo = this.payerNo;
         payerEligibility = this.payerEligibility
@@ -670,50 +671,50 @@ export class WidgetAppointmentListComponent implements OnInit {
     var dataPatient;
 
     this.admissionService.createAdmission(body).toPromise()
-    .then( res => {
-      dataPatient = {
-        schedule_id: val.schedule_id,
-        admission_id: res.data.admission_id,
-        admission_hope_id: res.data.admission_hope_id,
-        admission_no: res.data.admission_no,
-        payer_name: res.data.payer_name,
-        appointment_id: val.appointment_id,
-        appointment_date: val.appointment_date,
-        hospital_id: val.hospital_id,
-        doctor_id: val.doctor_id,
-        modified_name: res.data.modified_name,
-        modified_date: res.data.modified_date,
-        modified_from: res.data.modified_from,
-        modified_by: res.data.modified_by
-      }
-      // broadcast check-in
-      this.socket.emit(CHECK_IN, dataPatient);
-      this.buttonCreateAdmission = true;
-      this.buttonPrintQueue = false;
-      this.buttonCloseAdm = true;
-      this.buttonPatientLabel = false;
-      this.isLoadingCreateAdmission = false;
-      this.alertService.success(res.message, false, 3000);
-    }).catch( err => {
-      this.buttonCreateAdmission = true;
-      this.isLoadingCreateAdmission = false;
-      this.alertService.error(err.error.message, false, 3000);
-    })
+      .then(res => {
+        dataPatient = {
+          schedule_id: val.schedule_id,
+          admission_id: res.data.admission_id,
+          admission_hope_id: res.data.admission_hope_id,
+          admission_no: res.data.admission_no,
+          payer_name: res.data.payer_name,
+          appointment_id: val.appointment_id,
+          appointment_date: val.appointment_date,
+          hospital_id: val.hospital_id,
+          doctor_id: val.doctor_id,
+          modified_name: res.data.modified_name,
+          modified_date: res.data.modified_date,
+          modified_from: res.data.modified_from,
+          modified_by: res.data.modified_by
+        }
+        // broadcast check-in
+        this.socket.emit(CHECK_IN, dataPatient);
+        this.buttonCreateAdmission = true;
+        this.buttonPrintQueue = false;
+        this.buttonCloseAdm = true;
+        this.buttonPatientLabel = false;
+        this.isLoadingCreateAdmission = false;
+        this.alertService.success(res.message, false, 3000);
+      }).catch(err => {
+        this.buttonCreateAdmission = true;
+        this.isLoadingCreateAdmission = false;
+        this.alertService.error(err.error.message, false, 3000);
+      })
 
   }
 
-  newPatient(){
+  newPatient() {
     const params = { appointmentId: this.selectedCheckIn.appointment_id, };
     this.router.navigate(['./patient-data'], { queryParams: params });
   }
 
-  openLogHistory(val, content){
+  openLogHistory(val, content) {
     let history = val;
     this.nameHistory = history.contact_name;
     this.appointmentService.appointmentHistory(history.appointment_id).toPromise()
       .then(data => {
         let newData = data.data;
-        if(newData.length){
+        if (newData.length) {
           this.history = newData;
           this.flagHistory = true;
           this.opened(content);
@@ -728,32 +729,32 @@ export class WidgetAppointmentListComponent implements OnInit {
         this.flagHistory = false;
         this.openedTwo(content);
       }
-    );
+      );
   }
-  
-  filePdfCreated(val){
-    const { 
-      patientName, sex, phone, admissionNo, admissionDate, 
+
+  filePdfCreated(val) {
+    const {
+      patientName, sex, phone, admissionNo, admissionDate,
       alias, mrNoFormatted, barcode, age, admissionTime,
       doctorName, payer, patientType, labelBirth,
     } = val;
 
     const detailPayer = payer ? payer : patientType;
     const strName = patientName.toUpperCase();
-    const strAge = age.toLowerCase();  
-    let doctorPayer = doctorName+' / '+detailPayer;
-        doctorPayer = doctorPayer.substr(0,55);
+    const strAge = age.toLowerCase();
+    let doctorPayer = doctorName + ' / ' + detailPayer;
+    doctorPayer = doctorPayer.substr(0, 55);
 
     pdfMake.vfs = pdfFonts.pdfMake.vfs;
 
     const docDefinition = {
-      pageSize:  { width: 292.283, height: 98.031},
-      pageMargins: [ 0, 0, 0, 0 ],
+      pageSize: { width: 292.283, height: 98.031 },
+      pageMargins: [0, 0, 0, 0],
       content: [
-        { text: strName, style: 'header', bold: true , fontSize: 10, noWrap: true },
-        { text: 'Sex: '+sex+' / Ph: '+phone, style: 'header', bold: true , fontSize: 10, noWrap: true },
-        { text: 'MR No: '+alias+'.'+mrNoFormatted+' / DOB: '+labelBirth+' ('+strAge+') ', style: 'header', bold: true, fontSize: 10 },
-        { text: admissionNo+' '+admissionDate+' '+admissionTime, style: 'header' , fontSize: 9},
+        { text: strName, style: 'header', bold: true, fontSize: 10, noWrap: true },
+        { text: 'Sex: ' + sex + ' / Ph: ' + phone, style: 'header', bold: true, fontSize: 10, noWrap: true },
+        { text: 'MR No: ' + alias + '.' + mrNoFormatted + ' / DOB: ' + labelBirth + ' (' + strAge + ') ', style: 'header', bold: true, fontSize: 10 },
+        { text: admissionNo + ' ' + admissionDate + ' ' + admissionTime, style: 'header', fontSize: 9 },
         { text: doctorPayer, style: 'header', fontSize: 9 },
         {
           image: barcode,
@@ -773,31 +774,31 @@ export class WidgetAppointmentListComponent implements OnInit {
     pdfMake.createPdf(docDefinition).print();
   }
 
-  async printPatientLabel(val){
+  async printPatientLabel(val) {
     const contentPdf = await this.admissionService.getPatientLabel(val.appointment_id).toPromise()
-    .then( res => {
-      return res.data;
-    }).catch(err =>{
-      return null;
-    })
+      .then(res => {
+        return res.data;
+      }).catch(err => {
+        return null;
+      })
 
-    if(contentPdf){
+    if (contentPdf) {
       await this.filePdfCreated(contentPdf);
-    }else{
+    } else {
       this.alertService.error('Cannot print patient label', false, 3000);
     }
   }
 
-  printQueue(content, close){
-    this.modalService.open(content, { windowClass: 'modal_queue', size: 'lg'});
+  printQueue(content, close) {
+    this.modalService.open(content, { windowClass: 'modal_queue', size: 'lg' });
     this.closeAdm = close;
   }
-  
-  async printQueueAction(val, isReguler, content){
+
+  async printQueueAction(val, isReguler, content) {
     this.buttonReguler = true;
     this.buttonVIP = true;
     this.closeQue = content;
-    
+
     const queueTypeId = isReguler ? queueType.REG : queueType.VIP;
 
     const body = {
@@ -809,16 +810,16 @@ export class WidgetAppointmentListComponent implements OnInit {
     };
 
     this.roomDetail = await this.scheduleService.scheduleDetail(val.schedule_id)
-    .toPromise().then(res => {
-      return res.data;
-    }).catch( err => {
-      return null;
-    });
+      .toPromise().then(res => {
+        return res.data;
+      }).catch(err => {
+        return null;
+      });
 
     var dataPatient;
 
     this.resQueue = await this.queueService.createQueue(body).toPromise()
-      .then( res => {
+      .then(res => {
         this.buttonReguler = false;
         this.buttonVIP = false;
         dataPatient = {
@@ -845,10 +846,10 @@ export class WidgetAppointmentListComponent implements OnInit {
         this.alertService.error(err.error.message, false, 3000);
         return null;
       })
-      
-    this.selectedCheckIn = await this.appointmentService.getAppointmentById(val.appointment_id).toPromise().then( res => {
+
+    this.selectedCheckIn = await this.appointmentService.getAppointmentById(val.appointment_id).toPromise().then(res => {
       return res.data[0];
-    }).catch( err => {
+    }).catch(err => {
       return null;
     });
   }
@@ -864,17 +865,17 @@ export class WidgetAppointmentListComponent implements OnInit {
     let wing = '';
     let room = '';
 
-    if(this.roomDetail){
+    if (this.roomDetail) {
       floor = this.roomDetail.floor_name ? this.roomDetail.floor_name : floor;
       wing = this.roomDetail.wing_name ? this.roomDetail.wing_name : wing;
-      room = this.roomDetail.room_name ? this.roomDetail.room_name : room; 
+      room = this.roomDetail.room_name ? this.roomDetail.room_name : room;
     }
-    
+
     pdfMake.vfs = pdfFonts.pdfMake.vfs;
-    
+
     const docDefinition = {
-      pageSize:  { width: 252.283, height: 200},
-      pageMargins: [ 0, 10, 10, 10 ],
+      pageSize: { width: 252.283, height: 200 },
+      pageMargins: [0, 10, 10, 10],
       content: [
         {
           text: 'Your Queue Number',
@@ -885,24 +886,24 @@ export class WidgetAppointmentListComponent implements OnInit {
         {
           text: queueNo,
           style: 'header',
-          fontSize: 30 ,
+          fontSize: 30,
           margin: [0, 5, 0, 5]
         },
         {
-          text: 'Floor : '+floor+' , Wing : '+wing+' , Room : '+room,
+          text: 'Floor : ' + floor + ' , Wing : ' + wing + ' , Room : ' + room,
           margin: [0, 0, 0, 0],
           alignment: 'center',
           fontSize: 10,
           bold: true
         },
         {
-          text: 'Patient Name : '+patientName,
+          text: 'Patient Name : ' + patientName,
           margin: [0, 5, 0, 5],
           alignment: 'center',
           fontSize: 10
         },
         {
-          text: 'Doctor Name : '+doctorName,
+          text: 'Doctor Name : ' + doctorName,
           margin: [0, 0, 0, 5],
           alignment: 'center',
           fontSize: 10
@@ -934,7 +935,7 @@ export class WidgetAppointmentListComponent implements OnInit {
     pdfMake.defaultFileName = 'report registration';
     pdfMake.createPdf(docDefinition).print();
 
-    setTimeout (() => {
+    setTimeout(() => {
       this.closeQue.click();
       this.closeAdm.click();
       this.refreshPage();
@@ -943,22 +944,22 @@ export class WidgetAppointmentListComponent implements OnInit {
 
   }
 
-  getActiveAdmission(patientHopeId: any){
+  getActiveAdmission(patientHopeId: any) {
     const active = this.admissionService.getActiveAdmission(patientHopeId)
-    .toPromise().then(res => {
-      return res.data;
-    }).catch( err => {
-      return [];
-    });
+      .toPromise().then(res => {
+        return res.data;
+      }).catch(err => {
+        return [];
+      });
     return active;
   }
 
   async getCollectionAlert() {
     this.alertService.getAlert().subscribe((alert: Alert) => {
       if (!alert) {
-          // clear alerts when an empty alert is received
-          this.alerts = [];
-          return;
+        // clear alerts when an empty alert is received
+        this.alerts = [];
+        return;
       }
       // add alert to array
       this.alerts.push(alert);
@@ -995,7 +996,7 @@ export class WidgetAppointmentListComponent implements OnInit {
   }
 
   open50(content) {
-    this.modalService.open(content, { windowClass: 'fo_modal_admission'}).result.then((result) => {
+    this.modalService.open(content, { windowClass: 'fo_modal_admission' }).result.then((result) => {
       this.closeResult = `Closed with: ${result}`;
     }, (reason) => {
       this.closeResult = `Dismissed ${this.getDismissReason(reason)}`;
@@ -1003,7 +1004,7 @@ export class WidgetAppointmentListComponent implements OnInit {
   }
 
   openconfirmation(content) {
-    this.modalService.open(content, {windowClass: 'fo_modal_confirmation'}).result.then((result) => {
+    this.modalService.open(content, { windowClass: 'fo_modal_confirmation' }).result.then((result) => {
       this.closeResult = `Closed with: ${result}`;
     }, (reason) => {
       this.closeResult = `Dismissed ${this.getDismissReason(reason)}`;
@@ -1011,7 +1012,7 @@ export class WidgetAppointmentListComponent implements OnInit {
   }
 
   opened(content) {
-    this.modalService.open(content, {windowClass: 'log-history', size: 'lg'}).result.then((result) => {
+    this.modalService.open(content, { windowClass: 'log-history', size: 'lg' }).result.then((result) => {
 
       this.closeResult = `Closed with: ${result}`;
     }, (reason) => {
@@ -1020,7 +1021,7 @@ export class WidgetAppointmentListComponent implements OnInit {
   }
 
   openedTwo(content) {
-    this.modalService.open(content, {windowClass: 'log-history-2', size: 'lg'}).result.then((result) => {
+    this.modalService.open(content, { windowClass: 'log-history-2', size: 'lg' }).result.then((result) => {
 
       this.closeResult = `Closed with: ${result}`;
     }, (reason) => {
@@ -1041,7 +1042,7 @@ export class WidgetAppointmentListComponent implements OnInit {
     } else if (reason === ModalDismissReasons.BACKDROP_CLICK) {
       return 'by clicking on a backdrop';
     } else {
-      return  `with: ${reason}`;
+      return `with: ${reason}`;
     }
   }
 

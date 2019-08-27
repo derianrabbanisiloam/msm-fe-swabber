@@ -6,6 +6,7 @@ import { AlertService } from '../../../services/alert.service';
 import { Speciality } from '../../../models/specialities/speciality';
 import { Alert, AlertType } from '../../../models/alerts/alert';
 import { isEmpty } from 'lodash';
+import { environment } from '../../../../environments/environment';
 
 @Component({
   selector: 'app-widget-base-appointment',
@@ -13,7 +14,7 @@ import { isEmpty } from 'lodash';
   styleUrls: ['./widget-base-appointment.component.css']
 })
 export class WidgetBaseAppointmentComponent implements OnInit {
-
+  public assetPath = environment.ASSET_PATH;
   public key: any = JSON.parse(localStorage.getItem('key'));
   public hospital = this.key.hospital;
   public user = this.key.user;
@@ -35,7 +36,7 @@ export class WidgetBaseAppointmentComponent implements OnInit {
     private doctorService: DoctorService,
     private alertService: AlertService,
     private route: ActivatedRoute,
-    private router: Router, 
+    private router: Router,
   ) { }
 
   async ngOnInit() {
@@ -44,32 +45,32 @@ export class WidgetBaseAppointmentComponent implements OnInit {
     await this.fromBack();
   }
 
-  fromBack(){
+  fromBack() {
     const type = this.route.snapshot.queryParams['type'];
 
-    if(type){
-      if(type === 'doctor'){
+    if (type) {
+      if (type === 'doctor') {
         const searchKey = {
           doctor_id: this.route.snapshot.queryParams['doctor_id'],
           name: this.route.snapshot.queryParams['name'],
         };
-  
-        const idx = this.doctorList.findIndex((a)=>{
+
+        const idx = this.doctorList.findIndex((a) => {
           return a.doctor_id === searchKey.doctor_id;
         });
-  
-        this.searchAutoComplete = this.doctorList[idx]; 
+
+        this.searchAutoComplete = this.doctorList[idx];
         this.searchSchedule1(searchKey);
-      }else{
+      } else {
         const searchKey = {
           speciality_id: this.route.snapshot.queryParams['speciality_id'],
           speciality_name: this.route.snapshot.queryParams['speciality_name'],
         };
-  
-        const idx = this.specialities.findIndex((a)=>{
+
+        const idx = this.specialities.findIndex((a) => {
           return a.speciality_id === searchKey.speciality_id;
         });
-        
+
         this.model.speciality = this.specialities[idx];
         this.searchSchedule2();
       }
@@ -81,33 +82,33 @@ export class WidgetBaseAppointmentComponent implements OnInit {
     this.alerts = [];
 
     this.doctorList = await this.doctorService.getListDoctor(this.hospital.id)
-    .toPromise().then( res => {
-      return res.data;
-    }).catch( err => {
-      this.alertService.error(err.error.message);
-      return [];
-    });
+      .toPromise().then(res => {
+        return res.data;
+      }).catch(err => {
+        this.alertService.error(err.error.message);
+        return [];
+      });
   }
 
   async getSpecialities(specialityname = null, total = null) {
     this.specialities = await this.doctorService.getSpecialities(specialityname, total)
-    .toPromise().then( res => {
-      return res.data;
-    }).catch( err => {
-      this.alertService.error(err.error.message);
-      return [];
-    });
+      .toPromise().then(res => {
+        return res.data;
+      }).catch(err => {
+        this.alertService.error(err.error.message);
+        return [];
+      });
 
-    if(this.specialities.length !== 0){
+    if (this.specialities.length !== 0) {
       this.specialities.map(x => {
         x.speciality_name = isEmpty(x.speciality_name) ? '' : x.speciality_name;
       });
     }
   }
 
-  searchSchedule1(item){
+  searchSchedule1(item) {
     this.model.speciality = '';
-    
+
     this.searchKeywords.doctor = {
       doctor_id: item.doctor_id,
       name: item.name
@@ -118,18 +119,18 @@ export class WidgetBaseAppointmentComponent implements OnInit {
       doctor_id: item.doctor_id,
       name: item.name
     };
-    
+
     localStorage.setItem('searchKey', JSON.stringify(searchKey));
-    
+
     this.doctorService.changeSearchDoctor(this.searchKeywords);
     this.doctorService.searchDoctorSource2 = this.searchKeywords;
 
     this.showSchedule = true;
   }
 
-  searchSchedule2(){
+  searchSchedule2() {
     this.model.doctor = '';
-    
+
     const speciality = this.model.speciality;
 
     this.searchKeywords = {
@@ -154,9 +155,9 @@ export class WidgetBaseAppointmentComponent implements OnInit {
     const searchKey = {
       type: 'spesialist',
       speciality_id: speciality.speciality_id,
-      speciality_name: speciality.speciality_name,  
+      speciality_name: speciality.speciality_name,
     };
-    
+
     localStorage.setItem('searchKey', JSON.stringify(searchKey));
 
     this.doctorService.changeSearchDoctor(this.searchKeywords);

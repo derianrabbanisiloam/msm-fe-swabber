@@ -5,60 +5,52 @@
   </div>
   <div id="tutorial_week_button" class="btn-box header_right" *ngIf="showScheduleType1 && !message1">
     <div>
-      <my-date-picker
-        name="mydate" 
-        [options]="myDatePickerOptions" 
-        [(ngModel)]="datePickerModel" 
+      <my-date-picker name="mydate" [options]="myDatePickerOptions" [(ngModel)]="datePickerModel"
         (dateChanged)="gotoDate($event)">
       </my-date-picker>
     </div>
-    <button class="btn-nav btn-left-right"
-            (click)="gotoPrevWeek()"
-            [disabled]="btnActive.prevWeek == false"
-            [ngClass]="btnActive.prevWeek == false ? 'btn-left-right-disabled' : ''">
-      <img src="../../../../assets/icons/ic_ArrowRight_White.png">
+    <button class="btn-nav btn-left-right" (click)="gotoPrevWeek()" [disabled]="btnActive.prevWeek == false"
+      [ngClass]="btnActive.prevWeek == false ? 'btn-left-right-disabled' : ''">
+      <img src="{{assetPath}}icons/ic_ArrowRight_White.png">
     </button>
-    <button class="btn-nav btn-green btn-green header-3"
-            (click)="gotoThisWeek()"
-            [disabled]="btnActive.thisWeek == false"
-            [ngClass]="btnActive.thisWeek == false ? 'btn-left-right-disabled' : ''" >
+    <button class="btn-nav btn-green btn-green header-3" (click)="gotoThisWeek()"
+      [disabled]="btnActive.thisWeek == false" [ngClass]="btnActive.thisWeek == false ? 'btn-left-right-disabled' : ''">
       <span>This week</span>
     </button>
-    <button class="btn-nav btn-left-right"
-            (click)="gotoNextWeek()"
-            [disabled]="btnActive.nextWeek == false"
-            [ngClass]="btnActive.nextWeek == false ? 'btn-left-right-disabled' : ''">
-      <img src="../../../../assets/icons/ic_ArrowLeft_White.png">
+    <button class="btn-nav btn-left-right" (click)="gotoNextWeek()" [disabled]="btnActive.nextWeek == false"
+      [ngClass]="btnActive.nextWeek == false ? 'btn-left-right-disabled' : ''">
+      <img src="{{assetPath}}icons/ic_ArrowLeft_White.png">
     </button>
   </div>
   <div class="content-doctor-schedule-group" *ngIf="showScheduleType1 && !message1">
     <div class="content-header-container">
       <div class="content-doctor-schedule-group-1 ">
-        <span class="foot-note" ><span class="bold">Doctor : </span>{{keywords.doctor.name}}</span>
+        <span class="foot-note"><span class="bold">Doctor : </span>{{keywords.doctor.name}}</span>
       </div>
     </div>
 
     <div class="content-doctor-schedule-group-2 group-1 shadow-4">
       <div class="header-2 header-doctor">{{keywords.doctor.name}}</div>
-      <div  class="container-table">
+      <div class="container-table">
         <ngb-accordion #acc="ngbAccordion" activeIds="static-1" *ngFor="let sch of doctorSchedules1">
           <ngb-panel id="static-1" title="{{sch.hospital_name}}" class="header-doctor">
             <ng-template ngbPanelContent>
               <table border="0" class="">
                 <thead>
-                <tr>
-                  <th class="hack" *ngFor="let date of dates"
+                  <tr>
+                    <th class="hack" *ngFor="let date of dates"
                       [ngStyle]="{'background': date.dateISO == todayDateISO ? '#ccc' : '' }">
-                      <span *ngIf="date.isLeave && sch.hospital_id === date.hospitalId" class="unavailable">{{date.dateHeader}} * {{date.leaveType}}</span>
+                      <span *ngIf="date.isLeave && sch.hospital_id === date.hospitalId"
+                        class="unavailable">{{date.dateHeader}} * {{date.leaveType}}</span>
                       <span *ngIf="!(date.isLeave && sch.hospital_id === date.hospitalId)">{{date.dateHeader}}</span>
-                  </th>
-                </tr>
+                    </th>
+                  </tr>
                 </thead>
                 <tbody>
-                <tr>
-                  <td *ngFor="let date of dates">
-                    <ng-container *ngFor="let itemSch of sch.schedules">
-                      <span *ngIf="itemSch.day == date.dateDay && 
+                  <tr>
+                    <td *ngFor="let date of dates">
+                      <ng-container *ngFor="let itemSch of sch.schedules">
+                        <span *ngIf="itemSch.day == date.dateDay && 
                                   date.dateISO >= todayDateISO && !date.isLeave">
                           <span *ngIf="!itemSch.is_full" class="success-light"></span>
                           <span *ngIf="itemSch.is_full" class="danger-light"></span>
@@ -72,18 +64,17 @@
                             {{itemSch.from_time.substr(0,5)}} - {{itemSch.to_time.substr(0,5)}}
                           </a>
                           <br>
-                      </span>
-                      <span *ngIf="(itemSch.day == date.dateDay &&
+                        </span>
+                        <span *ngIf="(itemSch.day == date.dateDay &&
                                   date.dateISO < todayDateISO) || 
                                   (itemSch.day == date.dateDay &&
-                                  date.dateISO >= todayDateISO && date.isLeave)"
-                            class="unavailable">
-                        {{itemSch.from_time.substr(0,5)}} - {{itemSch.to_time.substr(0,5)}}<br>
-                      </span>
-                    </ng-container>
-                  </td>
-                </tr>
-                <tr style="height: 12px"></tr>
+                                  date.dateISO >= todayDateISO && date.isLeave)" class="unavailable">
+                          {{itemSch.from_time.substr(0,5)}} - {{itemSch.to_time.substr(0,5)}}<br>
+                        </span>
+                      </ng-container>
+                    </td>
+                  </tr>
+                  <tr style="height: 12px"></tr>
                 </tbody>
               </table>
             </ng-template>
@@ -96,83 +87,81 @@
   <div class="content-doctor-schedule-group" *ngIf="showScheduleType2 && !message1">
     <div class="content-header-container">
       <div class="content-doctor-schedule-group-1">
-        <span class="showing_result foot-note" *ngIf="keywords.area"><span class="bold">Area:</span> {{keywords.area.name}}</span>
-        <span class="showing_result foot-note" *ngIf="keywords.hospital"><span class="bold">Hospital:</span> {{keywords.hospital.name}}</span>
-        <span class="showing_result foot-note"><span class="bold">Speciality:</span> {{keywords.speciality.speciality_name}}</span>
+        <span class="showing_result foot-note" *ngIf="keywords.area"><span class="bold">Area:</span>
+          {{keywords.area.name}}</span>
+        <span class="showing_result foot-note" *ngIf="keywords.hospital"><span class="bold">Hospital:</span>
+          {{keywords.hospital.name}}</span>
+        <span class="showing_result foot-note"><span class="bold">Speciality:</span>
+          {{keywords.speciality.speciality_name}}</span>
       </div>
       <div class="header_right">
         <div>
-          <my-date-picker 
-            name="mydate" 
-            [options]="myDatePickerOptions" 
-            [(ngModel)]="datePickerModel" 
+          <my-date-picker name="mydate" [options]="myDatePickerOptions" [(ngModel)]="datePickerModel"
             (dateChanged)="gotoDate($event)">
           </my-date-picker>
         </div>
-        <button class="btn-nav btn-left-right"
-                (click)="gotoPrevWeek()"
-                [disabled]="btnActive.prevWeek == false"
-                [ngClass]="btnActive.prevWeek == false ? 'btn-left-right-disabled' : ''">
-          <img src="../../../../assets/icons/ic_ArrowRight_White.png">
+        <button class="btn-nav btn-left-right" (click)="gotoPrevWeek()" [disabled]="btnActive.prevWeek == false"
+          [ngClass]="btnActive.prevWeek == false ? 'btn-left-right-disabled' : ''">
+          <img src="{{assetPath}}icons/ic_ArrowRight_White.png">
         </button>
-        <button class="btn-nav btn-green btn-green header-3"
-                (click)="gotoThisWeek()"
-                [disabled]="btnActive.thisWeek == false"
-                [ngClass]="btnActive.thisWeek == false ? 'btn-left-right-disabled' : ''" >
+        <button class="btn-nav btn-green btn-green header-3" (click)="gotoThisWeek()"
+          [disabled]="btnActive.thisWeek == false"
+          [ngClass]="btnActive.thisWeek == false ? 'btn-left-right-disabled' : ''">
           <span>This week</span>
         </button>
-        <button class="btn-nav btn-left-right"
-                (click)="gotoNextWeek()"
-                [disabled]="btnActive.nextWeek == false"
-                [ngClass]="btnActive.nextWeek == false ? 'btn-left-right-disabled' : ''">
-          <img src="../../../../assets/icons/ic_ArrowLeft_White.png">
+        <button class="btn-nav btn-left-right" (click)="gotoNextWeek()" [disabled]="btnActive.nextWeek == false"
+          [ngClass]="btnActive.nextWeek == false ? 'btn-left-right-disabled' : ''">
+          <img src="{{assetPath}}icons/ic_ArrowLeft_White.png">
         </button>
       </div>
     </div>
     <div class="content-doctor-schedule-group-2 group-2">
       <ngb-accordion #acc="ngbAccordion" activeIds="static-0">
-        <ngb-panel 
-          class="header-2 table-align-left" 
-          *ngFor="let sch of doctorSchedules2; let i=index" 
+        <ngb-panel class="header-2 table-align-left" *ngFor="let sch of doctorSchedules2; let i=index"
           title=" {{sch.hospital_name}}" id="static-{{i}}">
           <ng-template ngbPanelContent>
             <div class="header-3" *ngFor="let doc of sch.doctors">
               <table border="0" class="">
                 <thead>
-                <th colspan="7" >{{doc.doctor_name}}</th>
+                  <th colspan="7">{{doc.doctor_name}}</th>
                 </thead>
                 <tbody>
-                <tr>
-                  <th class="hack" *ngFor="let date of dates"
+                  <tr>
+                    <th class="hack" *ngFor="let date of dates"
                       [ngStyle]="{'background': date.dateISO == todayDateISO ? '#ccc' : '' }">
-                      <span *ngIf="date.isLeave && sch.hospital_id === date.hospitalId && date.doctorId === doc.doctor_id" class="unavailable">{{date.dateHeader}} * {{date.leaveType}}</span>
-                      <span *ngIf="!(date.isLeave && sch.hospital_id === date.hospitalId && date.doctorId === doc.doctor_id)">{{date.dateHeader}}</span>
-                  </th>
-                </tr>
-                <tr>
-                  <td class="body-text" *ngFor="let date of dates">
-                    <ng-container *ngFor="let itemSch of doc.schedules">
-                        <span *ngIf="itemSch.day == date.dateDay && 
+                      <span
+                        *ngIf="date.isLeave && sch.hospital_id === date.hospitalId && date.doctorId === doc.doctor_id"
+                        class="unavailable">{{date.dateHeader}} * {{date.leaveType}}</span>
+                      <span
+                        *ngIf="!(date.isLeave && sch.hospital_id === date.hospitalId && date.doctorId === doc.doctor_id)">{{date.dateHeader}}</span>
+                    </th>
+                  </tr>
+                  <tr>
+                    <td class="body-text" *ngFor="let date of dates">
+                      <ng-container *ngFor="let itemSch of doc.schedules">
+                        <span
+                          *ngIf="itemSch.day == date.dateDay && 
                         date.dateISO >= todayDateISO && !(date.isLeave && sch.hospital_id === date.hospitalId && date.doctorId === doc.doctor_id)">
-                            <span *ngIf="!itemSch.is_full" class="success-light"></span>
-                            <span *ngIf="itemSch.is_full" class="danger-light"></span>
-                            <a (click)="gotoCreateApp(itemSch, date.dateISO)">
-                              {{itemSch.from_time.substr(0,5)}} - {{itemSch.to_time.substr(0,5)}}
-                            </a>
-                            <br>
+                          <span *ngIf="!itemSch.is_full" class="success-light"></span>
+                          <span *ngIf="itemSch.is_full" class="danger-light"></span>
+                          <a (click)="gotoCreateApp(itemSch, date.dateISO)">
+                            {{itemSch.from_time.substr(0,5)}} - {{itemSch.to_time.substr(0,5)}}
+                          </a>
+                          <br>
                         </span>
 
-                        <span *ngIf="(itemSch.day == date.dateDay &&
+                        <span
+                          *ngIf="(itemSch.day == date.dateDay &&
                         date.dateISO < todayDateISO) || 
                         (itemSch.day == date.dateDay &&
-                        date.dateISO >= todayDateISO && date.isLeave && sch.hospital_id === date.hospitalId && date.doctorId === doc.doctor_id)" 
-                              class="unavailable">
+                        date.dateISO >= todayDateISO && date.isLeave && sch.hospital_id === date.hospitalId && date.doctorId === doc.doctor_id)"
+                          class="unavailable">
                           {{itemSch.from_time.substr(0,5)}} - {{itemSch.to_time.substr(0,5)}}<br>
                         </span>
-                    </ng-container>
-                  </td>
-                </tr>
-                <tr style="height: 12px"></tr>
+                      </ng-container>
+                    </td>
+                  </tr>
+                  <tr style="height: 12px"></tr>
                 </tbody>
               </table>
             </div>

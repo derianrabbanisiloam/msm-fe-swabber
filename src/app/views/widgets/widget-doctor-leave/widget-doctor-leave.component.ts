@@ -9,15 +9,16 @@ import { NgbDateStruct } from '@ng-bootstrap/ng-bootstrap';
 import { NgbDateFRParserFormatter } from '../widget-doctor-leave/ngb-date-fr-parser-formatter';
 import Swal from 'sweetalert2';
 import * as moment from 'moment';
+import { environment } from '../../../../environments/environment';
 
 @Component({
   selector: 'app-widget-doctor-leave',
   templateUrl: './widget-doctor-leave.component.html',
   styleUrls: ['./widget-doctor-leave.component.css'],
-  providers: [NgbDatepickerConfig, {provide: NgbDateParserFormatter, useClass: NgbDateFRParserFormatter}],
+  providers: [NgbDatepickerConfig, { provide: NgbDateParserFormatter, useClass: NgbDateFRParserFormatter }],
 })
 export class WidgetDoctorLeaveComponent implements OnInit {
-
+  public assetPath = environment.ASSET_PATH;
   constructor(
     private doctorService: DoctorService,
     private modalService: NgbModal,
@@ -96,7 +97,7 @@ export class WidgetDoctorLeaveComponent implements OnInit {
       dateFormat: 'dd/mm/yyyy',
       height: '27px',
       width: '240px',
-      disableUntil: {year: this.today[0], month: this.today[1], day: this.today[2]}
+      disableUntil: { year: this.today[0], month: this.today[1], day: this.today[2] }
     };
 
     this.myDateRangePickerOptionsTwo = {
@@ -212,11 +213,11 @@ export class WidgetDoctorLeaveComponent implements OnInit {
 
   getViewDoctorLeave(): void {
     this.tampungOne = this.getViewDoctorLeaveForm.controls.from_to_date.value.beginDate.day + '-' +
-    this.getViewDoctorLeaveForm.controls.from_to_date.value.beginDate.month + '-' +
-    this.getViewDoctorLeaveForm.controls.from_to_date.value.beginDate.year;
+      this.getViewDoctorLeaveForm.controls.from_to_date.value.beginDate.month + '-' +
+      this.getViewDoctorLeaveForm.controls.from_to_date.value.beginDate.year;
     this.tampungTwo = this.getViewDoctorLeaveForm.controls.from_to_date.value.endDate.day + '-' +
-    this.getViewDoctorLeaveForm.controls.from_to_date.value.endDate.month + '-' +
-    this.getViewDoctorLeaveForm.controls.from_to_date.value.endDate.year;
+      this.getViewDoctorLeaveForm.controls.from_to_date.value.endDate.month + '-' +
+      this.getViewDoctorLeaveForm.controls.from_to_date.value.endDate.year;
 
     this.model.fromDate = this.getViewDoctorLeaveForm.controls.from_to_date.value.beginDate.year + '-' +
       this.getViewDoctorLeaveForm.controls.from_to_date.value.beginDate.month + '-' +
@@ -237,39 +238,39 @@ export class WidgetDoctorLeaveComponent implements OnInit {
       this.doctorRefresh = this.doctorIdSelectedTwo;
       this.doctorService.getViewDoctorLeave(this.hospitalId, this.model.fromDate, this.model.toDate, this.doctorIdSelectedTwo)
         .subscribe(data => {
-            this.leaves = data.data;
-            this.fromToView = null;
-            this.flag = false;
+          this.leaves = data.data;
+          this.fromToView = null;
+          this.flag = false;
         }, err => {
-            Swal.fire({
-              type: 'error',
-              title: 'Oops...',
-              text: 'Something went wrong!',
-              timer: 1500
-            });
-            this.fromToView = null;
-            this.leaves = null;
-            this.flag = false;
+          Swal.fire({
+            type: 'error',
+            title: 'Oops...',
+            text: 'Something went wrong!',
+            timer: 1500
+          });
+          this.fromToView = null;
+          this.leaves = null;
+          this.flag = false;
         });
 
     } else {
       this.doctorService.getViewDoctorLeave(this.hospitalId, this.model.fromDate, this.model.toDate)
         .subscribe(data => {
-            this.doctorRefresh = null;
-            this.leaves = data.data;
-            this.fromToView = null;
-            this.flag = false;
+          this.doctorRefresh = null;
+          this.leaves = data.data;
+          this.fromToView = null;
+          this.flag = false;
         }, err => {
-            Swal.fire({
-              type: 'error',
-              title: 'Oops...',
-              text: 'Something went wrong!',
-              timer: 1500
-            });
-            this.fromToView = null;
-            this.doctorRefresh = null;
-            this.leaves = null;
-            this.flag = false;
+          Swal.fire({
+            type: 'error',
+            title: 'Oops...',
+            text: 'Something went wrong!',
+            timer: 1500
+          });
+          this.fromToView = null;
+          this.doctorRefresh = null;
+          this.leaves = null;
+          this.flag = false;
         });
     }
   }
@@ -301,20 +302,20 @@ export class WidgetDoctorLeaveComponent implements OnInit {
 
     switch (this.scheduleTypeIdEdit) {
       case '2':
-      scheduleType = 'Annual Leave';
-      break;
+        scheduleType = 'Annual Leave';
+        break;
 
       case '3':
-      scheduleType = 'Personal Matters';
-      break;
+        scheduleType = 'Personal Matters';
+        break;
 
       case '4':
-      scheduleType = 'Maternity';
-      break;
+        scheduleType = 'Maternity';
+        break;
 
       case '5':
-      scheduleType = 'Sick Leave';
-      break;
+        scheduleType = 'Sick Leave';
+        break;
     }
     this.scheduleTypeEdit = scheduleType;
 
@@ -328,7 +329,7 @@ export class WidgetDoctorLeaveComponent implements OnInit {
   }
 
   showError() {
-      this.editDoctorLeave();
+    this.editDoctorLeave();
   }
 
   editDoctorLeave() {
@@ -354,27 +355,27 @@ export class WidgetDoctorLeaveComponent implements OnInit {
     this.model.source = this.dummyMACAddress;
 
     this.doctorService.editDoctorLeave(this.hospitalId, this.scheduleIdEdit, this.model)
-        .subscribe(data => {
-          Swal.fire({
-            position: 'top-end',
-            type: 'success',
-            title: 'Success',
-            showConfirmButton: false,
-            timer: 1500
-          });
-          if (this.doctorRefresh == null) {
-            this.refreshDoctorLeave();
-          } else {
-            this.refreshDoctorLeaveByDoctorId();
-          }
-        }, err => {
-          Swal.fire({
-            type: 'error',
-            title: 'Oops...',
-            text: 'Something went wrong!',
-            timer: 1500
-          });
+      .subscribe(data => {
+        Swal.fire({
+          position: 'top-end',
+          type: 'success',
+          title: 'Success',
+          showConfirmButton: false,
+          timer: 1500
         });
+        if (this.doctorRefresh == null) {
+          this.refreshDoctorLeave();
+        } else {
+          this.refreshDoctorLeaveByDoctorId();
+        }
+      }, err => {
+        Swal.fire({
+          type: 'error',
+          title: 'Oops...',
+          text: 'Something went wrong!',
+          timer: 1500
+        });
+      });
 
   }
 
@@ -384,77 +385,77 @@ export class WidgetDoctorLeaveComponent implements OnInit {
       source: this.dummyMACAddress
     };
     this.doctorService.deleteDoctorLeave(this.hospitalId, this.selectedDeleteLeave.schedule_id, modal)
-        .subscribe(data => {
-          Swal.fire({
-            position: 'top-end',
-            type: 'success',
-            title: 'Success',
-            showConfirmButton: false,
-            timer: 1500
-          });
-          if (this.doctorRefresh == null) {
-            this.refreshDoctorLeave();
-          } else {
-            this.refreshDoctorLeaveByDoctorId();
-          }
-        }, err => {
-          Swal.fire({
-            type: 'error',
-            title: 'Oops...',
-            text: 'Something went wrong!',
-            timer: 1500
-          });
+      .subscribe(data => {
+        Swal.fire({
+          position: 'top-end',
+          type: 'success',
+          title: 'Success',
+          showConfirmButton: false,
+          timer: 1500
         });
+        if (this.doctorRefresh == null) {
+          this.refreshDoctorLeave();
+        } else {
+          this.refreshDoctorLeaveByDoctorId();
+        }
+      }, err => {
+        Swal.fire({
+          type: 'error',
+          title: 'Oops...',
+          text: 'Something went wrong!',
+          timer: 1500
+        });
+      });
   }
 
   refreshDoctorLeaveByDoctorId() {
     this.doctorService.getViewDoctorLeave(this.hospitalId, this.dateOne, this.dateTwo, this.doctorRefresh)
-        .subscribe(data => {
-            this.leaves = data.data;
-            this.showSelected = true;
-            this.toggoleShowHide = 'visible';
-            this.flag = false;
-        }, err => {
-          this.toggoleShowHide = 'hidden';
-          this.showSelected = false;
-          this.flag = false;
-          this.leaves = null;
-        });
+      .subscribe(data => {
+        this.leaves = data.data;
+        this.showSelected = true;
+        this.toggoleShowHide = 'visible';
+        this.flag = false;
+      }, err => {
+        this.toggoleShowHide = 'hidden';
+        this.showSelected = false;
+        this.flag = false;
+        this.leaves = null;
+      });
   }
 
   refreshDoctorLeave() {
     if (this.fromDateRefresh === undefined || this.toDateRefresh === undefined) {
       this.doctorService.getViewDoctorLeave(this.hospitalId, this.dateOne, this.dateOne)
-        .subscribe( data => {
-            this.leaves = data.data;
-            this.showSelected = true;
-            this.toggoleShowHide = 'visible';
-            this.fromToView = null;
-            this.flag = false;
-        }, error => {
-            this.toggoleShowHide = 'hidden';
-            this.fromToView = null;
-            this.showSelected = false;
-            this.leaves = null;
-            this.flag = false;
-          }
-      );
-    } else {
-      this.doctorService.getViewDoctorLeave(this.hospitalId, this.fromDateRefresh, this.toDateRefresh)
-      .subscribe( data => {
+        .subscribe(data => {
           this.leaves = data.data;
           this.showSelected = true;
           this.toggoleShowHide = 'visible';
           this.fromToView = null;
           this.flag = false;
-      }, err => {
+        }, error => {
           this.toggoleShowHide = 'hidden';
           this.fromToView = null;
           this.showSelected = false;
           this.leaves = null;
           this.flag = false;
-      }
-    );
+        }
+        );
+    } else {
+      this.doctorService.getViewDoctorLeave(this.hospitalId, this.fromDateRefresh, this.toDateRefresh)
+        .subscribe(data => {
+          this.leaves = data.data;
+          this.showSelected = true;
+          this.toggoleShowHide = 'visible';
+          this.fromToView = null;
+          this.flag = false;
+        }, err => {
+          this.toggoleShowHide = 'hidden';
+          this.fromToView = null;
+          this.showSelected = false;
+          this.leaves = null;
+          this.flag = false;
+        }
+        );
     }
 
   }
@@ -479,7 +480,7 @@ export class WidgetDoctorLeaveComponent implements OnInit {
     } else if (reason === ModalDismissReasons.BACKDROP_CLICK) {
       return 'by clicking on a backdrop';
     } else {
-      return  `with: ${reason}`;
+      return `with: ${reason}`;
     }
   }
 

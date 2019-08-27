@@ -11,8 +11,8 @@
     <tbody>
       <tr class="fo_table_body_header">
         <td>
-          <input id="myInput" class="form-control" placeholder="Filter by doctor name"
-            (change)="searchDoctor(strName)" #strName ngbTooltip="Press 'Enter' to Search">
+          <input id="myInput" class="form-control" placeholder="Filter by doctor name" (change)="searchDoctor(strName)"
+            #strName ngbTooltip="Press 'Enter' to Search">
         </td>
         <td>
         </td>
@@ -43,12 +43,12 @@
   <ul *ngIf="pager.pages && pager.pages.length" class="pagination">
     <li [ngClass]="{disabled:pager.currentPage === 1}" class="page-item">
       <a class="page-link" (click)="setPage(1)">
-        <img src="../../../../assets/icons/ic_ArrowFirst@2x.png">
+        <img src="{{assetPath}}icons/ic_ArrowFirst@2x.png">
       </a>
     </li>
     <li [ngClass]="{disabled:pager.currentPage === 1}" class="page-item">
       <a class="page-link" (click)="setPage(pager.currentPage - 1)">
-        <img class="fo_arrow_big" src="../../../../assets/icons/ic_ArrowLeft@2x.png">
+        <img class="fo_arrow_big" src="{{assetPath}}icons/ic_ArrowLeft@2x.png">
       </a>
     </li>
     <li *ngFor="let page of pager.pages" [ngClass]="{active:pager.currentPage === page}" class="page-item">
@@ -56,12 +56,12 @@
     </li>
     <li [ngClass]="{disabled:pager.currentPage === pager.totalPages}" class="page-item">
       <a class="page-link" (click)="setPage(pager.currentPage + 1)">
-        <img class="fo_arrow_big" src="../../../../assets/icons/ic_ArrowRight@2x.png">
+        <img class="fo_arrow_big" src="{{assetPath}}icons/ic_ArrowRight@2x.png">
       </a>
     </li>
     <li [ngClass]="{disabled:pager.currentPage === pager.totalPages}" class="page-item">
       <a class="page-link" (click)="setPage(pager.totalPages)">
-        <img src="../../../../assets/icons/ic_ArrowLast@2x.png">
+        <img src="{{assetPath}}icons/ic_ArrowLast@2x.png">
       </a>
     </li>
   </ul>

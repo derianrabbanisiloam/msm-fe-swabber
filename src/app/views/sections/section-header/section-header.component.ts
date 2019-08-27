@@ -1,5 +1,5 @@
 import { Component, OnInit } from '@angular/core';
-import { AuthGuard} from '../../../guard/auth.guard';
+import { AuthGuard } from '../../../guard/auth.guard';
 import { environment } from '../../../../environments/environment';
 
 @Component({
@@ -10,7 +10,7 @@ import { environment } from '../../../../environments/environment';
 export class SectionHeaderComponent implements OnInit {
 
   title = 'msm-fe-template';
-
+  public assetPath = environment.ASSET_PATH;
   public currentHospital: any = {};
   public currentUser: any = {};
   public hospitals: any;
@@ -57,6 +57,6 @@ export class SectionHeaderComponent implements OnInit {
     };
 
     localStorage.setItem('key', JSON.stringify(this.key));
- }
+  }
 
 }

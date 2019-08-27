@@ -1,15 +1,16 @@
-import { Component, OnInit, Input} from '@angular/core';
+import { Component, OnInit, Input } from '@angular/core';
 import * as moment from 'moment';
 import { NgbModal } from '@ng-bootstrap/ng-bootstrap';
 import { NgbActiveModal } from '@ng-bootstrap/ng-bootstrap';
 import { ScheduleService } from '../../../services/schedule.service';
 import { ScheduleBlock } from '../../../models/schedules/schedule-block';
-import { 
+import {
   addScheduleBlockPayload, updateScheduleBlockPayload, deleteScheduleBlockPayload
 } from '../../../payloads/schedule-block.payload';
 import { sourceApps } from '../../../variables/common.variable';
 import { AlertService } from '../../../services/alert.service';
 import { Alert, AlertType } from '../../../models/alerts/alert';
+import { environment } from '../../../../environments/environment';
 
 @Component({
   selector: 'app-modal-schedule-block',
@@ -17,16 +18,16 @@ import { Alert, AlertType } from '../../../models/alerts/alert';
   styleUrls: ['./modal-schedule-block.component.css']
 })
 export class ModalScheduleBlockComponent implements OnInit {
-
+  public assetPath = environment.ASSET_PATH;
   @Input() inputedParams: any;
   public alerts: Alert[] = [];
   public key: any = JSON.parse(localStorage.getItem('key'));
   public hospital = this.key.hospital;
   public user = this.key.user;
   public blockModel: any = {};
-  public hourOptions: any = ['07', '08', '09', '10', '11', 
-                              '12', '13', '14', '15', '16', 
-                              '17', '18', '19', '20', '21', '22', '23'];
+  public hourOptions: any = ['07', '08', '09', '10', '11',
+    '12', '13', '14', '15', '16',
+    '17', '18', '19', '20', '21', '22', '23'];
   public minuteOptions: any = ['00', '30'];
   public scheduleBlocks: ScheduleBlock[];
   public addSchBlockPayload: addScheduleBlockPayload;
@@ -60,7 +61,7 @@ export class ModalScheduleBlockComponent implements OnInit {
         this.scheduleBlocks = data.data;
         let ft: any;
         let tt: any;
-        for (let i=0; i<this.scheduleBlocks.length; i++) {
+        for (let i = 0; i < this.scheduleBlocks.length; i++) {
           ft = this.scheduleBlocks[i].from_time.split(':');
           tt = this.scheduleBlocks[i].to_time.split(':');
           this.scheduleBlocks[i].fh = ft[0];
@@ -69,10 +70,10 @@ export class ModalScheduleBlockComponent implements OnInit {
           this.scheduleBlocks[i].tm = tt[1];
         }
       }
-    );    
+    );
   }
 
-  rangeTimeChecker(fromTime, toTime){
+  rangeTimeChecker(fromTime, toTime) {
     const fSplit = fromTime.split(':');
     const tSplit = toTime.split(':');
     const setFT = new Date(this.inputedParams.date).setUTCHours(fSplit[0], fSplit[1], 0, 0);
@@ -82,12 +83,12 @@ export class ModalScheduleBlockComponent implements OnInit {
     let fTime: any;
     let tTime: any;
     let found: boolean = false;
-    for (let i=0; i<this.scheduleBlocks.length; i++) {
+    for (let i = 0; i < this.scheduleBlocks.length; i++) {
       ft = this.scheduleBlocks[i].from_time.split(':');
       tt = this.scheduleBlocks[i].to_time.split(':');
       fTime = new Date(this.inputedParams.date).setUTCHours(ft[0], ft[1], 0, 0);
       tTime = new Date(this.inputedParams.date).setUTCHours(tt[0], tt[1], 0, 0);
-      if(((setFT >= fTime) && (setFT < tTime)) || ((setTT > fTime) && (setTT <= tTime))){
+      if (((setFT >= fTime) && (setFT < tTime)) || ((setTT > fTime) && (setTT <= tTime))) {
         found = true;
       }
     }
@@ -101,9 +102,9 @@ export class ModalScheduleBlockComponent implements OnInit {
     const toTime = moment('1990-01-01 ' + this.blockModel.th + ':' + this.blockModel.tm).format('HH:mm');
     const checkTime = await this.rangeTimeChecker(fromTime, toTime);
 
-    if(checkTime){
+    if (checkTime) {
       this.addBlockErrMsg = 'This range time already exist, please select another range time !';
-    }else{
+    } else {
       const { reason, isIncludeWaitingList } = this.blockModel;
       this.addSchBlockPayload = {
         fromDate: date,
@@ -111,7 +112,7 @@ export class ModalScheduleBlockComponent implements OnInit {
         fromTime: fromTime,
         toTime: toTime,
         reason: reason,
-        isIncludeWaitingList: isIncludeWaitingList, 
+        isIncludeWaitingList: isIncludeWaitingList,
         userId: this.userId,
         userName: this.userName,
         source: this.source,
@@ -136,7 +137,7 @@ export class ModalScheduleBlockComponent implements OnInit {
     const isIncludeWaitingList = this.schBlockSelected.is_include_waiting_list;
     this.checkBlockTime2(this.schBlockSelected.fh, this.schBlockSelected.fm, this.schBlockSelected.th, this.schBlockSelected.tm);
 
-    if(this.isValidBlock == true){
+    if (this.isValidBlock == true) {
       this.updateSchBlockPayload = {
         scheduleId: this.inputedParams.scheduleId,
         fromDate: fromDate,
@@ -144,7 +145,7 @@ export class ModalScheduleBlockComponent implements OnInit {
         fromTime: fromTime,
         toTime: toTime,
         reason: reason,
-        isIncludeWaitingList: isIncludeWaitingList, 
+        isIncludeWaitingList: isIncludeWaitingList,
         userId: this.userId,
         userName: this.userName,
         source: this.source,
@@ -223,12 +224,12 @@ export class ModalScheduleBlockComponent implements OnInit {
     }
   }
 
-  async getCollectionAlert(){
+  async getCollectionAlert() {
     this.alertService.getAlert().subscribe((alert: Alert) => {
       if (!alert) {
-          // clear alerts when an empty alert is received
-          this.alerts = [];
-          return;
+        // clear alerts when an empty alert is received
+        this.alerts = [];
+        return;
       }
       // add alert to array
       this.alerts.push(alert);
@@ -237,7 +238,7 @@ export class ModalScheduleBlockComponent implements OnInit {
 
   cssAlertType(alert: Alert) {
     if (!alert) {
-        return;
+      return;
     }
 
     switch (alert.type) {
@@ -251,7 +252,7 @@ export class ModalScheduleBlockComponent implements OnInit {
         return 'warning';
     }
   }
-  
+
   removeAlert(alert: Alert) {
     this.alerts = this.alerts.filter(x => x !== alert);
   }

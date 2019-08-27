@@ -10,6 +10,7 @@ import { Doctor } from '../../../models/doctors/doctor';
 import { Alert, AlertType } from '../../../models/alerts/alert';
 import { ModalRescheduleAppointmentComponent } from '../modal-reschedule-appointment/modal-reschedule-appointment.component';
 import { RescheduleAppointment } from '../../../models/appointments/reschedule-appointment';
+import { environment } from '../../../../environments/environment';
 
 @Component({
   selector: 'app-widget-reschedule-worklist',
@@ -17,8 +18,9 @@ import { RescheduleAppointment } from '../../../models/appointments/reschedule-a
   styleUrls: ['./widget-reschedule-worklist.component.css']
 })
 export class WidgetRescheduleWorklistComponent implements OnInit {
+  public assetPath = environment.ASSET_PATH;
   public key: any = JSON.parse(localStorage.getItem('key'));
-  public hospital: any = this.key.hospital; 
+  public hospital: any = this.key.hospital;
   public doctors: Doctor[];
   public rescheduledAppointments: RescheduleAppointment[];
   public totalAppointments: number;
@@ -26,7 +28,7 @@ export class WidgetRescheduleWorklistComponent implements OnInit {
   public pageSelected: number;
   public myDateRangePickerOptions: IMyDrpOptions = {
     dateFormat: 'dd/mm/yyyy',
-    height:'30px'
+    height: '30px'
   };
   public datePickerModel: any = {};
   public hospitalFormModel: any;
@@ -46,7 +48,7 @@ export class WidgetRescheduleWorklistComponent implements OnInit {
 
   ngOnInit() {
     //this.getHospitals();
-    this.keywordsModel.hospitalId = this.hospital.id; 
+    this.keywordsModel.hospitalId = this.hospital.id;
     this.getDoctors(this.hospital.id);
     this.initializeDateRangePicker();
     this.getCollectionAlert();
@@ -62,7 +64,7 @@ export class WidgetRescheduleWorklistComponent implements OnInit {
       }, err => {
         this.doctors = [];
       }
-    );
+      );
   }
 
   initializeDateRangePicker() {
@@ -71,16 +73,15 @@ export class WidgetRescheduleWorklistComponent implements OnInit {
     const month = Number(m.format('MM'));
     const date = Number(m.format('DD'));
     this.datePickerModel = {
-      beginDate: {year: year, month: month, day: date},
-      endDate: {year: year, month: month, day: date},
+      beginDate: { year: year, month: month, day: date },
+      endDate: { year: year, month: month, day: date },
     };
     this.keywordsModel.fromDate = m.format('YYYY-MM-DD');
     this.keywordsModel.toDate = this.keywordsModel.fromDate;
   }
 
   changeDateRange(dateRange: any) {
-    if (dateRange)
-    {
+    if (dateRange) {
       let bYear = dateRange.beginDate.year;
       let bMonth = dateRange.beginDate.month;
       bMonth = Number(bMonth) < 10 ? '0' + bMonth : bMonth;
@@ -96,13 +97,13 @@ export class WidgetRescheduleWorklistComponent implements OnInit {
       this.getRescheduleWorklist();
     }
   }
-  
+
   getRescheduleWorklist(doctor?: any) {
     if (doctor) {
       this.keywordsModel.doctorId = doctor.doctor_id;
     }
-    const { 
-      hospitalId = '', fromDate = this.todayDateISO, toDate = this.todayDateISO, 
+    const {
+      hospitalId = '', fromDate = this.todayDateISO, toDate = this.todayDateISO,
       patientName = '', doctorId = '', offset = 0, limit = 10
     } = this.keywordsModel;
     this.appointmentService.getRescheduleWorklist(
@@ -122,14 +123,14 @@ export class WidgetRescheduleWorklistComponent implements OnInit {
           x.appointment_from_time = x.appointment_from_time.substr(0, 5);
           x.appointment_to_time = x.appointment_to_time.substr(0, 5);
         });
-        this.isCanNextPage = this.rescheduledAppointments.length >= 10 ? true: false;
+        this.isCanNextPage = this.rescheduledAppointments.length >= 10 ? true : false;
       }
     );
   }
 
   openRescheduleModal(appointmentSelected: any) {
-    const modalRef = this.modalService.open(ModalRescheduleAppointmentComponent,  
-      {windowClass: 'cc_modal_confirmation', size: 'lg'});
+    const modalRef = this.modalService.open(ModalRescheduleAppointmentComponent,
+      { windowClass: 'cc_modal_confirmation', size: 'lg' });
     modalRef.componentInstance.appointmentSelected = appointmentSelected;
   }
 
@@ -173,12 +174,12 @@ export class WidgetRescheduleWorklistComponent implements OnInit {
     this.getRescheduleWorklist();
   }
 
-  async getCollectionAlert(){
+  async getCollectionAlert() {
     this.alertService.getAlert().subscribe((alert: Alert) => {
       if (!alert) {
-          // clear alerts when an empty alert is received
-          this.alerts = [];
-          return;
+        // clear alerts when an empty alert is received
+        this.alerts = [];
+        return;
       }
       // add alert to array
       this.alerts.push(alert);
@@ -187,7 +188,7 @@ export class WidgetRescheduleWorklistComponent implements OnInit {
 
   cssAlertType(alert: Alert) {
     if (!alert) {
-        return;
+      return;
     }
 
     switch (alert.type) {
@@ -201,7 +202,7 @@ export class WidgetRescheduleWorklistComponent implements OnInit {
         return 'warning';
     }
   }
-  
+
   removeAlert(alert: Alert) {
     this.alerts = this.alerts.filter(x => x !== alert);
   }

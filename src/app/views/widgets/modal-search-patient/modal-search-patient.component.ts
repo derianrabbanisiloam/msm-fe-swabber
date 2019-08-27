@@ -2,7 +2,7 @@ import { Component, OnInit, Input, Output, EventEmitter } from '@angular/core';
 import { NgbActiveModal, NgbProgressbarConfig } from '@ng-bootstrap/ng-bootstrap';
 import { PatientService } from '../../../services/patient.service';
 import { PatientHope } from '../../../models/patients/patient-hope';
-
+import { environment } from '../../../../environments/environment';
 
 @Component({
   selector: 'app-modal-search-patient',
@@ -10,7 +10,7 @@ import { PatientHope } from '../../../models/patients/patient-hope';
   styleUrls: ['./modal-search-patient.component.css']
 })
 export class ModalSearchPatientComponent implements OnInit {
-
+  public assetPath = environment.ASSET_PATH;
   @Input() searchKeywords: any;
   public patientHope: PatientHope[];
   public searchLoader: boolean = false;
@@ -19,7 +19,7 @@ export class ModalSearchPatientComponent implements OnInit {
     private patientService: PatientService,
     public activeModal: NgbActiveModal,
     public ngbProgressbarConfig: NgbProgressbarConfig
-  ) { 
+  ) {
     this.ngbProgressbarConfig.max = 1000;
     this.ngbProgressbarConfig.striped = true;
     this.ngbProgressbarConfig.animated = true;

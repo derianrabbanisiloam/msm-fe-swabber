@@ -218,7 +218,8 @@ export class ModalPatientVerificationComponent implements OnInit {
       note: app.note,
       userId: this.userId,
       userName: this.userName,
-      source: this.source
+      source: this.source,
+      isVerify: true,
     };
 
     await this.appointmentService.verifyAppointment(payload).toPromise().then(
@@ -255,7 +256,8 @@ export class ModalPatientVerificationComponent implements OnInit {
       note: app.note,
       userId: this.userId,
       userName: this.userName,
-      source: this.source
+      source: this.source,
+      isVerify: true,
     };
     await this.appointmentService.verifyAppointment(payload).toPromise().then(
       data => {

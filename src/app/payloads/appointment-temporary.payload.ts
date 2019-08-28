@@ -19,4 +19,5 @@ export class appointmentTemporaryPayload {
     userId: string;
     userName: string;
     source: string;
+    isVerify: boolean;
   }

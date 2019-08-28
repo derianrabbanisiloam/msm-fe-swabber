@@ -289,6 +289,7 @@ export class WidgetCreateAppointmentComponent implements OnInit {
   }
 
   async enableWalkInChecker() {
+    //to enable or disable button checkin and slot walkin 
     const appointmentDate = this.appointmentPayload.appointmentDate;
     const zone = this.hospital.zone;
     const dateNow = await regionTime(zone);
@@ -815,7 +816,13 @@ export class WidgetCreateAppointmentComponent implements OnInit {
         this.selectedCheckIn.custome_birth_date = dateFormatter(this.selectedCheckIn.birth_date, true);
       }
     );
-    this.late = await this.checkIsLate(appointmentId);
+
+    //if doctor type is not firstcome, check patient is late or not
+    if(this.doctorProfile.doctor_type_id !== '1'){
+      this.late = await this.checkIsLate(appointmentId);
+    }else{
+      this.late = '';
+    }
     this.open(content);
   }
 

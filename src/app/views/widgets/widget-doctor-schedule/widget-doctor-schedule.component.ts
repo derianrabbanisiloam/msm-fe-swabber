@@ -39,6 +39,8 @@ export class WidgetDoctorScheduleComponent implements OnInit {
   public isOriginal: boolean = true;
   public isForeign: boolean = false;
   private leaves = [];
+  public holidaysSpecialty: any = [];
+  public holidaysName: any = [];
 
   public datePickerModel: any = {
     date: {
@@ -121,43 +123,26 @@ export class WidgetDoctorScheduleComponent implements OnInit {
 
   async generateDates(selectedDate?: any) {
     this.dates = [];
-    let dateChoosed = selectedDate ? moment(selectedDate) : moment();
-    let now = dateChoosed.startOf('isoWeek').format('YYYY-MM-DD');
+    let dateChoosed = selectedDate ? moment(selectedDate) : moment(); 
+    let now = dateChoosed.startOf('isoWeek').format('YYYY-MM-DD'); 
     let date: any = now ? moment(now).startOf('week') : moment().startOf('week');
     let dateTemp: any;
     let dateHeader: any;
     let dateISO: any;
     let dateDay: any;
-    /** Kalo mau lanjutin pasang doctor leave, mulai dari sini ya */
-    let isLeave: boolean = false;
-    let hospitalId: any;
-    let leaveType: any;
-    let doctorId: any;
-    /** Kalo mau lanjutin pasang doctor leave, mulai dari sini ya */
-    let flag: any = null;
-    for (let i = 0, length = 7; i < length; i++) {
+    for (let i=0, length=7; i<length; i++) {
       dateTemp = date.add(1, 'days');
       dateHeader = dateTemp.format('dddd, DD-MM-YYYY');
       dateISO = dateTemp.format('YYYY-MM-DD');
       dateDay = dateTemp.format('E');
-
-      for (let j = 0, length = this.leaves.length; j < length; j++) {
-        if (dateISO !== flag) {
-          if (moment(dateISO) >= moment(this.leaves[j].from_date) && moment(dateISO) <= moment(this.leaves[j].to_date)) {
-            isLeave = true;
-            hospitalId = this.leaves[j].hospital_id;
-            leaveType = this.leaves[j].schedule_type_name;
-            doctorId = this.leaves[j].doctor_id;
-            flag = dateISO;
-          } else {
-            isLeave = false;
-            hospitalId = this.leaves[j].hospital_id;
-            leaveType = this.leaves[j].schedule_type_name;
-            doctorId = this.leaves[j].doctor_id;
+      this.dates.push({ dateHeader, dateISO, dateDay });
+      for(let l=0, lengthTwo=this.leaves.length; l<lengthTwo; l++) {
+          if(moment(this.dates[i].dateISO) >= moment(this.leaves[l].from_date) && moment(this.dates[i].dateISO) <= moment(this.leaves[l].to_date)) {
+            this.holidaysSpecialty.push(this.leaves[l].doctor_id+'-'+this.dates[i].dateISO+'-'+this.leaves[l].hospital_id);
+            this.holidaysName.push(this.leaves[l].schedule_type_name);
           }
-        }
       }
-      this.dates.push({ dateHeader, dateISO, dateDay, isLeave, hospitalId, leaveType, doctorId });
+      
     }
   }
 

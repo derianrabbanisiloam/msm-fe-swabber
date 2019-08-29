@@ -40,9 +40,9 @@
                   <tr>
                     <th class="hack" *ngFor="let date of dates"
                       [ngStyle]="{'background': date.dateISO == todayDateISO ? '#ccc' : '' }">
-                      <span *ngIf="date.isLeave && sch.hospital_id === date.hospitalId"
-                        class="unavailable">{{date.dateHeader}} * {{date.leaveType}}</span>
-                      <span *ngIf="!(date.isLeave && sch.hospital_id === date.hospitalId)">{{date.dateHeader}}</span>
+                      <span *ngIf="holidaysSpecialty.indexOf(sch.doctor_id+'-'+date.dateISO+'-'+sch.hospital_id) != -1"
+                        class="unavailable">{{date.dateHeader}} * {{holidaysName[holidaysSpecialty.indexOf(sch.doctor_id+'-'+date.dateISO+'-'+sch.hospital_id)]}}</span>
+                      <span *ngIf="!(holidaysSpecialty.indexOf(sch.doctor_id+'-'+date.dateISO+'-'+sch.hospital_id) != -1)">{{date.dateHeader}}</span>
                     </th>
                   </tr>
                 </thead>
@@ -50,28 +50,30 @@
                   <tr>
                     <td *ngFor="let date of dates">
                       <ng-container *ngFor="let itemSch of sch.schedules">
-                        <span *ngIf="itemSch.day == date.dateDay && 
-                                  date.dateISO >= todayDateISO && !date.isLeave">
-                          <span *ngIf="!itemSch.is_full" class="success-light"></span>
-                          <span *ngIf="itemSch.is_full" class="danger-light"></span>
-                          <a *ngIf="isOriginal && !isForeign" (click)="gotoCreateApp(itemSch, date.dateISO)">
-                            {{itemSch.from_time.substr(0,5)}} - {{itemSch.to_time.substr(0,5)}}
-                          </a>
-                          <a *ngIf="!isOriginal" (click)="gotoCreateApp2(itemSch, date.dateISO)">
-                            {{itemSch.from_time.substr(0,5)}} - {{itemSch.to_time.substr(0,5)}}
-                          </a>
-                          <a *ngIf="isOriginal && isForeign" (click)="gotoCreateApp3(itemSch, date.dateISO)">
-                            {{itemSch.from_time.substr(0,5)}} - {{itemSch.to_time.substr(0,5)}}
-                          </a>
-                          <br>
-                        </span>
-                        <span *ngIf="(itemSch.day == date.dateDay &&
-                                  date.dateISO < todayDateISO) || 
-                                  (itemSch.day == date.dateDay &&
-                                  date.dateISO >= todayDateISO && date.isLeave)" class="unavailable">
-                          {{itemSch.from_time.substr(0,5)}} - {{itemSch.to_time.substr(0,5)}}<br>
-                        </span>
-                      </ng-container>
+                          <span
+                            *ngIf="itemSch.day == date.dateDay && 
+                                    date.dateISO >= todayDateISO && !(holidaysSpecialty.indexOf(sch.doctor_id+'-'+date.dateISO+'-'+sch.hospital_id) != -1)">
+                            <span *ngIf="!itemSch.is_full" class="success-light"></span>
+                            <span *ngIf="itemSch.is_full" class="danger-light"></span>
+                            <a *ngIf="isOriginal && !isForeign" (click)="gotoCreateApp(itemSch, date.dateISO)">
+                              {{itemSch.from_time.substr(0,5)}} - {{itemSch.to_time.substr(0,5)}}
+                            </a>
+                            <a *ngIf="!isOriginal" (click)="gotoCreateApp2(itemSch, date.dateISO)">
+                              {{itemSch.from_time.substr(0,5)}} - {{itemSch.to_time.substr(0,5)}}
+                            </a>
+                            <a *ngIf="isOriginal && isForeign" (click)="gotoCreateApp3(itemSch, date.dateISO)">
+                              {{itemSch.from_time.substr(0,5)}} - {{itemSch.to_time.substr(0,5)}}
+                            </a>
+                            <br>
+                          </span>
+                          <span *ngIf="(itemSch.day == date.dateDay &&
+                                    date.dateISO < todayDateISO) || 
+                                    (itemSch.day == date.dateDay &&
+                                    date.dateISO >= todayDateISO && holidaysSpecialty.indexOf(sch.doctor_id+'-'+date.dateISO+'-'+sch.hospital_id) != -1)"
+                            class="unavailable">
+                            {{itemSch.from_time.substr(0,5)}} - {{itemSch.to_time.substr(0,5)}}<br>
+                          </span>
+                        </ng-container>
                     </td>
                   </tr>
                   <tr style="height: 12px"></tr>
@@ -130,35 +132,34 @@
                     <th class="hack" *ngFor="let date of dates"
                       [ngStyle]="{'background': date.dateISO == todayDateISO ? '#ccc' : '' }">
                       <span
-                        *ngIf="date.isLeave && sch.hospital_id === date.hospitalId && date.doctorId === doc.doctor_id"
-                        class="unavailable">{{date.dateHeader}} * {{date.leaveType}}</span>
+                        *ngIf="holidaysSpecialty.indexOf(doc.doctor_id+'-'+date.dateISO+'-'+sch.hospital_id) != -1"
+                        class="unavailable">{{date.dateHeader}} * {{holidaysName[holidaysSpecialty.indexOf(doc.doctor_id+'-'+date.dateISO+'-'+sch.hospital_id)]}}</span>
                       <span
-                        *ngIf="!(date.isLeave && sch.hospital_id === date.hospitalId && date.doctorId === doc.doctor_id)">{{date.dateHeader}}</span>
+                        *ngIf="!(holidaysSpecialty.indexOf(doc.doctor_id+'-'+date.dateISO+'-'+sch.hospital_id) != -1)">{{date.dateHeader}}</span>
                     </th>
                   </tr>
                   <tr>
                     <td class="body-text" *ngFor="let date of dates">
                       <ng-container *ngFor="let itemSch of doc.schedules">
-                        <span
-                          *ngIf="itemSch.day == date.dateDay && 
-                        date.dateISO >= todayDateISO && !(date.isLeave && sch.hospital_id === date.hospitalId && date.doctorId === doc.doctor_id)">
-                          <span *ngIf="!itemSch.is_full" class="success-light"></span>
-                          <span *ngIf="itemSch.is_full" class="danger-light"></span>
-                          <a (click)="gotoCreateApp(itemSch, date.dateISO)">
-                            {{itemSch.from_time.substr(0,5)}} - {{itemSch.to_time.substr(0,5)}}
-                          </a>
-                          <br>
-                        </span>
-
-                        <span
-                          *ngIf="(itemSch.day == date.dateDay &&
-                        date.dateISO < todayDateISO) || 
-                        (itemSch.day == date.dateDay &&
-                        date.dateISO >= todayDateISO && date.isLeave && sch.hospital_id === date.hospitalId && date.doctorId === doc.doctor_id)"
-                          class="unavailable">
-                          {{itemSch.from_time.substr(0,5)}} - {{itemSch.to_time.substr(0,5)}}<br>
-                        </span>
-                      </ng-container>
+                          <span
+                            *ngIf="itemSch.day == date.dateDay && 
+                          date.dateISO >= todayDateISO && !(holidaysSpecialty.indexOf(itemSch.doctor_id+'-'+date.dateISO+'-'+itemSch.hospital_id) != -1)">
+                            <span *ngIf="!itemSch.is_full" class="success-light"></span>
+                            <span *ngIf="itemSch.is_full" class="danger-light"></span>
+                            <a (click)="gotoCreateApp(itemSch, date.dateISO)">
+                              {{itemSch.from_time.substr(0,5)}} - {{itemSch.to_time.substr(0,5)}}
+                            </a>
+                            <br>
+                          </span>
+                          <span
+                            *ngIf="(itemSch.day == date.dateDay &&
+                          date.dateISO < todayDateISO) || 
+                          (itemSch.day == date.dateDay &&
+                          date.dateISO >= todayDateISO && holidaysSpecialty.indexOf(itemSch.doctor_id+'-'+date.dateISO+'-'+itemSch.hospital_id) != -1)"
+                            class="unavailable">
+                            {{itemSch.from_time.substr(0,5)}} - {{itemSch.to_time.substr(0,5)}}<br>
+                          </span>
+                        </ng-container>
                     </td>
                   </tr>
                   <tr style="height: 12px"></tr>

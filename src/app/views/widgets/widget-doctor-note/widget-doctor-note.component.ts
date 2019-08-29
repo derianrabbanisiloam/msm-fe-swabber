@@ -11,6 +11,7 @@ import { Subject } from 'rxjs';
 import Swal from 'sweetalert2';
 import * as moment from 'moment';
 import { environment } from '../../../../environments/environment';
+import { sourceApps } from '../../../variables/common.variable'
 
 @Component({
   selector: 'app-widget-doctor-note',
@@ -43,7 +44,7 @@ export class WidgetDoctorNoteComponent implements OnInit {
 
   public hospitalId: string = this.hospital.id;
   public userId: string = this.user.id;
-  public dummyMACAddress = 'B0-35-9F-F3-64-89';
+  public dummyMACAddress = sourceApps;
   public selectedEditNote: any;
   public selectedDeleteNote: any;
   public fromDateEdit: NgbDateStruct;
@@ -181,7 +182,7 @@ export class WidgetDoctorNoteComponent implements OnInit {
     this.postDoctorNotesForm.controls.note.setValue(this.postDoctorNotesForm.controls.note.value);
 
     this.model.note = this.postDoctorNotesForm.controls.note.value;
-    this.model.userId = localStorage.getItem('key');
+    this.model.userId = this.userId;
     this.model.source = this.dummyMACAddress;
 
     this.model.doctorId = this.doctorIdSelectedTwo;

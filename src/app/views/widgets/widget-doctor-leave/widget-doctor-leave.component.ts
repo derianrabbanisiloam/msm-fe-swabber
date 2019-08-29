@@ -1,6 +1,6 @@
 import { Component, OnInit } from '@angular/core';
 import { Doctor } from '../../../models/doctors/doctor';
-import { leaveType } from '../../../variables/common.variable';
+import { leaveType, sourceApps } from '../../../variables/common.variable';
 import { DoctorService } from '../../../services/doctor.service';
 import { IMyDrpOptions } from 'mydaterangepicker';
 import { FormGroup, FormControl, Validators } from '@angular/forms';
@@ -46,7 +46,7 @@ export class WidgetDoctorLeaveComponent implements OnInit {
   public myDateRangePickerOptions: IMyDrpOptions;
   public myDateRangePickerOptionsTwo: IMyDrpOptions;
   public model: any = {};
-  public dummyMACAddress = 'B0-35-9F-F3-64-89';
+  public dummyMACAddress = sourceApps;
   public dateTwo: any;
   public closeResult: string;
   public fromToPost: string;

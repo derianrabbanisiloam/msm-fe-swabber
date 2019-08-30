@@ -180,7 +180,7 @@ export class ModalRescheduleAppointmentComponent implements OnInit {
       data => {
         this.appointmentService.emitRescheduleApp(true);
       }, error => {
-        this.appointmentService.emitRescheduleApp(false);
+        this.appointmentService.emitRescheduleApp(error.error.message);
       }
     );
   }

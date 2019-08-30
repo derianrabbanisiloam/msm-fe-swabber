@@ -102,11 +102,13 @@ export class ModalPatientVerificationComponent implements OnInit {
 
   emitRescheduleApp() {
     this.appointmentService.rescheduleAppSource$.subscribe(
-      async () => {
-        await this.searchPatient();
-        await this.getDoctorProfile();
-        await this.getDoctorNotes();
-        await this.getConfirmTemp();
+      async (result) => {
+        if(result === true){
+          await this.searchPatient();
+          await this.getDoctorProfile();
+          await this.getDoctorNotes();
+          await this.getConfirmTemp();
+        }
       }
     );
   }

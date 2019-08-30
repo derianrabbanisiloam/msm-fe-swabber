@@ -22,7 +22,7 @@ export class AppointmentService {
   private reserveSlotAppUrl = environment.CALL_CENTER_SERVICE + '/appointments/reserved-slot';
   private appointmentRescheduleCount = environment.CALL_CENTER_SERVICE + '/appointments/reschedules/count';
 
-  private rescheduleAppSource = new Subject<boolean>();
+  private rescheduleAppSource = new Subject<any>();
   public rescheduleAppSource$ = this.rescheduleAppSource.asObservable();
   private createAppSource = new Subject<boolean>();
   public createAppSource$ = this.createAppSource.asObservable();
@@ -122,7 +122,7 @@ export class AppointmentService {
     return this.http.get<Appointment[]>(this.appointmentUrl + url, httpOptions);
   }
 
-  emitRescheduleApp(params: boolean) {
+  emitRescheduleApp(params: any) {
     this.rescheduleAppSource.next(params);
   }
 

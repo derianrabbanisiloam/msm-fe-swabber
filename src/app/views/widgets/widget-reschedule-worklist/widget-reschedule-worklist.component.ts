@@ -150,11 +150,11 @@ export class WidgetRescheduleWorklistComponent implements OnInit {
   emitRescheduleApp() {
     this.appointmentService.rescheduleAppSource$.subscribe(
       result => {
-        if (result) {
+        if (result === true) {
           this.alertService.success('Reschedule appointment berhasil', false, 5000);
           this.getRescheduleWorklist();
         } else {
-          this.alertService.error('Gagal reschedule appointment', false, 5000);
+          this.alertService.error(result, false, 5000);
         }
       }
     );

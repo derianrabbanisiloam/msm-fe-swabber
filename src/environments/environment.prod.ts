@@ -6,5 +6,5 @@ export const environment = {
   FRONT_OFFICE_SERVICE: 'http://gtn-mysiloam-api-02/frontoffice/api/v2',
   SSO_SERVICE: 'http://10.85.129.91:8500',
   WEB_SOCKET_SERVICE: 'http://gtn-mysiloam-websocket-01:7779',
-  ASSET_PATH: 'https://gtn-dev-mysiloam-02.siloamhospitals.com/fo-assets/',
+  ASSET_PATH: 'https://gtn-mysiloam-01.siloamhospitals.com/fo-assets/',
 };

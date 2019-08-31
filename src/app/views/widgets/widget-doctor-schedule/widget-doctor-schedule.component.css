@@ -243,11 +243,11 @@ a:hover {
   table td{vertical-align: top}
   
   ::ng-deep .card button[aria-expanded="true"]:before{
-    content: url("https://gtn-dev-mysiloam-02.siloamhospitals.com/fo-assets/icons/ic_ArrowUp.png");
+    content: url("https://gtn-mysiloam-01.siloamhospitals.com/fo-assets/icons/ic_ArrowUp.png");
     color: black;
   }
   ::ng-deep .card button[aria-expanded="false"]:before{
-    content: url("https://gtn-dev-mysiloam-02.siloamhospitals.com/fo-assets/icons/ic_ArrowDown.png");
+    content: url("https://gtn-mysiloam-01.siloamhospitals.com/fo-assets/icons/ic_ArrowDown.png");
     color: black;
   }
   .p-absolute {

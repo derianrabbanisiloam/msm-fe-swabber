@@ -184,6 +184,9 @@ export class WidgetCreateAppointmentComponent implements OnInit {
     this.socket.on(CREATE_APP, (call) => {
       if (call.data.schedule_id == this.appointmentPayload.scheduleId
         && call.data.appointment_date == this.appointmentPayload.appointmentDate) {
+        this.appointments = this.appointments.filter((value) => {
+          return value.appointment_id !== call.data.appointment_id;
+        });
         this.appointments.push(call.data);
         this.dataProcessing();
       }

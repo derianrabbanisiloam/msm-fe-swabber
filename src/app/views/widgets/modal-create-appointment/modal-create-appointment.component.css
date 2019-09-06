@@ -245,10 +245,7 @@
     background: #fcf2cb;
     padding: 0.5em 1em;
     margin: 0.5em;
-    color: #c43d32;
-    position: sticky;
-    top: 90px;
-    z-index: 10;     
+    color: #c43d32;   
   }
   .notes-container img {
     width: 2em;

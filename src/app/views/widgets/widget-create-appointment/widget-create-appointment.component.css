@@ -618,6 +618,9 @@ tbody tr:last-child {
   padding: 0.5em 1em;
   margin: 0.5em;
   color: #c43d32;
+  position: sticky;
+  top: 90px;
+  z-index: 10;  
 }
 .notes-container img {
   width: 2em;

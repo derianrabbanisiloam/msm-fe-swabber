@@ -70,8 +70,8 @@ export class AppointmentService {
     const url = `${this.ccAppointmentUrl}/history/${appointment}`;
     return this.http.get<any>(url, httpOptions);
   }
-  getCountAppReschedule() {
-    const url = `${this.appointmentRescheduleCount}`;
+  getCountAppReschedule(hospital: string) {
+    const url = `${this.appointmentRescheduleCount}?hospitalId=${hospital}`;
     return this.http.get<any>(url, httpOptions);
   }
 

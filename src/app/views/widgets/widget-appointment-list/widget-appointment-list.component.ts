@@ -688,6 +688,7 @@ export class WidgetAppointmentListComponent implements OnInit {
           modified_by: res.data.modified_by
         }
         // broadcast check-in
+        dataPatient.hospitalId = this.hospital.id;
         this.socket.emit(CHECK_IN, dataPatient);
         this.buttonCreateAdmission = true;
         this.buttonPrintQueue = false;
@@ -838,6 +839,7 @@ export class WidgetAppointmentListComponent implements OnInit {
           modified_by: res.data.modified_by
         }
         // broadcast queue-number
+        dataPatient.hospitalId = this.hospital.id;
         this.socketTwo.emit(QUEUE_NUMBER, dataPatient);
         return res.data;
       }).catch(err => {

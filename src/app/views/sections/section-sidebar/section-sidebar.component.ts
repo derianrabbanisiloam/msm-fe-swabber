@@ -14,6 +14,8 @@ export class SectionSidebarComponent implements OnInit {
   public assetPath = environment.ASSET_PATH;
   public countAppRes: number;
   private socket;
+  public key: any = JSON.parse(localStorage.getItem('key'));
+  public hospital = this.key.hospital;
 
   constructor(
     private appointmentService: AppointmentService,
@@ -28,13 +30,13 @@ export class SectionSidebarComponent implements OnInit {
 
   ngOnInit() {
     this.countRechedule();
-    this.socket.on(APP_RESCHEDULE, (call) => {
+    this.socket.on(APP_RESCHEDULE+'/'+this.hospital.id, (call) => {
       this.countAppRes = call.data;
     });
   }
 
   countRechedule() {
-    this.appointmentService.getCountAppReschedule().subscribe(
+    this.appointmentService.getCountAppReschedule(this.hospital.id).subscribe(
       data => {
         this.countAppRes = data.data;
       }

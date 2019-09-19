@@ -11,6 +11,9 @@ import { sourceApps } from '../../../variables/common.variable';
 import { AlertService } from '../../../services/alert.service';
 import { Alert, AlertType } from '../../../models/alerts/alert';
 import { environment } from '../../../../environments/environment';
+import socket from 'socket.io-client';
+import { SecretKey, Jwt, keySocket, SCHEDULE_BLOCK } from '../../../variables/common.variable';
+import Security from 'msm-kadapat';
 
 @Component({
   selector: 'app-modal-schedule-block',
@@ -40,13 +43,22 @@ export class ModalScheduleBlockComponent implements OnInit {
   private userName: string = this.user.fullname;
   public source: string = sourceApps;
   public schBlockSelected: any;
+  private socket;
 
   constructor(
     private modalService: NgbModal,
     public activeModal: NgbActiveModal,
     private scheduleService: ScheduleService,
     private alertService: AlertService,
-  ) { }
+  ) {
+    this.socket = socket(environment.WEB_SOCKET_SERVICE + keySocket.SCHEDULE, {
+      'force new connection': true,
+      transports: ['websocket'],  
+      query: `data=${
+        Security.encrypt({ secretKey: SecretKey }, Jwt)
+        }&url=${environment.FRONT_OFFICE_SERVICE}`,
+    });
+   }
 
   ngOnInit() {
     this.getScheduleBlock();
@@ -120,6 +132,10 @@ export class ModalScheduleBlockComponent implements OnInit {
 
       await this.scheduleService.addScheduleBlock(scheduleId, this.addSchBlockPayload).toPromise().then(
         data => {
+          let dataScheduleBlock = {...data.data};
+          dataScheduleBlock.method = 'post';
+          dataScheduleBlock.hospitalId = this.hospital.id;
+          this.socket.emit(SCHEDULE_BLOCK, dataScheduleBlock);
           this.scheduleService.emitScheduleBlock(true);
         }
       );
@@ -152,6 +168,10 @@ export class ModalScheduleBlockComponent implements OnInit {
       };
       await this.scheduleService.updateScheduleBlock(scheduleBlockId, this.updateSchBlockPayload).toPromise().then(
         data => {
+          let dataScheduleBlock = {...data.data};
+          dataScheduleBlock.method = 'put';
+          dataScheduleBlock.hospitalId = this.hospital.id;
+          this.socket.emit(SCHEDULE_BLOCK, dataScheduleBlock);
           this.scheduleService.emitScheduleBlock(true);
           this.alertService.success('Schedule Blocks Updated', false, 3000);
         }
@@ -169,6 +189,10 @@ export class ModalScheduleBlockComponent implements OnInit {
     };
     await this.scheduleService.deleteScheduleBlock(scheduleBlockId, this.deleteSchBlockPayload).toPromise().then(
       data => {
+        let dataScheduleBlock = {...data.data};
+        dataScheduleBlock.method = 'delete';
+        dataScheduleBlock.hospitalId = this.hospital.id;
+        this.socket.emit(SCHEDULE_BLOCK, dataScheduleBlock);
         this.scheduleService.emitScheduleBlock(true);
         this.getScheduleBlock();
       }

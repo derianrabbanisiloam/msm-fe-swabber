@@ -44,7 +44,7 @@ import {
   SecretKey, Jwt,
   CHECK_IN, CREATE_APP,
   CANCEL_APP, RESCHEDULE_APP,
-  QUEUE_NUMBER, keySocket
+  QUEUE_NUMBER, keySocket, SCHEDULE_BLOCK
 } from '../../../variables/common.variable';
 import Security from 'msm-kadapat';
 import { environment } from '../../../../environments/environment';
@@ -63,6 +63,7 @@ export class WidgetCreateAppointmentComponent implements OnInit {
   public assetPath = environment.ASSET_PATH;
   private socket;
   private socketTwo;
+  private socketThree;
   public appointments: AppointmentMini[];
   public appList: any = [];
   public appListWaiting: any = [];
@@ -149,6 +150,13 @@ export class WidgetCreateAppointmentComponent implements OnInit {
 
     this.socketTwo = socket(`${environment.WEB_SOCKET_SERVICE + keySocket.QUEUE}`, {
       transports: ['websocket'],
+      query: `data=${
+        Security.encrypt({ secretKey: SecretKey }, Jwt)
+        }&url=${environment.FRONT_OFFICE_SERVICE}`,
+    });
+
+    this.socketThree = socket(environment.WEB_SOCKET_SERVICE + keySocket.SCHEDULE, {
+      transports: ['websocket'],  
       query: `data=${
         Security.encrypt({ secretKey: SecretKey }, Jwt)
         }&url=${environment.FRONT_OFFICE_SERVICE}`,
@@ -266,6 +274,21 @@ export class WidgetCreateAppointmentComponent implements OnInit {
         this.dataProcessing();
       }
     });
+
+    //socket block slot
+    this.socketThree.on(SCHEDULE_BLOCK, (call) => {
+      if(call.data.schedule_id === this.appointmentPayload.scheduleId
+        && call.data.from_date === this.appointmentPayload.appointmentDate) {
+          this.emitBlockSchedule();
+        }
+    });
+  }
+
+  async emitBlockSchedule() {
+    await this.getScheduleBlock();
+    await this.getAppointmentList();
+    await this.getSlotTime(); 
+    await this.dataProcessing();
   }
 
   async ngOnChanges() {
@@ -675,7 +698,11 @@ export class WidgetCreateAppointmentComponent implements OnInit {
     const toDate = fromDate;
     await this.doctorService.getDoctorNotes(hospitalId, fromDate, toDate, doctorId).toPromise().then(
       data => {
-        this.doctorNotes = data.data;
+        if(data.data.length === 0) {
+          this.doctorNotes = null;
+        } else {
+          this.doctorNotes = data.data;
+        }
       }
     );
   }

@@ -21,7 +21,7 @@
     <div></div>
   </div>
 
-  <div *ngIf="doctorNotes" class="notes-container d-flex justify-content-start">
+  <div *ngIf="doctorNotes || scheduleBlocks?.length" class="notes-container d-flex justify-content-start">
     <div>
       <img class="icon" src="{{assetPath}}icons/ic_Warning.png">
     </div>

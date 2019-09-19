@@ -5,11 +5,16 @@ export const CREATE_APP = 'APPOINTMENT__CREATE';
 export const CANCEL_APP = 'APPOINTMENT__CANCEL';
 export const RESCHEDULE_APP = 'APPOINTMENT__RESCHEDULE';
 export const QUEUE_NUMBER = 'QUEUE__CREATE_QUEUE';
+export const APP_TEMP = 'APPOINTMENT_TEMPORARY__COUNT';
 export const APP_RESCHEDULE = 'APPOINTMENT_RESCHEDULE__COUNT';
+export const SCHEDULE_BLOCK = 'SCHEDULE__BLOCK';
+export const USER_LOGIN__FRONT_OFFICE = 'USER_LOGIN__FRONT_OFFICE';
 
 export const keySocket = {
   APPOINTMENT: '/appointments',
-  QUEUE: '/queues'
+  QUEUE: '/queues',
+  SCHEDULE: '/schedules',
+  USERS: '/users'
 }
 
 export const appInfo = {

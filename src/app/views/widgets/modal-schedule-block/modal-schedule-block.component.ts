@@ -56,7 +56,7 @@ export class ModalScheduleBlockComponent implements OnInit {
       transports: ['websocket'],  
       query: `data=${
         Security.encrypt({ secretKey: SecretKey }, Jwt)
-        }&url=${environment.CALL_CENTER_SERVICE}`,
+        }&url=${environment.FRONT_OFFICE_SERVICE}`,
     });
    }
 

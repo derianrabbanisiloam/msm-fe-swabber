@@ -256,7 +256,7 @@ export class WidgetCreateAppointmentComponent implements OnInit {
           }
         });
       } else {
-        this.appointments.push(call.data);
+        this.appointments.push(call.data.after);
         this.dataProcessing();
       }
     });

@@ -741,8 +741,10 @@ export class WidgetCreateAppointmentComponent implements OnInit {
   }
 
   async openCreateAppModal(item: any) {
-    await this.reserveSlotApp(item);
     const canReserved = await this.getReservedSlot(item);
+    if(canReserved.key === null) {
+      await this.reserveSlotApp(item);
+    }
     const fromTime = item.appointment_from_time ? item.appointment_from_time : this.schedule.from_time; const toTime = item.appointment_to_time ? item.appointment_to_time : this.schedule.to_time;
     const data = {
       schedule_id: this.appointmentPayload.scheduleId,
@@ -753,7 +755,8 @@ export class WidgetCreateAppointmentComponent implements OnInit {
       doctor_id: this.schedule.doctor_id,
       appointment_no: item.appointment_no,
       is_waiting_list: item.is_waiting_list,
-      can_reserved: canReserved
+      can_reserved: canReserved,
+      doctor_type_id: this.doctorProfile.doctor_type_id
     };
     const modalRef = this.modalService.open(ModalCreateAppointmentComponent);
     modalRef.componentInstance.appointmentInfo = data;
@@ -761,8 +764,10 @@ export class WidgetCreateAppointmentComponent implements OnInit {
 
   public reschCurrentIdx: any;
   async openCreateAppModal2(item: any) {
-    await this.reserveSlotApp(item);
     const canReserved = await this.getReservedSlot(item);
+    if(canReserved.key === null) {
+      await this.reserveSlotApp(item);
+    }
     const fromTime = item.appointment_from_time ? item.appointment_from_time : this.schedule.from_time; const toTime = item.appointment_to_time ? item.appointment_to_time : this.schedule.to_time;
     const data = {
       schedule_id: this.appointmentPayload.scheduleId,
@@ -773,7 +778,8 @@ export class WidgetCreateAppointmentComponent implements OnInit {
       doctor_id: this.schedule.doctor_id,
       appointment_no: item.appointment_no,
       is_waiting_list: item.is_waiting_list,
-      can_reserved: canReserved
+      can_reserved: canReserved,
+      doctor_type_id: this.doctorProfile.doctor_type_id
     };
     let idx = this.reschCurrentIdx;
     if (idx) {

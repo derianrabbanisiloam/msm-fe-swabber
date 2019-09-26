@@ -8,7 +8,7 @@ import { WidgetSendNotificationComponent } from '../../widgets/widget-send-notif
 import { SectionHeaderModule } from '../../sections/section-header/section-header.module';
 import { SectionSidebarModule } from '../../sections/section-sidebar/section-sidebar.module';
 import { SectionFooterModule } from '../../sections/section-footer/section-footer.module';
-import { NgbAlertModule, NgbTooltipModule } from '@ng-bootstrap/ng-bootstrap';
+import { NgbAlertModule, NgbTooltipModule, NgbModalModule} from '@ng-bootstrap/ng-bootstrap';
 import { TextMaskModule } from 'angular2-text-mask';
 import { NguiAutoCompleteModule } from '@ngui/auto-complete';
 
@@ -26,6 +26,7 @@ import { NguiAutoCompleteModule } from '@ngui/auto-complete';
     SectionFooterModule,
     NgbAlertModule,
     NgbTooltipModule,
+    NgbModalModule,
     TextMaskModule,
     NguiAutoCompleteModule
   ],

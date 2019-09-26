@@ -11,6 +11,7 @@ import { AlertService } from '../../../services/alert.service';
 import { Alert, AlertType } from '../../../models/alerts/alert';
 import { sourceApps } from '../../../variables/common.variable';
 import { environment } from '../../../../environments/environment';
+import { NgbModal, ModalDismissReasons } from '@ng-bootstrap/ng-bootstrap';
 
 @Component({
   selector: 'app-widget-send-notification',
@@ -36,6 +37,7 @@ export class WidgetSendNotificationComponent implements OnInit {
   public showWaitMsg = false;
   public showNotFoundMsg = false;
   public key: any = JSON.parse(localStorage.getItem('key'));
+  public closeResult: string;
 
   constructor(
     private generalService: GeneralService,
@@ -43,6 +45,7 @@ export class WidgetSendNotificationComponent implements OnInit {
     private appointmentService: AppointmentService,
     private notificationService: NotificationService,
     private alertService: AlertService,
+    private modalService: NgbModal,
   ) { }
 
   ngOnInit() {
@@ -175,43 +178,66 @@ export class WidgetSendNotificationComponent implements OnInit {
     });
   }
 
-  sendNotif() {
-    this.alerts = [];
+  // sendNotif() {
+  //   this.alerts = [];
 
-    const hospital = this.key.hospital;
-    const user = this.key.user;
-    const date = localSpliter(this.appointmentDate, false);
-    const source = sourceApps;
+  //   const hospital = this.key.hospital;
+  //   const user = this.key.user;
+  //   const date = localSpliter(this.appointmentDate, false);
+  //   const source = sourceApps;
 
-    const idx = this.patientList.findIndex((i) => {
-      return i.selected === true;
+  //   const idx = this.patientList.findIndex((i) => {
+  //     return i.selected === true;
+  //   });
+
+  //   if (idx >= 0) {
+  //     const patientSelected = [];
+
+  //     for (let i = 0, { length } = this.patientList; i < length; i += 1) {
+  //       if (this.patientList[i].selected === true) {
+  //         patientSelected.push({
+  //           contactId: this.patientList[i].contact_id,
+  //         });
+  //       }
+  //     }
+
+  //     const body = {
+  //       doctorId: this.doctorSelected.doctor_id,
+  //       content: this.notes,
+  //       notifType: this.notifType.value,
+  //       organizationId: parseInt(hospital.orgId),
+  //       bookingDate: date,
+  //       receiver: patientSelected,
+  //       source,
+  //       userId: user.id,
+  //     };
+
+  //     this.notifySender(body);
+  //   } else {
+  //     this.alertService.error('Please select patient');
+  //   }
+  // }
+
+  sendNotif(content){
+    this.open(content);
+  }
+
+  open(content) {
+    this.modalService.open(content).result.then((result) => {
+      this.closeResult = `Closed with: ${result}`;
+    }, (reason) => {
+      this.closeResult = `Dismissed ${this.getDismissReason(reason)}`;
     });
+  }
 
-    if (idx >= 0) {
-      const patientSelected = [];
+  private getDismissReason(reason: any): string {
 
-      for (let i = 0, { length } = this.patientList; i < length; i += 1) {
-        if (this.patientList[i].selected === true) {
-          patientSelected.push({
-            contactId: this.patientList[i].contact_id,
-          });
-        }
-      }
-
-      const body = {
-        doctorId: this.doctorSelected.doctor_id,
-        content: this.notes,
-        notifType: this.notifType.value,
-        organizationId: parseInt(hospital.orgId),
-        bookingDate: date,
-        receiver: patientSelected,
-        source,
-        userId: user.id,
-      };
-
-      this.notifySender(body);
+    if (reason === ModalDismissReasons.ESC) {
+      return 'by pressing ESC';
+    } else if (reason === ModalDismissReasons.BACKDROP_CLICK) {
+      return 'by clicking on a backdrop';
     } else {
-      this.alertService.error('Please select patient');
+      return `with: ${reason}`;
     }
   }
 

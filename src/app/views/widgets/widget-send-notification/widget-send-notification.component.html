@@ -99,7 +99,7 @@
               </div>
               <div class="d-flex justify-content-end" style="margin: 25px 19px">
                 <button type="button" class="fo_btn_green header-3"
-                        [disabled]="buttonNotify" (click)="sendNotif()">
+                        [disabled]="buttonNotify" (click)="sendNotif(alertDisplay)">
                   &nbsp; Send Notes
                 </button>
               </div>
@@ -119,3 +119,19 @@
       </form>
     </div>
   </div>
+
+  <ng-template #alertDisplay let-c="close" let-d="dismiss">
+    <div class="modal-header">
+      <h4 class="modal-title">Alert Message</h4>
+      <button type="button" class="close" aria-label="Close" (click)="d('Cross click')">
+        <span aria-hidden="true">&times;</span>
+      </button>
+    </div>
+    <div class="modal-body">
+      <p>This feature is under construction. We are launching soon</p>
+      <br>
+      <div class="fo_confirmation_button d-flex justify-content-center">
+        <button type="button" class="btn fo_btn_black" (click)="c('Cross click')">Close</button>
+      </div>
+    </div>
+  </ng-template>

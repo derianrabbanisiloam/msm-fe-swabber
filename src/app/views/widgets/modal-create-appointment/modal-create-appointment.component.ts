@@ -36,6 +36,7 @@ export class ModalCreateAppointmentComponent implements OnInit {
   private userName: string = this.user.fullname;
   public source: string = sourceApps;
   public alerts: Alert[] = [];
+  public doctorTypeFcfs: string = '1';
 
   constructor(
     private modalService: NgbModal,
@@ -61,7 +62,7 @@ export class ModalCreateAppointmentComponent implements OnInit {
     );
 
     this.getCollectionAlert();
-    if (!this.appointmentInfo.can_reserved) {
+    if (this.appointmentInfo.can_reserved.key && this.appointmentInfo.doctor_type_id !== this.doctorTypeFcfs) {
       this.isLock = true;
       this.alertService.error('This slot is unavailable at this time, '
         + 'because there is other user using this slot now. '

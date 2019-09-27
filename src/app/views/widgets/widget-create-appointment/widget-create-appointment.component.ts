@@ -995,6 +995,24 @@ export class WidgetCreateAppointmentComponent implements OnInit {
     }
   }
 
+  checkInValidate(){
+    let params = { valid: true, msg: '' };
+
+    if (!this.patientType) {
+      params.valid = false;
+      params.msg = `Select Patient Type First`;
+    }
+
+    if (this.patientType.description === 'PAYER') {
+      if (!this.payer || !this.payer.payer_id) {
+        params.valid = false;
+        params.msg = `Please Input Payer First`;
+      }
+    }
+
+    return params;
+  }
+
   processCreateAdmission(val) {
     // Show loading bar
     this.buttonCreateAdmission = true;
@@ -1004,66 +1022,68 @@ export class WidgetCreateAppointmentComponent implements OnInit {
     let payerNo = null;
     let payerEligibility = null;
 
-    if (!this.patientType) {
-      this.alertService.error('Select patient type', false, 3000);
+    //check condition in checkin validate
+    let params = this.checkInValidate();
+
+    if(!params.valid){
+      this.alertService.error(params.msg, false, 3000);
       this.buttonCreateAdmission = false;
       this.isLoadingCreateAdmission = false;
-    }
-
-    if (this.patientType.description === 'PAYER') {
-      if (this.payer && this.payer.payer_id) {
-        payer = this.payer.payer_id;
-        payerNo = this.payerNo;
-        payerEligibility = this.payerEligibility
-      }
-    }
-
-    const body = {
-      appointmentId: val.appointment_id,
-      organizationId: Number(this.hospital.orgId),
-      patientTypeId: Number(this.patientType.value),
-      admissionTypeId: this.selectedAdmissionType.value,
-      payerId: payer,
-      payerNo: payerNo,
-      payerEligibility: payerEligibility,
-      userId: this.user.id,
-      source: sourceApps,
-      userName: this.user.fullname,
-    };
-    var dataPatient;
-
-    this.admissionService.createAdmission(body).toPromise()
-      .then(res => {
-        dataPatient = {
-          schedule_id: val.schedule_id,
-          admission_id: res.data.admission_id,
-          admission_hope_id: res.data.admission_hope_id,
-          admission_no: res.data.admission_no,
-          payer_name: res.data.payer_name,
-          appointment_id: val.appointment_id,
-          appointment_date: val.appointment_date,
-          hospital_id: val.hospital_id,
-          doctor_id: val.doctor_id,
-          modified_name: res.data.modified_name,
-          modified_date: res.data.modified_date,
-          modified_from: res.data.modified_from,
-          modified_by: res.data.modified_by
+    }else{
+      if (this.patientType.description === 'PAYER') {
+        if (this.payer && this.payer.payer_id) {
+          payer = this.payer.payer_id;
+          payerNo = this.payerNo;
+          payerEligibility = this.payerEligibility
         }
-        // broadcast check-in
-        dataPatient.hospitalId = this.hospital.id;
-        this.socket.emit(CHECK_IN, dataPatient);
-        this.buttonCreateAdmission = true;
-        this.buttonPrintQueue = false;
-        this.buttonCloseAdm = true;
-        this.buttonPatientLabel = false;
-        this.isLoadingCreateAdmission = false;
-        this.alertService.success(res.message, false, 3000);
-      }).catch(err => {
-        this.buttonCreateAdmission = false;
-        this.isLoadingCreateAdmission = false;
-        this.alertService.error(err.error.message, false, 3000);
-      })
-
+      }
+  
+      const body = {
+        appointmentId: val.appointment_id,
+        organizationId: Number(this.hospital.orgId),
+        patientTypeId: Number(this.patientType.value),
+        admissionTypeId: this.selectedAdmissionType.value,
+        payerId: payer,
+        payerNo: payerNo,
+        payerEligibility: payerEligibility,
+        userId: this.user.id,
+        source: sourceApps,
+        userName: this.user.fullname,
+      };
+      var dataPatient;
+  
+      this.admissionService.createAdmission(body).toPromise()
+        .then(res => {
+          dataPatient = {
+            schedule_id: val.schedule_id,
+            admission_id: res.data.admission_id,
+            admission_hope_id: res.data.admission_hope_id,
+            admission_no: res.data.admission_no,
+            payer_name: res.data.payer_name,
+            appointment_id: val.appointment_id,
+            appointment_date: val.appointment_date,
+            hospital_id: val.hospital_id,
+            doctor_id: val.doctor_id,
+            modified_name: res.data.modified_name,
+            modified_date: res.data.modified_date,
+            modified_from: res.data.modified_from,
+            modified_by: res.data.modified_by
+          }
+          // broadcast check-in
+          dataPatient.hospitalId = this.hospital.id;
+          this.socket.emit(CHECK_IN, dataPatient);
+          this.buttonCreateAdmission = true;
+          this.buttonPrintQueue = false;
+          this.buttonCloseAdm = true;
+          this.buttonPatientLabel = false;
+          this.isLoadingCreateAdmission = false;
+          this.alertService.success(res.message, false, 3000);
+        }).catch(err => {
+          this.buttonCreateAdmission = false;
+          this.isLoadingCreateAdmission = false;
+          this.alertService.error(err.error.message, false, 3000);
+        })
+    }
   }
 
   async printPatientLabel(val) {

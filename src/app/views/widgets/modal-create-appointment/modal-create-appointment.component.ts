@@ -68,7 +68,7 @@ export class ModalCreateAppointmentComponent implements OnInit {
       this.isLock = true;
       this.alertService.error('This slot is unavailable at this time, '
         + 'because there is other user using this slot now. '
-        + 'Please try again 1 minutes later.', false, 10000);
+        + 'Please try again 15 seconds later.', false, 10000);
     }
   }
 

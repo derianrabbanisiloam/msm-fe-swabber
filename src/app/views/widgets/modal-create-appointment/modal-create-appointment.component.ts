@@ -62,7 +62,9 @@ export class ModalCreateAppointmentComponent implements OnInit {
     );
 
     this.getCollectionAlert();
-    if (this.appointmentInfo.can_reserved.key && this.appointmentInfo.doctor_type_id !== this.doctorTypeFcfs) {
+    if (this.appointmentInfo.can_reserved.key 
+      && this.appointmentInfo.doctor_type_id !== this.doctorTypeFcfs
+      && this.appointmentInfo.is_waiting_list === false) {
       this.isLock = true;
       this.alertService.error('This slot is unavailable at this time, '
         + 'because there is other user using this slot now. '

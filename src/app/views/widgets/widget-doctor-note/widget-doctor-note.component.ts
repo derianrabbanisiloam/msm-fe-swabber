@@ -210,6 +210,7 @@ export class WidgetDoctorNoteComponent implements OnInit {
     this.model.fromDate = dateFromChange;
     this.model.toDate = dateToChange;
     this.model.userId = this.userId;
+    this.model.userName = this.user.fullname;
     this.model.source = this.dummyMACAddress;
 
     this.dfRefresh = this.model.fromDate;
@@ -364,6 +365,7 @@ export class WidgetDoctorNoteComponent implements OnInit {
     this.modelEdit.fromDate = this.fromDateEdit.year + '-' + monthF + '-' + dayF;
     this.modelEdit.toDate = this.toDateEdit.year + '-' + monthT + '-' + dayT;
     this.modelEdit.userId = this.userId;
+    this.modelEdit.userName = this.user.fullname;
     this.modelEdit.source = this.dummyMACAddress;
 
     this.doctorService.editDoctorNotes(this.hospitalId, noteId, this.modelEdit)

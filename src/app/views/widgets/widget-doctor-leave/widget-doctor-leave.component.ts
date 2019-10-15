@@ -178,6 +178,7 @@ export class WidgetDoctorLeaveComponent implements OnInit {
       this.model.scheduleTypeId = this.postDoctorLeaveForm.controls.scheduleTypeId.value;
       this.model.notes = this.postDoctorLeaveForm.controls.notes.value ? this.postDoctorLeaveForm.controls.notes.value : '';
       this.model.userId = this.userId;
+      this.model.userName = this.user.fullname;
       this.model.source = this.dummyMACAddress;
       this.doctorService.postDoctorLeave(this.hospitalId, this.model)
         .subscribe(data => {
@@ -352,6 +353,7 @@ export class WidgetDoctorLeaveComponent implements OnInit {
 
     this.model.notes = this.noteEdit;
     this.model.userId = this.userId;
+    this.model.userName = this.user.fullname;
     this.model.source = this.dummyMACAddress;
 
     this.doctorService.editDoctorLeave(this.hospitalId, this.scheduleIdEdit, this.model)

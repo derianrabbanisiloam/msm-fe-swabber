@@ -193,7 +193,12 @@ export class WidgetCreateAppointmentComponent implements OnInit {
       if (call.data.schedule_id == this.appointmentPayload.scheduleId
         && call.data.appointment_date == this.appointmentPayload.appointmentDate) {
         this.appointments = this.appointments.filter((value) => {
-          return value.appointment_id !== call.data.appointment_id;
+          if(call.data.appointment_temporary_id) {
+            return value.appointment_temporary_id !== call.data.appointment_temporary_id;
+          }
+          else { 
+            return value.appointment_id !== call.data.appointment_id; 
+          }
         });
         this.appointments.push(call.data);
         this.dataProcessing();
@@ -205,7 +210,12 @@ export class WidgetCreateAppointmentComponent implements OnInit {
       if (call.data.schedule_id == this.appointmentPayload.scheduleId
         && call.data.appointment_date == this.appointmentPayload.appointmentDate) {
         this.appointments = this.appointments.filter((value) => {
-          return value.appointment_id !== call.data.appointment_id;
+          if(call.data.appointment_temporary_id) {
+            return value.appointment_temporary_id !== call.data.appointment_temporary_id;
+          }
+          else { 
+            return value.appointment_id !== call.data.appointment_id; 
+          }
         });
         this.dataProcessing();
       }
@@ -230,27 +240,50 @@ export class WidgetCreateAppointmentComponent implements OnInit {
       if (this.appointments.length) {
         let flag: any = '';
         this.appointments.map((value) => {
-          if (value.appointment_id === call.data.after.appointment_id
+          if ((value.appointment_id === call.data.after.appointment_id
+            || value.appointment_temporary_id === call.data.after.appointment_temporary_id)
             && value.schedule_id !== call.data.after.schedule_id) { //for appointment move to other schedule
             this.appointments = this.appointments.filter((value) => {
-              return value.appointment_id !== call.data.after.appointment_id;
+              if(call.data.after.appointment_temporary_id) {
+                return value.appointment_temporary_id !== call.data.after.appointment_temporary_id;
+              }
+              else {
+                return value.appointment_id !== call.data.after.appointment_id; 
+              }
             });
             this.dataProcessing();
           } else if (value.schedule_id === call.data.after.schedule_id
-            && value.appointment_id === call.data.after.appointment_id
-            && value.schedule_id === call.data.before.schedule_id
-            && value.appointment_id !== flag) { //for appointment move to the slot time with same schedule
-            flag = call.data.after.appointment_id;
-            this.appointments = this.appointments.filter((value) => {
-              return value.appointment_id !== call.data.after.appointment_id;
-            });
+            && value.schedule_id === call.data.before.schedule_id 
+            && ((value.appointment_id !== flag
+            && value.appointment_id === call.data.after.appointment_id)
+            || (value.appointment_temporary_id !== flag
+            && value.appointment_temporary_id === call.data.after.appointment_temporary_id))) { //for appointment move to the slot time with same schedule
+              if(call.data.after.appointment_temporary_id) {
+                flag = call.data.after.appointment_temporary_id;
+                this.appointments = this.appointments.filter((value) => {
+                  return value.appointment_temporary_id !== call.data.after.appointment_temporary_id;
+                });
+              }
+              else {
+                flag = call.data.after.appointment_id;
+                this.appointments = this.appointments.filter((value) => {
+                  return value.appointment_id !== call.data.after.appointment_id;
+                });
+              }
             this.appointments.push(call.data.after);
             this.dataProcessing();
-          } else if (value.appointment_id !== call.data.after.appointment_id
-            && value.schedule_id === call.data.after.schedule_id
-            && value.schedule_id !== call.data.before.schedule_id
-            && value.appointment_id !== flag) { //for appointment move to this schedule
-            flag = call.data.after.appointment_id;
+          } else if (value.schedule_id === call.data.after.schedule_id
+            && value.schedule_id !== call.data.before.schedule_id 
+            && ((value.appointment_id !== flag
+            && value.appointment_id !== call.data.after.appointment_id)
+            || (value.appointment_temporary_id !== flag
+            && value.appointment_temporary_id !== call.data.after.appointment_temporary_id))) { //for appointment move to this schedule
+              if(call.data.after.appointment_temporary_id) {
+                flag = call.data.after.appointment_temporary_id;
+              }
+              else {
+                flag = call.data.after.appointment_id; 
+              }
             this.appointments.push(call.data.after);
             this.dataProcessing();
           }

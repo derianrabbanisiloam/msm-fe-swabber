@@ -75,19 +75,36 @@ export class AppointmentService {
     return this.http.get<any>(url, httpOptions);
   }
 
-  getListAppointment(date: any, hospital: string, name?: string, birth?: any, mr?: any, doctor?: string, limit?: number, offset?: number): Observable<any> {
+  getListAppointment(date: any, hospital: string, name?: string, birth?: any, mr?: any, doctor?: string,
+     modifiedName?: string, isWaitingList?: boolean, limit?: number, offset?: number): Observable<any> {
 
     let uri = `/hospital/${hospital}?date=${date}`;
 
     if (name) {
-      if (name && birth && mr && doctor) {
+      if (name && birth && mr && doctor && modifiedName) {
+        uri = `${uri}&name=${name}&birth=${birth}&mr=${mr}&doctor=${doctor}&modifiedName=${modifiedName}`;
+      } else if (name && birth && mr && modifiedName) {
+        uri = `${uri}&name=${name}&birth=${birth}&mr=${mr}&modifiedName=${modifiedName}`;
+      } else if (name && birth && doctor && modifiedName) {
+        uri = `${uri}&name=${name}&birth=${birth}&doctor=${doctor}&modifiedName=${modifiedName}`;
+      } else if (name && mr && doctor && modifiedName) {
+        uri = `${uri}&name=${name}&mr=${mr}&doctor=${doctor}&modifiedName=${modifiedName}`;
+      } else if (name && birth && mr && doctor) {
         uri = `${uri}&name=${name}&birth=${birth}&mr=${mr}&doctor=${doctor}`;
+      } else if (name && birth && modifiedName) {
+        uri = `${uri}&name=${name}&birth=${birth}&modifiedName=${modifiedName}`;
+      } else if (name && mr && modifiedName) {
+        uri = `${uri}&name=${name}&mr=${mr}&modifiedName=${modifiedName}`;
+      } else if (name && doctor && modifiedName) {
+        uri = `${uri}&name=${name}&doctor=${doctor}&modifiedName=${modifiedName}`;
       } else if (name && birth && mr) {
         uri = `${uri}&name=${name}&birth=${birth}&mr=${mr}`;
       } else if (name && birth && doctor) {
         uri = `${uri}&name=${name}&birth=${birth}&doctor=${doctor}`;
       } else if (name && mr && doctor) {
         uri = `${uri}&name=${name}&mr=${mr}&doctor=${doctor}`;
+      } else if (name && modifiedName) {
+        uri = `${uri}&name=${name}&modifiedName=${modifiedName}`;
       } else if (name && mr) {
         uri = `${uri}&name=${name}&mr=${mr}`;
       } else if (name && birth) {
@@ -113,6 +130,10 @@ export class AppointmentService {
       }
     } else if (birth) {
       uri = `${uri}&birth=${birth}`;
+    } else if (modifiedName) {
+      uri = `${uri}&modifiedName=${modifiedName}`;
+    } else if (isWaitingList) {
+      uri = `${uri}&isWaitingList=${isWaitingList}`;
     } else {
       uri = `${uri}`;
     }

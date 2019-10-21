@@ -27,10 +27,10 @@
         Doctor
       </th>
       <th>Type App.</th>
-      <th>Waiting</th>
+      <th style="min-width: 6em">Waiting</th>
       <th>Queue#</th>
       <th width="90px" style="text-align: center">Action</th>
-      <th>ModifiedBy</th>
+      <th style="min-width: 9em">ModifiedBy</th>
       <th>Notes</th>
     </thead>
 
@@ -78,10 +78,25 @@
 
         </td>
         <td></td>
+        <td>
+          <div class="inner-addon right-addon">
+            <select id="title" class="form-control" (change)="searchAppointment(true)" [(ngModel)]="model.isWaitingList"
+                name="dropDownIsWaitingList">
+                <option value=''>ALL</option>
+                <option value=false>NO</option>
+                <option value=true>YES</option>
+              </select>
+          </div>
+        </td>
         <td></td>
         <td></td>
-        <td></td>
-        <td></td>
+        <td>
+          <div class="inner-addon right-addon">
+            <i class="glyphicon fa fa-search"></i>
+            <input type="text" class="form-control" placeholder="Min 3 characters" [(ngModel)]="model.modifiedName"
+            (change)="model.modifiedName.length >= 3 || model.modifiedName.length === 0? searchAppointment(true): ''" />
+          </div>
+        </td>
         <td></td>
       </tr>
 

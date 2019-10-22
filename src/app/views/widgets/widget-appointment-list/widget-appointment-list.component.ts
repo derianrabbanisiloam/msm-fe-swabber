@@ -75,7 +75,8 @@ export class WidgetAppointmentListComponent implements OnInit {
   public admissionTypeList: General[];
   public selectedAdmissionType: General;
 
-  public model: any = { hospital_id: '', name: '', mr: '', doctor: '' };
+  public model: any = { hospital_id: '', name: '', mr: '', doctor: '', modifiedName: '',
+   iswaitingList: '' };
 
   public appList: Appointment[];
   public selectedCheckIn: any;
@@ -340,6 +341,8 @@ export class WidgetAppointmentListComponent implements OnInit {
     this.model.mr = '';
     this.model.doctor = '';
     this.model.birth = '';
+    this.model.modifiedName = '';
+    this.model.isWaitingList = '';
   }
 
   async getListDoctor() {
@@ -359,7 +362,8 @@ export class WidgetAppointmentListComponent implements OnInit {
       });
   }
 
-  async listAppointment(name = '', birth = '', mr = '', doctor = '') {
+  async listAppointment(name = '', birth = '', mr = '', doctor = '', modifiedName = '',
+  isWaitingList = null) {
     this.showWaitMsg = true;
     this.showNotFoundMsg = false;
 
@@ -372,7 +376,7 @@ export class WidgetAppointmentListComponent implements OnInit {
     const limit = this.limit;
     const offset = this.offset;
 
-    this.appList = await this.appointmentService.getListAppointment(date, hospital, name, birth, mr, doctor, limit, offset)
+    this.appList = await this.appointmentService.getListAppointment(date, hospital, name, birth, mr, doctor, modifiedName, isWaitingList, limit, offset)
       .toPromise().then(res => {
         if (res.status === 'OK') {
 
@@ -402,17 +406,18 @@ export class WidgetAppointmentListComponent implements OnInit {
 
   async searchAppointment(search?: boolean) {
     this.offset = search ? 0 : this.offset;
-    let { name, mr, doctor, birth } = await this.model;
+    let { name, mr, doctor, birth, modifiedName, isWaitingList } = await this.model;
 
     const doctorId = doctor ? doctor.doctor_id : '';
     const arrBirth = birth ? birth.split('-') : '';
 
     name = name ? name.toLowerCase() : '';
     mr = mr ? mr.toLowerCase() : '';
+    modifiedName = modifiedName ? modifiedName.toLowerCase() : '';
     birth = arrBirth ? arrBirth[2] + '-' + arrBirth[1] + '-' + arrBirth[0] : '';
 
-    if (name || mr || doctorId || birth) {
-      this.listAppointment(name, birth, mr, doctorId);
+    if (name || mr || doctorId || birth || modifiedName || isWaitingList) {
+      this.listAppointment(name, birth, mr, doctorId, modifiedName, isWaitingList);
     } else {
       this.listAppointment();
     }

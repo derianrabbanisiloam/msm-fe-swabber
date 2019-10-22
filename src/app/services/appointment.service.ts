@@ -75,47 +75,17 @@ export class AppointmentService {
     return this.http.get<any>(url, httpOptions);
   }
 
-  getListAppointment(date: any, hospital: string, name?: string, birth?: any, mr?: any, doctor?: string, limit?: number, offset?: number): Observable<any> {
+  getListAppointment(date: any, hospital: string, name?: string, birth?: any, mr?: any, doctor?: string,
+     modifiedName?: string, isWaitingList?: boolean, limit?: number, offset?: number): Observable<any> {
 
     let uri = `/hospital/${hospital}?date=${date}`;
 
-    if (name) {
-      if (name && birth && mr && doctor) {
-        uri = `${uri}&name=${name}&birth=${birth}&mr=${mr}&doctor=${doctor}`;
-      } else if (name && birth && mr) {
-        uri = `${uri}&name=${name}&birth=${birth}&mr=${mr}`;
-      } else if (name && birth && doctor) {
-        uri = `${uri}&name=${name}&birth=${birth}&doctor=${doctor}`;
-      } else if (name && mr && doctor) {
-        uri = `${uri}&name=${name}&mr=${mr}&doctor=${doctor}`;
-      } else if (name && mr) {
-        uri = `${uri}&name=${name}&mr=${mr}`;
-      } else if (name && birth) {
-        uri = `${uri}&name=${name}&birth=${birth}`;
-      } else if (name && doctor) {
-        uri = `${uri}&name=${name}&doctor=${doctor}`;
-      } else {
-        uri = `${uri}&name=${name}`;
-      }
-    } else if (mr) {
-      if (mr && doctor) {
-        uri = `${uri}&mr=${mr}&doctor=${doctor}`;
-      } else if (mr && birth) {
-        uri = `${uri}&birth=${birth}&mr=${mr}`;
-      } else {
-        uri = `${uri}&mr=${mr}`;
-      }
-    } else if (doctor) {
-      if (doctor && birth) {
-        uri = `${uri}&birth=${birth}&doctor=${doctor}`;
-      } else {
-        uri = `${uri}&doctor=${doctor}`;
-      }
-    } else if (birth) {
-      uri = `${uri}&birth=${birth}`;
-    } else {
-      uri = `${uri}`;
-    }
+    uri = name ? `${uri}&name=${name}` : uri;
+    uri = birth ? `${uri}&birth=${birth}` : uri;
+    uri = mr ? `${uri}&mr=${mr}` : uri;
+    uri = doctor ? `${uri}&doctor=${doctor}` : uri;
+    uri = modifiedName ? `${uri}&modifiedName=${modifiedName}` : uri;
+    uri = isWaitingList ? `${uri}&isWaitingList=${isWaitingList}` : uri;
 
     const url = `${uri}&limit=${limit}&offset=${offset}`;
 

@@ -82,7 +82,7 @@
           <div class="inner-addon right-addon">
             <select id="title" class="form-control" (change)="searchAppointment(true)" [(ngModel)]="model.isWaitingList"
                 name="dropDownIsWaitingList">
-                <option value=''>ALL</option>
+                <option [ngValue]=undefined [selected]="model.isWaitingList === undefined">ALL</option>
                 <option value=false>NO</option>
                 <option value=true>YES</option>
               </select>

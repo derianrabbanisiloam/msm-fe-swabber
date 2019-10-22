@@ -80,63 +80,12 @@ export class AppointmentService {
 
     let uri = `/hospital/${hospital}?date=${date}`;
 
-    if (name) {
-      if (name && birth && mr && doctor && modifiedName) {
-        uri = `${uri}&name=${name}&birth=${birth}&mr=${mr}&doctor=${doctor}&modifiedName=${modifiedName}`;
-      } else if (name && birth && mr && modifiedName) {
-        uri = `${uri}&name=${name}&birth=${birth}&mr=${mr}&modifiedName=${modifiedName}`;
-      } else if (name && birth && doctor && modifiedName) {
-        uri = `${uri}&name=${name}&birth=${birth}&doctor=${doctor}&modifiedName=${modifiedName}`;
-      } else if (name && mr && doctor && modifiedName) {
-        uri = `${uri}&name=${name}&mr=${mr}&doctor=${doctor}&modifiedName=${modifiedName}`;
-      } else if (name && birth && mr && doctor) {
-        uri = `${uri}&name=${name}&birth=${birth}&mr=${mr}&doctor=${doctor}`;
-      } else if (name && birth && modifiedName) {
-        uri = `${uri}&name=${name}&birth=${birth}&modifiedName=${modifiedName}`;
-      } else if (name && mr && modifiedName) {
-        uri = `${uri}&name=${name}&mr=${mr}&modifiedName=${modifiedName}`;
-      } else if (name && doctor && modifiedName) {
-        uri = `${uri}&name=${name}&doctor=${doctor}&modifiedName=${modifiedName}`;
-      } else if (name && birth && mr) {
-        uri = `${uri}&name=${name}&birth=${birth}&mr=${mr}`;
-      } else if (name && birth && doctor) {
-        uri = `${uri}&name=${name}&birth=${birth}&doctor=${doctor}`;
-      } else if (name && mr && doctor) {
-        uri = `${uri}&name=${name}&mr=${mr}&doctor=${doctor}`;
-      } else if (name && modifiedName) {
-        uri = `${uri}&name=${name}&modifiedName=${modifiedName}`;
-      } else if (name && mr) {
-        uri = `${uri}&name=${name}&mr=${mr}`;
-      } else if (name && birth) {
-        uri = `${uri}&name=${name}&birth=${birth}`;
-      } else if (name && doctor) {
-        uri = `${uri}&name=${name}&doctor=${doctor}`;
-      } else {
-        uri = `${uri}&name=${name}`;
-      }
-    } else if (mr) {
-      if (mr && doctor) {
-        uri = `${uri}&mr=${mr}&doctor=${doctor}`;
-      } else if (mr && birth) {
-        uri = `${uri}&birth=${birth}&mr=${mr}`;
-      } else {
-        uri = `${uri}&mr=${mr}`;
-      }
-    } else if (doctor) {
-      if (doctor && birth) {
-        uri = `${uri}&birth=${birth}&doctor=${doctor}`;
-      } else {
-        uri = `${uri}&doctor=${doctor}`;
-      }
-    } else if (birth) {
-      uri = `${uri}&birth=${birth}`;
-    } else if (modifiedName) {
-      uri = `${uri}&modifiedName=${modifiedName}`;
-    } else if (isWaitingList) {
-      uri = `${uri}&isWaitingList=${isWaitingList}`;
-    } else {
-      uri = `${uri}`;
-    }
+    uri = name ? `${uri}&name=${name}` : uri;
+    uri = birth ? `${uri}&birth=${birth}` : uri;
+    uri = mr ? `${uri}&mr=${mr}` : uri;
+    uri = doctor ? `${uri}&doctor=${doctor}` : uri;
+    uri = modifiedName ? `${uri}&modifiedName=${modifiedName}` : uri;
+    uri = isWaitingList ? `${uri}&isWaitingList=${isWaitingList}` : uri;
 
     const url = `${uri}&limit=${limit}&offset=${offset}`;
 

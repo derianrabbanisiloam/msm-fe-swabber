@@ -17,6 +17,11 @@
     <div class="" style="margin-bottom: 1vw">
       <div class="header-2 center-text">{{schedule.doctor_name}} | {{ doctorProfile.doctor_type_name }}</div>
       <div class="body-text center-text"><span class="bold">Hospital:</span> {{schedule.hospital_name}}</div>
+      <div id="sub-quota-doctor" class="body-text center-text">
+        <span class="bold">quota: </span>{{doctorProfile.quota}}
+        <span class="bold">reservation: </span>{{doctorProfile.reservation}}
+        <span class="bold">walkin: </span>{{doctorProfile.walkin}}
+      </div>
     </div>
     <div></div>
   </div>

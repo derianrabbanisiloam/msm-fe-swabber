@@ -47,6 +47,11 @@
   .quota-list td {padding-left: 16px; font-size: 11px}
   .quota-list tr:hover, .highlighted { background: #4D9B35; color: white}
   .fo_validation_list_name{ text-transform: uppercase; font-weight: bold}
+  .fo_validation_list_name .mobile-status { 
+    text-transform: capitalize; 
+    font-weight: bold; 
+    font-style: italic;
+  }
   .fo_padding_16_side{ padding-left: 16px; padding-right: 16px}
   .fo_padding_10_vertical{ padding-top: 10px; padding-bottom: 10px}
   .fo_patient_detail_list span span { font-weight: bold}

@@ -7,7 +7,7 @@ import { District } from '../../../models/generals/district';
 import { Subdistrict } from '../../../models/generals/subdistrict';
 import { General } from '../../../models/generals/general';
 import { Country } from '../../../models/generals/country';
-import { channelId, sourceApps } from '../../../variables/common.variable';
+import { channelId, sourceApps, mobileStatus } from '../../../variables/common.variable';
 import { NgbModal, ModalDismissReasons } from '@ng-bootstrap/ng-bootstrap';
 import {
   ModalPatientRegistrationComponent
@@ -82,6 +82,7 @@ export class WidgetMobileValidationComponent implements OnInit {
   public showWaitMsgSrc: boolean = true;
   public showNotFoundMsg: boolean = false;
   public showWaitMsg: boolean = true;
+  public mobileStatus = mobileStatus;
 
   constructor(
     private patientService: PatientService,

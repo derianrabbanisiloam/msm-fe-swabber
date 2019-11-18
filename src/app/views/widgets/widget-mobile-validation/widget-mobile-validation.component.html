@@ -31,7 +31,18 @@
         <tbody class="quota-list">
           <tr *ngFor="let itr of accountList">
             <td (click)="choosedAccount(itr)">
-              <div class="fo_validation_list_name">{{itr.name}}</div>
+              <div class="fo_validation_list_name">
+                <span>{{itr.name}}</span>
+                <span style="float: right;">
+                  <span class="mobile-status" *ngIf="itr.mobile_status === mobileStatus.VALIDATED">Account Verified
+                      &nbsp; <img style="width: 15px; height: 15px" src="{{assetPath}}icons/ic_Check@2x.png">
+                  </span>
+                  <span class="mobile-status" *ngIf="itr.mobile_status === mobileStatus.ACCESSED">Access Granted
+                      &nbsp; <img style="width: 15px; height: 15px" src="{{assetPath}}icons/ic_Check@2x.png">
+                  </span>
+                </span>
+              </div>
+
               <div class="fo_validation_list_date">{{itr.birth_date}} - {{itr.phone_number_1}}</div>
             </td>
           </tr>

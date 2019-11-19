@@ -35,6 +35,7 @@ export class WidgetMobileValidationComponent implements OnInit {
   public isCanPrevPage: boolean = false;
   public isCanNextPage: boolean = false;
 
+  public mrCentral: any;
   public selectedAccount: any;
   public patientList: any;
   public suggestionList: any;
@@ -108,13 +109,41 @@ export class WidgetMobileValidationComponent implements OnInit {
 
   getSearchedPatient1() {
     this.flagSearch = true;
-    console.log('!!!!!!!!!!!!!!', this.selectedAccount.birth_date)
     let dateBirth = moment(this.selectedAccount.birth_date, 'DD-MM-YYYY').format('YYYY-MM-DD');
     this.patientService.searchPatientAccessMr(this.selectedAccount.name, dateBirth).subscribe(
       data => {
         let newData = data.data;
         if(newData.length){
+          let birthDate;
+          let dob;
           this.patientHope = newData;
+          for (let i = 0, length = newData.length; i < length; i += 1){
+            dob = this.patientHope[i].birthDate.split('-');
+            birthDate = dob[2] + '-' + dob[1] + '-' + dob[0];
+            this.patientHope.newBirthDate = birthDate;
+          }
+        }
+        else {
+          this.patientHope = null;
+        }
+      }
+    )
+  }
+
+  getSearchedPatient2() {
+    this.flagSearch = true;
+    this.patientService.searchPatientAccessMr2(this.hospital.id, this.mrCentral).subscribe(
+      data => {
+        let newData = data.data;
+        if(newData.length){
+          let birthDate;
+          let dob;
+          this.patientHope = newData;
+          for (let i = 0, length = newData.length; i < length; i += 1){
+            dob = this.patientHope[i].birthDate.split('-');
+            birthDate = dob[2] + '-' + dob[1] + '-' + dob[0];
+            this.patientHope.newBirthDate = birthDate;
+          }
         }
         else {
           this.patientHope = null;

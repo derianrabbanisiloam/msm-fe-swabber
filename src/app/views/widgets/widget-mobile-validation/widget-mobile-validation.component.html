@@ -188,9 +188,15 @@
               </button>
             </td>
             <td style="text-align: center;">or</td>
-            <td><input style="width: 17em;" class="form-control" placeholder="Central MR" type="text"></td>
             <td>
-              <button class="btn-grey" type="button" (click)="searchPatientHOPE()">
+              <input 
+              style="width: 17em;" 
+              class="form-control" 
+              placeholder="Central MR" 
+              type="text"
+              [(ngModel)]="mrCentral"></td>
+            <td>
+              <button class="btn-grey" type="button" (click)="getSearchedPatient2()">
                 <i style="width: 1em; height: 1.5em" class="fa fa-search"></i>
               </button>
             </td>
@@ -209,7 +215,7 @@
           <tbody>
             <tr *ngFor="let itr of patientHope">
               <td>{{itr.name}}</td>
-              <td>{{itr.birthDate}}</td>
+              <td>{{itr.newBirthDate}}</td>
               <td>{{itr.mrNo}}</td>
               <td>{{itr.hospitalAlias}}</td>
               <td>{{itr.mrNoUnit}}</td>

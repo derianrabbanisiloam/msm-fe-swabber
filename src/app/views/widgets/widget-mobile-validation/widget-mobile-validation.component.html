@@ -3,7 +3,7 @@
 </div>
 
 <div class="d-flex justify-content-start fo_container_container_list">
-  <div class="fo_validation_list fo_container_list shadow-4">
+  <div class="fo_validation_list fo_container_list shadow-3">
     <div class="">
       <table class="table">
         <thead>
@@ -29,25 +29,26 @@
         </tbody>
 
         <tbody class="quota-list">
-          <tr *ngFor="let itr of accountList">
-            <td (click)="choosedAccount(itr)">
-              <div class="fo_validation_list_name">
-                <span>{{itr.name}}</span>
-                <span style="float: right;">
-                  <span class="mobile-status" *ngIf="itr.mobile_status === mobileStatus.VALIDATED">Account Verified
-                      &nbsp; <img style="width: 15px; height: 15px" src="{{assetPath}}icons/ic_Check@2x.png">
+            <tr *ngFor="let itr of accountList" 
+            [ngClass]="{'selectedPatient': selectedAccount && itr.contact_id == selectedAccount.contact_id}" (click)="choosedAccount(itr)">
+              <td>
+                <div class="fo_validation_list_name">{{itr.name}}</div>
+                <div class="fo_validation_list_date">{{itr.birth_date}}</div>
+                <div class="fo_validation_list_name">
+                  <span>{{itr.phone_number_1}}</span>
+                  <span style="float: right;">
+                    <span class="mobile-status-1" *ngIf="itr.mobile_status === mobileStatus.ACTIVE && itr.contact_status_id === contactStatus.VERIFIED">
+                      <img style="width: 15px; height: 15px" src="{{assetPath}}icons/ic_MobileValidation.png">
+                    </span>
+                    <span class="mobile-status-2" *ngIf="itr.mobile_status === mobileStatus.ACCESSED">
+                      <img style="width: 15px; height: 15px" src="{{assetPath}}icons/ic_Check@2x.png">
+                    </span>
                   </span>
-                  <span class="mobile-status" *ngIf="itr.mobile_status === mobileStatus.ACCESSED">Access Granted
-                      &nbsp; <img style="width: 15px; height: 15px" src="{{assetPath}}icons/ic_Check@2x.png">
-                  </span>
-                </span>
-              </div>
-
-              <div class="fo_validation_list_date">{{itr.birth_date}} - {{itr.phone_number_1}}</div>
-            </td>
-          </tr>
-
-        </tbody>
+                </div>
+              </td>
+            </tr>
+  
+          </tbody>
       </table>
 
     </div>
@@ -55,9 +56,9 @@
 
   </div>
 
-  <div class="fo_container_list shadow-4" *ngIf="patientList">
+  <div class="fo_container_list_2" *ngIf="selectedAccount">
 
-    <div class="">
+    <!-- <div class="">
       <table class="table">
         <thead>
           <tr>
@@ -151,7 +152,91 @@
           </tr>
         </tbody>
       </table>
-    </div>
+    </div> -->
+    <aw-wizard [defaultStepIndex]=''>
+      <aw-wizard-step stepTitle="Title of step 1">
+        <table style="margin-top: 3em">
+          <thead>
+            <th style="width: 19em; padding-left: 1.2em">Date of birth</th>
+            <th style="width: 19em; padding-left: 1.2em">Name</th>
+            <th></th>
+            <th style="width: 4em"></th>
+            <th style="width: 18em; padding-left: 0.2em">Central MR</th>
+            <th style="width: 4em"></th>
+          </thead>
+          <tbody>
+            <td>
+              <input 
+                style="width: 17em; margin-left: 1em"
+                [textMask]="{mask: mask_birth}"
+                type="text"
+                [(ngModel)]="selectedAccount.birth_date"
+                class="form-control"
+                placeholder="dd-mm-yyyy"/>
+            </td>
+            <td>
+              <input 
+                style="width: 17em; margin-left: 1em" 
+                class="form-control" 
+                placeholder="Name" 
+                type="text"
+                [(ngModel)]="selectedAccount.name"/>
+            </td>
+            <td>
+              <button class="btn-grey" type="button" (click)="getSearchedPatient1()">
+                <i style="width: 1em; height: 1.5em" class="fa fa-search"></i>
+              </button>
+            </td>
+            <td style="text-align: center;">or</td>
+            <td><input style="width: 17em;" class="form-control" placeholder="Central MR" type="text"></td>
+            <td>
+              <button class="btn-grey" type="button" (click)="searchPatientHOPE()">
+                <i style="width: 1em; height: 1.5em" class="fa fa-search"></i>
+              </button>
+            </td>
+          </tbody>
+        </table>
+        <table class="table table-bordered" style="margin-top: 1em">
+          <thead class="fo_color_blue foot-note">
+            <th style="min-width: 14em">Name</th>
+            <th style="min-width: 8em">Date of birth</th>
+            <th style="white-space: nowrap; text-align: center; min-width: 10em">Central MR</th>
+            <th>Hospital</th>
+            <th width="100px">Local MR</th>
+            <th>Mobile Number</th>
+            <th style="min-width: 13em">Address</th>
+          </thead>
+          <tbody>
+            <tr *ngFor="let itr of patientHope">
+              <td>{{itr.name}}</td>
+              <td>{{itr.birthDate}}</td>
+              <td>{{itr.mrNo}}</td>
+              <td>{{itr.hospitalAlias}}</td>
+              <td>{{itr.mrNoUnit}}</td>
+              <td>{{itr.mobileNo1}}</td>
+              <td>{{itr.address}}</td>
+            </tr>
+          </tbody>
+          <tbody *ngIf="!patientHope && flagSearch">
+            <tr>
+              <td colspan="7" style="text-align: center;">result not found</td>
+            </tr>
+          </tbody>
+        </table>
+        <button type="button" awNextStep>Next Step</button>
+        <button type="button" [awGoToStep]="{stepIndex: 2}">Go directly to third Step</button>
+      </aw-wizard-step>
+      <aw-wizard-step stepTitle="Title of step 2">
+        Content of Step 2
+        <button type="button" awPreviousStep>Go to previous step</button>
+        <button type="button" awNextStep>Go to next step</button>
+      </aw-wizard-step>
+      <aw-wizard-step stepTitle="Title of step 3">
+        Content of Step 3
+        <button type="button" awPreviousStep>Previous Step</button>
+        <button type="button" (click)="finishFunction()">Finish</button>
+      </aw-wizard-step>
+    </aw-wizard>
   </div>
 
 
@@ -386,7 +471,7 @@
   </button>
   <span style="width:10px">&nbsp;</span>
   <button *ngIf="isCanNextPage" (click)="nextPage()" class="btn ms_btn_blue">
-    Next <img src="{{assetPath}}assets/icons/ic_ArrowLeft_White.png">
+    Next <img src="{{assetPath}}icons/ic_ArrowLeft_White.png">
   </button>
 </div>
 

@@ -69,6 +69,11 @@ export class PatientService {
     return this.http.post<any>(url, body, httpOptions);
   }
 
+  searchPatientAccessMr(patientName: string, birthDate: string): Observable<any> {
+    const url = `${this.patientHopeUrl}/new?patientName=${patientName}&birthDate=${birthDate}`;
+    return this.http.get<any>(url, httpOptions);
+  }
+
   searchPatientHope1(hospitalId: string, patientName: string, birthDate: string): Observable<any> {
     const url = `${this.patientHopeUrl}?hospitalId=${hospitalId}&patientName=${patientName}&birthDate=${birthDate}`;
     return this.http.get<any>(url, httpOptions);

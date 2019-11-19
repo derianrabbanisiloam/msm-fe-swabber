@@ -7,7 +7,7 @@ import { District } from '../../../models/generals/district';
 import { Subdistrict } from '../../../models/generals/subdistrict';
 import { General } from '../../../models/generals/general';
 import { Country } from '../../../models/generals/country';
-import { channelId, sourceApps, mobileStatus } from '../../../variables/common.variable';
+import { channelId, sourceApps, mobileStatus, contactStatus } from '../../../variables/common.variable';
 import { NgbModal, ModalDismissReasons } from '@ng-bootstrap/ng-bootstrap';
 import {
   ModalPatientRegistrationComponent
@@ -40,6 +40,8 @@ export class WidgetMobileValidationComponent implements OnInit {
   public suggestionList: any;
   public isFound: boolean = false;
   public currentPatientHope: any;
+  public patientHope;
+  public flagSearch: boolean = false;
 
   public mask = [/\d/, /\d/, /\d/, /\d/, /\d/, /\d/, /\d/, /\d/, /\d/, /\d/, /\d/, /\d/, /\d/];
   public mask_birth = [/\d/, /\d/, '-', /\d/, /\d/, '-', /\d/, /\d/, /\d/, /\d/];
@@ -83,13 +85,15 @@ export class WidgetMobileValidationComponent implements OnInit {
   public showNotFoundMsg: boolean = false;
   public showWaitMsg: boolean = true;
   public mobileStatus = mobileStatus;
+  public contactStatus = contactStatus;
 
   constructor(
     private patientService: PatientService,
     private modalService: NgbModal,
     private alertService: AlertService,
     private generalService: GeneralService,
-  ) { }
+  ) {
+   }
 
   ngOnInit() {
     this.getListAccount();
@@ -100,6 +104,23 @@ export class WidgetMobileValidationComponent implements OnInit {
     this.getReligion();
     this.getNationalIdType();
     this.getCollectionAlert();
+  }
+
+  getSearchedPatient1() {
+    this.flagSearch = true;
+    console.log('!!!!!!!!!!!!!!', this.selectedAccount.birth_date)
+    let dateBirth = moment(this.selectedAccount.birth_date, 'DD-MM-YYYY').format('YYYY-MM-DD');
+    this.patientService.searchPatientAccessMr(this.selectedAccount.name, dateBirth).subscribe(
+      data => {
+        let newData = data.data;
+        if(newData.length){
+          this.patientHope = newData;
+        }
+        else {
+          this.patientHope = null;
+        }
+      }
+    )
   }
 
   nextPage() {
@@ -198,8 +219,18 @@ export class WidgetMobileValidationComponent implements OnInit {
   }
 
   choosedAccount(val) {
-    this.selectedAccount = val;
-    this.getPatientHope();
+    //this.selectedAccount = val;
+    this.selectedAccount = {
+      contact_id: val.contact_id,
+      name: val.name,
+      birth_date: val.birth_date,
+      phone_number_1: val.phone_number_1,
+      phone_number_2: val.phone_number_2,
+      contact_status_id: val.contact_status_id,
+      mobile_status: val.mobile_status
+    };
+    console.log('!!!!!!!!!!!', this.selectedAccount)
+    //this.getPatientHope();
   }
 
   async getPatientHope() {

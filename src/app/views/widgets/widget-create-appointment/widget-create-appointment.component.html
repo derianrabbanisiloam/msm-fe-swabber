@@ -74,7 +74,7 @@
             <td *ngIf="app.is_can_create && !isOriginal && app.is_walkin == false" class="st-kolom-available"
               (click)="openCreateAppModal2(app)"><a>Available</a></td>
             <td *ngIf="app.is_can_create && !isOriginal && app.is_walkin == true && isOpen == true"
-              class="st-kolom-available" (click)="openCreateAppModal2(app)"><a>Available</a></td>
+              class="st-kolom-available" (click)="openCreateAppModal2(app)"><a>Available/Walk In Slot</a></td>
             <td *ngIf="app.is_can_create && !isOriginal && app.is_walkin == true && isOpen == false"
               class="st-kolom-available">
               <span style="color:red;font-weight:bold">Not Yet Opened</span>

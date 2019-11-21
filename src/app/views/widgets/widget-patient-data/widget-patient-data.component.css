@@ -67,9 +67,11 @@
   }
   :host(app-widget-patient-data) { width:100% }
   ::ng-deep ngb-progressbar .progress .progress-bar{ background-color: #4D9B35 !important; color: white!important;}
-  .fo_btn_registration{ height: 4rem;
-    border: none; border-radius: 4px;
-    font-size: 20px;
+  .fo_btn_registration{ 
+    height: 3rem;
+    border: none; 
+    border-radius: 4px;
+    font-size: 15px;
     margin-left: 2rem;
   }
   

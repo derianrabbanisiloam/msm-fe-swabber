@@ -8,7 +8,7 @@ import { Subdistrict } from '../../../models/generals/subdistrict';
 import { General } from '../../../models/generals/general';
 import { Country } from '../../../models/generals/country';
 import { channelId, sourceApps, mobileStatus, contactStatus } from '../../../variables/common.variable';
-import { NgbModal, ModalDismissReasons } from '@ng-bootstrap/ng-bootstrap';
+import { NgbModal, ModalDismissReasons, NgbActiveModal } from '@ng-bootstrap/ng-bootstrap';
 import {
   ModalPatientRegistrationComponent
 } from '../modal-patient-registration/modal-patient-registration.component';
@@ -43,6 +43,9 @@ export class WidgetMobileValidationComponent implements OnInit {
   public currentPatientHope: any;
   public patientHope;
   public flagSearch: boolean = false;
+  public selectPatient: any;
+  public dataContact: any;
+  public step: number = 0;
 
   public mask = [/\d/, /\d/, /\d/, /\d/, /\d/, /\d/, /\d/, /\d/, /\d/, /\d/, /\d/, /\d/, /\d/];
   public mask_birth = [/\d/, /\d/, '-', /\d/, /\d/, '-', /\d/, /\d/, /\d/, /\d/];
@@ -93,6 +96,7 @@ export class WidgetMobileValidationComponent implements OnInit {
     private modalService: NgbModal,
     private alertService: AlertService,
     private generalService: GeneralService,
+    private activeModal: NgbActiveModal,
   ) {
    }
 
@@ -107,11 +111,42 @@ export class WidgetMobileValidationComponent implements OnInit {
     this.getCollectionAlert();
   }
 
+  close() {
+    this.activeModal.close();
+  }
+
+  openConfirmationModal(modal: any) {
+    this.modalService.open(modal);
+  }
+
+  async verifyPatient() {
+    const payload = {
+      patientHopeId: this.selectPatient.patientId,
+      contactId: this.selectedAccount.contact_id,
+      hospitalId: this.hospital.id,
+      userId: this.user.id,
+      source: sourceApps
+    };
+    let select = this.selectedAccount;
+    this.alertService.success('Verify Patient Success', false, 5000);
+    this.getListAccount();
+
+    // const mappingPatient = await this.patientService.verifyPatient(payload).toPromise().then(
+    //   data => {
+    //     this.alertService.success('Verify Patient Success', false, 5000);
+    //     this.getListAccount();
+    //   }, error => {
+    //     this.alertService.error(error.error.message, false, 5000);
+    //   }
+    // );
+    // return mappingPatient;
+  }
+
   getSearchedPatient1() {
-    this.flagSearch = true;
     let dateBirth = moment(this.selectedAccount.birth_date, 'DD-MM-YYYY').format('YYYY-MM-DD');
     this.patientService.searchPatientAccessMr(this.selectedAccount.name, dateBirth).subscribe(
       data => {
+        this.flagSearch = true;
         let newData = data.data;
         if(newData.length){
           let birthDate;
@@ -120,12 +155,16 @@ export class WidgetMobileValidationComponent implements OnInit {
           for (let i = 0, length = newData.length; i < length; i += 1){
             dob = this.patientHope[i].birthDate.split('-');
             birthDate = dob[2] + '-' + dob[1] + '-' + dob[0];
-            this.patientHope.newBirthDate = birthDate;
+            this.patientHope[i].newBirthDate = birthDate;
           }
         }
         else {
+          this.flagSearch = true;
           this.patientHope = null;
         }
+      }, error => {
+        this.flagSearch = true;
+        this.alertService.error(error.error.message, false, 5000);
       }
     )
   }
@@ -142,12 +181,14 @@ export class WidgetMobileValidationComponent implements OnInit {
           for (let i = 0, length = newData.length; i < length; i += 1){
             dob = this.patientHope[i].birthDate.split('-');
             birthDate = dob[2] + '-' + dob[1] + '-' + dob[0];
-            this.patientHope.newBirthDate = birthDate;
+            this.patientHope[i].newBirthDate = birthDate;
           }
         }
         else {
           this.patientHope = null;
         }
+      }, error => {
+        this.alertService.error(error.error.message, false, 5000);
       }
     )
   }
@@ -249,6 +290,8 @@ export class WidgetMobileValidationComponent implements OnInit {
 
   choosedAccount(val) {
     //this.selectedAccount = val;
+    this.patientHope = null;
+    this.flagSearch = false;
     this.selectedAccount = {
       contact_id: val.contact_id,
       name: val.name,
@@ -258,8 +301,24 @@ export class WidgetMobileValidationComponent implements OnInit {
       contact_status_id: val.contact_status_id,
       mobile_status: val.mobile_status
     };
-    console.log('!!!!!!!!!!!', this.selectedAccount)
-    //this.getPatientHope();
+    if(this.selectedAccount.contact_status_id === contactStatus.VERIFIED
+      && this.selectedAccount.mobile_status === mobileStatus.ACTIVE) {
+        this.getContactData(this.selectedAccount.contact_id);
+      }
+  }
+
+  choosedSearchPatient(val) {
+    this.selectPatient = val;
+  }
+
+  getContactData(contactId) {
+    this.patientService.getContact(contactId).subscribe(
+      data => {
+        this.dataContact = data.data;
+      }, error => {
+        this.alertService.error(error.error.message, false, 5000);
+      }
+    )
   }
 
   async getPatientHope() {

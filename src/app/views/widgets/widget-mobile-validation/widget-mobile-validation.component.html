@@ -38,10 +38,10 @@
                     <span>{{itr.phone_number_1}}</span>
                     <span style="float: right;">
                       <span class="mobile-status-1" *ngIf="itr.mobile_status === mobileStatus.ACTIVE && itr.contact_status_id === contactStatus.VERIFIED">
-                        <img style="width: 15px; height: 15px" src="{{assetPath}}icons/ic_MobileValidation.png">
+                        <img style="width: 15px; height: 15px" src="../../../../assets/icons/ic_MobileValidation.png">
                       </span>
                       <span class="mobile-status-2" *ngIf="itr.mobile_status === mobileStatus.ACCESSED">
-                        <img style="width: 15px; height: 15px" src="{{assetPath}}icons/unlock.png">
+                        <img style="width: 15px; height: 15px" src="../../../../assets/icons/unlock.png">
                       </span>
                     </span>
                   </div>
@@ -57,233 +57,429 @@
     </div>
   
     <div class="fo_container_list_2" *ngIf="selectedAccount">
-      <aw-wizard #wizard [navBarLayout]="'large-empty-symbols'" [defaultStepIndex]='1'>
-        <aw-wizard-step stepTitle="Search Patient">
-          <ng-template awWizardStepSymbol>
-              <img src="../../../../assets/icons/ic_Search_Black.png">
-          </ng-template>
-          <table style="margin-top: 3em">
-            <thead>
-              <th style="width: 19em; padding-left: 1.2em">Date of birth</th>
-              <th style="width: 19em; padding-left: 1.2em">Name</th>
-              <th></th>
-              <th style="width: 4em"></th>
-              <th style="width: 18em; padding-left: 0.2em">Local MR</th>
-              <th style="width: 4em"></th>
-            </thead>
-            <tbody>
-              <td>
-                <input 
-                  style="width: 17em; margin-left: 1em"
-                  [textMask]="{mask: mask_birth}"
-                  type="text"
-                  [(ngModel)]="selectedAccount.birth_date"
-                  class="form-control"
-                  placeholder="dd-mm-yyyy"/>
-              </td>
-              <td>
-                <input 
-                  style="width: 17em; margin-left: 1em" 
+      <div class="row">
+        <div class="col-md-12">
+          <div style="background-color: white;">
+            <div class="progressbar-wrapper" style="height: 7em;">
+              <ul class="progressbar" style="margin-left: -22em; margin-right: -18em">
+                <li [ngClass]="{'active': (selectedAccount.mobile_status === mobileStatus.ACTIVE 
+                && selectedAccount.contact_status_id === contactStatus.VERIFIED) || (selectedAccount.mobile_status === mobileStatus.ACCESSED 
+                && selectedAccount.contact_status_id === contactStatus.VERIFIED)}">Mobile Account Verified</li>
+                <li [ngClass]="{'active': (selectedAccount.mobile_status === mobileStatus.ACTIVE 
+                && selectedAccount.contact_status_id === contactStatus.ACCESSED) || (selectedAccount.mobile_status === mobileStatus.ACCESSED 
+                && selectedAccount.contact_status_id === contactStatus.VERIFIED)}">Patient Portal Registered</li>
+              </ul>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="row">
+        <div class="col-md-12">
+          <div style="background-color: white; margin-top: 1em">
+            <div *ngIf="selectedAccount.mobile_status === mobileStatus.ACTIVE 
+              && selectedAccount.contact_status_id === contactStatus.MOBILE_ACTIVE" style="min-height: 19em;">
+            <table>
+              <thead>
+                <th style="width: 19em; padding-left: 1.2em">Date of birth</th>
+                <th style="width: 19em; padding-left: 1.2em">Name</th>
+                <th></th>
+                <th style="width: 4em"></th>
+                <th style="width: 18em; padding-left: 0.2em">Local MR</th>
+                <th style="width: 4em"></th>
+              </thead>
+              <tbody>
+                <td>
+                  <input 
+                    style="width: 17em; margin-left: 1em"
+                    [textMask]="{mask: mask_birth}"
+                    type="text"
+                    [(ngModel)]="selectedAccount.birth_date"
+                    class="form-control"
+                    placeholder="dd-mm-yyyy"/>
+                </td>
+                <td>
+                  <input 
+                    style="width: 17em; margin-left: 1em" 
+                    class="form-control" 
+                    placeholder="Name" 
+                    type="text"
+                    [(ngModel)]="selectedAccount.name"/>
+                </td>
+                <td>
+                  <button class="btn-grey" type="button" (click)="getSearchedPatient1()">
+                    <i style="width: 1em; height: 1.5em" class="fa fa-search"></i>
+                  </button>
+                </td>
+                <td style="text-align: center;">or</td>
+                <td>
+                  <input 
+                  style="width: 17em;" 
                   class="form-control" 
-                  placeholder="Name" 
+                  placeholder="Local MR" 
                   type="text"
-                  [(ngModel)]="selectedAccount.name"/>
-              </td>
-              <td>
-                <button class="btn-grey" type="button" (click)="getSearchedPatient1()">
-                  <i style="width: 1em; height: 1.5em" class="fa fa-search"></i>
-                </button>
-              </td>
-              <td style="text-align: center;">or</td>
-              <td>
-                <input 
-                style="width: 17em;" 
-                class="form-control" 
-                placeholder="Local MR" 
-                type="text"
-                [(ngModel)]="mrLocal"></td>
-              <td>
-                <button class="btn-grey" type="button" (click)="getSearchedPatient2()">
-                  <i style="width: 1em; height: 1.5em" class="fa fa-search"></i>
-                </button>
-              </td>
-            </tbody>
-          </table>
-          <table class="table table-bordered" style="margin-top: 1em">
-            <thead class="fo_color_blue foot-note">
-              <th style="min-width: 14em">Name</th>
-              <th style="min-width: 8em">Date of birth</th>
-              <th style="white-space: nowrap; text-align: center; min-width: 10em">Central MR</th>
-              <th>Hospital</th>
-              <th width="100px">Local MR</th>
-              <th>Mobile Number</th>
-              <th style="min-width: 13em">Address</th>
-            </thead>
-            <tbody class="quota-list">
-              <tr *ngFor="let itr of patientHope"
-              [ngClass]="{'selectedPatient': selectPatient && itr.patientId == selectPatient.patientId}" (click)="choosedSearchPatient(itr)">
-                <td>{{itr.name}}</td>
-                <td>{{itr.newBirthDate}}</td>
-                <td>{{itr.mrNo}}</td>
-                <td>{{itr.hospitalAlias}}</td>
-                <td>{{itr.mrNoUnit}}</td>
-                <td>{{itr.mobileNo1}}</td>
-                <td>{{itr.address}}</td>
-              </tr>
-            </tbody>
-            <tbody *ngIf="!patientHope && flagSearch">
-              <tr>
-                <td colspan="7" style="text-align: center;">result not found</td>
-              </tr>
-            </tbody>
-            <tbody *ngIf="patientHope && flagSearch">
-              <tr>
-                <td colspan="7" style="text-align: right">
-                  <button type="submit" class="fo_btn_registration fo_btn_save"
-                    [disabled]="!selectPatient"
-                    [ngStyle]="{ background: !selectPatient ? '#A5C39F' : '#4D9B35'}"
-                    data-toggle="modal" 
-                    data-target="#confirming" 
-                    data-dismiss="modal"
-                    (click)="openConfirmationModal(verify_patient)">Verify</button>
-              </tr>
-            </tbody>
-          </table>
-        </aw-wizard-step>
-        <aw-wizard-step stepTitle="Mobile Account Verified">
-          <ng-template awWizardStepSymbol>
-            <img src="../../../../assets/icons/ic_MobileValidation.png">
-          </ng-template>
-          <div class="row">
-            <div class="col-md-12 mob_valid_1">
-              1. PATIENT DATA FOR DISCLAIMER
-            </div>
+                  [(ngModel)]="mrLocal"></td>
+                <td>
+                  <button class="btn-grey" type="button" (click)="getSearchedPatient2()">
+                    <i style="width: 1em; height: 1.5em" class="fa fa-search"></i>
+                  </button>
+                </td>
+              </tbody>
+            </table>
+            <table class="table table-bordered" style="margin-top: 1em">
+              <thead class="fo_color_blue foot-note">
+                <th style="min-width: 14em">Name</th>
+                <th style="min-width: 8em">Date of birth</th>
+                <th style="white-space: nowrap; text-align: center; min-width: 10em">Central MR</th>
+                <th>Hospital</th>
+                <th width="100px">Local MR</th>
+                <th>Mobile Number</th>
+                <th style="min-width: 13em">Address</th>
+              </thead>
+              <tbody class="quota-list">
+                <tr *ngFor="let itr of patientHope"
+                [ngClass]="{'selectedPatient': selectPatient && itr.patientId == selectPatient.patientId}" (click)="choosedSearchPatient(itr)">
+                  <td>{{itr.name}}</td>
+                  <td>{{itr.newBirthDate}}</td>
+                  <td>{{itr.mrNo}}</td>
+                  <td>{{itr.hospitalAlias}}</td>
+                  <td>{{itr.mrNoUnit}}</td>
+                  <td>{{itr.mobileNo1}}</td>
+                  <td>{{itr.address}}</td>
+                </tr>
+              </tbody>
+              <tbody *ngIf="!patientHope && flagSearch">
+                <tr>
+                  <td colspan="7" style="text-align: center;">result not found</td>
+                </tr>
+              </tbody>
+              <tbody *ngIf="patientHope && flagSearch">
+                <tr>
+                  <td colspan="7" style="text-align: right">
+                    <button type="submit" class="fo_btn_registration fo_btn_save"
+                      [disabled]="!selectPatient"
+                      [ngStyle]="{ background: !selectPatient ? '#A5C39F' : '#4D9B35'}"
+                      data-toggle="modal" 
+                      data-target="#confirming" 
+                      data-dismiss="modal"
+                      (click)="openConfirmationModal(verify_patient)">Verify</button>
+                </tr>
+              </tbody>
+            </table>
           </div>
-          <div class="row">
-            <div class="col-md-3">
-              <div class="row">
-                <div class="col-md-12 mob_valid_2">
-                  Name
-                </div>
+          <div *ngIf="selectedAccount.mobile_status === mobileStatus.ACTIVE 
+            && selectedAccount.contact_status_id === contactStatus.VERIFIED
+            && dataContact && dataPatientHope">
+            <div class="row">
+              <div class="col-md-9 mob_valid_1" style="margin-top: 1em">
+                1. PATIENT DATA FOR DISCLAIMER
               </div>
-              <div class="row">
-                <div class="col-md-12 mob_valid_2">
-                  Date of Birth
-                </div>
-              </div>
-              <div class="row">
-                <div class="col-md-12 mob_valid_2">
-                  No. MR Central
-                </div>
-              </div>
-              <div class="row">
-                <div class="col-md-12 mob_valid_2">
-                  Mobile Number
-                </div>
-              </div>
-              <div class="row">
-                <div class="col-md-12 mob_valid_2">
-                  Email
-                </div>
-              </div>
-            </div>
-            <div class="mob_valid_5">
-              <div class="row">
-                <div class="col-md-12 mob_valid_3">
-                  :
-                </div>
-              </div>
-              <div class="row">
-                <div class="col-md-12 mob_valid_3">
-                  :
-                </div>
-              </div>
-              <div class="row">
-                <div class="col-md-12 mob_valid_3">
-                  :
-                </div>
-              </div>
-              <div class="row">
-                <div class="col-md-12 mob_valid_3">
-                  :
-                </div>
-              </div>
-              <div class="row">
-                <div class="col-md-12 mob_valid_3">
-                  :
+              <div class="col-md-3 mob_valid_1" style="margin-top: 1em">
+                <button class="fo_btn_registration_2 fo_btn_blue" (click)="print()" style="margin-left: -3em">Print</button>
+                <div id="print-section">
+                    <table class="table table-bordered" style="margin-top: 1em">
+                      <tr>
+                        PATIENT DATA FOR DISCLAIMER
+                      </tr>
+                      <tr>
+                        <td style="height: 2em;">Name</td>
+                        <td style="height: 2em; padding-left: 2em;">:</td>
+                        <td style="height: 2em; padding-left: 1em;">{{dataContact.name}}</td>
+                      </tr>
+                      <tr>
+                        <td style="height: 2em;">Date of Birth</td>
+                        <td style="height: 2em; padding-left: 2em;">:</td>
+                        <td style="height: 2em; padding-left: 1em;">{{selectedAccount.birth_date}}</td>
+                        </tr>
+                      <tr>
+                        <td style="height: 2em;">No. MR Central</td>
+                        <td style="height: 2em; padding-left: 2em;">:</td>
+                        <td style="height: 2em; padding-left: 1em;">{{dataPatientHope.mrNo}}</td>
+                      </tr>
+                      <tr>
+                        <td style="height: 2em;">Mobile Number</td>
+                        <td style="height: 2em; padding-left: 2em;">:</td>
+                        <td style="height: 2em; padding-left: 1em;">{{dataContact.phone_number_1}}</td>
+                      </tr>
+                      <tr>
+                        <td style="height: 2em;">Email</td>
+                        <td style="height: 2em; padding-left: 2em;">:</td>
+                        <td style="height: 2em; padding-left: 1em;">{{dataContact.email_address}}</td>
+                      </tr>
+                    </table>
                 </div>
               </div>
             </div>
-            <div class="col-md-4" *ngIf="dataContact">
-              <div class="row">
-                <div class="col-md-12 mob_valid_4">
-                    <input class="form-control mob_valid_6" type="text" [(ngModel)]="dataContact.name" disabled>
+            <div class="row">
+              <div class="col-md-3">
+                <div class="row">
+                  <div class="col-md-12 mob_valid_2">
+                    Name
+                  </div>
+                </div>
+                <div class="row">
+                  <div class="col-md-12 mob_valid_2">
+                    Date of Birth
+                  </div>
+                </div>
+                <div class="row">
+                  <div class="col-md-12 mob_valid_2">
+                    No. MR Central
+                  </div>
+                </div>
+                <div class="row">
+                  <div class="col-md-12 mob_valid_2">
+                    Mobile Number
+                  </div>
+                </div>
+                <div class="row">
+                  <div class="col-md-12 mob_valid_2">
+                    Email
+                  </div>
                 </div>
               </div>
-              <div class="row">
-                <div class="col-md-12 mob_valid_4">
-                  <input class="form-control mob_valid_6" type="text" [(ngModel)]="selectedAccount.birth_date" disabled>
+              <div class="mob_valid_5">
+                <div class="row">
+                  <div class="col-md-12 mob_valid_3">
+                    :
+                  </div>
+                </div>
+                <div class="row">
+                  <div class="col-md-12 mob_valid_3">
+                    :
+                  </div>
+                </div>
+                <div class="row">
+                  <div class="col-md-12 mob_valid_3">
+                    :
+                  </div>
+                </div>
+                <div class="row">
+                  <div class="col-md-12 mob_valid_3">
+                    :
+                  </div>
+                </div>
+                <div class="row">
+                  <div class="col-md-12 mob_valid_3">
+                    :
+                  </div>
                 </div>
               </div>
-              <div class="row">
-                <div class="col-md-12 mob_valid_4">
-                  <input class="form-control mob_valid_6" type="text" disabled>
+              <div class="col-md-4">
+                <div class="row">
+                  <div class="col-md-12 mob_valid_4">
+                      <input class="form-control mob_valid_6" type="text" [(ngModel)]="dataContact.name" disabled>
+                  </div>
                 </div>
-              </div>
-              <div class="row">
-                <div class="col-md-12 mob_valid_4">
-                  <input class="form-control mob_valid_6" type="text" [(ngModel)]="dataContact.phone_number_1" disabled>
+                <div class="row">
+                  <div class="col-md-12 mob_valid_4">
+                    <input class="form-control mob_valid_6" type="text" [(ngModel)]="selectedAccount.birth_date" disabled>
+                  </div>
                 </div>
-              </div>
-              <div class="row">
-                <div class="col-md-12 mob_valid_4">
-                  <input class="form-control mob_valid_6" type="text" [(ngModel)]="dataContact.email_address">
+                <div class="row">
+                  <div class="col-md-12 mob_valid_4">
+                    <input class="form-control mob_valid_6" type="text" [(ngModel)]="dataPatientHope.mrNo" disabled>
+                  </div>
+                </div>
+                <div class="row">
+                  <div class="col-md-12 mob_valid_4">
+                    <input class="form-control mob_valid_6" type="text" [(ngModel)]="dataContact.phone_number_1" disabled>
+                  </div>
+                </div>
+                <div class="row">
+                  <div class="col-md-12 mob_valid_4">
+                    <input class="form-control mob_valid_6" type="text" [(ngModel)]="dataContact.email_address">
+                  </div>
                 </div>
               </div>
             </div>
-            <div class="col-md-4" style="background-color: violet;">
-
+            <form [formGroup] = "uploadForm" (ngSubmit)="onSubmitUpload()" enctype="multipart/form-data">
+            <div class="row">
+              <div class="col-md-10 mob_valid_1">
+                <div class="image-upload">
+                    2. 
+                  <label for="file-input">
+                    <img style="height: 3rem; width: 4rem; margin-left: 0.5em;margin-right: 0.5rem" src="../../../../assets/icons/ic_folder.png">
+                  </label>
+                    <input id="file-input" type="file" (change)="uploadDisclaimer($event)" accept="application/pdf"/> UPLOAD DISCLAIMER
+                    <img *ngIf="flagFile1" src="../../../../assets/icons/ic_checklist.png" style="width: 3em; height: 3em;">
+                </div>
+              </div>
             </div>
+            <div class="row">
+              <div class="col-md-10 mob_valid_1">
+                <div class="image-upload">
+                    3. 
+                  <label for="file-input-2">
+                    <img style="height: 3rem; width: 4rem; margin-left: 0.5em;margin-right: 0.5rem" src="../../../../assets/icons/ic_folder.png">
+                  </label>
+                  <input id="file-input-2" type="file" (change)="uploadKtp($event)" accept="application/pdf"/> UPLOAD IDENTITY DOCUMENT
+                  <img *ngIf="flagFile2" src="../../../../assets/icons/ic_checklist.png" style="width: 3em; height: 3em;">
+                </div>
+              </div>
+            </div>
+            <div class="row">
+              <div class="col-md-12">
+                <div class="tar">
+                  <button type="submit" class="fo_btn_registration fo_btn_save">Save</button>
+                </div>
+              </div>
+            </div>
+            </form>
           </div>
-          <div class="row">
-            <div class="col-md-10 mob_valid_1">
-              2. UPLOAD DISCLAIMER
-            </div>
-            <div class="col-md-2">
-  
-            </div>
-          </div>
-          <div class="row">
-            <div class="col-md-10 mob_valid_1">
-              3. UPLOAD IDENTITY DOCUMENT
-            </div>
-            <div class="col-md-2">
-  
-            </div>
-          </div>
-          <div class="row">
-            <div class="col-md-12">
-              <div class="tar">
-                <button type="submit" class="fo_btn_registration fo_btn_save"
-                  data-toggle="modal" 
-                  data-target="#confirming" 
-                  data-dismiss="modal"
-                  (click)="openConfirmationModal(verify_patient_2)">Save</button>
+          <div *ngIf="selectedAccount.mobile_status === mobileStatus.ACCESSED 
+            && selectedAccount.contact_status_id === contactStatus.VERIFIED
+            && dataContact && dataPatientHope">
+            <div class="row">
+                <div class="col-md-9 mob_valid_1" style="margin-top: 1em">
+                  1. PATIENT DATA FOR DISCLAIMER
+                </div>
+                <div class="col-md-3 mob_valid_1" style="margin-top: 1em">
+                  <button class="fo_btn_registration_2 fo_btn_blue" (click)="print()" style="margin-left: -3em">Print</button>
+                  <div id="print-section">
+                    <table class="table table-bordered" style="margin-top: 1em">
+                      <tr>
+                        PATIENT DATA FOR DISCLAIMER
+                      </tr>
+                      <tr>
+                        <td style="height: 2em;">Name</td>
+                        <td style="height: 2em; padding-left: 2em;">:</td>
+                        <td style="height: 2em; padding-left: 1em;">{{dataContact.name}}</td>
+                      </tr>
+                      <tr>
+                        <td style="height: 2em;">Date of Birth</td>
+                        <td style="height: 2em; padding-left: 2em;">:</td>
+                        <td style="height: 2em; padding-left: 1em;">{{selectedAccount.birth_date}}</td>
+                        </tr>
+                      <tr>
+                        <td style="height: 2em;">No. MR Central</td>
+                        <td style="height: 2em; padding-left: 2em;">:</td>
+                        <td style="height: 2em; padding-left: 1em;">{{dataPatientHope.mrNo}}</td>
+                      </tr>
+                      <tr>
+                        <td style="height: 2em;">Mobile Number</td>
+                        <td style="height: 2em; padding-left: 2em;">:</td>
+                        <td style="height: 2em; padding-left: 1em;">{{dataContact.phone_number_1}}</td>
+                      </tr>
+                      <tr>
+                        <td style="height: 2em;">Email</td>
+                        <td style="height: 2em; padding-left: 2em;">:</td>
+                        <td style="height: 2em; padding-left: 1em;">{{dataContact.email_address}}</td>
+                      </tr>
+                    </table>
+                  </div>
+                </div>
               </div>
-            </div>
+              <div class="row">
+                <div class="col-md-3">
+                  <div class="row">
+                    <div class="col-md-12 mob_valid_2">
+                      Name
+                    </div>
+                  </div>
+                  <div class="row">
+                    <div class="col-md-12 mob_valid_2">
+                      Date of Birth
+                    </div>
+                  </div>
+                  <div class="row">
+                    <div class="col-md-12 mob_valid_2">
+                      No. MR Central
+                    </div>
+                  </div>
+                  <div class="row">
+                    <div class="col-md-12 mob_valid_2">
+                      Mobile Number
+                    </div>
+                  </div>
+                  <div class="row">
+                    <div class="col-md-12 mob_valid_2">
+                      Email
+                    </div>
+                  </div>
+                </div>
+                <div class="mob_valid_5">
+                  <div class="row">
+                    <div class="col-md-12 mob_valid_3">
+                      :
+                    </div>
+                  </div>
+                  <div class="row">
+                    <div class="col-md-12 mob_valid_3">
+                      :
+                    </div>
+                  </div>
+                  <div class="row">
+                    <div class="col-md-12 mob_valid_3">
+                      :
+                    </div>
+                  </div>
+                  <div class="row">
+                    <div class="col-md-12 mob_valid_3">
+                      :
+                    </div>
+                  </div>
+                  <div class="row">
+                    <div class="col-md-12 mob_valid_3">
+                      :
+                    </div>
+                  </div>
+                </div>
+                <div class="col-md-4">
+                  <div class="row">
+                    <div class="col-md-12 mob_valid_4">
+                        <input class="form-control mob_valid_6" type="text" [(ngModel)]="dataContact.name" disabled>
+                    </div>
+                  </div>
+                  <div class="row">
+                    <div class="col-md-12 mob_valid_4">
+                      <input class="form-control mob_valid_6" type="text" [(ngModel)]="selectedAccount.birth_date" disabled>
+                    </div>
+                  </div>
+                  <div class="row">
+                    <div class="col-md-12 mob_valid_4">
+                      <input class="form-control mob_valid_6" type="text" [(ngModel)]="dataPatientHope.mrNo" disabled>
+                    </div>
+                  </div>
+                  <div class="row">
+                    <div class="col-md-12 mob_valid_4">
+                      <input class="form-control mob_valid_6" type="text" [(ngModel)]="dataContact.phone_number_1" disabled>
+                    </div>
+                  </div>
+                  <div class="row">
+                    <div class="col-md-12 mob_valid_4">
+                      <input class="form-control mob_valid_6" type="text" [(ngModel)]="dataContact.email_address">
+                    </div>
+                  </div>
+                </div>
+                <div class="col-md-4" style="padding: 0">
+                  <iframe [src]="getKtp" style="width:25em; height:17em;" frameborder="0"></iframe>
+                </div>
+              </div>
+              <form [formGroup] = "uploadForm" (ngSubmit)="onSubmitUpload()" enctype="multipart/form-data">
+              <div class="row">
+                <div class="col-md-10 mob_valid_1">
+                  <div class="image-upload">
+                      2. 
+                    <label for="file-input">
+                      <img style="height: 3rem; width: 4rem; margin-left: 0.5em;margin-right: 0.5rem" src="../../../../assets/icons/ic_folder.png">
+                    </label>
+                      <input id="file-input" type="file" (change)="uploadDisclaimer($event)" accept="application/pdf"/> UPLOAD DISCLAIMER
+                      <img *ngIf="flagFile1" src="../../../../assets/icons/ic_checklist.png" style="width: 3em; height: 3em;">
+                  </div>
+                </div>
+              </div>
+              <div class="row">
+                <div class="col-md-12">
+                  <div class="tar">
+                    <button type="submit" class="fo_btn_registration fo_btn_save">Save</button>
+                  </div>
+                </div>
+              </div>
+              </form>
           </div>
-          <!-- <button type="button" awPreviousStep>Go to previous step</button>
-          <button type="button" awNextStep>Go to next step</button> -->
-        </aw-wizard-step>
-        <aw-wizard-step stepTitle="Patient Portal Registered">
-          <ng-template awWizardStepSymbol>
-              <img style="width: 20px; height: 20px;" src="../../../../assets/icons/unlock.png">
-            </ng-template>
-          <!-- <button type="button" awPreviousStep>Previous Step</button>
-          <button type="button" (click)="finishFunction()">Finish</button> -->
-        </aw-wizard-step>
-      </aw-wizard>
-      
+          </div>
+        </div>
+      </div>
     </div>
   
     <ng-template #verify_patient let-modal>
@@ -295,7 +491,7 @@
       </div>
       <div class="modal-footer">
         <button type="button" class="btn ms_btn_black" (click)="modal.close()">Cancel</button>
-        <button class="btn ms_btn_green" [ngClass]="{'disable': flagConfirm}" (click)="verifyPatient()">Confirm</button>
+        <button class="btn ms_btn_green" [ngClass]="{'disable': flagConfirm}" (click)="verifyPatient()" (click)="modal.close()">Confirm</button>
       </div>
     </ng-template>
   
@@ -308,7 +504,7 @@
       </div>
       <div class="modal-footer">
         <button type="button" class="btn ms_btn_black" (click)="modal.close()">Cancel</button>
-        <button class="btn ms_btn_green" [ngClass]="{'disable': flagConfirm}" (click)="verifyPatient()">Confirm</button>
+        <button class="btn ms_btn_green" [ngClass]="{'disable': flagConfirm}" (click)="onSubmitUpload()" (click)="modal.close()">Confirm</button>
       </div>
     </ng-template>
   

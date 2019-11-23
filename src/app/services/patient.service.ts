@@ -14,11 +14,16 @@ export class PatientService {
   ) { }
 
   private contactUrl = environment.CALL_CENTER_SERVICE + '/contacts';
+  private updateContactUrl = environment.FRONT_OFFICE_SERVICE + '/contacts/account/open-access-mr';
   private patientUrl = environment.FRONT_OFFICE_SERVICE + '/patients';
   private contactFoUrl = environment.FRONT_OFFICE_SERVICE + '/contacts';
 
   private patientHopeUrl = environment.CALL_CENTER_SERVICE + '/patients/hope';
   private verifyPatientUrl = environment.CALL_CENTER_SERVICE + '/patients/verify';
+
+  private patientHopeDetailUrl = environment.HIS_SERVICE + '/patient';
+
+  private uploadImageUrl = environment.UPLOAD_IMAGE + '/pdf-upload';
 
   private searchPatientHopeSource = new Subject<any>();
   public searchPatientHopeSource$ = this.searchPatientHopeSource.asObservable();
@@ -31,6 +36,21 @@ export class PatientService {
   
   emitUpdateContact(params: boolean) {
     this.updateContactSource.next(params);
+  }
+
+  uploadImage(formData: any) {
+    const url = `${this.uploadImageUrl}`;
+    return this.http.post<any>(url, formData);
+  }
+
+  uploadContact(payload: any) {
+    const url = `${this.updateContactUrl}`;
+    return this.http.put<any>(url, payload, httpOptions);
+  }
+
+  getPatientHopeDetail(patientId: number) {
+    const uri = `${this.patientHopeDetailUrl}/${patientId}`;
+    return this.http.get<any>(uri, httpOptions);
   }
 
   getAccountMobile(searchString, offset, limit){

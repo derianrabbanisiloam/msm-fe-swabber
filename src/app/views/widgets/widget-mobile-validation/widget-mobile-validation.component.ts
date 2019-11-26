@@ -56,6 +56,7 @@ export class WidgetMobileValidationComponent implements OnInit {
   public flagFile2: boolean = false;
   public validUpload1: boolean = false;
   public validUpload2: boolean = false;
+  public flagEmail: boolean = false;
 
   public mask = [/\d/, /\d/, /\d/, /\d/, /\d/, /\d/, /\d/, /\d/, /\d/, /\d/, /\d/, /\d/, /\d/];
   public mask_birth = [/\d/, /\d/, '-', /\d/, /\d/, '-', /\d/, /\d/, /\d/, /\d/];
@@ -185,7 +186,10 @@ export class WidgetMobileValidationComponent implements OnInit {
     formData_2.append('uploader', 'identity');
     formData_2.append('filePdf', this.uploadForm.get('ktp').value);
 
-    this.assetDisclaimer = await this.patientService.uploadImage(formData_1)
+    if(!this.dataContact.email_address) {
+
+    } else {
+      this.assetDisclaimer = await this.patientService.uploadImage(formData_1)
       .toPromise().then(res => {
         return res.data;
       }).catch(err => {
@@ -204,6 +208,7 @@ export class WidgetMobileValidationComponent implements OnInit {
     
 
     await this.editContactUpload(this.assetDisclaimer.name, assetKtpUpload);
+    }
   }
 
   async editContactUpload(disclaimer, ktp) {
@@ -216,16 +221,20 @@ export class WidgetMobileValidationComponent implements OnInit {
       userName: this.user.username
     }
     ktp ? body.identity = ktp : '';
-    console.log('!!!!!!!!!!', body)
+    this.editEmailAddress();
     this.patientService.uploadContact(body).subscribe(
       data => {
         this.assetKtp = null;
         this.assetDisclaimer = null;
+        this.flagFile1 = false;
+        this.flagFile2 = false;
         this.uploadForm.get('disclaimer').setValue(null);
         this.uploadForm.get('ktp').setValue(null);
         this.alertService.success('Upload Data Success', false, 5000);
         this.getListAccount();
-        this.selectedAccount = null;
+        this.selectedAccount.contact_status_id = contactStatus.VERIFIED;
+        this.selectedAccount.mobile_status = mobileStatus.ACCESSED;
+        this.choosedAccount(this.selectedAccount);
       }, error => {
         this.alertService.error(error.error.message, false, 5000);
       }
@@ -249,7 +258,9 @@ export class WidgetMobileValidationComponent implements OnInit {
       data => {
         this.alertService.success('Verify Patient Success', false, 5000);
         this.getListAccount();
-        this.selectedAccount = null;
+        this.selectedAccount.contact_status_id = contactStatus.VERIFIED;
+        this.selectedAccount.mobile_status = mobileStatus.ACTIVE;
+        this.choosedAccount(this.selectedAccount);
       }, error => {
         this.alertService.error(error.error.message, false, 5000);
       }

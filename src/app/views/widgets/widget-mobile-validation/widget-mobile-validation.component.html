@@ -287,12 +287,13 @@
                 </div>
                 <div class="row">
                   <div class="col-md-12 mob_valid_4">
-                    <input class="form-control mob_valid_6" type="text" [(ngModel)]="dataContact.email_address">
+                    <input class="form-control mob_valid_6" type="text" [(ngModel)]="dataContact.email_address" #emailAddress="ngModel" required>
+                    <i *ngIf="f.submitted && !emailAddress.valid" class="error-msg">* Email is required</i>
                   </div>
                 </div>
               </div>
             </div>
-            <form [formGroup] = "uploadForm" (ngSubmit)="onSubmitUpload()" enctype="multipart/form-data">
+            <form [formGroup] = "uploadForm" (ngSubmit)="onSubmitUpload()" #f="ngForm" enctype="multipart/form-data">
             <div class="row">
               <div class="col-md-10 mob_valid_1">
                 <div class="image-upload">
@@ -301,6 +302,7 @@
                     <img style="height: 3rem; width: 4rem; margin-left: 0.5em;margin-right: 0.5rem" src="../../../../assets/icons/ic_folder.png">
                   </label>
                     <input id="file-input" type="file" (change)="uploadDisclaimer($event)" accept="application/pdf"/> UPLOAD DISCLAIMER
+                    <i *ngIf="f.submitted && !this.uploadForm.get('disclaimer').value" class="error-msg">* Disclaimer is required</i>
                     <img *ngIf="flagFile1" src="../../../../assets/icons/ic_checklist.png" style="width: 3em; height: 3em;">
                 </div>
               </div>
@@ -313,6 +315,7 @@
                     <img style="height: 3rem; width: 4rem; margin-left: 0.5em;margin-right: 0.5rem" src="../../../../assets/icons/ic_folder.png">
                   </label>
                   <input id="file-input-2" type="file" (change)="uploadKtp($event)" accept="application/pdf"/> UPLOAD IDENTITY DOCUMENT
+                  <i *ngIf="f.submitted && !this.uploadForm.get('ktp').value" class="error-msg">* KTP is required</i>
                   <img *ngIf="flagFile2" src="../../../../assets/icons/ic_checklist.png" style="width: 3em; height: 3em;">
                 </div>
               </div>

@@ -66,7 +66,12 @@ export const appointmentStatusId = {
 };
 
 export const mobileStatus = {
-  ACTIVE: 'active',
-  ACCESSED: 'accessed',
-  VALIDATED: 'validated',
+  ACTIVE: 'ACTIVE',
+  ACCESSED: 'MR-ACCESSED',
+  VALIDATED: 'VALIDATED'
 };
+
+export const contactStatus = {
+  MOBILE_ACTIVE: '3',
+  VERIFIED: '4'
+}

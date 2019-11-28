@@ -1,678 +1,529 @@
 <div *ngFor="let alert of alerts">
-  <ngb-alert *ngIf="alert" type="{{cssAlertType(alert)}}" (close)="removeAlert(alert)">{{ alert.message }}</ngb-alert>
-</div>
-
-<div class="d-flex justify-content-start fo_container_container_list">
-  <div class="fo_validation_list fo_container_list shadow-4">
-    <div class="">
-      <table class="table">
-        <thead>
-          <tr>
-            <th class="fo_list_header">Mobile Account</th>
-          </tr>
-        </thead>
-        <tbody>
-          <tr id="filter-quota" class="fo_grey">
-            <td class="fo_validation_filter">
-              <div class="input-group">
-                <input class="form-control input-patient" placeholder="Filter by Phone Number" name="searchString"
-                  [(ngModel)]="keywords.searchString" (change)="getListAccount()" ngbTooltip="Press 'Enter' to Search">
-              </div>
-            </td>
-          </tr>
-          <tr>
-            <td *ngIf="showNotFoundMsg" colspan="1">Displaying no data</td>
-            <td *ngIf="showWaitMsg" colspan="1">
-              <ngb-progressbar value="1000">Loading...</ngb-progressbar>
-            </td>
-          </tr>
-        </tbody>
-
-        <tbody class="quota-list">
-          <tr *ngFor="let itr of accountList">
-            <td (click)="choosedAccount(itr)">
-              <div class="fo_validation_list_name">
-                <span>{{itr.name}}</span>
-                <span style="float: right;">
-                  <span class="mobile-status" *ngIf="itr.mobile_status === mobileStatus.VALIDATED">Account Verified
-                      &nbsp; <img style="width: 15px; height: 15px" src="{{assetPath}}icons/ic_Check@2x.png">
-                  </span>
-                  <span class="mobile-status" *ngIf="itr.mobile_status === mobileStatus.ACCESSED">Access Granted
-                      &nbsp; <img style="width: 15px; height: 15px" src="{{assetPath}}icons/ic_Check@2x.png">
-                  </span>
-                </span>
-              </div>
-
-              <div class="fo_validation_list_date">{{itr.birth_date}} - {{itr.phone_number_1}}</div>
-            </td>
-          </tr>
-
-        </tbody>
-      </table>
-
-    </div>
-
-
+    <ngb-alert *ngIf="alert" type="{{cssAlertType(alert)}}" (close)="removeAlert(alert)">{{ alert.message }}</ngb-alert>
   </div>
-
-  <div class="fo_container_list shadow-4" *ngIf="patientList">
-
-    <div class="">
-      <table class="table">
-        <thead>
-          <tr>
-            <th class="fo_list_header">Patient Data</th>
-          </tr>
-        </thead>
-
-        <tbody class="fo_patient_data" *ngIf="patientList && isFound">
-          <tr *ngFor="let itr of patientList" [class.highlighted]="itr.patientOrganizationId == currentPatientHope">
-            <td style="padding: 8px 16px" (click)="choosedPatient(itr)">
-              <label class="bold">{{itr.name}}</label>
-              <br>
-              <label>{{itr.birthDate}}</label>
-              <br>
-              <label>{{itr.alias}}</label>
-            </td>
-          </tr>
-          <tr>
-            <td>
-              <form>
-                <div style="text-align: center">
-                  <button class="btn fo_btn_green" style="width: 16rem; height: 2.7rem"
-                    (click)="openPatientRegistration()">Register as New Patient</button>
-                </div>
-              </form>
-            </td>
-          </tr>
-        </tbody>
-
-        <tbody *ngIf="patientList && !isFound">
-          <tr style="background: #FFEEED">
-            <td>
-              <div style="text-align: center">
-                <img src="{{assetPath}}icons/ic_NoResult@2x.png" style="height: 2.4rem;width: 2.4rem;">
-              </div>
-              <div class="body-text" style="text-align: center; color: #6E6E6E">
-                Patient data not found, <br> Please search or register as a new patient</div>
-            </td>
-          </tr>
-          <tr>
-            <td>
-              <form name="form" (ngSubmit)="f.form.valid && searchPatient(searchPatientModal)" #f="ngForm" novalidate>
-                <div class="form-group d-flex justify-content-between">
-                  <div style="margin-right: 8px">
-                    <label class="fo_requirement">Name</label>
-                    <input type="text" class="form-control" placeholder="Patient Name..." name="patient"
-                      [(ngModel)]="params.name" required>
-                  </div>
-                  <div class="">
-                    <label class="fo_requirement">Birth Date</label>
-                    <div class="d-flex justify-content-between">
-                      <input [textMask]="{mask: mask_birth}" type="text" name="birth" placeholder="Search dob"
-                        class="form-control" [(ngModel)]="params.birth" placeholder="dd-mm-yyyy" />
-                      <button class="btn" style="margin-left: 8px; background: #1A2269" [disabled]="submitting">
-                        <img style="width: 15px; height: 15px" src="{{assetPath}}icons/ic_Search_white@2x.png">
-                      </button>
-
-                    </div>
-                  </div>
-                </div>
-                <div class="form-group">
-                  <div class="">
-                    <div *ngIf="f.submitted && !params.name" class="alert-danger form-field-error-msg">Name must be
-                      filled</div>
-                    <div *ngIf="f.submitted && !params.birth" class="alert-danger form-field-error-msg">Birth date must
-                      be filled</div>
-                    <div *ngIf="!f.submitted && params.name && !params.birth" class="alert-danger form-field-error-msg">
-                      Birth date must be filled</div>
-                  </div>
-                </div>
-
-                <div class="d-flex justify-content-between">
-                  <div class="fo_or_line">
-                    <div></div>
-                  </div>
-                  <div style="padding: 1rem; color: #6E6E6E">
-                    OR
-                  </div>
-                  <div class="fo_or_line">
-                    <div></div>
-                  </div>
-                </div>
-
-
-                <div style="text-align: center">
-                  <button class="btn fo_btn_green" style="width: 16rem; height: 2.7rem" type="button"
-                    (click)="openPatientRegistration()">Register as New Patient</button>
-                </div>
-              </form>
-            </td>
-          </tr>
-        </tbody>
-      </table>
-    </div>
-  </div>
-
-
-  <div class="fo_container_list fo_container_patient_detail shadow-4" *ngIf="detailPatient">
-    <div class="">
-      <div class="fo_list_header">
-        Patient Detail
-      </div>
-      <div class="fo_list_content">
-        <div class="fo_patient_detail_list fo_header_grey fo_padding_16_side fo_padding_10_vertical">
-          <span><span>MR Central No&nbsp;:</span>{{model.mrCentral}}&nbsp;&nbsp;&nbsp;&nbsp;</span>
-          <span><span>MR Local No&nbsp;:</span>{{model.mrlocal}}&nbsp;&nbsp;&nbsp;&nbsp;</span>
-        </div>
-        <div class="fo_patient_detail_input">
-          <div style="width: 65%">
-            <div class="form-group">
-              <label for="patient_name" class="fo_requirement">Name</label>
-              <div>
-                <input class="form-control" placeholder="Full Name" type="text" id="patientName" name="patientName"
-                  [(ngModel)]="model.patientName">
-              </div>
-            </div>
-            <div class="form-group d-flex justify-content-between">
-              <div class="">
-                <label for="birth_place" class="fo_requirement">Tempat Lahir</label>
-                <input auto-complete class="form-control" placeholder="Birth Place" value-formatter="name"
-                  list-formatter="name" [match-formatted]="true" min-chars="1" z-index="2" [source]="listCity"
-                  type="text" id="birthPlace" name="birthPlace" auto-select-first-item="true"
-                  [(ngModel)]="model.birthPlace">
-              </div>
-              <div class="">
-                <label for="birth_date" class="fo_requirement">Birth date</label>
-                <div class="">
-                  <div class="fo_btn_append input-group">
-                    <input [textMask]="{mask: mask_birth}" type="text" name="birth" placeholder="Search dob"
-                      class="form-control" [(ngModel)]="model.birth" placeholder="dd-mm-yyyy" />
-                  </div>
-                </div>
-              </div>
-            </div>
-            <div class="form-group d-flex justify-content-between">
-              <div class="">
-                <label for="sex">Jenis Kelamin</label>
-                <select id="sex" class="form-control" [(ngModel)]="model.sex" name="sex" required>
-                  <option *ngFor="let itr of listSex" [ngValue]="itr">
-                    {{itr.description}}
-                  </option>
-                </select>
-              </div>
-              <div class="">
-                <label for="marital_status">Status</label>
-                <select id="marital" class="form-control" [(ngModel)]="model.maritalStatus" name="marital">
-                  <option *ngFor="let itr of listMarital" [ngValue]="itr">{{itr.description}}</option>
-                </select>
-              </div>
-            </div>
-            <div class="form-group d-flex justify-content-between">
-              <div class="">
-                <label for="nationality" class="fo_requirement">Kebangsaan</label>
-                <input auto-complete class="form-control" placeholder="Nationality" value-formatter="name"
-                  list-formatter="name" [match-formatted]="true" min-chars="1" z-index="2" [source]="listCountry"
-                  type="text" id="nationality" name="nationality" auto-select-first-item="true"
-                  [(ngModel)]="model.nationality">
-              </div>
-              <div class="">
-                <label for="nationality" class="">Agama</label>
-                <select id="religion" class="form-control" [(ngModel)]="model.religion" name="religion">
-                  <option *ngFor="let itr of listReligion" [ngValue]="itr">{{itr.description}}</option>
-                </select>
-              </div>
-            </div>
-            <div class="form-group d-flex justify-content-between">
-              <div class="">
-                <label for="nohome">No. Telp. Rumah</label>
-                <input type="text" [textMask]="{mask: mask}" class="form-control" id="homePhone"
-                  [(ngModel)]="model.homePhone" name="homePhone" placeholder="(Optional)">
-              </div>
-              <div class="">
-                <label for="nooffice">No. Telp. Kantor</label>
-                <input type="text" class="form-control" [textMask]="{mask: mask}" id="officePhone"
-                  [(ngModel)]="model.officePhone" name="officePhone" placeholder="(Optional)">
-              </div>
-            </div>
-            <div class="form-group d-flex justify-content-between">
-              <div class="">
-                <label for="noHp1">No. HP 1</label>
-                <input type="text" [textMask]="{mask: mask}" class="form-control" id="mobileNo1"
-                  [(ngModel)]="model.mobileNo1" name="mobileNo1" placeholder="(Optional)">
-              </div>
-              <div class="">
-                <label for="noHp2">No. HP 2</label>
-                <input type="text" [textMask]="{mask: mask}" class="form-control" id="mobileNo2"
-                  [(ngModel)]="model.mobileNo2" name="mobileNo2" placeholder="(Optional)">
-              </div>
-            </div>
-            <div class="form-group d-flex justify-content-between">
-              <div class="">
-                <label for="notes">Kartu Identitas Yang Digunakan</label>
-                <select id="nationalidType" class="form-control" [(ngModel)]="model.nationalidType"
-                  name="nationalidType">
-                  <option *ngFor="let itr of listNationalIdType" [ngValue]="itr">{{itr.description}}</option>
-                </select>
-              </div>
-              <div class="">
-                <label for="notes">No Identitas</label>
-                <input type="text" class="form-control" id="nationalIdNo" [(ngModel)]="model.nationalIdNo"
-                  name="nationalIdNo" placeholder="(Optional)">
-              </div>
-            </div>
-          </div>
-          <div style="width: 80%">
-            <div class="form-group d-flex justify-content-between">
-              <div class="">
-                <label for="notes">Alamat (sesuai ID)</label>
-                <textarea class="form-control" s="2" id="comment" [(ngModel)]="model.permanentAddress"
-                  name="permanentAddress" id="permanentAddress" placeholder="(Optional)">
-                </textarea>
-              </div>
-              <div class="">
-                <label for="notes">Kab/Kota</label>
-                <input auto-complete class="form-control" placeholder="City" value-formatter="name"
-                  list-formatter="name" [match-formatted]="true" min-chars="1" z-index="2" [source]="listCity"
-                  type="text" id="city" name="city" required auto-select-first-item="true" [(ngModel)]="model.city"
-                  (change)="getDetailAddress()">
-              </div>
-            </div>
-            <div class="form-group d-flex justify-content-between">
-              <div class="">
-                <label for="notes">Kecamatan</label>
-                <select id="district" class="form-control" (change)="findSubdistrict($event)" name="district" required>
-                  <option *ngFor="let itr of listDistrict" [ngValue]="itr"
-                    [selected]="itr.district_id == model.district.district_id">{{itr.name}}</option>
-                </select>
-              </div>
-              <div class=" ">
-                <label for="notes">Kelurahan</label>
-                <select id="subdistrict" class="form-control" name="subdistrict" (change)="selectSubdistrict($event)"
-                  required>
-                  <option *ngFor="let itr of listSubdistrict" [ngValue]="itr"
-                    [selected]="itr.sub_district_id == model.subdistrict.sub_district_id">{{itr.name}}</option>
-                </select>
-              </div>
-              <div class=" ">
-                <label for="notes">Kode Pos</label>
-                <input type="text" class="form-control" id="postCode" [(ngModel)]="model.postCode" name="postCode">
-              </div>
-            </div>
-            <div class="form-group">
-              <div class="">
-                <label for="notes">Alamat Domisili</label>
-                <textarea class="form-control" id="comment" [(ngModel)]="model.address" name="address" id="address">
-                  </textarea>
-              </div>
-            </div>
-          </div>
-          <div style="width: 65%;">
-            <div class="form-group d-flex justify-content-between">
-              <div class="">
-                <label for="notes">Nama Ayah</label>
-                <input type="text" class="form-control" id="fatherName" [(ngModel)]="model.fatherName"
-                  name="fatherName">
-              </div>
-              <div class="">
-                <label for="notes">Nama Ibu</label>
-                <input type="text" class="form-control" id="motherName" [(ngModel)]="model.motherName"
-                  name="motherName">
-              </div>
-            </div>
-            <div class="form-group d-flex justify-content-between">
-              <div class="">
-                <label for="notes">Nama Pasangan</label>
-                <input type="text" class="form-control" id="spouseName" [(ngModel)]="model.spouseName"
-                  name="spouseName">
-              </div>
-              <div>
-
-              </div>
-            </div>
-            <div class="form-group">
-              <div class="">
-                <label for="notes">Alamat Email</label>
-                <input type="email" class="form-control" id="emailAddress" [(ngModel)]="model.email"
-                  name="emailAddress">
-              </div>
-            </div>
-          </div>
-          <div>
-            <div class="form-group">
-              <label for="scanKTP">Scan KTP</label>
-              <input type="file" accept="image/*" class="form-control-file" id="scanKTP" (change)="readUrl($event)">
-            </div>
-            <div class="form-group">
-              <img *ngIf="url" [src]="url" height="100px" width="100px">
-            </div>
-          </div>
-        </div>
-      </div>
-      <div class="fo_list_verify">
-        <div class="form-group">
-          <label *ngFor="let itr of listCheckBox" class="check_box_container">
-            <input type="checkbox" [(ngModel)]="itr.state" [ngModelOptions]="{standalone: true}"
-              (ngModelChange)="setButtonState()" />{{itr.label}}
-            <span class="checkmark"></span>
-          </label>
-        </div>
-        <div class="form-group d-flex justify-content-end">
-          <div class=" ">
-            <button type="button" class="btn fo_btn_black" (click)="cancel(confirmCancel)">
-              &nbsp; Cancel
-            </button>
-          </div>
-          <div class="">
-            <!-- <button type="button" class="btn fo_btn_grey" [disabled]="buttonPrint" (click)="print()" >
-              &nbsp; Print
-            </button> -->
-          </div>
-          <div class=" ">
-            <button type="button" [disabled]="buttonVerify" class="btn fo_btn_green" (click)="verify(confirmVerify)">
-              &nbsp; Verify
-            </button>
-          </div>
-
-        </div>
-      </div>
-    </div>
-  </div>
-</div>
-
-<div class="pagination">
-  <button *ngIf="isCanPrevPage" (click)="prevPage()" class="btn ms_btn_blue">
-    <img src="{{assetPath}}icons/ic_ArrowRight_White.png"> Prev
-  </button>
-  <span style="width:10px">&nbsp;</span>
-  <button *ngIf="isCanNextPage" (click)="nextPage()" class="btn ms_btn_blue">
-    Next <img src="{{assetPath}}assets/icons/ic_ArrowLeft_White.png">
-  </button>
-</div>
-
-
-<ng-template #confirmVerify let-c="close" let-d="dismiss">
-  <div class="modal-header">
-    <h4 class="modal-title">Confirmation</h4>
-  </div>
-  <div class="modal-body">
-    <p>Are you sure to verify {{model.patientName}}</p>
-    <div class="fo_confirmation_button d-flex justify-content-center">
-      <button type="button" class="btn fo_btn_black" (click)="c('Cross click')">No</button>
-      <button type="button" class="btn fo_btn_green" (click)="verifyProcess()" (click)="c('Cross click')">Yes</button>
-    </div>
-  </div>
-</ng-template>
-
-<ng-template #searchPatientModal let-c="close" let-d="dismiss">
-  <div class="modal-header fo_list_header">
-    <div class="header-2">List Patient From Hope</div>
-    <button type="button" class="close" aria-label="Close" (click)="c('Cross click')">
-      <span aria-hidden="true">&times;</span>
-    </button>
-  </div>
-
-  <div class="modal-body search-patient-modal">
-    <div class="">
+  
+  <div class="d-flex justify-content-start fo_container_container_list">
+    <div class="fo_validation_list fo_container_list shadow-3">
       <div class="">
-        <table class="table table-bordered">
-          <thead class="fo_header_grey">
-            <th>Mr No</th>
-            <th>CentralMrNo</th>
-            <th>Name</th>
-            <th width="100px">BirthDate</th>
-            <th>Address</th>
-            <th>Mobile No 1</th>
-            <th>Mobile No 2</th>
-
+        <table class="table">
+          <thead>
+            <tr>
+              <th class="fo_list_header">Mobile Account</th>
+            </tr>
           </thead>
-
           <tbody>
-            <tr *ngFor="let p of suggestionList; let i=index" (click)="choosedPatient(p)" (click)="c('Cross click')">
-              <td>
-                <div *ngIf="p.isThisOrg">
-                  <span>{{p.mrlocal}}</span>
+            <tr id="filter-quota" class="fo_grey">
+              <td class="fo_validation_filter">
+                <div class="input-group">
+                  <input class="form-control input-patient" placeholder="Filter by Phone Number" name="searchString"
+                    [(ngModel)]="keywords.searchString" (change)="getListAccount()" ngbTooltip="Press 'Enter' to Search">
                 </div>
               </td>
-              <td> {{ p.mrCentral }} </td>
-              <td> {{p.name}} </td>
-              <td> {{ p.birthDate }} </td>
-              <td> {{ p.address }} </td>
-              <td> {{ p.mobileNo1 }} </td>
-              <td> {{ p.mobileNo2 }} </td>
             </tr>
             <tr>
-              <td *ngIf="showNotFoundMsgSrc" colspan="7" style="color: #6E6E6E; text-align: center">
-                <img style="width: 27px;height: 27px" src="{{assetPath}}icons/ic_NoResult@2x.png">Displaying no
-                data
-              </td>
-              <td *ngIf="showWaitMsgSrc" colspan="7">
+              <td *ngIf="showNotFoundMsg" colspan="1">Displaying no data</td>
+              <td *ngIf="showWaitMsg" colspan="1">
                 <ngb-progressbar value="1000">Loading...</ngb-progressbar>
               </td>
             </tr>
           </tbody>
+  
+          <tbody class="quota-list">
+              <tr *ngFor="let itr of accountList" 
+              [ngClass]="{'selectedPatient': selectedAccount && itr.contact_id == selectedAccount.contact_id}" (click)="choosedAccount(itr)">
+                <td>
+                  <div class="fo_validation_list_name">{{itr.name}}</div>
+                  <div class="fo_validation_list_date">{{itr.birth_date}}</div>
+                  <div class="fo_validation_list_name">
+                    <span>{{itr.phone_number_1}}</span>
+                    <span style="float: right;">
+                      <span class="mobile-status-1" *ngIf="itr.mobile_status === mobileStatus.ACTIVE && itr.contact_status_id === contactStatus.VERIFIED">
+                        <img style="width: 30px; height: 30px" src="../../../../assets/icons/ic_mobile_linked_mr.svg">
+                      </span>
+                      <span class="mobile-status-2" *ngIf="itr.mobile_status === mobileStatus.ACCESSED">
+                        <img style="width: 30px; height: 30px" src="../../../../assets/icons/ic_access_opened.svg">
+                      </span>
+                    </span>
+                  </div>
+                </td>
+              </tr>
+            </tbody>
         </table>
       </div>
     </div>
-  </div>
-</ng-template>
-
-<!-- <section class="full-width" id="group-patient-validate">
-<div class="row">
-
-
-<ng-template #confirmCancel let-c="close" let-d="dismiss">
-  <div class="modal-header">
-    <h4 class="modal-title">Confirmation</h4>
-  </div>
-  <div class="modal-body">
-    <p>Are you sure to cancel this patient ?</p>
-    <div class="fo_confirmation_button d-flex justify-content-center">
-      <button type="button" class="btn fo_btn_black" (click)="confirmCancelValue(false)" (click)="c('Cross click')">No</button>
-      <button type="button" class="btn fo_btn_green" (click)="confirmCancelValue(true)" (click)="c('Cross click')">Yes</button>
-    </div>
-  </div>
-</ng-template>
-
-
-
-  <ng-template #modalPR let-c="close" let-d="dismiss">
-    <div class="modal-header" style="border-bottom: 0.5px solid #C1C1C1; padding: 16px 16px 0px 16px">
-      <span class="modal-title header-2 bold">Patient Registration</span>
-      <button type="button" class="close" aria-label="Close" (click)="d('Cross click')">
-        <span aria-hidden="true"><img src="../../../assets/Asset%20-WEB%20Front%20Office/ic_Cross@2x.png" style="width: 1.5rem; height: 1.5rem; cursor: pointer;"></span>
-      </button>
-    </div>
-    <div class="modal-body" style="padding: 0 0">
-         <arkcare-content-patient-registration-2 *ngIf="isModalPR"></arkcare-content-patient-registration-2>
-    </div>
-  </ng-template>
-
-</div>
-</section> -->
-
-
-
-<!-- <div id="print-section">
-    <img id="siloam-image" src="../../../assets/aaa-images/logo_siloam.png">
-    <div id="content-print">
-      <form style="margin:30px" id="form-print-registration">
-        <div class="form-group row">
-
-            <label for="mrStatus" class="col-md-2 col-form-label">No.Rekam Medis Central :</label>
-            <div class="col-md-2">
-              <input type="text" class="form-control"
-              name="MrCentralNo"
-              [(ngModel)]="model.mrcentral"
-              >
+  
+    <div class="fo_container_list_2" *ngIf="selectedAccount">
+      <div class="row">
+        <div class="col-md-12">
+          <div style="background-color: white;">
+            <div class="progressbar-wrapper" style="height: 7em;">
+              <ul class="progressbar" style="margin-left: -21em; margin-right: -18em">
+                <li [ngClass]="{'active': (selectedAccount.mobile_status === mobileStatus.ACTIVE 
+                && selectedAccount.contact_status_id === contactStatus.VERIFIED) || (selectedAccount.mobile_status === mobileStatus.ACCESSED 
+                && selectedAccount.contact_status_id === contactStatus.VERIFIED)}">Mobile Account Linked to MR</li>
+                <li [ngClass]="{'active': (selectedAccount.mobile_status === mobileStatus.ACTIVE 
+                && selectedAccount.contact_status_id === contactStatus.ACCESSED) || (selectedAccount.mobile_status === mobileStatus.ACCESSED 
+                && selectedAccount.contact_status_id === contactStatus.VERIFIED)}">Patient Portal Registered</li>
+              </ul>
             </div>
-
-            <label for="mrNo" class="col-md-2 col-form-label">No.Rekam Medis Lokal :</label>
-            <div class="col-md-2">
-              <input type="text" class="form-control"
-              name="mrlocal"
-              [(ngModel)]="model.mrlocal"
-              >
-            </div>
-
-            <label for="centralMrNo" class="col-md-2 col-form-label">Jenis Kelamin :</label>
-            <div class="col-md-2">
-              <input type="text" class="form-control"
-              name="sexStr"
-              [(ngModel)]="sexStr"
-              >
-            </div>
-        </div>
-
-        <div class="form-group row">
-          <label for="patientName" class="col-md-2 col-form-label">Nama Lengkap :</label>
-          <div class="col-md-4">
-            <input type="text"
-            class="form-control"
-            id="patientName_print"
-            [(ngModel)]="model.patientName"
-            name="patientName">
           </div>
-          <label for="spouseName" class="col-md-2 col-form-label">Nama Pasangan :</label>
-          <div class="col-md-4">
-            <input type="text"
-            class="form-control"
-            id="spouseName_print"
-            [(ngModel)]="model.spouseName"
-            name="spouseName"
-            >
-          </div>
-        </div>
-
-        <div class="form-group row">
-          <label for="fatherName" class="col-md-2 col-form-label">Nama Ayah :</label>
-          <div class="col-md-4">
-            <input type="text"
-            class="form-control"
-            id="fatherName_print"
-            [(ngModel)]="model.fatherName"
-            name="fatherName"
-            >
-          </div>
-          <label for="motherName" class="col-md-2 col-form-label">Nama Ibu :</label>
-          <div class="col-md-4">
-            <input type="text"
-            class="form-control"
-            id="motherName_print"
-            [(ngModel)]="model.motherName"
-            name="motherName"
-            >
-          </div>
-        </div>
-
-        <div class="form-group row">
-          <label for="religion" class="col-md-2 col-form-label">Agama :</label>
-          <div class="col-md-2">
-            <input type="text"
-                class="form-control"
-                [(ngModel)]="religionStr" name="religion"
-                >
-          </div>
-
-          <label for="religion" class="col-md-2 col-form-label">Status :</label>
-          <div class="col-md-2">
-            <input type="text"
-                class="form-control"
-                [(ngModel)]="maritalStatusStr" name="maritalStatus"
-                >
-          </div>
-
-        <label for="birthPlace" class="col-md-2 col-form-label">Tanggal Lahir :</label>
-        <div class="col-md-2">
-          <input class="form-control" placeholder="dd-mm-yyyy" [minDate]="minDate"
-            name="dp" [(ngModel)]="birth_date"
-            ngbDatepicker #d="ngbDatepicker">
         </div>
       </div>
-
-      <div class="form-group row">
-          <label for="city" class="col-md-2 col-form-label">Kartu Identitas : </label>
-          <div class="col-md-2">
-            <input type="text"
-                class="form-control"
-                [(ngModel)]="nationalidTypeStr" name="nationalidTypeStr"
-                >
+      <div class="row">
+        <div class="col-md-12">
+          <div style="background-color: white; margin-top: 1em">
+            <div *ngIf="selectedAccount.mobile_status === mobileStatus.ACTIVE 
+              && selectedAccount.contact_status_id === contactStatus.MOBILE_ACTIVE" style="min-height: 19em;">
+            <table>
+              <thead>
+                <th style="width: 19em; padding-left: 1.2em">Date of birth</th>
+                <th style="width: 19em; padding-left: 1.2em">Name</th>
+                <th></th>
+                <th style="width: 4em"></th>
+                <th style="width: 18em; padding-left: 0.2em">Local MR</th>
+                <th style="width: 4em"></th>
+              </thead>
+              <tbody>
+                <td>
+                  <input 
+                    style="width: 17em; margin-left: 1em"
+                    [textMask]="{mask: mask_birth}"
+                    type="text"
+                    [(ngModel)]="selectedAccount.birth_date"
+                    class="form-control"
+                    placeholder="dd-mm-yyyy"/>
+                </td>
+                <td>
+                  <input 
+                    style="width: 17em; margin-left: 1em" 
+                    class="form-control" 
+                    placeholder="Name" 
+                    type="text"
+                    [(ngModel)]="selectedAccount.name"/>
+                </td>
+                <td>
+                  <button class="btn-grey" type="button" (click)="getSearchedPatient1()">
+                    <i style="width: 1em; height: 1.5em" class="fa fa-search"></i>
+                  </button>
+                </td>
+                <td style="text-align: center;">or</td>
+                <td>
+                  <input 
+                  style="width: 17em;" 
+                  class="form-control" 
+                  placeholder="Local MR" 
+                  type="text"
+                  [(ngModel)]="mrLocal"></td>
+                <td>
+                  <button class="btn-grey" type="button" (click)="getSearchedPatient2()">
+                    <i style="width: 1em; height: 1.5em" class="fa fa-search"></i>
+                  </button>
+                </td>
+              </tbody>
+            </table>
+            <table class="table table-bordered" style="margin-top: 1em">
+              <thead class="fo_color_blue foot-note">
+                <th style="min-width: 14em">Name</th>
+                <th style="min-width: 8em">Date of birth</th>
+                <th style="white-space: nowrap; text-align: center; min-width: 10em">Central MR</th>
+                <th>Hospital</th>
+                <th width="100px">Local MR</th>
+                <th>Mobile Number</th>
+                <th style="min-width: 13em">Address</th>
+              </thead>
+              <tbody class="quota-list">
+                <tr *ngFor="let itr of patientHope"
+                [ngClass]="{'selectedPatient': selectPatient && itr.patientId == selectPatient.patientId}" (click)="choosedSearchPatient(itr)">
+                  <td>{{itr.name}}</td>
+                  <td>{{itr.newBirthDate}}</td>
+                  <td>{{itr.mrNo}}</td>
+                  <td>{{itr.hospitalAlias}}</td>
+                  <td>{{itr.mrNoUnit}}</td>
+                  <td>{{itr.mobileNo1}}</td>
+                  <td>{{itr.address}}</td>
+                </tr>
+              </tbody>
+              <tbody *ngIf="!patientHope && flagSearch">
+                <tr>
+                  <td colspan="7" style="text-align: center;">result not found</td>
+                </tr>
+              </tbody>
+              <tbody *ngIf="patientHope && flagSearch">
+                <tr>
+                  <td colspan="7" style="text-align: right">
+                    <button type="submit" class="fo_btn_registration fo_btn_save"
+                      [disabled]="!selectPatient"
+                      [ngStyle]="{ background: !selectPatient ? '#A5C39F' : '#4D9B35'}"
+                      data-toggle="modal" 
+                      data-target="#confirming" 
+                      data-dismiss="modal"
+                      (click)="openConfirmationModal(verify_patient)">Verify</button>
+                </tr>
+              </tbody>
+            </table>
           </div>
-          <label for="city" class="col-md-2 col-form-label">No. Identitas :</label>
-          <div class="col-md-2">
-            <input type="text"
-                class="form-control"
-                [(ngModel)]="model.nationalIdNo" name="nationalIdNo"
-                >
+          <div *ngIf="selectedAccount.mobile_status === mobileStatus.ACTIVE 
+            && selectedAccount.contact_status_id === contactStatus.VERIFIED
+            && dataContact && dataPatientHope">
+            <div class="row">
+              <div class="col-md-9 mob_valid_1" style="margin-top: 1em">
+                1. PATIENT DATA FOR DISCLAIMER
+              </div>
+              <div class="col-md-3 mob_valid_1" style="margin-top: 1em">
+                <button class="fo_btn_registration_2 fo_btn_blue" (click)="print()" style="margin-left: -3em">Print</button>
+                <div id="print-section">
+                    <table class="table table-bordered" style="margin-top: 1em">
+                      <tr>
+                        PATIENT DATA FOR DISCLAIMER
+                      </tr>
+                      <tr>
+                        <td style="height: 2em;">Name</td>
+                        <td style="height: 2em; padding-left: 2em;">:</td>
+                        <td style="height: 2em; padding-left: 1em;">{{dataContact.name}}</td>
+                      </tr>
+                      <tr>
+                        <td style="height: 2em;">Date of Birth</td>
+                        <td style="height: 2em; padding-left: 2em;">:</td>
+                        <td style="height: 2em; padding-left: 1em;">{{selectedAccount.birth_date}}</td>
+                        </tr>
+                      <tr>
+                        <td style="height: 2em;">No. MR Central</td>
+                        <td style="height: 2em; padding-left: 2em;">:</td>
+                        <td style="height: 2em; padding-left: 1em;">{{dataPatientHope.mrNo}}</td>
+                      </tr>
+                      <tr>
+                        <td style="height: 2em;">Mobile Number</td>
+                        <td style="height: 2em; padding-left: 2em;">:</td>
+                        <td style="height: 2em; padding-left: 1em;">{{dataContact.phone_number_1}}</td>
+                      </tr>
+                      <tr>
+                        <td style="height: 2em;">Email</td>
+                        <td style="height: 2em; padding-left: 2em;">:</td>
+                        <td style="height: 2em; padding-left: 1em;">{{dataContact.email_address}}</td>
+                      </tr>
+                    </table>
+                </div>
+              </div>
+            </div>
+            <div class="row">
+              <div class="col-md-3">
+                <div class="row">
+                  <div class="col-md-12 mob_valid_2">
+                    Name
+                  </div>
+                </div>
+                <div class="row">
+                  <div class="col-md-12 mob_valid_2">
+                    Date of Birth
+                  </div>
+                </div>
+                <div class="row">
+                  <div class="col-md-12 mob_valid_2">
+                    No. MR Central
+                  </div>
+                </div>
+                <div class="row">
+                  <div class="col-md-12 mob_valid_2">
+                    Mobile Number
+                  </div>
+                </div>
+                <div class="row">
+                  <div class="col-md-12 mob_valid_2">
+                    Email
+                  </div>
+                </div>
+              </div>
+              <div class="mob_valid_5">
+                <div class="row">
+                  <div class="col-md-12 mob_valid_3">
+                    :
+                  </div>
+                </div>
+                <div class="row">
+                  <div class="col-md-12 mob_valid_3">
+                    :
+                  </div>
+                </div>
+                <div class="row">
+                  <div class="col-md-12 mob_valid_3">
+                    :
+                  </div>
+                </div>
+                <div class="row">
+                  <div class="col-md-12 mob_valid_3">
+                    :
+                  </div>
+                </div>
+                <div class="row">
+                  <div class="col-md-12 mob_valid_3">
+                    :
+                  </div>
+                </div>
+              </div>
+              <div class="col-md-4">
+                <div class="row">
+                  <div class="col-md-12 mob_valid_4">
+                      <input class="form-control mob_valid_6" type="text" [(ngModel)]="dataContact.name" disabled>
+                  </div>
+                </div>
+                <div class="row">
+                  <div class="col-md-12 mob_valid_4">
+                    <input class="form-control mob_valid_6" type="text" [(ngModel)]="selectedAccount.birth_date" disabled>
+                  </div>
+                </div>
+                <div class="row">
+                  <div class="col-md-12 mob_valid_4">
+                    <input class="form-control mob_valid_6" type="text" [(ngModel)]="dataPatientHope.mrNo" disabled>
+                  </div>
+                </div>
+                <div class="row">
+                  <div class="col-md-12 mob_valid_4">
+                    <input class="form-control mob_valid_6" type="text" [(ngModel)]="dataContact.phone_number_1" disabled>
+                  </div>
+                </div>
+                <div class="row">
+                  <div class="col-md-12 mob_valid_4">
+                    <input class="form-control mob_valid_6" type="text" [(ngModel)]="dataContact.email_address" #emailAddress="ngModel" required>
+                    <i *ngIf="f.submitted && !emailAddress.valid" class="error-msg">* Email is required</i>
+                  </div>
+                </div>
+              </div>
+            </div>
+            <form [formGroup] = "uploadForm" (ngSubmit)="onSubmitUpload()" #f="ngForm" enctype="multipart/form-data">
+            <div class="row">
+              <div class="col-md-10 mob_valid_1">
+                <div class="image-upload">
+                    2. 
+                  <label for="file-input">
+                    <img style="height: 3rem; width: 4rem; margin-left: 0.5em;margin-right: 0.5rem" src="../../../../assets/icons/ic_folder.png">
+                  </label>
+                    <input id="file-input" type="file" (change)="uploadDisclaimer($event)" accept="application/pdf"/> UPLOAD DISCLAIMER
+                    <i *ngIf="f.submitted && !this.uploadForm.get('disclaimer').value" class="error-msg">* Disclaimer is required</i>
+                    <img *ngIf="flagFile1" src="../../../../assets/icons/ic_checklist.png" style="width: 3em; height: 3em;">
+                    <div style="float: right;">
+                      <img *ngIf="flagFile1" src="../../../../assets/icons/ic_delete.svg" (click)="deleteDisclaimer()" style="width: 3em; height: 3em;">
+                    </div>
+                </div>
+              </div>
+            </div>
+            <div class="row">
+              <div class="col-md-10 mob_valid_1">
+                <div class="image-upload">
+                    3. 
+                  <label for="file-input-2">
+                    <img style="height: 3rem; width: 4rem; margin-left: 0.5em;margin-right: 0.5rem" src="../../../../assets/icons/ic_folder.png">
+                  </label>
+                  <input id="file-input-2" type="file" (change)="uploadKtp($event)" accept="application/pdf"/> UPLOAD IDENTITY DOCUMENT
+                  <i *ngIf="f.submitted && !this.uploadForm.get('ktp').value" class="error-msg">* KTP is required</i>
+                  <img *ngIf="flagFile2" src="../../../../assets/icons/ic_checklist.png" style="width: 3em; height: 3em;">
+                  <div style="float: right;">
+                    <img *ngIf="flagFile2" src="../../../../assets/icons/ic_delete.svg" (click)="deleteKtp()" style="width: 3em; height: 3em;">
+                  </div>
+                </div>
+              </div>
+            </div>
+            <div class="row">
+              <div class="col-md-12">
+                <div class="tar">
+                  <button type="submit" class="fo_btn_registration fo_btn_save">Save</button>
+                </div>
+              </div>
+            </div>
+            </form>
           </div>
-          <label for="city" class="col-md-2 col-form-label">Kebangsaan :</label>
-          <div class="col-md-2">
-            <input type="text"
-                class="form-control"
-                [(ngModel)]="strNationality" name="strNationality"
-                >
+          <div *ngIf="selectedAccount.mobile_status === mobileStatus.ACCESSED 
+            && selectedAccount.contact_status_id === contactStatus.VERIFIED
+            && dataContact && dataPatientHope">
+            <div class="row">
+                <div class="col-md-9 mob_valid_1" style="margin-top: 1em">
+                  1. PATIENT DATA FOR DISCLAIMER
+                </div>
+                <div class="col-md-3 mob_valid_1" style="margin-top: 1em">
+                  <button class="fo_btn_registration_2 fo_btn_blue" (click)="print()" style="margin-left: -3em">Print</button>
+                  <div id="print-section">
+                    <table class="table table-bordered" style="margin-top: 1em">
+                      <tr>
+                        PATIENT DATA FOR DISCLAIMER
+                      </tr>
+                      <tr>
+                        <td style="height: 2em;">Name</td>
+                        <td style="height: 2em; padding-left: 2em;">:</td>
+                        <td style="height: 2em; padding-left: 1em;">{{dataContact.name}}</td>
+                      </tr>
+                      <tr>
+                        <td style="height: 2em;">Date of Birth</td>
+                        <td style="height: 2em; padding-left: 2em;">:</td>
+                        <td style="height: 2em; padding-left: 1em;">{{selectedAccount.birth_date}}</td>
+                        </tr>
+                      <tr>
+                        <td style="height: 2em;">No. MR Central</td>
+                        <td style="height: 2em; padding-left: 2em;">:</td>
+                        <td style="height: 2em; padding-left: 1em;">{{dataPatientHope.mrNo}}</td>
+                      </tr>
+                      <tr>
+                        <td style="height: 2em;">Mobile Number</td>
+                        <td style="height: 2em; padding-left: 2em;">:</td>
+                        <td style="height: 2em; padding-left: 1em;">{{dataContact.phone_number_1}}</td>
+                      </tr>
+                      <tr>
+                        <td style="height: 2em;">Email</td>
+                        <td style="height: 2em; padding-left: 2em;">:</td>
+                        <td style="height: 2em; padding-left: 1em;">{{dataContact.email_address}}</td>
+                      </tr>
+                    </table>
+                  </div>
+                </div>
+              </div>
+              <div class="row">
+                <div class="col-md-3">
+                  <div class="row">
+                    <div class="col-md-12 mob_valid_2">
+                      Name
+                    </div>
+                  </div>
+                  <div class="row">
+                    <div class="col-md-12 mob_valid_2">
+                      Date of Birth
+                    </div>
+                  </div>
+                  <div class="row">
+                    <div class="col-md-12 mob_valid_2">
+                      No. MR Central
+                    </div>
+                  </div>
+                  <div class="row">
+                    <div class="col-md-12 mob_valid_2">
+                      Mobile Number
+                    </div>
+                  </div>
+                  <div class="row">
+                    <div class="col-md-12 mob_valid_2">
+                      Email
+                    </div>
+                  </div>
+                </div>
+                <div class="mob_valid_5">
+                  <div class="row">
+                    <div class="col-md-12 mob_valid_3">
+                      :
+                    </div>
+                  </div>
+                  <div class="row">
+                    <div class="col-md-12 mob_valid_3">
+                      :
+                    </div>
+                  </div>
+                  <div class="row">
+                    <div class="col-md-12 mob_valid_3">
+                      :
+                    </div>
+                  </div>
+                  <div class="row">
+                    <div class="col-md-12 mob_valid_3">
+                      :
+                    </div>
+                  </div>
+                  <div class="row">
+                    <div class="col-md-12 mob_valid_3">
+                      :
+                    </div>
+                  </div>
+                </div>
+                <div class="col-md-4">
+                  <div class="row">
+                    <div class="col-md-12 mob_valid_4">
+                        <input class="form-control mob_valid_6" type="text" [(ngModel)]="dataContact.name" disabled>
+                    </div>
+                  </div>
+                  <div class="row">
+                    <div class="col-md-12 mob_valid_4">
+                      <input class="form-control mob_valid_6" type="text" [(ngModel)]="selectedAccount.birth_date" disabled>
+                    </div>
+                  </div>
+                  <div class="row">
+                    <div class="col-md-12 mob_valid_4">
+                      <input class="form-control mob_valid_6" type="text" [(ngModel)]="dataPatientHope.mrNo" disabled>
+                    </div>
+                  </div>
+                  <div class="row">
+                    <div class="col-md-12 mob_valid_4">
+                      <input class="form-control mob_valid_6" type="text" [(ngModel)]="dataContact.phone_number_1" disabled>
+                    </div>
+                  </div>
+                  <div class="row">
+                    <div class="col-md-12 mob_valid_4">
+                      <input class="form-control mob_valid_6" type="text" [(ngModel)]="dataContact.email_address">
+                    </div>
+                  </div>
+                </div>
+                <div class="col-md-4" style="padding: 0">
+                  <iframe [src]="getKtp" style="width:25em; height:17em;" frameborder="0"></iframe>
+                </div>
+              </div>
+              <form [formGroup] = "uploadForm" (ngSubmit)="onSubmitUpload()" enctype="multipart/form-data">
+              <div class="row">
+                <div class="col-md-10 mob_valid_1">
+                  <div class="image-upload">
+                      2. 
+                    <label for="file-input">
+                      <img style="height: 3rem; width: 4rem; margin-left: 0.5em;margin-right: 0.5rem" src="../../../../assets/icons/ic_folder.png">
+                    </label>
+                      <input id="file-input" type="file" (change)="uploadDisclaimer($event)" accept="application/pdf"/> UPLOAD DISCLAIMER
+                      <img *ngIf="flagFile1" src="../../../../assets/icons/ic_checklist.png" style="width: 3em; height: 3em;">
+                      <div style="float: right;">
+                      <img *ngIf="flagFile1" src="../../../../assets/icons/ic_delete.svg" (click)="deleteDisclaimer()" style="width: 3em; height: 3em;">
+                      </div>
+                  </div>
+                </div>
+              </div>
+              <div class="row">
+                <div class="col-md-12">
+                  <div class="tar">
+                    <button type="submit" class="fo_btn_registration fo_btn_save">Save</button>
+                  </div>
+                </div>
+              </div>
+              </form>
+          </div>
           </div>
         </div>
-
-      <div class="form-group row">
-          <label for="address" class="col-md-2 col-form-label">Alamat (sesuai ID) :</label>
-          <div class="col-md-4">
-            <input type="text"
-                class="form-control"
-                [(ngModel)]="model.address" name="addressId"
-                >
-          </div>
-          <label for="subdistrict" class="col-md-2 col-form-label">Kelurahan :</label>
-          <div class="col-md-4">
-            <input type="text"
-            class="form-control"
-            id="homePhone"
-            [(ngModel)]="strSubdistrict"
-            name="strSubdistrict"
-            >
-
-          </div>
-        </div>
-
-        <div class="form-group row">
-          <label for="address" class="col-md-2 col-form-label">Kecamatan :</label>
-          <div class="col-md-4">
-            <input type="text"
-                class="form-control"
-                [(ngModel)]="strDistrict" name="strDistrict"
-                >
-          </div>
-          <label for="strCity" class="col-md-2 col-form-label"> Kab/Kota :</label>
-          <div class="col-md-4">
-            <input type="text"
-            class="form-control"
-            id="strCity"
-            [(ngModel)]="strCity"
-            name="strCity"
-            >
-          </div>
-        </div>
-
-        <div class="form-group row">
-          <label for="postCode" class="col-md-2 col-form-label">Kode Pos :</label>
-          <div class="col-md-4">
-            <input type="text"
-            class="form-control"
-            id="postCode"
-            [(ngModel)]="model.postCode"
-            name="postCode"
-            >
-          </div>
-          <label for="postCode" class="col-md-2 col-form-label">Email Address: </label>
-          <div class="col-md-4">
-            <input type="email" class="form-control"
-            id="email"
-            [(ngModel)]="model.email"
-            name="email"
-            >
-          </div>
-        </div>
-
-      </form>
+      </div>
     </div>
-  </div> -->
+  
+    <ng-template #verify_patient let-modal>
+      <div class="modal-header">
+        <div class="header-2 modal-padding">Verify Patient Confirmation</div>
+      </div>
+      <div class="modal-body">
+        Are you sure?
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn ms_btn_black" (click)="modal.close()">Cancel</button>
+        <button class="btn ms_btn_green" [ngClass]="{'disable': flagConfirm}" (click)="verifyPatient()" (click)="modal.close()">Confirm</button>
+      </div>
+    </ng-template>
+  
+    <ng-template #verify_patient_2 let-modal>
+      <div class="modal-header">
+        <div class="header-2 modal-padding">MR Access For Mobile</div>
+      </div>
+      <div class="modal-body">
+        Are you sure?
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn ms_btn_black" (click)="modal.close()">Cancel</button>
+        <button class="btn ms_btn_green" [ngClass]="{'disable': flagConfirm}" (click)="onSubmitUpload()" (click)="modal.close()">Confirm</button>
+      </div>
+    </ng-template>
+  
+  </div>
+  
+  <div class="pagination">
+    <button *ngIf="isCanPrevPage" (click)="prevPage()" class="btn ms_btn_blue">
+      <img src="{{assetPath}}icons/ic_ArrowRight_White.png"> Prev
+    </button>
+    <span style="width:10px">&nbsp;</span>
+    <button *ngIf="isCanNextPage" (click)="nextPage()" class="btn ms_btn_blue">
+      Next <img src="{{assetPath}}icons/ic_ArrowLeft_White.png">
+    </button>
+  </div>

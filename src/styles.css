@@ -3,6 +3,7 @@
 @import "~font-awesome/css/font-awesome.css";
 @import "~bootstrap/dist/css/bootstrap.min.css";
 @import url('https://fonts.googleapis.com/css?family=Roboto');
+@import '../node_modules/angular-archwizard/archwizard.css';
 
 .btn {
   cursor: pointer;

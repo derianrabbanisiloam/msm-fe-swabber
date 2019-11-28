@@ -117,7 +117,6 @@ export class PatientService {
   }
 
   verifyPatient(verifyPatientPayload: any): Observable<any> {
-    console.log(this.verifyPatientUrl);
     return this.http.post<any>(this.verifyPatientUrl, verifyPatientPayload, httpOptions);
   }
 

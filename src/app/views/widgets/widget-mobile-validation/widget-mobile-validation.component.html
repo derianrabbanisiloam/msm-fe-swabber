@@ -38,10 +38,10 @@
                     <span>{{itr.phone_number_1}}</span>
                     <span style="float: right;">
                       <span class="mobile-status-1" *ngIf="itr.mobile_status === mobileStatus.ACTIVE && itr.contact_status_id === contactStatus.VERIFIED">
-                        <img style="width: 30px; height: 30px" src="../../../../assets/test/ic_mobile_linked_mr.svg">
+                        <img style="width: 30px; height: 30px" src="../../../../assets/ic_mobile_linked_mr.svg">
                       </span>
                       <span class="mobile-status-2" *ngIf="itr.mobile_status === mobileStatus.ACCESSED">
-                        <img style="width: 30px; height: 30px" src="../../../../assets/test/ic_access_opened.svg">
+                        <img style="width: 30px; height: 30px" src="../../../../assets/ic_access_opened.svg">
                       </span>
                     </span>
                   </div>
@@ -301,7 +301,7 @@
                     <i *ngIf="f.submitted && !this.uploadForm.get('disclaimer').value" class="error-msg">* Disclaimer is required</i>
                     <img *ngIf="flagFile1" src="../../../../assets/icons/ic_checklist.png" style="width: 3em; height: 3em;">
                     <div style="float: right;">
-                      <img *ngIf="flagFile1" src="../../../../assets/test/ic_delete.svg" (click)="deleteDisclaimer()" style="width: 3em; height: 3em;">
+                      <img *ngIf="flagFile1" src="../../../../assets/ic_delete.svg" (click)="deleteDisclaimer()" style="width: 3em; height: 3em;">
                     </div>
                 </div>
               </div>
@@ -317,7 +317,7 @@
                   <i *ngIf="f.submitted && !this.uploadForm.get('ktp').value" class="error-msg">* KTP is required</i>
                   <img *ngIf="flagFile2" src="../../../../assets/icons/ic_checklist.png" style="width: 3em; height: 3em;">
                   <div style="float: right;">
-                    <img *ngIf="flagFile2" src="../../../../assets/test/ic_delete.svg" (click)="deleteKtp()" style="width: 3em; height: 3em;">
+                    <img *ngIf="flagFile2" src="../../../../assets/ic_delete.svg" (click)="deleteKtp()" style="width: 3em; height: 3em;">
                   </div>
                 </div>
               </div>
@@ -471,7 +471,7 @@
                       <input id="file-input" type="file" (change)="uploadDisclaimer($event)" accept="application/pdf"/> UPLOAD DISCLAIMER
                       <img *ngIf="flagFile1" src="../../../../assets/icons/ic_checklist.png" style="width: 3em; height: 3em;">
                       <div style="float: right;">
-                      <img *ngIf="flagFile1" src="../../../../assets/test/ic_delete.svg" (click)="deleteDisclaimer()" style="width: 3em; height: 3em;">
+                      <img *ngIf="flagFile1" src="../../../../assets/ic_delete.svg" (click)="deleteDisclaimer()" style="width: 3em; height: 3em;">
                       </div>
                   </div>
                 </div>

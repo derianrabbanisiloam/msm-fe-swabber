@@ -141,6 +141,12 @@
   color: white;
 }
 
+.square {
+  height: 1em;
+  width: 1em;
+  border: 1px solid black;
+}
+
 #print-section {
     display: none;
   }

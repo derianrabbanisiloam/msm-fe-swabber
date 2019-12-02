@@ -133,6 +133,8 @@ export class WidgetAppointmentListComponent implements OnInit {
   public socket;
   public socketTwo;
   public dateApp;
+  public listRoomHope: any = [];
+  public roomHope: any;
 
   constructor(
     private doctorService: DoctorService,
@@ -167,6 +169,7 @@ export class WidgetAppointmentListComponent implements OnInit {
     this.getPayer();
     this.getReferral();
     this.getListDoctor();
+    this.getListRoomHope();
     this.getPatientType();
     this.listAppointment();
     this.emitRescheduleApp();
@@ -321,6 +324,16 @@ export class WidgetAppointmentListComponent implements OnInit {
       })
   }
 
+  async getListRoomHope() {
+    const organizationId = this.hospital.orgId;
+    this.listRoomHope = await this.generalService.getRoomHope(organizationId)
+      .toPromise().then(res => {
+        return res.data;
+      }).catch(err => {
+        return [];
+      })
+  }
+
   refreshPage() {
     this.buttonCreateAdmission = false;
     this.buttonPrintQueue = true;
@@ -334,6 +347,7 @@ export class WidgetAppointmentListComponent implements OnInit {
     this.payer = null;
     this.payerNo = null;
     this.payerEligibility = null;
+    this.roomHope = null;
   }
 
   clearSearch() {
@@ -664,6 +678,7 @@ export class WidgetAppointmentListComponent implements OnInit {
     let payer = null;
     let payerNo = null;
     let payerEligibility = null;
+    let procedureRoomId = this.roomHope ? this.roomHope.procedureRoomId : null;
 
     //check condition in checkin validate
     let params = this.checkInValidate();
@@ -677,7 +692,7 @@ export class WidgetAppointmentListComponent implements OnInit {
         if (this.payer && this.payer.payer_id) {
           payer = this.payer.payer_id;
           payerNo = this.payerNo;
-          payerEligibility = this.payerEligibility
+          payerEligibility = this.payerEligibility;
         }
       }
 
@@ -689,6 +704,7 @@ export class WidgetAppointmentListComponent implements OnInit {
         payerId: payer,
         payerNo: payerNo,
         payerEligibility: payerEligibility,
+        procedureRoomId: procedureRoomId,
         userId: this.user.id,
         source: sourceApps,
         userName: this.user.fullname,

@@ -668,19 +668,31 @@
         </div>
       </div>
       <div *ngIf="!selectedCheckIn.admission_id" style="border-top: 0.5px solid #C1C1C1">
-        <div style="width: 20%">
-          <label class="">Patient Type</label>
-          <div class="">
-            <select id="title" class="form-control" required (change)="changeCondition($event)"
-              name="dropDownPatientType">
-
-              <option *ngFor="let itr of patientTypeList" [ngValue]="itr" [disabled]="itr.description == 'EMPLOYEE'"
-                [selected]="(itr.description == 'KITAS' && nationalIdTypeId == 4) || (itr.description == 'PASSPORT' && nationalIdTypeId == 3)
-                  || itr.description == 'PRIVATE' && nationalIdTypeId == 1 || (itr.description == 'PRIVATE' && nationalIdTypeId == 2) || (itr.description == 'PRIVATE' && nationalIdTypeId == 5) || (itr.description == 'PRIVATE' && nationalIdTypeId == '')">
-                {{itr.description}}</option>
-
-            </select>
-            <input type="hidden" name="patientType" [(ngModel)]="patientType">
+        <div class="d-flex justify-content-between">
+          <div style="width: 20%">
+            <label class="">Patient Type</label>
+            <div class="">
+              <select id="title" class="form-control" required (change)="changeCondition($event)" name="dropDownPatientType">
+                <option *ngFor="let itr of patientTypeList" [ngValue]="itr" [disabled]="itr.description == 'EMPLOYEE'"
+                      [selected]="(itr.description == 'KITAS' && nationalIdTypeId == 4) || (itr.description == 'PASSPORT' && nationalIdTypeId == 3)
+                        || itr.description == 'PRIVATE' && nationalIdTypeId == 1 || (itr.description == 'PRIVATE' && nationalIdTypeId == 2) || (itr.description == 'PRIVATE' && nationalIdTypeId == 5) || (itr.description == 'PRIVATE' && nationalIdTypeId == '')">
+                      {{itr.description}}
+                </option>
+              </select>
+              <input type="hidden" name="patientType" [(ngModel)]="patientType">
+            </div>
+          </div>
+          <div style="width: 40%">
+            <label class="">Room / Location</label>
+            <div class="input-group">
+              <select class="form-control" [(ngModel)]="roomHope" name="dropDownRoom">
+                <option *ngFor="let itr of listRoomHope" [ngValue]="itr">
+                  {{itr.name}} - {{itr.code}}
+                </option>
+              </select>
+            </div>
+          </div>
+          <div style="width: 40%">
           </div>
         </div>
         <div class="d-flex justify-content-between">

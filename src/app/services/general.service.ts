@@ -1,10 +1,11 @@
 import { Injectable } from '@angular/core';
-import { Observable, of } from 'rxjs';
+import { Observable, of, from } from 'rxjs';
 import { HttpClient } from '@angular/common/http';
 import { catchError, tap } from 'rxjs/operators';
 import { Country } from '../models/generals/country';
 import { General } from '../models/generals/general';
 import { City } from '../models/generals/city';
+import { RoomHope } from '../models/generals/roomHope';
 import { District } from '../models/generals/district';
 import { Subdistrict } from '../models/generals/subdistrict';
 import { environment } from '../../environments/environment';
@@ -114,6 +115,11 @@ export class GeneralService {
       const uri = `subdistrict/${subDistrictId}`;
       return this.http.get<Subdistrict>(this.generalUrl + uri, httpOptions);
     }
+  }
+
+  getRoomHope(organizationId: any): Observable<any> {
+    const uri = `procedure-room/${organizationId}`;
+    return this.http.get<RoomHope[]>(this.generalUrl + uri, httpOptions);
   }
 
   private handleError<T>(operation = 'operation', result?: T) {

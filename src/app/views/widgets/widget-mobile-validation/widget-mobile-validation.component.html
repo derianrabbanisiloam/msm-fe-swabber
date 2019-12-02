@@ -172,36 +172,94 @@
               <div class="col-md-3 mob_valid_1" style="margin-top: 1em">
                 <button class="fo_btn_registration_2 fo_btn_blue" (click)="print()" style="margin-left: -3em">Print</button>
                 <div id="print-section">
-                    <table class="table table-bordered" style="margin-top: 1em">
+                  <table class="table table-bordered" style="margin-top: 10em; margin-left: 4.5em; 
+                    margin-right: 5em; margin-bottom: 5em; width: 80%">
+                    <tr>
+                      <td style="font-weight: bold; text-align: center" colspan="3">Ijin Pembukaan Akses Data Medis / Authorization to Medical Records</td>
+                    </tr>
+                    <tr>
+                      <td style="padding-top: 2.5em" colspan="3">
+                        Yang bertandatangan di bawah ini saya : / The Undersigned below :
+                      </td>
+                    </tr>
+                    <tr>
+                      <td style="height: 2em; width: 50%; padding-left: 1em">Nama / Name</td>
+                      <td style="height: 2em; width: 2%">:</td>
+                      <td style="height: 2em;">{{dataContact.name}}</td>
+                    </tr>
+                    <tr>
+                      <td style="height: 2em; padding-left: 1em">No. MR Central / Central MR. Number</td>
+                      <td style="height: 2em;">:</td>
+                      <td style="height: 2em;">{{dataPatientHope.mrNo}}</td>
+                    </tr>
+                    <tr>
+                      <td style="height: 2em; padding-left: 1em">Tanggal Lahir/ DOB</td>
+                      <td style="height: 2em;">:</td>
+                      <td style="height: 2em;">{{selectedAccount.birth_date}}</td>
+                    </tr>
+                    <tr>
+                      <td style="height: 2em; padding-left: 1em">Nomor HP/ Mobile Number</td>
+                      <td style="height: 2em;">:</td>
+                      <td style="height: 2em;">{{dataContact.phone_number_1}}</td>
+                    </tr>
+                    <tr>
+                      <td style="height: 2em; padding-left: 1em">Email</td>
+                      <td style="height: 2em;">:</td>
+                      <td style="height: 2em;">{{dataContact.email_address}}</td>
+                    </tr>
+                    <tr>
+                      <td colspan="3" style="padding-top: 1.7em">
+                        <p style="text-align: justify; line-height: 1.5em;">Dengan ini mengizinkan Siloam Hospitals untuk membuka akses data medis saya di 
+                          seluruh Unit Siloam Hospitals untuk ditampilkan pada Mobile Application MySiloam
+                          /Hereby give permission to Siloam Hospitals to release my medical record data at all 
+                          Siloam Hospitals Unit to be displayed at MySiloam Mobile Application.</p>
+                      </td>
+                    </tr>
                       <tr>
-                        PATIENT DATA FOR DISCLAIMER
+                        <td colspan="3" style="padding-top: 1.7em">
+                          Persetujuan dan otorisasi ini berlaku untuk / This consent and authorization applies to
+                        </td>
                       </tr>
                       <tr>
-                        <td style="height: 2em;">Name</td>
-                        <td style="height: 2em; padding-left: 2em;">:</td>
-                        <td style="height: 2em; padding-left: 1em;">{{dataContact.name}}</td>
+                        <td colspan="3">
+                          <div class="row">
+                            <div style="width: 13px; height: 13px; margin-left: 0.5em; margin-right: 0.8em; border: 1px solid; float: left;"></div>
+                            <div>Hasil Laboratorium / Lab Result</div>
+                            <div class="clear: left;"></div>
+                          </div>
+                        </td>
                       </tr>
                       <tr>
-                        <td style="height: 2em;">Date of Birth</td>
-                        <td style="height: 2em; padding-left: 2em;">:</td>
-                        <td style="height: 2em; padding-left: 1em;">{{selectedAccount.birth_date}}</td>
-                        </tr>
-                      <tr>
-                        <td style="height: 2em;">No. MR Central</td>
-                        <td style="height: 2em; padding-left: 2em;">:</td>
-                        <td style="height: 2em; padding-left: 1em;">{{dataPatientHope.mrNo}}</td>
+                        <td colspan="3">
+                          <div class="row">
+                            <div style="width: 13px; height: 13px; margin-left: 0.5em; margin-right: 0.8em; border: 1px solid; float: left;"></div>
+                            <div>Hasil Radiologi / Radiology Result</div>
+                            <div class="clear: left;"></div>
+                          </div>
+                        </td>
                       </tr>
                       <tr>
-                        <td style="height: 2em;">Mobile Number</td>
-                        <td style="height: 2em; padding-left: 2em;">:</td>
-                        <td style="height: 2em; padding-left: 1em;">{{dataContact.phone_number_1}}</td>
+                        <td colspan="3" style="padding-top: 1.7em;">
+                          Yang bertandatangan / The Undersigned
+                        </td>
                       </tr>
                       <tr>
-                        <td style="height: 2em;">Email</td>
-                        <td style="height: 2em; padding-left: 2em;">:</td>
-                        <td style="height: 2em; padding-left: 1em;">{{dataContact.email_address}}</td>
+                        <td style="padding-top: 5em;">
+                          <hr>
+                        </td>
                       </tr>
-                    </table>
+                      <tr>
+                        <td>
+                          Tanggal / date :
+                        </td>
+                      </tr>
+                      <tr>
+                        <td colspan="3" style="padding-top: 8.5em;">
+                          <hr style="margin-top: 0.01em; margin-bottom: 0.01em;">
+                          <hr style="margin-top: 0.01em; margin-bottom: 0.01em;">
+                        </td>
+                      </tr>
+                  </table>
                 </div>
               </div>
             </div>
@@ -341,35 +399,93 @@
                 <div class="col-md-3 mob_valid_1" style="margin-top: 1em">
                   <button class="fo_btn_registration_2 fo_btn_blue" (click)="print()" style="margin-left: -3em">Print</button>
                   <div id="print-section">
-                    <table class="table table-bordered" style="margin-top: 1em">
+                    <table class="table table-bordered" style="margin-top: 10em; margin-left: 4.5em; 
+                      margin-right: 5em; margin-bottom: 5em; width: 80%">
                       <tr>
-                        PATIENT DATA FOR DISCLAIMER
+                        <td style="font-weight: bold; text-align: center" colspan="3">Ijin Pembukaan Akses Data Medis / Authorization to Medical Records</td>
                       </tr>
                       <tr>
-                        <td style="height: 2em;">Name</td>
-                        <td style="height: 2em; padding-left: 2em;">:</td>
-                        <td style="height: 2em; padding-left: 1em;">{{dataContact.name}}</td>
+                        <td style="padding-top: 2.5em" colspan="3">
+                          Yang bertandatangan di bawah ini saya : / The Undersigned below :
+                        </td>
                       </tr>
                       <tr>
-                        <td style="height: 2em;">Date of Birth</td>
-                        <td style="height: 2em; padding-left: 2em;">:</td>
-                        <td style="height: 2em; padding-left: 1em;">{{selectedAccount.birth_date}}</td>
+                        <td style="height: 2em; width: 50%; padding-left: 1em">Nama / Name</td>
+                        <td style="height: 2em; width: 2%">:</td>
+                        <td style="height: 2em;">{{dataContact.name}}</td>
+                      </tr>
+                      <tr>
+                        <td style="height: 2em; padding-left: 1em">No. MR Central / Central MR. Number</td>
+                        <td style="height: 2em;">:</td>
+                        <td style="height: 2em;">{{dataPatientHope.mrNo}}</td>
+                      </tr>
+                      <tr>
+                        <td style="height: 2em; padding-left: 1em">Tanggal Lahir/ DOB</td>
+                        <td style="height: 2em;">:</td>
+                        <td style="height: 2em;">{{selectedAccount.birth_date}}</td>
+                      </tr>
+                      <tr>
+                        <td style="height: 2em; padding-left: 1em">Nomor HP/ Mobile Number</td>
+                        <td style="height: 2em;">:</td>
+                        <td style="height: 2em;">{{dataContact.phone_number_1}}</td>
+                      </tr>
+                      <tr>
+                        <td style="height: 2em; padding-left: 1em">Email</td>
+                        <td style="height: 2em;">:</td>
+                        <td style="height: 2em;">{{dataContact.email_address}}</td>
+                      </tr>
+                      <tr>
+                        <td colspan="3" style="padding-top: 1.7em">
+                          <p style="text-align: justify; line-height: 1.5em;">Dengan ini mengizinkan Siloam Hospitals untuk membuka akses data medis saya di 
+                            seluruh Unit Siloam Hospitals untuk ditampilkan pada Mobile Application MySiloam
+                            /Hereby give permission to Siloam Hospitals to release my medical record data at all 
+                            Siloam Hospitals Unit to be displayed at MySiloam Mobile Application.</p>
+                        </td>
+                      </tr>
+                        <tr>
+                          <td colspan="3" style="padding-top: 1.7em">
+                            Persetujuan dan otorisasi ini berlaku untuk / This consent and authorization applies to
+                          </td>
                         </tr>
-                      <tr>
-                        <td style="height: 2em;">No. MR Central</td>
-                        <td style="height: 2em; padding-left: 2em;">:</td>
-                        <td style="height: 2em; padding-left: 1em;">{{dataPatientHope.mrNo}}</td>
-                      </tr>
-                      <tr>
-                        <td style="height: 2em;">Mobile Number</td>
-                        <td style="height: 2em; padding-left: 2em;">:</td>
-                        <td style="height: 2em; padding-left: 1em;">{{dataContact.phone_number_1}}</td>
-                      </tr>
-                      <tr>
-                        <td style="height: 2em;">Email</td>
-                        <td style="height: 2em; padding-left: 2em;">:</td>
-                        <td style="height: 2em; padding-left: 1em;">{{dataContact.email_address}}</td>
-                      </tr>
+                        <tr>
+                          <td colspan="3">
+                            <div class="row">
+                              <div style="width: 13px; height: 13px; margin-left: 0.5em; margin-right: 0.8em; border: 1px solid; float: left;"></div>
+                              <div>Hasil Laboratorium / Lab Result</div>
+                              <div class="clear: left;"></div>
+                            </div>
+                          </td>
+                        </tr>
+                        <tr>
+                          <td colspan="3">
+                            <div class="row">
+                              <div style="width: 13px; height: 13px; margin-left: 0.5em; margin-right: 0.8em; border: 1px solid; float: left;"></div>
+                              <div>Hasil Radiologi / Radiology Result</div>
+                              <div class="clear: left;"></div>
+                            </div>
+                          </td>
+                        </tr>
+                        <tr>
+                          <td colspan="3" style="padding-top: 1.7em;">
+                            Yang bertandatangan / The Undersigned
+                          </td>
+                        </tr>
+                        <tr>
+                          <td style="padding-top: 5em;">
+                            <hr>
+                          </td>
+                        </tr>
+                        <tr>
+                          <td>
+                            Tanggal / date :
+                          </td>
+                        </tr>
+                        <tr>
+                          <td colspan="3" style="padding-top: 8.5em;">
+                            <hr style="margin-top: 0.01em; margin-bottom: 0.01em;">
+                            <hr style="margin-top: 0.01em; margin-bottom: 0.01em;">
+                          </td>
+                        </tr>
                     </table>
                   </div>
                 </div>

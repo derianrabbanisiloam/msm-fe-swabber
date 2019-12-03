@@ -116,6 +116,8 @@ export class WidgetPatientDataComponent implements OnInit {
   public roomDetail: any;
   public socket;
   public socketTwo;
+  public listRoomHope: any = [];
+  public roomHope: any;
 
   constructor(
     private generalService: GeneralService,
@@ -153,6 +155,7 @@ export class WidgetPatientDataComponent implements OnInit {
 
   ngOnInit() {
     this.admissionType();
+    this.getListRoomHope();
     this.getPatientType();
     this.getReferral();
     this.getCity();
@@ -166,6 +169,16 @@ export class WidgetPatientDataComponent implements OnInit {
     this.getReligion();
     this.getBloodType();
     this.getCollectionAlert();
+  }
+
+  async getListRoomHope() {
+    const organizationId = this.hospital.orgId;
+    this.listRoomHope = await this.generalService.getRoomHope(organizationId)
+      .toPromise().then(res => {
+        return res.data;
+      }).catch(err => {
+        return [];
+      })
   }
 
   async getPatientType() {
@@ -990,6 +1003,7 @@ export class WidgetPatientDataComponent implements OnInit {
     let payer = null;
     let payerNo = null;
     let payerEligibility = null;
+    let procedureRoomId = this.roomHope ? this.roomHope.procedureRoomId : null;
 
     //check condition in checkin validate
     let params = this.checkInValidate();
@@ -1003,7 +1017,7 @@ export class WidgetPatientDataComponent implements OnInit {
         if (this.payer && this.payer.payer_id) {
           payer = this.payer.payer_id;
           payerNo = this.payerNo;
-          payerEligibility = this.payerEligibility
+          payerEligibility = this.payerEligibility;
         }
       }
   
@@ -1015,6 +1029,7 @@ export class WidgetPatientDataComponent implements OnInit {
         payerId: payer,
         payerNo: payerNo,
         payerEligibility: payerEligibility,
+        procedureRoomId: procedureRoomId,
         userId: this.user.id,
         source: sourceApps,
         userName: this.user.fullname,

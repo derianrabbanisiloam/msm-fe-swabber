@@ -127,6 +127,9 @@ export class WidgetCreateAppointmentComponent implements OnInit {
 
   public slotList: any = [];
 
+  public listRoomHope: any = [];
+  public roomHope: any;
+
   constructor(
     private router: Router,
     private activatedRoute: ActivatedRoute,
@@ -179,6 +182,7 @@ export class WidgetCreateAppointmentComponent implements OnInit {
     await this.getPayer();
     await this.getPatientType();
     await this.admissionType();
+    await this.getListRoomHope();
     await this.getReferral();
     this.setTableHeader();
     this.emitCreateApp();
@@ -337,6 +341,7 @@ export class WidgetCreateAppointmentComponent implements OnInit {
     await this.getPayer();
     await this.getPatientType();
     await this.admissionType();
+    await this.getListRoomHope();
     await this.getReferral();
     this.setTableHeader();
     this.emitCreateApp();
@@ -392,6 +397,17 @@ export class WidgetCreateAppointmentComponent implements OnInit {
     this.payer = null;
     this.payerNo = null;
     this.payerEligibility = null;
+    this.roomHope = null;
+  }
+
+  async getListRoomHope() {
+    const organizationId = this.hospital.orgId;
+    this.listRoomHope = await this.generalService.getRoomHope(organizationId)
+      .toPromise().then(res => {
+        return res.data;
+      }).catch(err => {
+        return [];
+      })
   }
 
   async admissionType() {
@@ -1054,6 +1070,7 @@ export class WidgetCreateAppointmentComponent implements OnInit {
     let payer = null;
     let payerNo = null;
     let payerEligibility = null;
+    let procedureRoomId = this.roomHope ? this.roomHope.procedureRoomId : null;
 
     //check condition in checkin validate
     let params = this.checkInValidate();
@@ -1079,6 +1096,7 @@ export class WidgetCreateAppointmentComponent implements OnInit {
         payerId: payer,
         payerNo: payerNo,
         payerEligibility: payerEligibility,
+        procedureRoomId: procedureRoomId,
         userId: this.user.id,
         source: sourceApps,
         userName: this.user.fullname,

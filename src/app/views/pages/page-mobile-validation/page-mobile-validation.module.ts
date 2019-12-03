@@ -15,6 +15,7 @@ import { TextMaskModule } from 'angular2-text-mask';
 import { WidgetMobileValidationComponent } from '../../widgets/widget-mobile-validation/widget-mobile-validation.component';
 import { NgbProgressbarModule, NgbAlertModule, NgbModalModule , NgbTooltipModule} from '@ng-bootstrap/ng-bootstrap';
 import { NguiAutoCompleteModule } from '@ngui/auto-complete';
+import { ArchwizardModule } from 'angular-archwizard';
 
 @NgModule({
   declarations: [
@@ -36,6 +37,7 @@ import { NguiAutoCompleteModule } from '@ngui/auto-complete';
     TextMaskModule,
     NguiAutoCompleteModule,
     NgbAlertModule,
+    ArchwizardModule
   ],
   exports: [
     PageMobileValidationComponent,

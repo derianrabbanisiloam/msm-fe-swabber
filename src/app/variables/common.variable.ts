@@ -64,3 +64,14 @@ export const appointmentStatusId = {
   INACTIVE: '2',
   RESCHEDULED: '3'
 };
+
+export const mobileStatus = {
+  ACTIVE: 'ACTIVE',
+  ACCESSED: 'MR-ACCESSED',
+  VALIDATED: 'VALIDATED'
+};
+
+export const contactStatus = {
+  MOBILE_ACTIVE: '3',
+  VERIFIED: '4'
+}

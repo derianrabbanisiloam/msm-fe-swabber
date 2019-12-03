@@ -76,10 +76,21 @@
             </div>
             <div class="row">
               <div class="col-md-12" style="text-align: right;margin-top:15px">
-                <button class="btn btn-light btn-outline-dark"
-                  [hidden]="postDoctorNotesForm.valid && doctorIdSelectedTwo">Add Note</button>
-                <button class="btn create-btn" [hidden]="!(postDoctorNotesForm.valid && doctorIdSelectedTwo)"
-                  (click)="postDoctorNotes()" (click)="x('Cross click')">Add Note</button>
+                <div style="float: left;">
+                  <label class="container">
+                      <input type="checkbox" class="regular-checkbox" formControlName="checkBoxApp" [(ngModel)]="checkBoxApp">
+                      <span class="checkmark" style="margin-top: 1em; border: solid 1px;"></span>
+                  </label>
+                  <div style="margin-left: 2em; margin-top: -2px">
+                    <span>Schedule affected</span>
+                  </div>
+                </div>
+                <div style="float: right;">
+                  <button class="btn btn-light btn-outline-dark"
+                    [hidden]="postDoctorNotesForm.valid && doctorIdSelectedTwo">Add Note</button>
+                  <button class="btn create-btn" [hidden]="!(postDoctorNotesForm.valid && doctorIdSelectedTwo)"
+                    (click)="postDoctorNotes()" (click)="x('Cross click')">Add Note</button>
+                </div>
               </div>
 
               <div class="col-md-12">
@@ -107,7 +118,7 @@
           <div class="row">
             <div class="col-md-12">
               <label>Doctor</label>
-              <input [(ngModel)]="selectedEditNote.doctor_name" placeholder="Search Doctor by name ..." readonly>
+              <input class="form-control" [(ngModel)]="selectedEditNote.doctor_name" placeholder="Search Doctor by name ..." readonly>
             </div>
           </div>
           <!--<span>{{this.selectedEditNote.fromDate}}</span>-->
@@ -159,6 +170,15 @@
           </div>
           <div class="row">
             <div class="col-md-12" style="text-align: right;margin-top:15px">
+              <div style="float: left;">
+                  <label class="container">
+                      <input type="checkbox" class="regular-checkbox" [(ngModel)]="selectedEditNote.is_impact_schedule" [checked]="selectedEditNote.is_impact_schedule == true">
+                      <span class="checkmark" style="margin-top: 1em; border: solid 1px;"></span>
+                  </label>
+                  <div style="margin-left: 2em; margin-top: -2px">
+                    <span>Schedule affected</span>
+                  </div>
+              </div>
               <button class="btn print-btn" (click)="showError()" (click)="x('Cross click')">Update Note</button>
             </div>
 

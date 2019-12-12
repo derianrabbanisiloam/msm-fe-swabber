@@ -178,48 +178,45 @@ export class WidgetSendNotificationComponent implements OnInit {
     });
   }
 
-  // sendNotif() {
-  //   this.alerts = [];
+  sendNotif(content) {
+    //this.open(content);
+    this.alerts = [];
 
-  //   const hospital = this.key.hospital;
-  //   const user = this.key.user;
-  //   const date = localSpliter(this.appointmentDate, false);
-  //   const source = sourceApps;
+    const hospital = this.key.hospital;
+    const user = this.key.user;
+    const date = localSpliter(this.appointmentDate, false);
+    const source = sourceApps;
 
-  //   const idx = this.patientList.findIndex((i) => {
-  //     return i.selected === true;
-  //   });
+    const idx = this.patientList.findIndex((i) => {
+      return i.selected === true;
+    });
 
-  //   if (idx >= 0) {
-  //     const patientSelected = [];
+    if (idx >= 0) {
+      const patientSelected = [];
 
-  //     for (let i = 0, { length } = this.patientList; i < length; i += 1) {
-  //       if (this.patientList[i].selected === true) {
-  //         patientSelected.push({
-  //           contactId: this.patientList[i].contact_id,
-  //         });
-  //       }
-  //     }
+      for (let i = 0, { length } = this.patientList; i < length; i += 1) {
+        if (this.patientList[i].selected === true) {
+          patientSelected.push({
+            contactId: this.patientList[i].contact_id,
+          });
+        }
+      }
 
-  //     const body = {
-  //       doctorId: this.doctorSelected.doctor_id,
-  //       content: this.notes,
-  //       notifType: this.notifType.value,
-  //       organizationId: parseInt(hospital.orgId),
-  //       bookingDate: date,
-  //       receiver: patientSelected,
-  //       source,
-  //       userId: user.id,
-  //     };
+      const body = {
+        doctorId: this.doctorSelected.doctor_id,
+        content: this.notes,
+        notifType: this.notifType.value,
+        organizationId: parseInt(hospital.orgId),
+        bookingDate: date,
+        receiver: patientSelected,
+        source,
+        userId: user.id,
+      };
 
-  //     this.notifySender(body);
-  //   } else {
-  //     this.alertService.error('Please select patient');
-  //   }
-  // }
-
-  sendNotif(content){
-    this.open(content);
+      this.notifySender(body);
+    } else {
+      this.alertService.error('Please select patient');
+    }
   }
 
   open(content) {

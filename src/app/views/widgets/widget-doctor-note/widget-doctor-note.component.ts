@@ -99,6 +99,7 @@ export class WidgetDoctorNoteComponent implements OnInit {
   public postDoctorNotesForm = new FormGroup({
     note: new FormControl('', Validators.required),
     from_to_pn: new FormControl('', Validators.required),
+    checkBoxApp: new FormControl("")
   });
 
   public options = {
@@ -180,7 +181,8 @@ export class WidgetDoctorNoteComponent implements OnInit {
 
   postDoctorNotes(): void {
     this.postDoctorNotesForm.controls.note.setValue(this.postDoctorNotesForm.controls.note.value);
-
+    this.model.isImpactSchedule = this.postDoctorNotesForm.controls.checkBoxApp.value ? 
+      this.postDoctorNotesForm.controls.checkBoxApp.value : false;
     this.model.note = this.postDoctorNotesForm.controls.note.value;
     this.model.userId = this.userId;
     this.model.source = this.dummyMACAddress;
@@ -365,6 +367,7 @@ export class WidgetDoctorNoteComponent implements OnInit {
     this.modelEdit.fromDate = this.fromDateEdit.year + '-' + monthF + '-' + dayF;
     this.modelEdit.toDate = this.toDateEdit.year + '-' + monthT + '-' + dayT;
     this.modelEdit.userId = this.userId;
+    this.modelEdit.isImpactSchedule = this.selectedEditNote.is_impact_schedule;
     this.modelEdit.userName = this.user.fullname;
     this.modelEdit.source = this.dummyMACAddress;
 

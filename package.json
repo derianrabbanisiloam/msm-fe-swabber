@@ -17,7 +17,7 @@
     "compile:server": "webpack --config webpack.server.config.js --progress --colors",
     "serve:ssr": "pm2 start ecosystem.config.js --watch",
     "dev:ssr": "npm run build:dev --watch && npm run build:client-and-server-bundles && npm run compile:server",
-    "test:ssr": "npm run build:prod --watch && npm run build:client-and-server-bundles && npm run compile:server",
+    "test:ssr": "npm run build:test --watch && npm run build:client-and-server-bundles && npm run compile:server",
     "prod:ssr": "npm run build:prod --watch && npm run build:client-and-server-bundles && npm run compile:server",
     "build:client-and-server-bundles": "ng run msm-fe-front-office:server:production"
   },
@@ -37,6 +37,7 @@
     "@ngui/auto-complete": "^2.0.0",
     "@nguniversal/express-engine": "^7.1.1",
     "@nguniversal/module-map-ngfactory-loader": "0.0.0",
+    "angular-archwizard": "^5.0.0",
     "angular-ng-autocomplete": "^1.1.12",
     "angular2-text-mask": "^9.0.0",
     "bootstrap": "^4.3.1",

@@ -133,7 +133,9 @@
               </thead>
               <tbody class="quota-list">
                 <tr *ngFor="let itr of patientHope"
-                [ngClass]="{'selectedPatient': selectPatient && itr.patientId == selectPatient.patientId}" (click)="choosedSearchPatient(itr)">
+                [ngClass]="{'selectedPatient': selectPatient 
+                && itr.patientId == selectPatient.patientId 
+                && itr.patientOrganizationId == selectPatient.patientOrganizationId}" (click)="choosedSearchPatient(itr)">
                   <td>{{itr.name}}</td>
                   <td>{{itr.newBirthDate}}</td>
                   <td>{{itr.mrNo}}</td>

@@ -924,20 +924,32 @@ export class WidgetPatientDataComponent implements OnInit {
   }
 
   async checkSearchPatientHope(content) {
-    if(this.model.patientId === undefined && this.model.patientOrganizationId === undefined) {
-      let birthDate = localSpliter(this.model.birth, false);
-      this.nameDobPhone = await this.patientService.getPatientHopeSearch(this.model.patientName, birthDate, this.charRemove(this.model.mobileNo1))
-      .toPromise().then(res => {
-        return res.data;
-      }).catch(err => {
-      });
-      if(!isEmpty(this.nameDobPhone)) {
-        await this.actionCheckSearchPatient(content)
+    let isValid;
+    isValid = this.checkFormCondition(); // return true if valid (there is no empty mandatory)
+
+    let x = this;
+    $('.form-error').bind('input click change', function () {
+      x.checkFormCondition();
+    });
+
+    if (!isValid) {
+      this.alertService.error('Please input all mandatory field', false, 5000);
+    } else {
+      if(this.model.patientId === undefined && this.model.patientOrganizationId === undefined) {
+        let birthDate = localSpliter(this.model.birth, false);
+        this.nameDobPhone = await this.patientService.getPatientHopeSearch(this.model.patientName, birthDate, this.charRemove(this.model.mobileNo1))
+        .toPromise().then(res => {
+          return res.data;
+        }).catch(err => {
+        });
+        if(!isEmpty(this.nameDobPhone)) {
+          await this.actionCheckSearchPatient(content)
+        } else {
+          this.savePatient();
+        }
       } else {
         this.savePatient();
       }
-    } else {
-      this.savePatient();
     }
   }
 
@@ -950,47 +962,34 @@ export class WidgetPatientDataComponent implements OnInit {
   }
 
   savePatient() {
-    let isValid;
-    isValid = this.checkFormCondition(); // return true if valid (there is no empty mandatory)
-
-    let x = this;
-    $('.form-error').bind('input click change', function () {
-      x.checkFormCondition();
-    });
-
-    if (!isValid) {
-      this.alertService.error('Please input all mandatory field', false, 5000);
-    } else {
-      const payload = this.loadPayload();
-
-      if (this.isFromAppointmentList) {
-        this.isButtonSave = true;
-        if (this.model.patientId && this.model.patientOrganizationId) {
-          const body = {
-            ...payload,
-            patientHopeId: this.model.patientId,
-            patientOrganizationId: this.model.patientOrganizationId,
-            appointmentId: this.appointmentId,
-          }
-          this.createPatientComplete(body);
-        } else {
-          const body = {
-            ...payload,
-            appointmentId: this.appointmentId,
-          };
-          this.createPatientComplete(body);
+    const payload = this.loadPayload();
+    if (this.isFromAppointmentList) {
+      this.isButtonSave = true;
+      if (this.model.patientId && this.model.patientOrganizationId) {
+        const body = {
+          ...payload,
+          patientHopeId: this.model.patientId,
+          patientOrganizationId: this.model.patientOrganizationId,
+          appointmentId: this.appointmentId,
         }
+        this.createPatientComplete(body);
       } else {
-        this.isButtonSave = true;
-        if (this.model.patientId && this.model.patientOrganizationId) {
-          const body = {
-            ...payload,
-            patientOrganizationId: this.model.patientOrganizationId,
-          };
-          this.updatePatientComplete(body, this.model.patientId);
-        } else {
-          this.createPatientComplete(payload);
-        }
+        const body = {
+          ...payload,
+          appointmentId: this.appointmentId,
+        };
+        this.createPatientComplete(body);
+      }
+    } else {
+      this.isButtonSave = true;
+      if (this.model.patientId && this.model.patientOrganizationId) {
+        const body = {
+          ...payload,
+          patientOrganizationId: this.model.patientOrganizationId,
+        };
+        this.updatePatientComplete(body, this.model.patientId);
+      } else {
+        this.createPatientComplete(payload);
       }
     }
   }

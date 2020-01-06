@@ -24,6 +24,8 @@ import socket from 'socket.io-client';
 import { SecretKey, Jwt, QUEUE_NUMBER, CHECK_IN, keySocket } from '../../../variables/common.variable';
 import Security from 'msm-kadapat';
 import { environment } from '../../../../environments/environment';
+import { localSpliter } from '../../../../app/utils/helpers.util';
+import { isEmpty } from 'lodash';
 
 @Component({
   selector: 'app-widget-patient-data',
@@ -118,6 +120,7 @@ export class WidgetPatientDataComponent implements OnInit {
   public socketTwo;
   public listRoomHope: any = [];
   public roomHope: any;
+  public nameDobPhone;
 
   constructor(
     private generalService: GeneralService,
@@ -920,6 +923,31 @@ export class WidgetPatientDataComponent implements OnInit {
     this.isButtonSave = false;
   }
 
+  async checkSearchPatientHope(content) {
+    if(this.model.patientId === undefined && this.model.patientOrganizationId === undefined) {
+      let birthDate = localSpliter(this.model.birth, false);
+      this.nameDobPhone = await this.patientService.getPatientHopeSearch(this.model.patientName, birthDate, this.charRemove(this.model.mobileNo1))
+      .toPromise().then(res => {
+        return res.data;
+      }).catch(err => {
+      });
+      if(!isEmpty(this.nameDobPhone)) {
+        await this.actionCheckSearchPatient(content)
+      } else {
+        this.savePatient();
+      }
+    } else {
+      this.savePatient();
+    }
+  }
+
+  actionCheckSearchPatient(content) {
+    this.modalService.open(content).result.then((result) => {
+      this.closeResult = `Closed with: ${result}`;
+    }, (reason) => {
+      this.closeResult = `Dismissed ${this.getDismissReason(reason)}`;
+    });
+  }
 
   savePatient() {
     let isValid;

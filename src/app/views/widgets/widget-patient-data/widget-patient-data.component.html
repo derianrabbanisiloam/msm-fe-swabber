@@ -392,7 +392,7 @@
         <button *ngIf="!isSuccessCreatePatient" type="submit" class="fo_btn_registration fo_btn_save"
           [disabled]="f.submitted && isButtonSave"
           [ngStyle]="{ background: f.submitted && isButtonSave ? '#A5C39F' : '#4D9B35'}"
-          (click)="savePatient()">Save</button>
+          (click)="checkSearchPatientHope(searchPatientHope)">Save</button>
 
         <!-- false if patient failed to saved or not saved yet -->
         <button *ngIf="isSuccessCreatePatient && isFromAppointmentList" type="button" [disabled]="buttonCreateAdmission"
@@ -801,5 +801,30 @@
       </div>
     </div>
     <h3 *ngIf="resQueue"> {{ resQueue.name }}</h3>
+  </div>
+</ng-template>
+
+<ng-template #searchPatientHope let-c="close" let-d="dismiss">
+  <div class="modal-header">
+    <h4 class="modal-title">Patient Found</h4>
+    <button type="button" class="close" aria-label="Close" (click)="d('Cross click')">
+      <span aria-hidden="true">&times;</span>
+    </button>
+  </div>
+  <div class="modal-body">
+    <table style="text-align: left">
+      <tr><td>Name</td><td>: {{nameDobPhone.name}}</td></tr>
+      <tr><td>Birth Date</td><td>: {{nameDobPhone.birthDate}}</td></tr>
+      <tr><td>Mobile Number</td><td>: {{nameDobPhone.mobileNo1}}</td></tr>
+    </table>
+  </div>
+  <div class="row" style="padding: 1vw">
+    <div class="col-md-12">
+      Patient found, you keep create new patient?
+    </div>
+    <div class="col-md-12">
+      <button type="button" style="float: right;" class="btn fo_btn_black_new" (click)="d('Cross click')">no</button>
+      <button type="button" style="float: right;" class="btn fo_btn_green" (click)="d('Cross click')" (click)="savePatient()">Create new patient</button>
+    </div>
   </div>
 </ng-template>

@@ -38,6 +38,11 @@ export class PatientService {
     this.updateContactSource.next(params);
   }
 
+  getPatientHopeSearch(name, dob, phoneNumber): Observable<any> {
+    const uri = `${this.contactFoUrl}/confirm?name=${name}&dob=${dob}&phoneNumber=${phoneNumber}`;
+    return this.http.get<any>(uri, httpOptions);
+  }
+
   uploadImage(formData: any) {
     const url = `${this.uploadImageUrl}`;
     return this.http.post<any>(url, formData);

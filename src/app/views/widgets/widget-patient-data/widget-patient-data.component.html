@@ -392,7 +392,7 @@
         <button *ngIf="!isSuccessCreatePatient" type="submit" class="fo_btn_registration fo_btn_save"
           [disabled]="f.submitted && isButtonSave"
           [ngStyle]="{ background: f.submitted && isButtonSave ? '#A5C39F' : '#4D9B35'}"
-          (click)="checkSearchPatientHope(searchPatientHope)">Save</button>
+          (click)="checkSearchPatientHope(searchPatientHope, confirmLocalMrCreate)">Save</button>
 
         <!-- false if patient failed to saved or not saved yet -->
         <button *ngIf="isSuccessCreatePatient && isFromAppointmentList" type="button" [disabled]="buttonCreateAdmission"
@@ -435,7 +435,7 @@
         <div class="header-3 bold">Patient From Your Input</div>
       </div>
 
-      <div class="" style="">
+      <div class="">
         <table class="table table-bordered">
           <thead class="fo_search_table_header">
             <th>Name</th>
@@ -823,8 +823,37 @@
       Patient found, you keep create new patient?
     </div>
     <div class="col-md-12">
-      <button type="button" style="float: right;" class="btn fo_btn_black_new" (click)="d('Cross click')">no</button>
+      <button type="button" style="float: right;" class="btn fo_btn_black_new" (click)="d('Cross click')" (click)="mappingPatient()">Use this patient</button>
       <button type="button" style="float: right;" class="btn fo_btn_green" (click)="d('Cross click')" (click)="savePatient()">Create new patient</button>
+    </div>
+  </div>
+</ng-template>
+
+<ng-template #confirmLocalMrCreate let-c="close" let-d="dismiss">
+  <div class="modal-header">
+    <h4 class="modal-title">Confirmation</h4>
+    <button #cls_btn_confirm type="button" class="close" aria-label="Close" (click)="d('Cross click')">
+      <span aria-hidden="true">&times;</span>
+    </button>
+  </div>
+  <div class="modal-body">
+    <ngb-alert *ngIf="successMessage4" type="success" (close)="successMessage4 = null">{{ successMessage4 }}
+    </ngb-alert>
+    <ngb-alert *ngIf="errorMessage4" type="danger" (close)="errorMessage4 = null">{{ errorMessage4 }}</ngb-alert>
+    <div>This patient already register in another siloam hospitals. This is of patient information : </div>
+    <div>Name : {{ showCreateMrData.name }}</div>
+    <div>Birthdate : {{ showCreateMrData.birthDate }}</div>
+    <div>Address : {{ showCreateMrData.address }}</div>
+    <div>Phone : {{ showCreateMrData.phoneNumber }}</div>
+
+    <div class="fo_confirmation_button d-flex justify-content-center">
+      <button type="button" class="btn fo_btn_green"
+        (click)="buildMrLocal(cls_btn_confirm)" (click)="c('Cross click')">Create
+        MR Local
+      </button>
+      <!-- <button type="button" class="btn fo_btn_blue" (click)="newPatient()" (click)="c('Cross click')">New Patient
+      </button> -->
+      <button type="button" class="btn fo_btn_black" (click)="c('Cross click')">Cancel</button>
     </div>
   </div>
 </ng-template>

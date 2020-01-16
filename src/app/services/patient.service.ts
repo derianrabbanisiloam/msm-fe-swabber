@@ -38,8 +38,13 @@ export class PatientService {
     this.updateContactSource.next(params);
   }
 
-  getPatientHopeSearch(name, dob, phoneNumber): Observable<any> {
-    const uri = `${this.contactFoUrl}/confirm?name=${name}&dob=${dob}&phoneNumber=${phoneNumber}`;
+  getPatientHopeSearch(name, dob, phoneNumber, hospitalId): Observable<any> {
+    const uri = `${this.contactFoUrl}/confirm?name=${name}&dob=${dob}&phoneNumber=${phoneNumber}&hospitalId=${hospitalId}`;
+    return this.http.get<any>(uri, httpOptions);
+  }
+
+  getCheckMappingContact(patientHopeId, hospitalId): Observable<any> {
+    const uri = `${this.patientUrl}/mapping?patientHopeId=${patientHopeId}&hospitalId=${hospitalId}`;
     return this.http.get<any>(uri, httpOptions);
   }
 

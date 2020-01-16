@@ -121,6 +121,8 @@ export class WidgetPatientDataComponent implements OnInit {
   public listRoomHope: any = [];
   public roomHope: any;
   public nameDobPhone;
+  public resMrLocal: any;
+  public showCreateMrData: any = {};
 
   constructor(
     private generalService: GeneralService,
@@ -923,7 +925,7 @@ export class WidgetPatientDataComponent implements OnInit {
     this.isButtonSave = false;
   }
 
-  async checkSearchPatientHope(content) {
+  async checkSearchPatientHope(content, contentTwo) {
     let isValid;
     isValid = this.checkFormCondition(); // return true if valid (there is no empty mandatory)
 
@@ -937,28 +939,92 @@ export class WidgetPatientDataComponent implements OnInit {
     } else {
       if(this.model.patientId === undefined && this.model.patientOrganizationId === undefined) {
         let birthDate = localSpliter(this.model.birth, false);
-        this.nameDobPhone = await this.patientService.getPatientHopeSearch(this.model.patientName, birthDate, this.charRemove(this.model.mobileNo1))
+        this.nameDobPhone = await this.patientService.getPatientHopeSearch(
+          this.model.patientName, 
+          birthDate, 
+          this.charRemove(this.model.mobileNo1),
+          this.hospital.id)
         .toPromise().then(res => {
           return res.data;
         }).catch(err => {
+          return null
         });
         if(!isEmpty(this.nameDobPhone)) {
-          await this.actionCheckSearchPatient(content)
+          await this.open(content)
         } else {
-          this.savePatient();
+          //this.savePatient();
         }
+      } else if(this.model.patientId) {
+        // let checkMapping = await this.patientService.getCheckMappingContact(this.model.patientId, this.hospital.id)
+        // .toPromise().then(res => {
+        //   return res.data
+        // }).catch(err => {
+        //   return null
+        // })
+        // if(checkMapping.patient === true && checkMapping.patientHospital === true) {
+        //   this.savePatient();
+        // } else if(checkMapping.patient === true && checkMapping.patientHospital === false) {
+        //   this.showCreateMrData.name = this.model.patientName;
+        //   this.showCreateMrData.birthDate = this.model.birth;
+        //   this.showCreateMrData.address = this.model.address;
+        //   this.showCreateMrData.phoneNumber = this.model.mobileNo1;
+        //   await this.open(contentTwo);
+        // } else if(checkMapping.patient === false && checkMapping.patientHospital === false) {
+        //   console.log('this.model', this.model)
+        // }
+        // // if(this.model.patientOrganizationId === 0) {
+        // //   let createMrlocal = await this.buildMrLocal(this.model);
+        // //   if(createMrlocal) {
+        // //     this.savePatient();
+        // //   }
+        // // }
       } else {
         this.savePatient();
       }
     }
   }
 
-  actionCheckSearchPatient(content) {
-    this.modalService.open(content).result.then((result) => {
-      this.closeResult = `Closed with: ${result}`;
-    }, (reason) => {
-      this.closeResult = `Dismissed ${this.getDismissReason(reason)}`;
-    });
+  async mappingPatient() {
+    
+  }
+
+  async buildMrLocal(close) {
+    this.isButtonSave = true;
+    const body = {
+      patientHopeId: Number(this.model.patientId),
+      organizationId: Number(this.hospital.orgId),
+      userId: this.user.id,
+      source: sourceApps,
+    }
+    this.resMrLocal = await this.mrLocalProcess(body);
+
+    if (this.resMrLocal && this.isFromAppointmentList) {
+      this.isSuccessCreatePatient = true;
+      this.isButtonSave = false;
+      this.selectedCheckIn.medical_record_number = this.resMrLocal.medical_record_number;
+      this.selectedCheckIn.patient_organization_id = this.resMrLocal.patient_organization_id;
+      close.click();
+    } else {
+      this.isSuccessCreatePatient = true;
+      this.isButtonSave = true;
+      this.model.patientOrganizationId = this.resMrLocal.patient_organization_id;
+      this.savePatient();
+      close.click();
+    }
+    return this.resMrLocal
+  }
+
+  mrLocalProcess(payload: any) {
+    const patient = this.patientService.createMrLocal(payload)
+      .toPromise().then(res => {
+        this.alertService.success(res.message, false, 3000);
+        return res.data;
+      }).catch(err => {
+        this.alertService.error(err.error.message, false, 3000);
+        return null;
+      })
+
+    return patient;
   }
 
   savePatient() {
@@ -973,6 +1039,12 @@ export class WidgetPatientDataComponent implements OnInit {
           appointmentId: this.appointmentId,
         }
         this.createPatientComplete(body);
+      } else if(this.model.patientId && this.model.patientOrganizationId === 0) {
+        const body = {
+          ...payload,
+          patientOrganizationId: this.model.patientOrganizationId,
+        };
+        this.updatePatientComplete(body, this.model.patientId);
       } else {
         const body = {
           ...payload,
@@ -982,13 +1054,14 @@ export class WidgetPatientDataComponent implements OnInit {
       }
     } else {
       this.isButtonSave = true;
-      if (this.model.patientId && this.model.patientOrganizationId) {
+      if ((this.model.patientId && this.model.patientOrganizationId) ||
+      (this.model.patientId && this.model.patientOrganizationId === 0)) {
         const body = {
           ...payload,
           patientOrganizationId: this.model.patientOrganizationId,
         };
         this.updatePatientComplete(body, this.model.patientId);
-      } else {
+      } else { 
         this.createPatientComplete(payload);
       }
     }

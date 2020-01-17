@@ -43,9 +43,10 @@ export class PatientService {
     return this.http.get<any>(uri, httpOptions);
   }
 
-  getCheckMappingContact(patientHopeId, hospitalId): Observable<any> {
-    const uri = `${this.patientUrl}/mapping?patientHopeId=${patientHopeId}&hospitalId=${hospitalId}`;
-    return this.http.get<any>(uri, httpOptions);
+  postMappingPatient(payload: any): Observable<any> {
+    const uri = `${this.patientUrl}/sync`;
+    const body = JSON.stringify(payload);
+    return this.http.put<any>(uri, body, httpOptions);
   }
 
   uploadImage(formData: any) {

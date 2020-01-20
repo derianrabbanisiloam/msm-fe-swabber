@@ -49,6 +49,8 @@ export class WidgetMobileValidationComponent implements OnInit {
   public validUpload1: boolean = false;
   public validUpload2: boolean = false;
   public flagEmail: boolean = false;
+  public loadingBar: boolean = false;
+  public loadingBarTwo: boolean = false;
 
   public mask = [/\d/, /\d/, /\d/, /\d/, /\d/, /\d/, /\d/, /\d/, /\d/, /\d/, /\d/, /\d/, /\d/];
   public mask_birth = [/\d/, /\d/, '-', /\d/, /\d/, '-', /\d/, /\d/, /\d/, /\d/];
@@ -270,9 +272,11 @@ export class WidgetMobileValidationComponent implements OnInit {
 
   getSearchedPatient1() {
     this.flagSearch = false;
+    this.loadingBarTwo = true;
     let dateBirth = moment(this.selectedAccount.birth_date, 'DD-MM-YYYY').format('YYYY-MM-DD');
     this.patientService.searchPatientAccessMr(this.selectedAccount.name, dateBirth).subscribe(
       data => {
+        this.loadingBarTwo = false;
         this.flagSearch = true;
         let newData = data.data;
         if(newData.length){
@@ -286,10 +290,12 @@ export class WidgetMobileValidationComponent implements OnInit {
           }
         }
         else {
+          this.loadingBarTwo = false;
           this.flagSearch = true;
           this.patientHope = null;
         }
       }, error => {
+        this.loadingBarTwo = false;
         this.flagSearch = true;
         this.alertService.error(error.error.message, false, 5000);
       }
@@ -298,8 +304,10 @@ export class WidgetMobileValidationComponent implements OnInit {
 
   getSearchedPatient2() {
     this.flagSearch = false;
+    this.loadingBarTwo = true;
     this.patientService.searchPatientAccessMr2(this.hospital.id, this.mrLocal).subscribe(
       data => {
+        this.loadingBarTwo = false;
         this.flagSearch = true;
         let newData = data.data;
         if(newData.length){
@@ -313,9 +321,11 @@ export class WidgetMobileValidationComponent implements OnInit {
           }
         }
         else {
+          this.loadingBarTwo = false;
           this.patientHope = null;
         }
       }, error => {
+        this.loadingBarTwo = false;
         this.flagSearch = true;
         this.alertService.error(error.error.message, false, 5000);
       }
@@ -371,7 +381,7 @@ export class WidgetMobileValidationComponent implements OnInit {
     this.flagFile1 = false;
     this.uploadForm.get('ktp').setValue(null);
     this.flagFile2 = false;
-    
+
     this.selectedAccount = {
       contact_id: val.contact_id,
       name: val.name,
@@ -383,6 +393,7 @@ export class WidgetMobileValidationComponent implements OnInit {
     };
     if(this.selectedAccount.contact_status_id === contactStatus.VERIFIED
       && this.selectedAccount.mobile_status === mobileStatus.ACTIVE) {
+        this.loadingBar = true;
         this.dataContact = await this.patientService.getContact(this.selectedAccount.contact_id)
           .toPromise().then(res => {
             return res.data;
@@ -392,6 +403,7 @@ export class WidgetMobileValidationComponent implements OnInit {
         this.editEmail = this.dataContact.email_address;
         this.dataPatientHope = await this.patientService.getPatientHopeDetail(this.dataContact.patient_hope_id)
           .toPromise().then(res => {
+            this.loadingBar = false;
             return res.data;
           }).catch(err => {
             this.alertService.error(err.error.message, false, 5000);
@@ -399,6 +411,7 @@ export class WidgetMobileValidationComponent implements OnInit {
       }
       else if(this.selectedAccount.contact_status_id === contactStatus.VERIFIED
         && this.selectedAccount.mobile_status === mobileStatus.ACCESSED) {
+          this.loadingBar = true;
           this.dataContact = await this.patientService.getContact(this.selectedAccount.contact_id)
             .toPromise().then(res => {
               return res.data;
@@ -409,6 +422,7 @@ export class WidgetMobileValidationComponent implements OnInit {
           this.getKtp = this.sanitizer.bypassSecurityTrustResourceUrl(this.urlKtp + this.dataContact.identity);
           this.dataPatientHope = await this.patientService.getPatientHopeDetail(this.dataContact.patient_hope_id)
             .toPromise().then(res => {
+              this.loadingBar = false;
               return res.data;
             }).catch(err => {
               this.alertService.error(err.error.message, false, 5000);

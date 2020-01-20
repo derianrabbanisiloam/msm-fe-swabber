@@ -72,7 +72,10 @@
       <div class="row">
         <div class="col-md-12">
           <div style="background-color: white; margin-top: 1em">
-            <div *ngIf="selectedAccount.mobile_status === mobileStatus.ACTIVE 
+          <div *ngIf="loadingBar" style="text-align: center;">
+            <img src="../../../../assets/icons/Logo-Animation---S(FAST).gif" width="200px" height="200px">
+          </div>
+          <div *ngIf="selectedAccount.mobile_status === mobileStatus.ACTIVE 
               && selectedAccount.contact_status_id === contactStatus.MOBILE_ACTIVE" style="min-height: 19em;">
             <table>
               <thead>
@@ -145,12 +148,19 @@
                   <td>{{itr.address}}</td>
                 </tr>
               </tbody>
-              <tbody *ngIf="!patientHope && flagSearch">
+              <tbody *ngIf="loadingBarTwo">
+                <tr>
+                  <td colspan="4" style="text-align: right">
+                    <img src="../../../../assets/icons/Logo-Animation---S(FAST).gif" width="200px" height="200px">
+                  </td>
+                </tr>
+              </tbody>
+              <tbody *ngIf="!patientHope && flagSearch && !loadingBarTwo">
                 <tr>
                   <td colspan="7" style="text-align: center;">result not found</td>
                 </tr>
               </tbody>
-              <tbody *ngIf="patientHope && flagSearch">
+              <tbody *ngIf="patientHope && flagSearch && !loadingBarTwo">
                 <tr>
                   <td colspan="7" style="text-align: right">
                     <button type="submit" class="fo_btn_registration fo_btn_save"
@@ -166,7 +176,7 @@
           </div>
           <div *ngIf="selectedAccount.mobile_status === mobileStatus.ACTIVE 
             && selectedAccount.contact_status_id === contactStatus.VERIFIED
-            && dataContact && dataPatientHope">
+            && dataContact && dataPatientHope && !loadingBar">
             <div class="row">
               <div class="col-md-9 mob_valid_1" style="margin-top: 1em">
                 1. PATIENT DATA FOR DISCLAIMER
@@ -398,7 +408,7 @@
           </div>
           <div *ngIf="selectedAccount.mobile_status === mobileStatus.ACCESSED 
             && selectedAccount.contact_status_id === contactStatus.VERIFIED
-            && dataContact && dataPatientHope">
+            && dataContact && dataPatientHope && !loadingBar">
             <div class="row">
                 <div class="col-md-9 mob_valid_1" style="margin-top: 1em">
                   1. PATIENT DATA FOR DISCLAIMER

@@ -172,7 +172,8 @@
                 1. PATIENT DATA FOR DISCLAIMER
               </div>
               <div class="col-md-3 mob_valid_1" style="margin-top: 1em">
-                <button class="fo_btn_registration_2 fo_btn_blue" (click)="print()" style="margin-left: -3em">Print</button>
+                <button class="fo_btn_registration_2 fo_btn_blue" (click)="dataContact.email_address ? print() : ''" style="margin-left: -3em">Print</button>
+                <i *ngIf="!dataContact.email_address" class="error-msg-2">* Email is required</i>
                 <div id="print-section">
                   <table class="table table-bordered" style="margin-top: 10em; margin-left: 4.5em; 
                     margin-right: 5em; margin-bottom: 5em; width: 80%">
@@ -403,7 +404,8 @@
                   1. PATIENT DATA FOR DISCLAIMER
                 </div>
                 <div class="col-md-3 mob_valid_1" style="margin-top: 1em">
-                  <button class="fo_btn_registration_2 fo_btn_blue" (click)="print()" style="margin-left: -3em">Print</button>
+                  <button class="fo_btn_registration_2 fo_btn_blue" (click)="dataContact.email_address ? print() : ''" style="margin-left: -3em">Print</button>
+                  <i *ngIf="!dataContact.email_address" class="error-msg-2">* Email is required</i>
                   <div id="print-section">
                     <table class="table table-bordered" style="margin-top: 10em; margin-left: 4.5em; 
                       margin-right: 5em; margin-bottom: 5em; width: 80%">

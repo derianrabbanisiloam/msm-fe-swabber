@@ -111,7 +111,7 @@ export class WidgetMobileValidationComponent implements OnInit {
           //........Customized style.......
           </style>
         </head>
-    <body onload="window.print();window.close()">${printContents}</body>
+    <body onload="document.execCommand('print');window.close()">${printContents}</body>
       </html>`
     );
     popupWin.document.close();
@@ -367,6 +367,11 @@ export class WidgetMobileValidationComponent implements OnInit {
     //this.selectedAccount = val;
     this.patientHope = null;
     this.flagSearch = false;
+    this.uploadForm.get('disclaimer').setValue(null);
+    this.flagFile1 = false;
+    this.uploadForm.get('ktp').setValue(null);
+    this.flagFile2 = false;
+    
     this.selectedAccount = {
       contact_id: val.contact_id,
       name: val.name,

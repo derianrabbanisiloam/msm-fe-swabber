@@ -945,9 +945,18 @@ export class WidgetPatientDataComponent implements OnInit {
         }
       } else if(this.model.patientId) {
         const payload = this.loadPayload();
-        let body = {
-          ...payload,
-          patientHopeId: this.model.patientId
+        let body;
+        if(this.isFromAppointmentList) {
+          body = {
+            ...payload,
+            patientHopeId: this.model.patientId,
+            appointmentId: this.appointmentId
+          }
+        } else {
+          body = {
+            ...payload,
+            patientHopeId: this.model.patientId
+          }
         }
         this.resMappingData = null;
         this.resMappingData = await this.mappingProcess(body);

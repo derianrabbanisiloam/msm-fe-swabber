@@ -406,6 +406,7 @@ export class WidgetMobileValidationComponent implements OnInit {
             this.loadingBar = false;
             return res.data;
           }).catch(err => {
+            this.loadingBar = false;
             this.alertService.error(err.error.message, false, 5000);
           });
       }
@@ -425,6 +426,7 @@ export class WidgetMobileValidationComponent implements OnInit {
               this.loadingBar = false;
               return res.data;
             }).catch(err => {
+              this.loadingBar = false;
               this.alertService.error(err.error.message, false, 5000);
             });
         }

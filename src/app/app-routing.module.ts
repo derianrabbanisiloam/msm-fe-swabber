@@ -38,6 +38,11 @@ const routes: Routes = [
     loadChildren: './views/pages/page-appointment-list/page-appointment-list.module#PageAppointmentListModule',
   },
   {
+    path: 'bpjs',
+    canActivate: [AuthGuard],
+    loadChildren: './views/pages/page-appointment-bpjs/page-appointment-bpjs.module#PageAppointmentBpjsModule',
+  },
+  {
     path: 'view-quota',
     canActivate: [AuthGuard],
     loadChildren: './views/pages/page-view-quota/page-view-quota.module#PageViewQuotaModule',

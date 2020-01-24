@@ -16,6 +16,7 @@ export class SectionSidebarComponent implements OnInit {
   private socket;
   public key: any = JSON.parse(localStorage.getItem('key'));
   public hospital = this.key.hospital;
+  public jogjaHospitalId = "39764039-37b9-4176-a025-ef7b2e124ba4";
 
   constructor(
     private appointmentService: AppointmentService,

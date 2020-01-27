@@ -3,10 +3,7 @@ import { Component, OnInit, Input } from '@angular/core';
 import { DoctorService } from '../../../services/doctor.service';
 import { NgbActiveModal } from '@ng-bootstrap/ng-bootstrap';
 import { AppointmentService } from '../../../services/appointment.service';
-import { PatientService } from '../../../services/patient.service';
-import { Appointment } from '../../../models/appointments/appointment';
 import { editContactPayload } from '../../../payloads/edit-contact.payload';
-import { rescheduleAppointmentPayload } from '../../../payloads/reschedule-appointment.payload';
 import { sourceApps, channelId } from '../../../variables/common.variable';
 import { environment } from '../../../../environments/environment';
 import { Router, ActivatedRoute } from '@angular/router';
@@ -14,6 +11,7 @@ import { Doctor } from '../../../models/doctors/doctor';
 import { AlertService } from '../../../services/alert.service';
 import { Speciality } from '../../../models/specialities/speciality';
 import { Alert, AlertType } from '../../../models/alerts/alert';
+import { dateFormatter } from '../../../utils/helpers.util';
 import { isEmpty } from 'lodash';
 
 @Component({
@@ -38,6 +36,7 @@ export class ModalAppointmentBpjsComponent implements OnInit {
   public createAppBpjsPayload;
   public editModel: any = {};
   public flag: string;
+  public dateConvert: any;
 
   public doctorList: Doctor[];
   public alerts: Alert[] = [];
@@ -55,7 +54,6 @@ export class ModalAppointmentBpjsComponent implements OnInit {
   constructor(
     private doctorService: DoctorService,
     private appointmentService: AppointmentService,
-    private patientService: PatientService,
     private activeModal: NgbActiveModal,
     private alertService: AlertService,
     private route: ActivatedRoute,
@@ -156,6 +154,7 @@ export class ModalAppointmentBpjsComponent implements OnInit {
   }
 
   async getAppointmentById() {
+    this.dateConvert = dateFormatter(this.appointmentSelected.birthDate, true);
     this.appointment = this.appointmentSelected;
   }
 
@@ -164,10 +163,8 @@ export class ModalAppointmentBpjsComponent implements OnInit {
   }
 
   getScheduleData(data: any) {
-    console.log('!!!!!!!!!!!!!!!!!!', data)
     this.opScheduleSelected = data;
-    let name = this.appointmentSelected.contact_name;
-    name = name ? name : this.appointmentSelected.patient_name;
+    let name = this.appointment.name;
     this.createAppInputData = {
       scheduleId: data.schedule_id,
       appointmentDate: data.date,
@@ -176,70 +173,37 @@ export class ModalAppointmentBpjsComponent implements OnInit {
   }
 
   getSlotData(data: any) {
-    const app = this.appointmentSelected;
-    const sch = this.opScheduleSelected;  
-    console.log('!!!!!!!!!!!$$$$$$$$$', app);
-    console.log('$$$$$$$$$$$$$$$', sch);
-    console.log('###########', data)
+    const app = this.appointment;
+    const sch = this.opScheduleSelected;
     this.createAppBpjsPayload = {
-      scheduleId: sch.schedule_id,
       appointmentDate: sch.date,
       appointmentFromTime: data.appointment_from_time,
       appointmentToTime: data.appointment_to_time,
       appointmentNo: data.appointment_no,
-      channelId: channelId.FRONT_OFFICE,
       hospitalId: data.hospital_id,
+      doctorId: sch.doctor_id,
+      scheduleId: sch.schedule_id,
       isWaitingList: data.is_waiting_list,
-      note: this.rescheduleSelected.note,
+      name: app.name,
+      birthDate: app.birthDate,
+      phoneNumber1: app.phoneNumber1,
+      addressLine1: app.addressLine1,
+      channelId: channelId.BPJS,
+      isVerify: true,
+      appointmentTemporaryId: app.appBpjsId,
+      note: app.appointment_note,
       userId: this.user.id,
       userName: this.user.fullname,
       source: sourceApps,
     };
 
-    // app.appointment_id ? this.rescheduleAppPayload.appointmentId = app.appointment_id :
-    //   this.rescheduleAppPayload.appointmentTemporaryId = app.appointment_temporary_id;
-  }
-
-  openDoctorSchedule() {
-    console.log('pertama', this.isOpenDoctorSchedule)
-    console.log('!!!!!!!!!1234124', this.flag)
-    this.isOpenDoctorSchedule = this.isOpenDoctorSchedule ? false : true;
-    console.log('!!!!!!!!!!!!!!!!!!!!@$$$$$$$$$$', this.isOpenDoctorSchedule)
-    this.flag = this.isOpenDoctorSchedule ? 'block' : 'none';
-    console.log('!!!!!!!!!!!!!!!!!@@@@@@@@@@@@@', this.flag)
-    this.opScheduleSelected = this.isOpenDoctorSchedule ? this.opScheduleSelected : null;
-    const searchKeywords = {
-      doctor: {
-        doctor_id: this.appointmentSelected.doctor_id,
-        name: this.appointmentSelected.doctor_name,
-      },
-      original: false,
-    };
-    this.doctorService.changeSearchDoctor(searchKeywords);
+    app.patientHopeId ? this.createAppBpjsPayload.patientHopeId = app.patientHopeId : '';
   }
 
   async updateAppointment() {
     if (this.createAppBpjsPayload) {
       await this.createAppointmentBpjs();
     }
-  }
-
-  async updateNotes() {
-    const appointmentId = this.appointmentSelected.appointment_id;
-    const model = {
-      notes: this.rescheduleSelected.note,
-      userName: this.user.fullname,
-      userId: this.user.id,
-      source: sourceApps,
-    };
-
-    await this.appointmentService.updateAppNotes(appointmentId, model).subscribe(
-      (data) => {
-        this.appointmentService.emitUpdateNotes(true);
-      }, error => {
-        this.appointmentService.emitUpdateNotes(false);
-      }
-    );
   }
 
   async createAppointmentBpjs() {
@@ -254,46 +218,20 @@ export class ModalAppointmentBpjsComponent implements OnInit {
     );
   }
 
-  async updateContact() {
-    const contactId = this.appointment.contact_id;
-    this.editContactPayload = {
-      contactId: this.appointment.contact_id,
-      data: {
-        phoneNumber1: this.editModel.phoneNo,
-      },
-      userName: this.user.fullname,
-      userId: this.user.id,
-      source: sourceApps,
-    };
-    await this.patientService.updateContact(contactId, this.editContactPayload).subscribe(
-      (data) => {
-        this.patientService.emitUpdateContact(true);
-      }, error => {
-        this.patientService.emitUpdateContact(false);
-      }
-    );
+  cssAlertType(alert: Alert) {
+    if (!alert) {
+      return;
+    }
+
+    switch (alert.type) {
+      case AlertType.Success:
+        return 'success';
+      case AlertType.Error:
+        return 'danger';
+      case AlertType.Info:
+        return 'info';
+      case AlertType.Warning:
+        return 'warning';
+    }
   }
-
-  async updateDetailTemporaryApp() {
-    //to update detail of temporary appointment
-
-    const tempAppId = this.appointmentSelected.appointment_temporary_id;
-    const model = {
-      phoneNumber: this.editModel.phoneNo,
-      note: this.rescheduleSelected.note,
-      userName: this.user.fullname,
-      userId: this.user.id,
-      source: sourceApps,
-    };
-
-    await this.appointmentService.updateDetailTemporaryApp(tempAppId, model).subscribe(
-      (data) => {
-        this.appointmentService.emitUpdateNotes(true);
-      }, error => {
-        this.appointmentService.emitUpdateNotes(false);
-      }
-    );
-  }
-
-
 }

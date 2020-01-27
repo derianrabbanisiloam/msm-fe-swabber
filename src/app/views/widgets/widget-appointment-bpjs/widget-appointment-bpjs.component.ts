@@ -4,14 +4,17 @@ import { DoctorService } from '../../../services/doctor.service';
 import { AppointmentService } from '../../../services/appointment.service';
 import { AlertService } from '../../../services/alert.service';
 import { PatientService } from '../../../services/patient.service';
+import { BpjsService } from '../../../services/bpjs.service';
 import { IMyDrpOptions } from 'mydaterangepicker';
 import { Doctor } from '../../../models/doctors/doctor';
 import { Alert, AlertType } from '../../../models/alerts/alert';
 import { ModalAppointmentBpjsComponent } from '../modal-appointment-bpjs/modal-appointment-bpjs.component';
 import { RescheduleAppointment } from '../../../models/appointments/reschedule-appointment';
 import { environment } from '../../../../environments/environment';
-import { NgbModal, NgbActiveModal, ModalDismissReasons } from '@ng-bootstrap/ng-bootstrap';
+import { NgbModal, NgbActiveModal, ModalDismissReasons, NgbModalConfig } from '@ng-bootstrap/ng-bootstrap';
 import { sourceApps } from '../../../variables/common.variable';
+import { dateFormatter } from '../../../utils/helpers.util';
+import { isEmpty } from 'lodash';
 
 @Component({
   selector: 'app-widget-appointment-bpjs',
@@ -23,7 +26,7 @@ export class WidgetAppointmentBpjsComponent implements OnInit {
   public key: any = JSON.parse(localStorage.getItem('key'));
   public hospital: any = this.key.hospital;
   public doctors: Doctor[];
-  public rescheduledAppointments: any;
+  public bpjsAppointments: any;
   public totalAppointments: number;
   public todayDateISO: any = moment().format('YYYY-MM-DD');
   public pageSelected: number;
@@ -53,77 +56,82 @@ export class WidgetAppointmentBpjsComponent implements OnInit {
   public createContactMsg: string;
   public tampung: any = [];
   public patientDetail: any;
+  public flagPatientHope: boolean = false;
+  public dateConvert: any;
 
   constructor(
     private appointmentService: AppointmentService,
     private doctorService: DoctorService,
     private patientService: PatientService,
+    private bpjsService: BpjsService,
     private modalService: NgbModal,
     private alertService: AlertService,
-    private activeModal: NgbActiveModal,
+    private activeModal: NgbModal,
+    modalSetting: NgbModalConfig,
   ) {
-    this.tampung = [
-    {
-      "patient_name": "agus",
-      "appointment_bpjs_id": 1,
-      "appointment_id": "5473e034-f8fe-43a3-b257-48f6de16c16a",
-      "hospital_id": "39764039-37b9-4176-a025-ef7b2e124ba4",
-      "hospital_alias": "SHLV",
-      "bpjs_card_number": "ab129Er",
-      "identity_type_id": "",
-      "identity_number": "79872347",
-      "medical_record_number": 7612548,
-      "contact_id": "8f7a6a61-bcd6-4a42-bca7-60c6db1e6b15",
-      "phone_number_1": "082297175638",
-      "appointment_date": "2020-01-23",
-      "poly_code": "gen",
-      "reference_no": "jb93jv",
-      "reference_type": "",
-      "booking_code": "AB3LP1",
-      "is_notified": false,
-      "checked": false,
-      "birth_date": "19-08-1998",
-    },
-    {
-      "patient_name": "agus",
-      "appointment_bpjs_id": 2,
-      "appointment_id": "e538cf36-957e-4eba-9bb6-4b6f1425a549",
-      "hospital_id": "39764039-37b9-4176-a025-ef7b2e124ba4",
-      "hospital_alias": "SHLV",
-      "bpjs_card_number": "ab123tq",
-      "identity_type_id": "",
-      "identity_number": "798748748",
-      "medical_record_number": 44656,
-      "contact_id": "452f244f-85e6-4ea0-9f2c-93826eaf2ffd",
-      "phone_number_1": "082297175637",
-      "appointment_date": "2020-01-23",
-      "poly_code": "gen",
-      "reference_no": "p93jrj",
-      "reference_type": "",
-      "booking_code": "AB3LP2",
-      "is_notified": false,
-      "checked": false,
-      "birth_date": "11-08-2003"
-    },
-  ]
+    modalSetting.backdrop = 'static';
+    modalSetting.keyboard = false;
    }
 
   ngOnInit() {
-     //this.getHospitals();
      this.keywordsModel.hospitalId = this.hospital.id;
      this.getDoctors(this.hospital.id);
      this.initializeDateRangePicker();
      this.getCollectionAlert();
-     this.emitUpdateContact();
-     this.emitRescheduleApp();
-     this.getRescheduleWorklist();
+     this.getAppointmentBpjs();
+     this.emitCreateApp();
+  }
+
+  emitCreateApp() {
+    this.appointmentService.createAppSource$.subscribe(
+      async () => {
+        this.activeModal.dismissAll();
+        this.getAppointmentBpjs();
+      }
+    );
   }
   
   CheckAllOptions() {
-    if (this.rescheduledAppointments.every(val => val.checked == true))
-      this.rescheduledAppointments.forEach(val => { val.checked = false });
-    else
-      this.rescheduledAppointments.forEach(val => { val.checked = true });
+    if (this.bpjsAppointments.every(val => val.checked == false 
+      && val.is_notified == false && val.appointment_id)) {
+        this.bpjsAppointments.forEach(val => { val.checked = true });
+      }
+    else {
+      this.bpjsAppointments.forEach(val => { val.checked = false });
+    }
+  }
+
+  checkboxBpjs(content) {
+    this.bpjsAppointments.map(x => {
+      if(x.checked === true) {
+        this.openTwo(content);
+      }
+    });
+  }
+  updateBpjs() {
+    let body;
+    let tampung = [];
+    this.bpjsAppointments.map(x => {
+      if(x.checked === true) {
+        tampung.push(x.appointment_bpjs_id)
+      } 
+    });
+
+    body = {
+      appBpjsId: tampung,
+      userId: this.user.id,
+      userName: this.user.fullname,
+      source: sourceApps
+    }
+
+    this.bpjsService.notifyBpjs(body)
+      .subscribe(data => {
+        this.getAppointmentBpjs();
+        this.alertService.success('Success update to BPJS', false, 3000);
+      }, err => {
+        this.alertService.error(err.error.message);
+      }
+    );
   }
 
   getDoctors(hospitalId: string) {
@@ -163,11 +171,11 @@ export class WidgetAppointmentBpjsComponent implements OnInit {
       eDay = Number(eDay) < 10 ? '0' + eDay : eDay;
       this.keywordsModel.fromDate = bYear + '-' + bMonth + '-' + bDay;
       this.keywordsModel.toDate = eYear + '-' + eMonth + '-' + eDay;
-      this.getRescheduleWorklist();
+      this.getAppointmentBpjs();
     }
   }
 
-  getRescheduleWorklist(doctor?: any) {
+  getAppointmentBpjs(doctor?: any) {
     if (doctor) {
       this.keywordsModel.doctorId = doctor.doctor_id;
     }
@@ -175,7 +183,7 @@ export class WidgetAppointmentBpjsComponent implements OnInit {
       hospitalId = '', fromDate = this.todayDateISO, toDate = this.todayDateISO,
       patientName = '', doctorId = '', offset = 0, limit = 10
     } = this.keywordsModel;
-    this.appointmentService.getRescheduleWorklist(
+    this.bpjsService.getListAppointmentBpjs(
       hospitalId,
       fromDate,
       toDate,
@@ -185,16 +193,17 @@ export class WidgetAppointmentBpjsComponent implements OnInit {
       limit
     ).subscribe(
       data => {
-        this.rescheduledAppointments = this.tampung;
-        // this.rescheduledAppointments = data.data;
-        // this.rescheduledAppointments.map(x => {
-        //   x.birth_date = moment(x.birth_date).format('DD-MM-YYYY');
-        //   x.appointment_date = moment(x.appointment_date).format('DD-MM-YYYY');
-        //   x.appointment_from_time = x.appointment_from_time.substr(0, 5);
-        //   x.appointment_to_time = x.appointment_to_time.substr(0, 5);
-        //   x.checked = false;
-        // });
-        // this.isCanNextPage = this.rescheduledAppointments.length >= 10 ? true : false;
+        //this.bpjsAppointments = this.tampung;
+        this.bpjsAppointments = data.data;
+        this.bpjsAppointments.map(x => {
+          if(x.appointment_id && x.is_notified === false) {
+            x.hideChecked = false;
+          } else {
+            x.hideChecked = true;
+          }
+          x.appointment_date = moment(x.appointment_date).format('DD-MM-YYYY');
+        });
+        this.isCanNextPage = this.bpjsAppointments.length >= 10 ? true : false;
       }
       
     );
@@ -203,31 +212,56 @@ export class WidgetAppointmentBpjsComponent implements OnInit {
   openConfirmationModal(modal) {
     this.open(modal);
   }
-
-  emitUpdateContact() {
-    this.patientService.updateContactSource$.subscribe(
-      async (result) => {
-        if (result) {
-          this.alertService.success('Ubah nomor HP berhasil', false, 5000);
-          await this.getRescheduleWorklist();
-        } else {
-          this.alertService.error('Gagal ubah nomor HP', false, 5000);
-        }
-      }
-    );
-  }
-
   
   setVerifyPatient(patient: any) {
-    this.patientSelected = patient; 
+    this.patientSelected = patient;
   }
 
+  async getAppBpjsDetail(appBpjsId) {
+    this.patientDetail = await this.bpjsService.getAppointmentDetailById(appBpjsId)
+      .toPromise().then(res => {
+        return res.data;
+      }).catch(err => {
+        this.alertService.error(err.message);
+        return [];
+      });
+
+      this.dateConvert = dateFormatter(this.patientDetail.appointment_date, true);
+  }
+  
   async openModal(data, content) {
+    this.patientSelected = null;
     this.appointmentSelected = data;
-    console.log('this.appointment', this.appointmentSelected)
-    //await this.getPatientDetail();
+    await this.getAppBpjsDetail(this.appointmentSelected.appointment_bpjs_id);
     await this.searchPatient();
     this.open(content);
+  }
+
+  searchPatient() {
+    this.searchLoader = true;
+    this.searchPatientModel = null;
+    if (!this.searchPatientModel) {
+      this.searchPatientModel = {
+        patientName: this.patientDetail.name,
+        patientBirth: dateFormatter(this.patientDetail.dob, true),
+        hospitalId: this.appointmentSelected.hospital_id,
+      }; 
+    }
+    const hospitalId = this.searchPatientModel.hospitalId;
+    const patientName = this.searchPatientModel.patientName;
+    const dob = this.searchPatientModel.patientBirth.split('-');
+    const birthDate = dob[2] + '-' + dob[1] + '-' + dob[0];
+    this.patientService.searchPatientHope1(hospitalId, patientName, birthDate).subscribe(
+      data => {
+        if(!isEmpty(data.data)) {
+          this.searchLoader = false;
+          this.patientHope = data.data;
+        } else {
+          this.searchLoader = false;
+          this.patientHope = null;
+        }
+      }
+    )
   }
 
   // async getPatientDetail() {
@@ -248,7 +282,10 @@ export class WidgetAppointmentBpjsComponent implements OnInit {
         name: this.patientSelected.name,
         birthDate: this.patientSelected.birthDate,
         phoneNumber1: this.patientSelected.mobileNo1,
-        addressLine1: this.patientSelected.address
+        addressLine1: this.patientSelected.address,
+        speciality: this.patientDetail.speciality_name_en,
+        appointmentDate: this.patientDetail.appointment_date,
+        appBpjsId: this.appointmentSelected.appointment_bpjs_id
       };
       const modalRef = this.modalService.open(ModalAppointmentBpjsComponent,  
         {windowClass: 'cc_modal_confirmation', size: 'lg'});
@@ -256,86 +293,18 @@ export class WidgetAppointmentBpjsComponent implements OnInit {
     } else {
       body = {
         patientHopeId : null,
-        name: this.appointmentSelected.patient_name,
-        birthDate: this.appointmentSelected.birth_date,
-        phoneNumber1: this.appointmentSelected.phone_number_1,
-        addressLine1: ''
+        name: this.patientDetail.name,
+        birthDate: this.patientDetail.dob,
+        phoneNumber1: this.patientDetail.phone_number_1,
+        addressLine1: '',
+        speciality: this.patientDetail.speciality_name_en,
+        appointmentDate: this.patientDetail.appointment_date,
+        appBpjsId: this.appointmentSelected.appointment_bpjs_id
       };
       const modalRef = this.modalService.open(ModalAppointmentBpjsComponent,  
         {windowClass: 'cc_modal_confirmation', size: 'lg'});
       modalRef.componentInstance.appointmentSelected = body;
     }
-    
-  }
-
-  createContact() {
-    const app = this.appointmentSelected;
-    const payload = {
-      name: app.contact_name,
-      birthDate: app.date_of_birth,
-      phoneNumber1: app.phone_number,
-      channelId: app.channel_id,
-      emailAddress: app.email_address,
-      cityId: app.city_id,
-      countryId: app.country_id,
-      districtId: app.district_id,
-      subDistrictId: app.sub_district_id,
-      currentAddress: app.address,
-      genderId: app.gender_id,
-      religionId: app.religion_id,
-      identityTypeId: app.identity_id,
-      identityNumber: app.identity_number,
-      identityAddress: app.identity_address,
-      phoneNumber2: app.phone_number,
-      stateId: app.state_id,
-      userId: this.userId,
-      source: this.source,
-    };
-    this.patientService.addContact(payload).subscribe(
-      data => {
-        this.isSuccessCreateContact = true;
-        this.patientHope = [];
-        this.contactId = data.data.contact_id;
-      }, error => {
-        this.createContactMsg = 'Gagal create new contact';
-      }
-    );
-  }
-
-  searchPatient() {
-    this.searchLoader = true;
-    this.searchPatientModel = null;
-    if (!this.searchPatientModel) {
-      this.searchPatientModel = {
-        patientName: this.appointmentSelected.patient_name,
-        patientBirth: this.appointmentSelected.birth_date,
-        hospitalId: this.appointmentSelected.hospital_id,
-      }; 
-    }
-    const hospitalId = this.searchPatientModel.hospitalId;
-    const patientName = this.searchPatientModel.patientName;
-    const dob = this.searchPatientModel.patientBirth.split('-');
-    const birthDate = dob[2] + '-' + dob[1] + '-' + dob[0];
-    this.patientService.searchPatientHope1(hospitalId, patientName, birthDate).subscribe(
-      data => {
-        this.searchLoader = false;
-        this.patientHope = data.data;
-      }
-    )
-  }
-
-
-  emitRescheduleApp() {
-    this.appointmentService.rescheduleAppSource$.subscribe(
-      result => {
-        if (result === true) {
-          this.alertService.success('Reschedule appointment berhasil', false, 5000);
-          this.getRescheduleWorklist();
-        } else {
-          this.alertService.error(result, false, 5000);
-        }
-      }
-    );
   }
 
   private page: number = 0;
@@ -343,13 +312,13 @@ export class WidgetAppointmentBpjsComponent implements OnInit {
     this.page += 1;
     this.keywordsModel.offset = this.page * 10;
     this.isCanPrevPage = this.keywordsModel.offset === 0 ? false : true;
-    this.getRescheduleWorklist();
+    this.getAppointmentBpjs();
   }
   prevPage() {
     this.page -= 1;
     this.keywordsModel.offset = this.page * 10;
     this.isCanPrevPage = this.keywordsModel.offset === 0 ? false : true;
-    this.getRescheduleWorklist();
+    this.getAppointmentBpjs();
   }
 
   async getCollectionAlert() {
@@ -385,12 +354,16 @@ export class WidgetAppointmentBpjsComponent implements OnInit {
     this.alerts = this.alerts.filter(x => x !== alert);
   }
 
-  close() {
-    this.activeModal.close();
-  }
-
   open(content) {
     this.modalService.open(content, { windowClass: 'fo_modal_search'}).result.then((result) => {
+      this.closeResult = `Closed with: ${result}`;
+    }, (reason) => {
+      this.closeResult = `Dismissed ${this.getDismissReason(reason)}`;
+    });
+  }
+
+  openTwo(content) {
+    this.modalService.open(content).result.then((result) => {
       this.closeResult = `Closed with: ${result}`;
     }, (reason) => {
       this.closeResult = `Dismissed ${this.getDismissReason(reason)}`;

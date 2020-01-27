@@ -4,6 +4,7 @@ export const environment = {
   CALL_CENTER_SERVICE: 'http://10.85.139.13/callcenter/api/v2',
   OPADMIN_SERVICE: 'http://10.85.139.13/opadmin/api/v2',
   FRONT_OFFICE_SERVICE: 'http://10.85.139.13/frontoffice/api/v2',
+  BPJS_SERVICE: '',
   SSO_SERVICE: 'http://10.85.129.55:7500',
   WEB_SOCKET_SERVICE: 'http://10.85.139.12:7779',
   HIS_SERVICE: 'http://10.85.139.13/his-get',

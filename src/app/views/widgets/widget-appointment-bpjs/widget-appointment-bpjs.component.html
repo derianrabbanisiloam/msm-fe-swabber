@@ -1,3 +1,6 @@
+<div *ngFor="let alert of alerts" class="alert-fixed-div">
+  <ngb-alert *ngIf="alert" type="{{cssAlertType(alert)}}" (close)="removeAlert(alert)">{{ alert.message }}</ngb-alert>
+</div>
 <div>
   <div class="container-appointment-input">
     <div class="filter-box">
@@ -7,6 +10,14 @@
           (dateRangeChanged)="changeDateRange($event)" #date>
         </my-date-range-picker>
       </div>
+    </div>
+  </div>
+
+  <div class="row">
+    <div class="col-md-12">
+      <button class="btn fo_btn_green" style="float: right; margin-right: 1vw; margin-bottom: 1vw;" (click)="checkboxBpjs(notifyBpjs)">
+        Update to BPJS
+      </button>
     </div>
   </div>
 
@@ -20,85 +31,25 @@
           <th><input type="checkbox" (click)="CheckAllOptions()" [(ngModel)]="checkAll"></th>
           <th>Booking Date</th>
           <th width="100px">BPJS Number</th>
-          <th>Referral Number</th>
+          <th>reference Number</th>
           <th width="100px" style="white-space: nowrap">Speciality</th>
-          <th>Preferred App Date</th>
-          <th>Hospital</th>
           <th>Phone Number</th>
-          <th>Note</th>
           <th>Status</th>
           <th>Action</th>
         </tr>
       </thead>
 
       <tbody>
-
-        <!-- <tr>
-          <td>
-            <div class="inner-addon right-addon">
-              <input type="text" class="form-control filter-input filter" placeholder="Filter by name"
-                [(ngModel)]="keywordsModel.patientName" />
-            </div>
-          </td>
-          <td></td>
-          <td></td>
-          <td></td>
-          <td></td>
-          <td style="white-space: nowrap">
-            <div class="tab-pane fade show active" id="doctor-pane" role="tabpanel" aria-labelledby="home-tab">
-              <div class="form-group">
-                <div class="ng-autocomplete" class="angular-autocomplete">
-                  <ng-autocomplete placeHolder="Search Doctor..." [data]="doctors" searchKeyword="name"
-                    (selected)='getRescheduleWorklist($event)' [itemTemplate]="itemTemplateDoctor"
-                    [notFoundTemplate]="notFoundTemplate">
-                  </ng-autocomplete>
-
-                  <ng-template #itemTemplateDoctor let-item>
-                    <a [innerHTML]="item.name"></a>
-                  </ng-template>
-
-                  <ng-template #notFoundTemplate let-notFound>
-                    <div [innerHTML]="notFound"></div>
-                  </ng-template>
-                </div>
-              </div>
-            </div>
-          </td>
-          <td></td>
-          <td></td>
-          <td></td>
-        </tr> -->
-
-        <!-- <tr *ngFor="let r of rescheduledAppointments; let i = index">
-          <td><input type="checkbox" style="margin-top: 0.7vw" [(ngModel)]="r.checked" [value]="r.checked"></td>
-          <td>
-            <a href="javascript:void(0)" (click)="openRescheduleModal(r)">
-              {{r.patient_name != null ? r.patient_name.substr(0,30) : ''}}</a>
-          </td>
-          <td>{{ r.medical_record_number }}</td>
-          <td>{{ r.birth_date }}</td>
-          <td style="white-space: nowrap">{{ r.appointment_date }}</td>
-          <td>{{ r.appointment_from_time }} - {{ r.appointment_to_time }}</td>
-          <td>{{ r.hospital_alias }}</td>
-          <td>{{ r.phone_number_1 }}</td>
-          <td><a ngbPopover="{{r.note}}" popoverTitle=""
-              triggers="mouseenter:mouseleave">{{r.note && r.note.length > 30 ? r.note.substr(0,30)+"..." : r.note}}</a>
-          </td>
-          <th>empty</th>
-          <td><button class="btn fo_btn_green" (click)="openModal(r, searchPatientBpjs)">create apppointment</button></td>
-        </tr> -->
-        <tr *ngFor="let r of rescheduledAppointments; let i = index">
-          <td><input type="checkbox" style="margin-top: 0.7vw" [(ngModel)]="r.checked" [value]="r.checked"></td>
+        <tr *ngFor="let r of bpjsAppointments; let i = index">
+          <td><input *ngIf="r.hideChecked === false" type="checkbox" style="margin-top: 0.7vw" [(ngModel)]="r.checked" [value]="r.checked"></td>
           <td>{{ r.appointment_date }}</td>
           <td>{{ r.identity_number }}</td>
           <td>{{ r.reference_no }}</td>
           <td style="white-space: nowrap">{{ r.poly_code }}</td>
-          <td>{{ r.appointment_date }}</td>
-          <td>{{ r.hospital_alias }}</td>
           <td>{{ r.phone_number_1 }}</td>
-          <td></td>
-          <th>empty</th>
-          <td><button class="btn fo_btn_green" (click)="openModal(r, searchPatientBpjs)">create apppointment</button></td>
+          <td *ngIf="r.appointment_id">Complete</td>
+          <td *ngIf="!r.appointment_id">Request</td>
+          <td><button *ngIf="!r.appointment_id" class="btn fo_btn_green" (click)="openModal(r, searchPatientBpjs)">create apppointment</button></td>
         </tr>
       </tbody>
     </table>
@@ -114,7 +65,7 @@
     </button>
   </div>
 
-  <ng-template #searchPatientBpjs let-c="close" let-x="dismiss">
+  <ng-template #searchPatientBpjs let-c="close" let-x="dismiss" let-modal>
   <div class="modal-header">
     <div class="header-2 modal-padding">Search Patient Data</div>
   </div>
@@ -135,18 +86,14 @@
       <img src="../../../../assets/icons/ic_Search_white.png">
     </div>
   </div>
-  <div style="margin: 15px" *ngIf="specialist">
-      <strong>Hospital Name: </strong><br>
-      <strong>Doctor Name: </strong><br>
-      <strong>Specialty: </strong><br>
-      <strong>Appointment Date: </strong><br>
-      <strong>Appointment Time: </strong><br>
-      <strong>Notes:<br></strong>
-      <!-- <ul>
-        <li *ngFor="let note of doctorNotes" style="color:red;font-size:16px">{{note.note}}</li>
-      </ul> -->
+  <div style="margin: 15px">
+      <strong>Name: </strong>{{patientDetail.name}}<br>
+      <strong>Birth date: </strong>{{searchPatientModel.patientBirth}}<br>
+      <strong>Phone number: </strong>{{patientDetail.phone_number_1}}<br>
+      <strong>Speciality: </strong>{{patientDetail.speciality_name_en}}<br>
+      <strong>Appointment date: </strong>{{dateConvert}}<br>
   </div>
-  <div *ngIf="(patientHope && !searchLoader)" class="scrollTable verifyTable">
+  <div *ngIf="(!searchLoader)" class="scrollTable verifyTable">
     <table>
       <thead>
         <tr>
@@ -158,7 +105,7 @@
           <th>Address</th>
         </tr>
       </thead>
-      <tbody [ngClass]="{'disable': confirmReschedule}">
+      <tbody>
         <tr *ngFor="let p of patientHope" [ngClass]="{'selectedVerify': patientSelected && (p.name == patientSelected.name && p.mrNo == patientSelected.mrNo)}" (click)="setVerifyPatient(p)">
           <td>{{p.name}}</td>
           <td>{{p.mrNo}}</td>
@@ -168,8 +115,14 @@
           <td>{{p.address}}</td>
         </tr>
       </tbody>
+      <tbody *ngIf="!patientHope">
+        <tr>
+          <td colspan="6" style="text-align: center;">result not found</td>
+        </tr>
+      </tbody>
     </table>
   </div>
+  <div *ngIf="patientHope" style="margin-top: 2vw;"><span style="color: red;">*if you don't choose one of the patients, then will create a new patient</span></div>
   <div class="modal-footer d-flex justify-content-start">
     you want create appointment ?
       <button class="btn ms_btn_blue" (click)="openAppBpjsModal()"
@@ -178,13 +131,19 @@
       </button>
   </div>
   <div class="modal-footer">
-    <button type="button" class="btn ms_btn_black" data-dismiss="modal" (click)="x('Cross click')">Close</button>
-    <button type="button" 
-            class="btn ms_btn_green" data-toggle="modal" data-target="#confirming" 
-            data-dismiss="modal">Verify Appointment</button>
+    <button type="button" class="btn ms_btn_black" data-dismiss="modal" #close_bpjs (click)="modal.close()">Close</button>
   </div>
   </ng-template>
 
-  <ng-template #create_contact let-modal let-c="close" let-x="dismiss">
-    
+  <ng-template #notifyBpjs let-c="close" let-x="dismiss" let-modal>
+    <div class="modal-header" style="padding-bottom: 0px">
+      <h4 class="modal-title" style="padding: 4px">Confirmation !</h4>
+    </div>
+    <div class="modal-body">
+      <p style="padding: 1vw 4vw">Are you sure for update to BPJS?</p>
+      <div style="text-align: center">
+        <button class="ms_btn_border ms_btn_black" style="padding: 0.3vw 0vw; width: 5vw" (click)="modal.close()">Cancel</button>
+        <button class="ms_btn_border ms_btn_red" style="padding: 0.3vw 0vw; width: 5vw" (click)="updateBpjs()" (click)="modal.close()">Yes</button>
+      </div>
+  </div>
   </ng-template>

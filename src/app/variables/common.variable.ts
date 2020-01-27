@@ -57,6 +57,7 @@ export const doctorType = {
 export const channelId = {
   CALL_CENTER: '1',
   FRONT_OFFICE: '2',
+  BPJS: '15'
 };
 
 export const appointmentStatusId = {
@@ -74,4 +75,8 @@ export const mobileStatus = {
 export const contactStatus = {
   MOBILE_ACTIVE: '3',
   VERIFIED: '4'
+}
+
+export const hospitalId = {
+  yogyakarta: '8c09908a-2eb3-4e5e-a7d3-ab2400df0b82'
 }

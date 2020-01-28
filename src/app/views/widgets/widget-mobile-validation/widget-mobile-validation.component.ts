@@ -18,8 +18,8 @@ import { environment } from '../../../../environments/environment';
 })
 export class WidgetMobileValidationComponent implements OnInit {
   public assetPath = environment.ASSET_PATH;
-  public urlKtp = environment.GET_IMAGE_KTP;
-  public getKtp;
+  public urlDisclaimer = environment.GET_IMAGE_DISCLAIMER;
+  public getDisclaimer;
   public key: any = JSON.parse(localStorage.getItem('key'));
   public hospital = this.key.hospital;
   public user = this.key.user;
@@ -45,7 +45,6 @@ export class WidgetMobileValidationComponent implements OnInit {
   public editEmail: string;
   public editContactPayload: any;
   public flagFile1: boolean = false;
-  public flagFile2: boolean = false;
   public validUpload1: boolean = false;
   public validUpload2: boolean = false;
   public flagEmail: boolean = false;
@@ -66,8 +65,7 @@ export class WidgetMobileValidationComponent implements OnInit {
   public showWaitMsg: boolean = true;
   public mobileStatus = mobileStatus;
   public contactStatus = contactStatus;
-  public assetKtp: any;
-  public assetDisclaimer: any;
+  public assetDisclaimer: any = null;
   public formPrint;
   uploadForm: FormGroup;
 
@@ -91,8 +89,7 @@ export class WidgetMobileValidationComponent implements OnInit {
     this.getListAccount();
     this.getCollectionAlert();
     this.uploadForm = this.formBuilder.group({
-      disclaimer: [''],
-      ktp: ['']
+      disclaimer: ['']
     });
   }
 
@@ -124,11 +121,6 @@ export class WidgetMobileValidationComponent implements OnInit {
     this.flagFile1 = false;
   }
 
-  deleteKtp() {
-    this.uploadForm.get('ktp').setValue(null);
-    this.flagFile2 = false;
-  }
-  
   uploadDisclaimer(event){
     if (event.target.files.length > 0) {
       this.flagFile1 = true;
@@ -137,73 +129,65 @@ export class WidgetMobileValidationComponent implements OnInit {
     }
   }
 
-  uploadKtp(event){
-    if (event.target.files.length > 0) {
-      this.flagFile2 = true;
-      const file = event.target.files[0];
-      this.uploadForm.get('ktp').setValue(file);
-    }
-  }
-
   async onSubmitUpload() {
     const formData_1 = new FormData();
-    const formData_2 = new FormData();
     formData_1.append('uploader', 'disclaimer_1');
     formData_1.append('filePdf', this.uploadForm.get('disclaimer').value);
-    formData_2.append('uploader', 'identity');
-    formData_2.append('filePdf', this.uploadForm.get('ktp').value);
 
     if(this.dataContact.email_address) {
-      this.assetDisclaimer = await this.patientService.uploadImage(formData_1)
-      .toPromise().then(res => {
-        return res.data;
-      }).catch(err => {
-        this.alertService.error(err.error.message, false, 5000);
-      });
-
+      if(this.uploadForm.get('disclaimer').value) {
+        this.assetDisclaimer = await this.patientService.uploadImage(formData_1)
+          .toPromise().then(res => {
+            return res.data;
+          }).catch(err => {
+            this.alertService.error(err.error.message, false, 5000);
+          });
+      }
     if(this.selectedAccount.mobile_status !== mobileStatus.ACCESSED) {
-      this.assetKtp = await this.patientService.uploadImage(formData_2)
-        .toPromise().then(res => {
-          return res.data;
-        }).catch(err => {
-          this.alertService.error(err.error.message, false, 5000);
-        });
-        await this.editDataContact(this.assetDisclaimer.name);
-        await this.editContactUpload(this.assetDisclaimer.name, this.assetKtp.name);
+        if(this.assetDisclaimer) {
+          await this.editDataContact(this.assetDisclaimer.name);
+          await this.editContactUpload(this.assetDisclaimer.name);
+        } else {
+          await this.editDataContact(null);
+          await this.editContactUpload(null);
+        }
       }
       else if (this.selectedAccount.mobile_status === mobileStatus.ACCESSED) {
-        this.editDataContact(this.assetDisclaimer.name);
+        if(this.assetDisclaimer) {
+          this.editDataContact(this.assetDisclaimer.name);
+        } else {
+          this.editDataContact(null);
+        }
+        
       }
     }
   }
 
-  async editContactUpload(disclaimer, ktp) {
+  async editContactUpload(disclaimer) { //open access MR
     let body;
     body = {
-      disclaimer: disclaimer,
       contactId: this.dataContact.contact_id,
       userId: this.user.id,
       source: sourceApps,
       userName: this.user.username
     }
-    ktp ? body.identity = ktp : '';
-    this.patientService.uploadContact(body).subscribe(
-      data => {
-        this.assetKtp = null;
-        this.assetDisclaimer = null;
-        this.flagFile1 = false;
-        this.flagFile2 = false;
-        this.uploadForm.get('disclaimer').setValue(null);
-        this.uploadForm.get('ktp').setValue(null);
-        this.alertService.success('Upload Data Success', false, 5000);
-        this.getListAccount();
-        this.selectedAccount.contact_status_id = contactStatus.VERIFIED;
-        this.selectedAccount.mobile_status = mobileStatus.ACCESSED;
-        this.choosedAccount(this.selectedAccount);
-      }, error => {
-        this.alertService.error(error.error.message, false, 5000);
-      }
-    )
+    if(disclaimer) {
+      body.disclaimer = disclaimer;
+      this.patientService.uploadContact(body).subscribe(
+        data => {
+          this.assetDisclaimer = null;
+          this.flagFile1 = false;
+          this.uploadForm.get('disclaimer').setValue(null);
+          this.alertService.success('Upload Data Success', false, 5000);
+          this.getListAccount();
+          this.selectedAccount.contact_status_id = contactStatus.VERIFIED;
+          this.selectedAccount.mobile_status = mobileStatus.ACCESSED;
+          this.choosedAccount(this.selectedAccount);
+        }, error => {
+          this.alertService.error(error.error.message, false, 5000);
+        }
+      )
+    }
   }
 
   openConfirmationModal(modal: any) {
@@ -247,15 +231,13 @@ export class WidgetMobileValidationComponent implements OnInit {
     } else if(this.selectedAccount.mobile_status === mobileStatus.ACCESSED) {
       this.editContactPayload = {
         contactId: this.dataContact.contact_id,
-        data: {
-          disclaimer1: disclaimer
-        },
         userId: this.user.id,
         userName: this.user.username,
         source: sourceApps
       };
       this.editEmail !== this.dataContact.email_address ? 
       this.editContactPayload.data.emailAddress = this.dataContact.email_address : '';
+      disclaimer ? this.editContactPayload.data.disclaimer1 = disclaimer : '';
     }
 
     this.patientService.updateContact(this.selectedAccount.contact_id, this.editContactPayload).subscribe(
@@ -379,8 +361,6 @@ export class WidgetMobileValidationComponent implements OnInit {
     this.flagSearch = false;
     this.uploadForm.get('disclaimer').setValue(null);
     this.flagFile1 = false;
-    this.uploadForm.get('ktp').setValue(null);
-    this.flagFile2 = false;
 
     this.selectedAccount = {
       contact_id: val.contact_id,
@@ -420,7 +400,7 @@ export class WidgetMobileValidationComponent implements OnInit {
               this.alertService.error(err.error.message, false, 5000);
             });
           this.editEmail = this.dataContact.email_address;
-          this.getKtp = this.sanitizer.bypassSecurityTrustResourceUrl(this.urlKtp + this.dataContact.identity);
+          this.getDisclaimer = this.sanitizer.bypassSecurityTrustResourceUrl(this.urlDisclaimer + this.dataContact.disclaimer_1);
           this.dataPatientHope = await this.patientService.getPatientHopeDetail(this.dataContact.patient_hope_id)
             .toPromise().then(res => {
               this.loadingBar = false;

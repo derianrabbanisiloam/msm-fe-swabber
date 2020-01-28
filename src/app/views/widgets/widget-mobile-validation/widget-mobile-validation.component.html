@@ -373,27 +373,11 @@
                     <img style="height: 3rem; width: 4rem; margin-left: 0.5em;margin-right: 0.5rem" src="../../../../assets/icons/ic_folder.png">
                   </label>
                     <input id="file-input" type="file" (change)="uploadDisclaimer($event)" accept="application/pdf"/> UPLOAD DISCLAIMER
-                    <i *ngIf="f.submitted && !this.uploadForm.get('disclaimer').value" class="error-msg">* Disclaimer is required</i>
+                    <!-- <i *ngIf="f.submitted && !this.uploadForm.get('disclaimer').value" class="error-msg">* Disclaimer is required</i> -->
                     <img *ngIf="flagFile1" src="../../../../assets/icons/ic_checklist.png" style="width: 3em; height: 3em;">
                     <div style="float: right;">
                       <img *ngIf="flagFile1" src="../../../../assets/icons/ic_delete.svg" (click)="deleteDisclaimer()" style="width: 3em; height: 3em;">
                     </div>
-                </div>
-              </div>
-            </div>
-            <div class="row">
-              <div class="col-md-10 mob_valid_1">
-                <div class="image-upload">
-                    3. 
-                  <label for="file-input-2">
-                    <img style="height: 3rem; width: 4rem; margin-left: 0.5em;margin-right: 0.5rem" src="../../../../assets/icons/ic_folder.png">
-                  </label>
-                  <input id="file-input-2" type="file" (change)="uploadKtp($event)" accept="application/pdf"/> UPLOAD IDENTITY DOCUMENT
-                  <i *ngIf="f.submitted && !this.uploadForm.get('ktp').value" class="error-msg">* KTP is required</i>
-                  <img *ngIf="flagFile2" src="../../../../assets/icons/ic_checklist.png" style="width: 3em; height: 3em;">
-                  <div style="float: right;">
-                    <img *ngIf="flagFile2" src="../../../../assets/icons/ic_delete.svg" (click)="deleteKtp()" style="width: 3em; height: 3em;">
-                  </div>
                 </div>
               </div>
             </div>
@@ -595,7 +579,7 @@
                   </div>
                 </div>
                 <div class="col-md-4" style="padding: 0">
-                  <iframe [src]="getKtp" style="width:25em; height:17em;" frameborder="0"></iframe>
+                  <iframe [src]="getDisclaimer" style="width:25em; height:17em;" frameborder="0"></iframe>
                 </div>
               </div>
               <form [formGroup] = "uploadForm" (ngSubmit)="onSubmitUpload()" enctype="multipart/form-data">

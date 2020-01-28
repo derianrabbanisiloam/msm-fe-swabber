@@ -164,6 +164,7 @@ export class WidgetMobileValidationComponent implements OnInit {
   }
 
   async editContactUpload(disclaimer) { //open access MR
+
     let body;
     body = {
       contactId: this.dataContact.contact_id,
@@ -173,21 +174,21 @@ export class WidgetMobileValidationComponent implements OnInit {
     }
     if(disclaimer) {
       body.disclaimer = disclaimer;
-      this.patientService.uploadContact(body).subscribe(
-        data => {
-          this.assetDisclaimer = null;
-          this.flagFile1 = false;
-          this.uploadForm.get('disclaimer').setValue(null);
-          this.alertService.success('Upload Data Success', false, 5000);
-          this.getListAccount();
-          this.selectedAccount.contact_status_id = contactStatus.VERIFIED;
-          this.selectedAccount.mobile_status = mobileStatus.ACCESSED;
-          this.choosedAccount(this.selectedAccount);
-        }, error => {
-          this.alertService.error(error.error.message, false, 5000);
-        }
-      )
     }
+    this.patientService.uploadContact(body).subscribe(
+      data => {
+        this.assetDisclaimer = null;
+        this.flagFile1 = false;
+        this.uploadForm.get('disclaimer').setValue(null);
+        this.alertService.success('Upload Data Success', false, 5000);
+        this.getListAccount();
+        this.selectedAccount.contact_status_id = contactStatus.VERIFIED;
+        this.selectedAccount.mobile_status = mobileStatus.ACCESSED;
+        this.choosedAccount(this.selectedAccount);
+      }, error => {
+        this.alertService.error(error.error.message, false, 5000);
+      }
+    )
   }
 
   openConfirmationModal(modal: any) {
@@ -400,7 +401,11 @@ export class WidgetMobileValidationComponent implements OnInit {
               this.alertService.error(err.error.message, false, 5000);
             });
           this.editEmail = this.dataContact.email_address;
-          this.getDisclaimer = this.sanitizer.bypassSecurityTrustResourceUrl(this.urlDisclaimer + this.dataContact.disclaimer_1);
+          if(this.dataContact.disclaimer_1) {
+            this.getDisclaimer = this.sanitizer.bypassSecurityTrustResourceUrl(this.urlDisclaimer + this.dataContact.disclaimer_1);
+          } else {
+            this.getDisclaimer = null
+          }
           this.dataPatientHope = await this.patientService.getPatientHopeDetail(this.dataContact.patient_hope_id)
             .toPromise().then(res => {
               this.loadingBar = false;

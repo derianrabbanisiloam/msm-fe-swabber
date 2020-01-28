@@ -578,7 +578,7 @@
                     </div>
                   </div>
                 </div>
-                <div class="col-md-4" style="padding: 0">
+                <div *ngIf="getDisclaimer" class="col-md-4" style="padding: 0">
                   <iframe [src]="getDisclaimer" style="width:25em; height:17em;" frameborder="0"></iframe>
                 </div>
               </div>

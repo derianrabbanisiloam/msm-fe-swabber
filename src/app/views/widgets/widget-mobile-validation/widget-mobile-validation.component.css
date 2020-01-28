@@ -3,6 +3,12 @@
   float: right;
   right:0;
 }
+.error-msg-2 {
+  color: red;
+  float: left;
+  right:0;
+  margin-left: -2vw
+}
 .image-upload>input {
   display: none;
 }

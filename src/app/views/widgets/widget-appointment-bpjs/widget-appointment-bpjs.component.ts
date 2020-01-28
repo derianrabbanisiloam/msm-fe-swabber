@@ -193,7 +193,6 @@ export class WidgetAppointmentBpjsComponent implements OnInit {
       limit
     ).subscribe(
       data => {
-        //this.bpjsAppointments = this.tampung;
         this.bpjsAppointments = data.data;
         this.bpjsAppointments.map(x => {
           if(x.appointment_id && x.is_notified === false) {
@@ -263,16 +262,6 @@ export class WidgetAppointmentBpjsComponent implements OnInit {
       }
     )
   }
-
-  // async getPatientDetail() {
-  //   this.patientDetail = await this.appointmentService.getRoomHope(organizationId)
-  //     .toPromise().then(res => {
-  //       return res.data;
-  //     }).catch(err => {
-  //       return [];
-  //     })
-  //   return this.patientDetail;
-  // }
 
   openAppBpjsModal() {
     let body;

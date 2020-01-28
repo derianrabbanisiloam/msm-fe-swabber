@@ -13,14 +13,6 @@
     </div>
   </div>
 
-  <div class="row">
-    <div class="col-md-12">
-      <button class="btn fo_btn_green" style="float: right; margin-right: 1vw; margin-bottom: 1vw;" (click)="checkboxBpjs(notifyBpjs)">
-        Update to BPJS
-      </button>
-    </div>
-  </div>
-
   <div class="ms_container ms_shadow_4" id="tutorial_reschedule_table">
     <table class="table">
       <thead>
@@ -55,14 +47,25 @@
     </table>
   </div>
 
-  <div class="pagination-bottom">
-    <button *ngIf="isCanPrevPage" (click)="prevPage()" class="btn ms_btn_blue">
-      <img src="{{assetPath}}icons/ic_ArrowRight_White.png"> Prev
-    </button>
-    <span style="width:10px">&nbsp;</span>
-    <button *ngIf="isCanNextPage" (click)="nextPage()" class="btn ms_btn_blue">
-      Next <img src="{{assetPath}}icons/ic_ArrowLeft_White.png">
-    </button>
+  
+
+  <div class="row">
+    <div class="col-md-6">
+      <div class="pagination-bottom">
+        <button *ngIf="isCanPrevPage" (click)="prevPage()" class="btn ms_btn_blue">
+          <img src="{{assetPath}}icons/ic_ArrowRight_White.png"> Prev
+        </button>
+        <span style="width:10px">&nbsp;</span>
+        <button *ngIf="isCanNextPage" (click)="nextPage()" class="btn ms_btn_blue">
+          Next <img src="{{assetPath}}icons/ic_ArrowLeft_White.png">
+        </button>
+      </div>
+    </div>
+    <div class="col-md-6">
+      <button class="btn fo_btn_green" style="float: right; margin-right: 1vw; margin-bottom: 1vw;" (click)="checkboxBpjs(notifyBpjs)">
+        Update to BPJS
+      </button>
+    </div>
   </div>
 
   <ng-template #searchPatientBpjs let-c="close" let-x="dismiss" let-modal>

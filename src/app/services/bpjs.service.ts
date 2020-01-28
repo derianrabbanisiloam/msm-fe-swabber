@@ -27,10 +27,8 @@ export class BpjsService {
   limit?: number
 ): Observable<any> {
     let url = `${this.appointmentBpjsUrl}`;
-    // url = `${this.appointmentBpjsUrl}?hospitalId=${hospitalId}&from=${fromDate}&to=${toDate}`;
-    // url = name ? `${url}&patientName=${name}` : url;
-    // url = doctor ? `${url}&doctorId=${doctor}` : url;
-    // url = `${url}&limit=${limit}&offset=${offset}`;
+    url = `${this.appointmentBpjsUrl}?from=${fromDate}&to=${toDate}`;
+    url = `${url}&limit=${limit}&offset=${offset}`;
     
     return this.http.get<any>(url, httpOptions);
   }

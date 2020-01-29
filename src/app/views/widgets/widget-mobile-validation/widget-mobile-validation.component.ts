@@ -1,5 +1,5 @@
 import { Component, OnInit } from '@angular/core';
-import { FormBuilder, FormGroup } from '@angular/forms';
+import { FormBuilder, FormGroup, FormControl } from '@angular/forms';
 import { PatientService } from '../../../services/patient.service';
 import { GeneralService } from '../../../services/general.service';
 import { AccountMobile } from '../../../models/patients/account-mobile';
@@ -50,6 +50,7 @@ export class WidgetMobileValidationComponent implements OnInit {
   public flagEmail: boolean = false;
   public loadingBar: boolean = false;
   public loadingBarTwo: boolean = false;
+  public checkData: boolean = false;
 
   public mask = [/\d/, /\d/, /\d/, /\d/, /\d/, /\d/, /\d/, /\d/, /\d/, /\d/, /\d/, /\d/, /\d/];
   public mask_birth = [/\d/, /\d/, '-', /\d/, /\d/, '-', /\d/, /\d/, /\d/, /\d/];
@@ -89,7 +90,8 @@ export class WidgetMobileValidationComponent implements OnInit {
     this.getListAccount();
     this.getCollectionAlert();
     this.uploadForm = this.formBuilder.group({
-      disclaimer: ['']
+      disclaimer: [''],
+      checkboxPatient: new FormControl('checkboxPatient'),
     });
   }
 
@@ -115,6 +117,10 @@ export class WidgetMobileValidationComponent implements OnInit {
     );
     popupWin.document.close();
 }
+
+  checkDataPatient() {
+    this.checkData === false ? this.checkData = true : this.checkData = false;
+  }
 
   deleteDisclaimer() {
     this.uploadForm.get('disclaimer').setValue(null);

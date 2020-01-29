@@ -365,29 +365,39 @@
               </div>
             </div>
             <form [formGroup] = "uploadForm" (ngSubmit)="onSubmitUpload()" #f="ngForm" enctype="multipart/form-data">
-            <div class="row">
-              <div class="col-md-10 mob_valid_1">
-                <div class="image-upload">
-                    2. 
-                  <label for="file-input">
-                    <img style="height: 3rem; width: 4rem; margin-left: 0.5em;margin-right: 0.5rem" src="../../../../assets/icons/ic_folder.png">
-                  </label>
-                    <input id="file-input" type="file" (change)="uploadDisclaimer($event)" accept="application/pdf"/> UPLOAD DISCLAIMER
-                    <!-- <i *ngIf="f.submitted && !this.uploadForm.get('disclaimer').value" class="error-msg">* Disclaimer is required</i> -->
-                    <img *ngIf="flagFile1" src="../../../../assets/icons/ic_checklist.png" style="width: 3em; height: 3em;">
-                    <div style="float: right;">
-                      <img *ngIf="flagFile1" src="../../../../assets/icons/ic_delete.svg" (click)="deleteDisclaimer()" style="width: 3em; height: 3em;">
-                    </div>
+              <div class="row">
+                <div class="col-md-10 mob_valid_8">
+                  <div class="image-upload">
+                      2. 
+                    <label>
+                      <div>
+                        <input formControlName="checkboxPatient" type="checkbox" style="width: 1.5vw; height: 1.5vw; position: absolute; margin-left: 0.5vw" (click)="checkDataPatient()" [(ngModel)]="checkData">
+                        <span style="margin-left: 2.5vw">PATIENT IDENTITY CHECKED</span>
+                      </div>
+                    </label>
+                  </div>
+                </div>
+                <div class="col-md-10 mob_valid_7">
+                  <div class="image-upload">
+                    <label for="file-input">
+                      <img style="height: 3rem; width: 4rem; margin-left: 0.5em;margin-right: 0.5rem" src="../../../../assets/icons/ic_folder.png">
+                    </label>
+                      <input id="file-input" type="file" (change)="uploadDisclaimer($event)" accept="application/pdf"/> UPLOAD DATA
+                      <!-- <i *ngIf="f.submitted && !this.uploadForm.get('disclaimer').value" class="error-msg">* Disclaimer is required</i> -->
+                      <img *ngIf="flagFile1" src="../../../../assets/icons/ic_checklist.png" style="width: 3em; height: 3em;">
+                      <div style="float: right;">
+                        <img *ngIf="flagFile1" src="../../../../assets/icons/ic_delete.svg" (click)="deleteDisclaimer()" style="width: 3em; height: 3em;">
+                      </div>
+                  </div>
                 </div>
               </div>
-            </div>
-            <div class="row">
-              <div class="col-md-12">
-                <div class="tar">
-                  <button type="submit" class="fo_btn_registration fo_btn_save">Save</button>
+              <div class="row">
+                <div class="col-md-12">
+                  <div class="tar">
+                    <button type="submit" [disabled]="checkData === false" class="btn fo_btn_registration fo_btn_save">Save</button>
+                  </div>
                 </div>
               </div>
-            </div>
             </form>
           </div>
           <div *ngIf="selectedAccount.mobile_status === mobileStatus.ACCESSED 

@@ -232,21 +232,18 @@ export class WidgetAppointmentBpjsComponent implements OnInit {
     this.patientSelected = null;
     this.appointmentSelected = data;
     await this.getAppBpjsDetail(this.appointmentSelected.appointment_bpjs_id);
+    this.searchPatientModel = {
+      patientName: this.patientDetail.name,
+      patientBirth: dateFormatter(this.patientDetail.dob, true),
+      hospitalId: this.appointmentSelected.hospital_id,
+    };
     await this.searchPatient();
     this.open(content);
   }
 
   searchPatient() {
     this.searchLoader = true;
-    this.searchPatientModel = null;
-    if (!this.searchPatientModel) {
-      this.searchPatientModel = {
-        patientName: this.patientDetail.name,
-        patientBirth: dateFormatter(this.patientDetail.dob, true),
-        hospitalId: this.appointmentSelected.hospital_id,
-      }; 
-    }
-    const hospitalId = this.searchPatientModel.hospitalId;
+    const hospitalId = this.appointmentSelected.hospital_id;
     const patientName = this.searchPatientModel.patientName;
     const dob = this.searchPatientModel.patientBirth.split('-');
     const birthDate = dob[2] + '-' + dob[1] + '-' + dob[0];

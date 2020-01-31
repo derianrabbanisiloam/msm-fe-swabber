@@ -6,7 +6,7 @@ export const environment = {
   FRONT_OFFICE_SERVICE: 'http://10.85.139.13/msm-be-front-office-master/api/v2',
   BPJS_SERVICE: 'http://10.85.139.13/msm-be-bpjs-master/api/v2',
   SSO_SERVICE: 'http://10.85.129.55:7500',
-  WEB_SOCKET_SERVICE: 'http://10.85.139.12:7779',
+  WEB_SOCKET_SERVICE: 'http://10.85.139.12:8860',
   HIS_SERVICE: 'http://10.85.139.13/his-service-master',
   ASSET_PATH: 'https://gtn-dev-mysiloam-02.siloamhospitals.com/fo-assets/',
   UPLOAD_IMAGE: 'http://10.85.136.23:3333',

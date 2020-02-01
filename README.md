@@ -1,4 +1,4 @@
-# MsmFeTemplate
+# msm-fe-front-office
 A Front End Template for MySiloam Web Applications.
 This project was generated with [Angular CLI](https://github.com/angular/angular-cli) version 7.3.8.
 

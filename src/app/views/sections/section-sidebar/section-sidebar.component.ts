@@ -4,6 +4,7 @@ import socket from 'socket.io-client';
 import { SecretKey, Jwt, APP_RESCHEDULE, keySocket } from '../../../variables/common.variable';
 import Security from 'msm-kadapat';
 import { environment } from '../../../../environments/environment';
+import { hospitalId } from '../../../variables/common.variable';
 
 @Component({
   selector: 'app-section-sidebar',
@@ -16,6 +17,7 @@ export class SectionSidebarComponent implements OnInit {
   private socket;
   public key: any = JSON.parse(localStorage.getItem('key'));
   public hospital = this.key.hospital;
+  public yogyaHospitalId = hospitalId.yogyakarta;
 
   constructor(
     private appointmentService: AppointmentService,

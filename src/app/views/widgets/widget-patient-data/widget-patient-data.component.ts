@@ -24,6 +24,8 @@ import socket from 'socket.io-client';
 import { SecretKey, Jwt, QUEUE_NUMBER, CHECK_IN, keySocket } from '../../../variables/common.variable';
 import Security from 'msm-kadapat';
 import { environment } from '../../../../environments/environment';
+import { localSpliter } from '../../../../app/utils/helpers.util';
+import { isEmpty } from 'lodash';
 
 @Component({
   selector: 'app-widget-patient-data',
@@ -118,6 +120,9 @@ export class WidgetPatientDataComponent implements OnInit {
   public socketTwo;
   public listRoomHope: any = [];
   public roomHope: any;
+  public dataSiloamPatient;
+  public resMappingData: any;
+  public showCreateMrData: any = {};
 
   constructor(
     private generalService: GeneralService,
@@ -901,27 +906,13 @@ export class WidgetPatientDataComponent implements OnInit {
 
       this.buttonCreateAdmission = this.isFromAppointmentList ? false : true;
       this.isSuccessCreatePatient = true;
-      this.isButtonSave = false;
+      this.isButtonSave = true;
     } else {
-      this.isButtonSave = false;
+      this.isButtonSave = true;
     }
   }
 
-  async updatePatientComplete(body: any, params: any) {
-    const result = await this.patientService.updatePatientComplete(body, params)
-      .toPromise().then(res => {
-        this.alertService.success(res.message, false, 5000);
-        return res.data;
-      }).catch(err => {
-        this.alertService.error(err.error.message, false, 5000);
-        return null;
-      })
-
-    this.isButtonSave = false;
-  }
-
-
-  savePatient() {
+  async checkSearchPatientHope(content) {
     let isValid;
     isValid = this.checkFormCondition(); // return true if valid (there is no empty mandatory)
 
@@ -933,38 +924,144 @@ export class WidgetPatientDataComponent implements OnInit {
     if (!isValid) {
       this.alertService.error('Please input all mandatory field', false, 5000);
     } else {
-      const payload = this.loadPayload();
-
-      if (this.isFromAppointmentList) {
-        this.isButtonSave = true;
-        if (this.model.patientId && this.model.patientOrganizationId) {
-          const body = {
+      if(this.model.patientId === undefined && this.model.patientOrganizationId === undefined) {
+        let birthDate = localSpliter(this.model.birth, false);
+        this.dataSiloamPatient = await this.patientService.getPatientHopeSearch(
+          this.model.patientName, 
+          birthDate, 
+          this.charRemove(this.model.mobileNo1),
+          this.hospital.id)
+        .toPromise().then(res => {
+          return res.data;
+        }).catch(err => {
+          return null
+        });
+        if(!isEmpty(this.dataSiloamPatient)) {
+          if(this.dataSiloamPatient.status === 1) {
+            this.mappingPatient();
+          } else {
+            await this.open(content);
+          }
+        }
+      } else if(this.model.patientId) {
+        const payload = this.loadPayload();
+        let body;
+        if(this.isFromAppointmentList) {
+          body = {
             ...payload,
             patientHopeId: this.model.patientId,
-            patientOrganizationId: this.model.patientOrganizationId,
-            appointmentId: this.appointmentId,
+            appointmentId: this.appointmentId
           }
-          this.createPatientComplete(body);
         } else {
-          const body = {
+          body = {
             ...payload,
-            appointmentId: this.appointmentId,
-          };
-          this.createPatientComplete(body);
+            patientHopeId: this.model.patientId
+          }
         }
-      } else {
-        this.isButtonSave = true;
-        if (this.model.patientId && this.model.patientOrganizationId) {
-          const body = {
-            ...payload,
-            patientOrganizationId: this.model.patientOrganizationId,
-          };
-          this.updatePatientComplete(body, this.model.patientId);
-        } else {
-          this.createPatientComplete(payload);
+        this.resMappingData = null;
+        this.resMappingData = await this.mappingProcess(body);
+        if(this.resMappingData) {
+          this.model.mrlocal = this.resMappingData.medical_record_number;
+          this.model.patientOrganizationId = this.resMappingData.patient_organization_id;
+    
+          this.buttonCreateAdmission = this.isFromAppointmentList ? false : true;
+          this.isSuccessCreatePatient = true;
+          this.isButtonSave = false;
+        }
+        else {
+          this.isButtonSave = false;
         }
       }
     }
+  }
+
+  async newPatient() {
+    const payload = this.loadPayload();
+    let body;
+    body = {
+      ...payload
+    }
+
+    if(this.isFromAppointmentList) {
+      body = {
+        ...body,
+        appointmentId: this.appointmentId
+      }
+    }
+
+    this.isButtonSave = true;
+    this.createPatientComplete(body);
+  }
+
+  async mappingPatient() {
+    const payload = this.loadPayload();
+    let body;
+
+    if(this.dataSiloamPatient.status === 1) { //no data found
+      body = {
+        ...payload
+      }
+      if(this.isFromAppointmentList) {
+        body = {
+          ...body,
+          appointmentId: this.appointmentId
+        }
+      }
+      this.isButtonSave = true;
+      this.createPatientComplete(body);
+    } else {
+      if(this.dataSiloamPatient.status === 2) { //contactId or patientHopeId not mapping to MySiloam
+        if(!isEmpty(this.dataSiloamPatient.contactId)) {
+          body = {
+            ...payload,
+            contactId: this.dataSiloamPatient.contactId
+          }
+        } else if(typeof this.dataSiloamPatient.patientHopeId === 'number') {
+          body = {
+            ...payload,
+            patientHopeId: this.dataSiloamPatient.patientHopeId
+          }
+        }
+      } else if(this.dataSiloamPatient.status === 3 //contactid or patientHopeId mapping to MySiloam but don't have MR Local 
+        || this.dataSiloamPatient.status === 4) { //contactId or patientHopeId have MR Local and already mapping do MySiloam
+          body = {
+            ...payload,
+            patientHopeId: this.dataSiloamPatient.patientHopeId
+          }
+        }
+        if(this.isFromAppointmentList) {
+          body = {
+            ...body,
+            appointmentId: this.appointmentId
+          }
+        }
+      this.resMappingData = null;
+      this.isButtonSave = true;
+      this.resMappingData = await this.mappingProcess(body);
+      if(this.resMappingData) {
+        this.model.mrlocal = this.resMappingData.medical_record_number;
+        this.model.patientOrganizationId = this.resMappingData.patient_organization_id;
+  
+        this.buttonCreateAdmission = this.isFromAppointmentList ? false : true;
+        this.isSuccessCreatePatient = true;
+        this.isButtonSave = true;
+      }
+      else {
+        this.isButtonSave = false;
+      }
+    }
+  }
+
+  mappingProcess(payload: any) {
+    const patient = this.patientService.postMappingPatient(payload)
+      .toPromise().then(res => {
+        this.alertService.success(res.message, false, 3000);
+        return res.data;
+      }).catch(err => {
+        this.alertService.error(err.error.message, false, 3000);
+        return null;
+      })
+    return patient;
   }
 
   getActiveAdmission(patientHopeId: any) {

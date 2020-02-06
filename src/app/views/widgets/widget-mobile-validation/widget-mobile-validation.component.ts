@@ -10,6 +10,7 @@ import { Alert, AlertType } from '../../../models/alerts/alert';
 import * as moment from 'moment';
 import { DomSanitizer } from '@angular/platform-browser';
 import { environment } from '../../../../environments/environment';
+import Swal from 'sweetalert2';
 
 @Component({
   selector: 'app-widget-mobile-validation',
@@ -146,7 +147,12 @@ export class WidgetMobileValidationComponent implements OnInit {
           .toPromise().then(res => {
             return res.data;
           }).catch(err => {
-            this.alertService.error(err.error.message, false, 5000);
+            Swal.fire({
+              type: 'error',
+              title: 'Oops...',
+              text: err.error.message,
+              timer: 4000
+            })
           });
       }
     if(this.selectedAccount.mobile_status !== mobileStatus.ACCESSED) {
@@ -186,13 +192,24 @@ export class WidgetMobileValidationComponent implements OnInit {
         this.assetDisclaimer = null;
         this.flagFile1 = false;
         this.uploadForm.get('disclaimer').setValue(null);
-        this.alertService.success('Upload Data Success', false, 5000);
+        Swal.fire({
+          position: 'center',
+          type: 'success',
+          title: 'Patient portal access opened, please instruct patient to open patient portal',
+          showConfirmButton: false,
+          timer: 5000
+        })
         this.getListAccount();
         this.selectedAccount.contact_status_id = contactStatus.VERIFIED;
         this.selectedAccount.mobile_status = mobileStatus.ACCESSED;
         this.choosedAccount(this.selectedAccount);
       }, error => {
-        this.alertService.error(error.error.message, false, 5000);
+        Swal.fire({
+          type: 'error',
+          title: 'Oops...',
+          text: error.error.message,
+          timer: 4000
+        })
       }
     )
   }
@@ -212,13 +229,25 @@ export class WidgetMobileValidationComponent implements OnInit {
     };
     this.patientService.verifyPatient(payload).subscribe(
       data => {
-        this.alertService.success('Verify Patient Success', false, 5000);
+        Swal.fire({
+          position: 'top-end',
+          type: 'success',
+          title: 'Success',
+          text: 'Verify Patient Success',
+          showConfirmButton: false,
+          timer: 4000
+        })
         this.getListAccount();
         this.selectedAccount.contact_status_id = contactStatus.VERIFIED;
         this.selectedAccount.mobile_status = mobileStatus.ACTIVE;
         this.choosedAccount(this.selectedAccount);
       }, error => {
-        this.alertService.error(error.error.message, false, 5000);
+        Swal.fire({
+          type: 'error',
+          title: 'Oops...',
+          text: error.error.message,
+          timer: 4000
+        })
       }
     )
 
@@ -286,7 +315,12 @@ export class WidgetMobileValidationComponent implements OnInit {
       }, error => {
         this.loadingBarTwo = false;
         this.flagSearch = true;
-        this.alertService.error(error.error.message, false, 5000);
+        Swal.fire({
+          type: 'error',
+          title: 'Oops...',
+          text: error.error.message,
+          timer: 4000
+        })
       }
     )
   }
@@ -316,7 +350,12 @@ export class WidgetMobileValidationComponent implements OnInit {
       }, error => {
         this.loadingBarTwo = false;
         this.flagSearch = true;
-        this.alertService.error(error.error.message, false, 5000);
+        Swal.fire({
+          type: 'error',
+          title: 'Oops...',
+          text: error.error.message,
+          timer: 4000
+        })
       }
     )
   }
@@ -363,7 +402,6 @@ export class WidgetMobileValidationComponent implements OnInit {
   }
 
   async choosedAccount(val) {
-    //this.selectedAccount = val;
     this.patientHope = null;
     this.flagSearch = false;
     this.uploadForm.get('disclaimer').setValue(null);
@@ -385,7 +423,12 @@ export class WidgetMobileValidationComponent implements OnInit {
           .toPromise().then(res => {
             return res.data;
           }).catch(err => {
-            this.alertService.error(err.error.message, false, 5000);
+            Swal.fire({
+              type: 'error',
+              title: 'Oops...',
+              text: err.error.message,
+              timer: 4000
+            })
           });
         this.editEmail = this.dataContact.email_address;
         this.dataPatientHope = await this.patientService.getPatientHopeDetail(this.dataContact.patient_hope_id)
@@ -394,7 +437,12 @@ export class WidgetMobileValidationComponent implements OnInit {
             return res.data;
           }).catch(err => {
             this.loadingBar = false;
-            this.alertService.error(err.error.message, false, 5000);
+            Swal.fire({
+              type: 'error',
+              title: 'Oops...',
+              text: err.error.message,
+              timer: 4000
+            })
           });
       }
       else if(this.selectedAccount.contact_status_id === contactStatus.VERIFIED
@@ -404,7 +452,12 @@ export class WidgetMobileValidationComponent implements OnInit {
             .toPromise().then(res => {
               return res.data;
             }).catch(err => {
-              this.alertService.error(err.error.message, false, 5000);
+              Swal.fire({
+                type: 'error',
+                title: 'Oops...',
+                text: err.error.message,
+                timer: 4000
+              })
             });
           this.editEmail = this.dataContact.email_address;
           if(this.dataContact.disclaimer_1) {
@@ -418,7 +471,12 @@ export class WidgetMobileValidationComponent implements OnInit {
               return res.data;
             }).catch(err => {
               this.loadingBar = false;
-              this.alertService.error(err.error.message, false, 5000);
+              Swal.fire({
+                type: 'error',
+                title: 'Oops...',
+                text: err.error.message,
+                timer: 4000
+              })
             });
         }
   }

@@ -185,7 +185,7 @@
                 <button class="fo_btn_registration_2 fo_btn_blue" (click)="dataContact.email_address ? print() : ''" style="margin-left: -3em">Print</button>
                 <i *ngIf="!dataContact.email_address" class="error-msg-2">* Email is required</i>
                 <div id="print-section">
-                  <table class="table table-bordered" style="margin-top: 10em; margin-left: 4.5em; 
+                  <table class="table table-bordered" style="margin-top: 8em; margin-left: 4.5em; 
                     margin-right: 5em; margin-bottom: 5em; width: 80%">
                     <tr>
                       <td style="font-weight: bold; text-align: center" colspan="3">Ijin Pembukaan Akses Data Medis / Authorization to Medical Records</td>
@@ -251,6 +251,28 @@
                               <img src="../../../../assets/icons/ic_dot.png" width="7px" height="7px">
                             </div>
                             <div>Hasil Radiologi / Radiology Result</div>
+                            <div class="clear: left;"></div>
+                          </div>
+                        </td>
+                      </tr>
+                      <tr>
+                        <td colspan="3">
+                          <div class="row">
+                            <div style="margin-left: 0.5em; margin-right: 0.5em; margin-top: 0.3em; float: left;">
+                              <img src="../../../../assets/icons/ic_dot.png" width="7px" height="7px">
+                            </div>
+                            <div>Resep / Prescription</div>
+                            <div class="clear: left;"></div>
+                          </div>
+                        </td>
+                      </tr>
+                      <tr>
+                        <td colspan="3">
+                          <div class="row">
+                            <div style="margin-left: 0.5em; margin-right: 0.5em; margin-top: 0.3em; float: left;">
+                              <img src="../../../../assets/icons/ic_dot.png" width="7px" height="7px">
+                            </div>
+                            <div>Tagihan / Ongoing Bill</div>
                             <div class="clear: left;"></div>
                           </div>
                         </td>
@@ -411,7 +433,7 @@
                   <button class="fo_btn_registration_2 fo_btn_blue" (click)="dataContact.email_address ? print() : ''" style="margin-left: -3em">Print</button>
                   <i *ngIf="!dataContact.email_address" class="error-msg-2">* Email is required</i>
                   <div id="print-section">
-                    <table class="table table-bordered" style="margin-top: 10em; margin-left: 4.5em; 
+                    <table class="table table-bordered" style="margin-top: 8em; margin-left: 4.5em; 
                       margin-right: 5em; margin-bottom: 5em; width: 80%">
                       <tr>
                         <td style="font-weight: bold; text-align: center" colspan="3">Ijin Pembukaan Akses Data Medis / Authorization to Medical Records</td>
@@ -477,6 +499,28 @@
                                 <img src="../../../../assets/icons/ic_dot.png" width="7px" height="7px">
                               </div>
                               <div>Hasil Radiologi / Radiology Result</div>
+                              <div class="clear: left;"></div>
+                            </div>
+                          </td>
+                        </tr>
+                        <tr>
+                          <td colspan="3">
+                            <div class="row">
+                              <div style="margin-left: 0.5em; margin-right: 0.5em; margin-top: 0.3em; float: left;">
+                                <img src="../../../../assets/icons/ic_dot.png" width="7px" height="7px">
+                              </div>
+                              <div>Resep / Prescription</div>
+                              <div class="clear: left;"></div>
+                            </div>
+                          </td>
+                        </tr>
+                        <tr>
+                          <td colspan="3">
+                            <div class="row">
+                              <div style="margin-left: 0.5em; margin-right: 0.5em; margin-top: 0.3em; float: left;">
+                                <img src="../../../../assets/icons/ic_dot.png" width="7px" height="7px">
+                              </div>
+                              <div>Tagihan / Ongoing Bill</div>
                               <div class="clear: left;"></div>
                             </div>
                           </td>
@@ -593,28 +637,44 @@
                 </div>
               </div>
               <form [formGroup] = "uploadForm" (ngSubmit)="onSubmitUpload()" enctype="multipart/form-data">
-              <div class="row">
-                <div class="col-md-10 mob_valid_1">
-                  <div class="image-upload">
-                      2. 
-                    <label for="file-input">
-                      <img style="height: 3rem; width: 4rem; margin-left: 0.5em;margin-right: 0.5rem" src="../../../../assets/icons/ic_folder.png">
-                    </label>
-                      <input id="file-input" type="file" (change)="uploadDisclaimer($event)" accept="application/pdf"/> UPLOAD DISCLAIMER
-                      <img *ngIf="flagFile1" src="../../../../assets/icons/ic_checklist.png" style="width: 3em; height: 3em;">
-                      <div style="float: right;">
-                      <img *ngIf="flagFile1" src="../../../../assets/icons/ic_delete.svg" (click)="deleteDisclaimer()" style="width: 3em; height: 3em;">
+                <div class="row">
+                  <div class="col-md-10 mob_valid_8">
+                    <div class="image-upload">
+                        2. 
+                      <label *ngIf="dataContact.email_address !== this.editEmail">
+                        <div>
+                          <input formControlName="checkboxPatient" type="checkbox" style="width: 1.5vw; height: 1.5vw; position: absolute; margin-left: 0.5vw" (click)="checkDataPatient()" [(ngModel)]="checkData">
+                          <span style="margin-left: 2.5vw">PATIENT IDENTITY CHECKED</span>
+                        </div>
+                      </label>
+                    </div>
+                  </div>
+                  <div class="col-md-10 mob_valid_7">
+                    <div class="image-upload">
+                      <label for="file-input">
+                        <img style="height: 3rem; width: 4rem; margin-left: 0.5em;margin-right: 0.5rem" src="../../../../assets/icons/ic_folder.png">
+                      </label>
+                        <input id="file-input" type="file" (change)="uploadDisclaimer($event)" accept="application/pdf"/> UPLOAD DATA
+                        <!-- <i *ngIf="f.submitted && !this.uploadForm.get('disclaimer').value" class="error-msg">* Disclaimer is required</i> -->
+                        <img *ngIf="flagFile1" src="../../../../assets/icons/ic_checklist.png" style="width: 3em; height: 3em;">
+                        <div style="float: right;">
+                          <img *ngIf="flagFile1" src="../../../../assets/icons/ic_delete.svg" (click)="deleteDisclaimer()" style="width: 3em; height: 3em;">
+                        </div>
+                    </div>
+                  </div>
+                </div>
+                <div class="row">
+                  <div class="col-md-12">
+                    <div class="tar">
+                      <div [ngStyle]="{ display: dataContact.email_address !== this.editEmail ? 'block' : 'none'}">
+                        <button type="submit" [disabled]="checkData === false" class="btn fo_btn_registration fo_btn_save">Save</button>
                       </div>
+                      <div [ngStyle]="{ display: dataContact.email_address === this.editEmail ? 'block' : 'none'}">
+                        <button type="submit" class="btn fo_btn_registration fo_btn_save">Save</button>
+                      </div>
+                    </div>
                   </div>
                 </div>
-              </div>
-              <div class="row">
-                <div class="col-md-12">
-                  <div class="tar">
-                    <button type="submit" class="fo_btn_registration fo_btn_save">Save</button>
-                  </div>
-                </div>
-              </div>
               </form>
           </div>
           </div>

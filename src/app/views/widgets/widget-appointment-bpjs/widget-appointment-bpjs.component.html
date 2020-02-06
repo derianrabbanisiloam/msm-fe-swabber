@@ -35,7 +35,7 @@
         <tr *ngFor="let r of bpjsAppointments; let i = index">
           <td><input *ngIf="r.hideChecked === false" type="checkbox" style="margin-top: 0.7vw" [(ngModel)]="r.checked" [value]="r.checked"></td>
           <td>{{ r.appointment_date }}</td>
-          <td>{{ r.identity_number }}</td>
+          <td>{{ r.bpjs_card_number }}</td>
           <td>{{ r.reference_no }}</td>
           <td style="white-space: nowrap">{{ r.poly_code }}</td>
           <td>{{ r.phone_number_1 }}</td>

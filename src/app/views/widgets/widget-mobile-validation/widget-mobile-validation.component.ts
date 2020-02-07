@@ -52,6 +52,7 @@ export class WidgetMobileValidationComponent implements OnInit {
   public loadingBar: boolean = false;
   public loadingBarTwo: boolean = false;
   public checkData: boolean = false;
+  public flagAlert: boolean = false;
 
   public mask = [/\d/, /\d/, /\d/, /\d/, /\d/, /\d/, /\d/, /\d/, /\d/, /\d/, /\d/, /\d/, /\d/];
   public mask_birth = [/\d/, /\d/, '-', /\d/, /\d/, '-', /\d/, /\d/, /\d/, /\d/];
@@ -157,11 +158,11 @@ export class WidgetMobileValidationComponent implements OnInit {
       }
     if(this.selectedAccount.mobile_status !== mobileStatus.ACCESSED) {
         if(this.assetDisclaimer) {
-          await this.editDataContact(this.assetDisclaimer.name);
           await this.editContactUpload(this.assetDisclaimer.name);
+          await this.editDataContact(this.assetDisclaimer.name);
         } else {
-          await this.editDataContact(null);
           await this.editContactUpload(null);
+          await this.editDataContact(null);
         }
       }
       else if (this.selectedAccount.mobile_status === mobileStatus.ACCESSED) {
@@ -176,7 +177,6 @@ export class WidgetMobileValidationComponent implements OnInit {
   }
 
   async editContactUpload(disclaimer) { //open access MR
-
     let body;
     body = {
       contactId: this.dataContact.contact_id,
@@ -192,6 +192,7 @@ export class WidgetMobileValidationComponent implements OnInit {
         this.assetDisclaimer = null;
         this.flagFile1 = false;
         this.uploadForm.get('disclaimer').setValue(null);
+        this.flagAlert = true;
         Swal.fire({
           position: 'center',
           type: 'success',
@@ -235,9 +236,10 @@ export class WidgetMobileValidationComponent implements OnInit {
           title: 'Success',
           text: 'Verify Patient Success',
           showConfirmButton: false,
-          timer: 4000
+          timer: 3000
         })
         this.getListAccount();
+        this.selectedAccount.contact_id = data.data.contact_id;
         this.selectedAccount.contact_status_id = contactStatus.VERIFIED;
         this.selectedAccount.mobile_status = mobileStatus.ACTIVE;
         this.choosedAccount(this.selectedAccount);
@@ -254,6 +256,7 @@ export class WidgetMobileValidationComponent implements OnInit {
   }
 
   editDataContact(disclaimer){
+    let body;
     if(this.selectedAccount.mobile_status !== mobileStatus.ACCESSED) {
       this.editContactPayload = {
         contactId: this.dataContact.contact_id,
@@ -264,6 +267,9 @@ export class WidgetMobileValidationComponent implements OnInit {
         userName: this.user.username,
         source: sourceApps
       };
+      body = {
+        ...this.editContactPayload
+      }
     } else if(this.selectedAccount.mobile_status === mobileStatus.ACCESSED) {
       this.editContactPayload = {
         contactId: this.dataContact.contact_id,
@@ -271,19 +277,40 @@ export class WidgetMobileValidationComponent implements OnInit {
         userName: this.user.username,
         source: sourceApps
       };
+      body = {
+        ...this.editContactPayload,
+        data: {}
+      }
       this.editEmail !== this.dataContact.email_address ? 
-      this.editContactPayload.data.emailAddress = this.dataContact.email_address : '';
-      disclaimer ? this.editContactPayload.data.disclaimer1 = disclaimer : '';
+      body.data.emailAddress = this.dataContact.email_address : '';
+      disclaimer ? body.data.disclaimer1 = disclaimer : ''; //replace disclaimer when already opened access MR 
     }
 
-    this.patientService.updateContact(this.selectedAccount.contact_id, this.editContactPayload).subscribe(
+    this.patientService.updateContact(this.selectedAccount.contact_id, body).subscribe(
       data => {
         this.getListAccount();
+        if(disclaimer) {
+          this.getDisclaimer = null;
+          this.getDisclaimer = this.sanitizer.bypassSecurityTrustResourceUrl(this.urlDisclaimer + disclaimer);
+        }
         this.flagFile1 = false;
         this.uploadForm.get('disclaimer').setValue(null);
-        this.alertService.success('Edit Success', false, 5000);
+        if(this.flagAlert === false) {  
+          Swal.fire({
+            position: 'top-end',
+            type: 'success',
+            title: 'Edit Success',
+            showConfirmButton: false,
+            timer: 3000
+          })
+        }
       }, error => {
-        this.alertService.error(error.error.message, false, 5000);
+        Swal.fire({
+          type: 'error',
+          title: 'Oops...',
+          text: error.error.message,
+          timer: 4000
+        })
       }
     )
   }
@@ -402,6 +429,7 @@ export class WidgetMobileValidationComponent implements OnInit {
   }
 
   async choosedAccount(val) {
+    this.flagAlert = false;
     this.patientHope = null;
     this.flagSearch = false;
     this.uploadForm.get('disclaimer').setValue(null);

@@ -429,6 +429,7 @@ export class WidgetMobileValidationComponent implements OnInit {
   }
 
   async choosedAccount(val) {
+    this.checkData = false;
     this.flagAlert = false;
     this.patientHope = null;
     this.flagSearch = false;

@@ -123,12 +123,16 @@ export class WidgetPatientDataComponent implements OnInit {
   public dataSiloamPatient;
   public resMappingData: any;
   public showCreateMrData: any = {};
+  public flagPoint: boolean = false;
+  public bucketOne: any;
+  public bucketTwo: any;
 
   constructor(
     private generalService: GeneralService,
     private alertService: AlertService,
     private patientService: PatientService,
     private modalService: NgbModal,
+    private modalTwoService: NgbModal,
     private admissionService: AdmissionService,
     private appointmentService: AppointmentService,
     private route: ActivatedRoute,
@@ -615,7 +619,7 @@ export class WidgetPatientDataComponent implements OnInit {
     this.actionSearch(name, birthDate);
   }
 
-  findMatchPatient(content) {
+  findMatchPatient(content, fromSaveButton) {
     if (!this.model.patientName || !this.model.birth) {
       if (!this.model.patientName) {
         this.alertService.error('Please input patient name', false, 5000);
@@ -624,37 +628,39 @@ export class WidgetPatientDataComponent implements OnInit {
         this.alertService.error('Please input patient birthdate', false, 5000);
       }
     } else {
+      this.flagPoint = fromSaveButton;
       this.searchPatient(this.model.patientName, this.model.birth);
       this.openLarge(content);
     }
   }
 
-  async choosePatient(val, isFromHope) {
+  async confirmPatient() {
+    this.modalService.dismissAll();
     this.model.viewedBirthDate = null;
     this.listInputUser = [];
+    
+    if (this.bucketTwo) {
+      this.model.patientId = this.bucketOne.patientId;
+      this.model.patientOrganizationId = this.bucketOne.patientOrganizationId;
+      this.model.createDate = this.bucketOne.createDate;
+      this.model.registrationDate = this.bucketOne.registrationDate;
+      this.model.mrCentral = this.bucketOne.mrNo;
+      this.model.mrlocal = this.bucketOne.localMrNo;
+      this.model.birth = this.bucketOne.viewedBirthDate;
+      this.model.patientName = this.bucketOne.name;
+      this.model.fatherName = this.bucketOne.fatherName;
+      this.model.motherName = this.bucketOne.motherName;
+      this.model.spouseName = this.bucketOne.spouseName;
+      this.model.birthPlace = this.bucketOne.str_birth_place;
+      this.model.title = this.bucketOne.str_title;
+      this.model.bloodType = this.bucketOne.str_bloodType;
+      this.model.sex = this.bucketOne.str_sex;
+      this.model.religion = this.bucketOne.str_religion;
+      this.model.address = this.bucketOne.address;
+      this.model.city = this.bucketOne.str_city;
 
-    if (isFromHope) {
-      this.model.patientId = val.patientId;
-      this.model.patientOrganizationId = val.patientOrganizationId;
-      this.model.createDate = val.createDate;
-      this.model.registrationDate = val.registrationDate;
-      this.model.mrCentral = val.mrNo;
-      this.model.mrlocal = val.localMrNo;
-      this.model.birth = val.viewedBirthDate;
-      this.model.patientName = val.name;
-      this.model.fatherName = val.fatherName;
-      this.model.motherName = val.motherName;
-      this.model.spouseName = val.spouseName;
-      this.model.birthPlace = val.str_birth_place;
-      this.model.title = val.str_title;
-      this.model.bloodType = val.str_bloodType;
-      this.model.sex = val.str_sex;
-      this.model.religion = val.str_religion;
-      this.model.address = val.address;
-      this.model.city = val.str_city;
-
-      if (val.districtId) {
-        const district = await this.generalService.getDistrict(null, val.districtId)
+      if (this.bucketOne.districtId) {
+        const district = await this.generalService.getDistrict(null, this.bucketOne.districtId)
           .toPromise().then(res => {
             return res.data;
           }).catch(err => {
@@ -666,8 +672,8 @@ export class WidgetPatientDataComponent implements OnInit {
         this.model.district = { district_id: null };
       }
 
-      if (val.subDistrictId) {
-        const subdistrict = await this.generalService.getSubDistrict(null, val.subDistrictId)
+      if (this.bucketOne.subDistrictId) {
+        const subdistrict = await this.generalService.getSubDistrict(null, this.bucketOne.subDistrictId)
           .toPromise().then(res => {
             return res.data;
           }).catch(err => {
@@ -681,32 +687,117 @@ export class WidgetPatientDataComponent implements OnInit {
 
       await this.getDetailAddress(true);
 
-      this.model.postCode = val.postCode;
-      this.model.maritalStatus = val.str_marital;
-      this.model.notes = val.notes;
-      this.model.allergy = val.allergy;
+      this.model.postCode = this.bucketOne.postCode;
+      this.model.maritalStatus = this.bucketOne.str_marital;
+      this.model.notes = this.bucketOne.notes;
+      this.model.allergy = this.bucketOne.allergy;
 
-      this.model.homePhone = val.homePhoneNo;
-      this.model.officePhone = val.officePhoneNo;
-      this.model.mobileNo1 = val.mobileNo1;
-      this.model.mobileNo2 = val.mobileNo2;
-      this.model.email = val.emailAddress;
+      this.model.homePhone = this.bucketOne.homePhoneNo;
+      this.model.officePhone = this.bucketOne.officePhoneNo;
+      this.model.mobileNo1 = this.bucketOne.mobileNo1;
+      this.model.mobileNo2 = this.bucketOne.mobileNo2;
+      this.model.email = this.bucketOne.emailAddress;
 
-      this.model.contactEmail = val.contactEmailAddress;
-      this.model.contactMobile = val.contactMobileNo;
-      this.model.contactAddress = val.contactAddress;
-      this.model.contactPhone = val.contactPhoneNo;
-      this.model.contactName = val.contactName;
-      this.model.contactCity = val.str_contact_city;
+      this.model.contactEmail = this.bucketOne.contactEmailAddress;
+      this.model.contactMobile = this.bucketOne.contactMobileNo;
+      this.model.contactAddress = this.bucketOne.contactAddress;
+      this.model.contactPhone = this.bucketOne.contactPhoneNo;
+      this.model.contactName = this.bucketOne.contactName;
+      this.model.contactCity = this.bucketOne.str_contact_city;
 
-      this.model.nationality = val.str_nationality;
-      this.model.nationalidType = val.str_national_id_type;
-      this.model.nationalIdNo = val.nationalIdNo;
+      this.model.nationality = this.bucketOne.str_nationality;
+      this.model.nationalidType = this.bucketOne.str_national_id_type;
+      this.model.nationalIdNo = this.bucketOne.nationalIdNo;
 
-      this.model.permanentPostCode = val.permanentPostCode;
-      this.model.permanentAddress = val.permanentAddress;
-      this.model.permanentCity = val.str_permanent_city;
-      this.model.payerIdNo = val.payerIdNo;
+      this.model.permanentPostCode = this.bucketOne.permanentPostCode;
+      this.model.permanentAddress = this.bucketOne.permanentAddress;
+      this.model.permanentCity = this.bucketOne.str_permanent_city;
+      this.model.payerIdNo = this.bucketOne.payerIdNo;
+    }
+  }
+
+  async choosePatient(val, isFromHope, content) {
+    this.model.viewedBirthDate = null;
+    this.listInputUser = [];
+    if(this.flagPoint === true) { //from save button
+      this.openTwo(val, isFromHope, content);
+    } else {
+      this.modalService.dismissAll();
+      if (isFromHope) {
+        this.model.patientId = val.patientId;
+        this.model.patientOrganizationId = val.patientOrganizationId;
+        this.model.createDate = val.createDate;
+        this.model.registrationDate = val.registrationDate;
+        this.model.mrCentral = val.mrNo;
+        this.model.mrlocal = val.localMrNo;
+        this.model.birth = val.viewedBirthDate;
+        this.model.patientName = val.name;
+        this.model.fatherName = val.fatherName;
+        this.model.motherName = val.motherName;
+        this.model.spouseName = val.spouseName;
+        this.model.birthPlace = val.str_birth_place;
+        this.model.title = val.str_title;
+        this.model.bloodType = val.str_bloodType;
+        this.model.sex = val.str_sex;
+        this.model.religion = val.str_religion;
+        this.model.address = val.address;
+        this.model.city = val.str_city;
+  
+        if (val.districtId) {
+          const district = await this.generalService.getDistrict(null, val.districtId)
+            .toPromise().then(res => {
+              return res.data;
+            }).catch(err => {
+              return null;
+            })
+  
+          this.model.district = district ? district : { district_id: null };
+        } else {
+          this.model.district = { district_id: null };
+        }
+  
+        if (val.subDistrictId) {
+          const subdistrict = await this.generalService.getSubDistrict(null, val.subDistrictId)
+            .toPromise().then(res => {
+              return res.data;
+            }).catch(err => {
+              return null;
+            });
+  
+          this.model.subdistrict = subdistrict ? subdistrict : { sub_district_id: null };
+        } else {
+          this.model.subdistrict = { sub_district_id: null };
+        }
+  
+        await this.getDetailAddress(true);
+  
+        this.model.postCode = val.postCode;
+        this.model.maritalStatus = val.str_marital;
+        this.model.notes = val.notes;
+        this.model.allergy = val.allergy;
+  
+        this.model.homePhone = val.homePhoneNo;
+        this.model.officePhone = val.officePhoneNo;
+        this.model.mobileNo1 = val.mobileNo1;
+        this.model.mobileNo2 = val.mobileNo2;
+        this.model.email = val.emailAddress;
+  
+        this.model.contactEmail = val.contactEmailAddress;
+        this.model.contactMobile = val.contactMobileNo;
+        this.model.contactAddress = val.contactAddress;
+        this.model.contactPhone = val.contactPhoneNo;
+        this.model.contactName = val.contactName;
+        this.model.contactCity = val.str_contact_city;
+  
+        this.model.nationality = val.str_nationality;
+        this.model.nationalidType = val.str_national_id_type;
+        this.model.nationalIdNo = val.nationalIdNo;
+  
+        this.model.permanentPostCode = val.permanentPostCode;
+        this.model.permanentAddress = val.permanentAddress;
+        this.model.permanentCity = val.str_permanent_city;
+        this.model.payerIdNo = val.payerIdNo;
+      }
     }
   }
 
@@ -912,7 +1003,7 @@ export class WidgetPatientDataComponent implements OnInit {
     }
   }
 
-  async checkSearchPatientHope(content) {
+  async checkSearchPatientHope(content, fromSaveButton) {
     let isValid;
     isValid = this.checkFormCondition(); // return true if valid (there is no empty mandatory)
 
@@ -926,24 +1017,23 @@ export class WidgetPatientDataComponent implements OnInit {
     } else {
       if(this.model.patientId === undefined && this.model.patientOrganizationId === undefined) {
         let birthDate = localSpliter(this.model.birth, false);
-        this.dataSiloamPatient = await this.patientService.getPatientHopeSearch(
-          this.model.patientName, 
-          birthDate, 
-          this.charRemove(this.model.mobileNo1),
-          this.hospital.id)
+        const suggestion = await this.patientService.searchPatient(this.model.patientName, birthDate, this.hospital.orgId)
         .toPromise().then(res => {
           return res.data;
         }).catch(err => {
-          return null
-        });
-        if(!isEmpty(this.dataSiloamPatient)) {
-          if(this.dataSiloamPatient.status === 1) {
-            this.mappingPatient();
-          } else {
-            await this.open(content);
-          }
+          this.showNotFoundMsg = true;
+          this.showWaitMsg = false;
+          return [];
+        })
+
+        if(!isEmpty(suggestion)) {
+          await this.findMatchPatient(content, fromSaveButton);
+        } else {
+          this.newPatient();
         }
+        
       } else if(this.model.patientId) {
+        this.isButtonSave = true;
         const payload = this.loadPayload();
         let body;
         if(this.isFromAppointmentList) {
@@ -976,6 +1066,7 @@ export class WidgetPatientDataComponent implements OnInit {
   }
 
   async newPatient() {
+    this.modalService.dismissAll();
     const payload = this.loadPayload();
     let body;
     body = {
@@ -1488,6 +1579,16 @@ export class WidgetPatientDataComponent implements OnInit {
 
   open(content) {
     this.modalService.open(content).result.then((result) => {
+      this.closeResult = `Closed with: ${result}`;
+    }, (reason) => {
+      this.closeResult = `Dismissed ${this.getDismissReason(reason)}`;
+    });
+  }
+
+  openTwo(val, isFromHope, content) {
+    this.bucketOne = val;
+    this.bucketTwo = isFromHope;
+    this.modalTwoService.open(content).result.then((result) => {
       this.closeResult = `Closed with: ${result}`;
     }, (reason) => {
       this.closeResult = `Dismissed ${this.getDismissReason(reason)}`;

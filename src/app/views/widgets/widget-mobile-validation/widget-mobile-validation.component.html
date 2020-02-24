@@ -8,7 +8,17 @@
         <table class="table">
           <thead>
             <tr>
-              <th class="fo_list_header">Mobile Account</th>
+              <th class="fo_list_header">
+                <div>
+                  Mobile Account
+                </div>
+                <div style="font-size: 10px;">
+                  <img style="width: 20px; height: 20px" src="../../../../assets/icons/ic_mobile_linked_mr.svg">
+                  : Mobile Account Linked to MR <br>
+                  <img style="width: 20px; height: 20px" src="../../../../assets/icons/ic_access_opened.svg">
+                  : MR Access Opened
+                </div>
+              </th>
             </tr>
           </thead>
           <tbody>
@@ -179,7 +189,7 @@
             && dataContact && dataPatientHope && !loadingBar">
             <div class="row">
               <div class="col-md-9 mob_valid_1" style="margin-top: 1em">
-                1. PATIENT DATA FOR DISCLAIMER
+                1. PATIENT DATA FOR CONSENT
               </div>
               <div class="col-md-3 mob_valid_1" style="margin-top: 1em">
                 <button class="fo_btn_registration_2 fo_btn_blue" (click)="dataContact.email_address ? print() : ''" style="margin-left: -3em">Print</button>
@@ -394,7 +404,7 @@
                     <label>
                       <div>
                         <input formControlName="checkboxPatient" type="checkbox" style="width: 1.5vw; height: 1.5vw; position: absolute; margin-left: 0.5vw" (click)="checkDataPatient()" [(ngModel)]="checkData">
-                        <span style="margin-left: 2.5vw">PATIENT IDENTITY AND DISCLAIMER CHECKED</span>
+                        <span style="margin-left: 2.5vw">PATIENT IDENTITY AND CONSENT CHECKED</span>
                       </div>
                     </label>
                   </div>
@@ -427,7 +437,7 @@
             && dataContact && dataPatientHope && !loadingBar">
             <div class="row">
                 <div class="col-md-9 mob_valid_1" style="margin-top: 1em">
-                  1. PATIENT DATA FOR DISCLAIMER
+                  1. PATIENT DATA FOR CONSENT
                 </div>
                 <div class="col-md-3 mob_valid_1" style="margin-top: 1em">
                   <button class="fo_btn_registration_2 fo_btn_blue" (click)="dataContact.email_address ? print() : ''" style="margin-left: -3em">Print</button>
@@ -644,7 +654,7 @@
                       <label *ngIf="dataContact.email_address !== this.editEmail">
                         <div>
                           <input formControlName="checkboxPatient" type="checkbox" style="width: 1.5vw; height: 1.5vw; position: absolute; margin-left: 0.5vw" (click)="checkDataPatient()" [(ngModel)]="checkData">
-                          <span style="margin-left: 2.5vw">PATIENT IDENTITY AND DISCLAIMER CHECKED</span>
+                          <span style="margin-left: 2.5vw">PATIENT IDENTITY AND CONSENT CHECKED</span>
                         </div>
                       </label>
                     </div>

@@ -3,7 +3,7 @@ import { FormBuilder, FormGroup, FormControl } from '@angular/forms';
 import { PatientService } from '../../../services/patient.service';
 import { GeneralService } from '../../../services/general.service';
 import { AccountMobile } from '../../../models/patients/account-mobile';
-import { sourceApps, mobileStatus, contactStatus } from '../../../variables/common.variable';
+import { sourceApps, mobileStatus, contactStatus, channelId } from '../../../variables/common.variable';
 import { NgbModal, NgbActiveModal, ModalDismissReasons, NgbModalConfig } from '@ng-bootstrap/ng-bootstrap';
 import { AlertService } from '../../../services/alert.service';
 import { Alert, AlertType } from '../../../models/alerts/alert';
@@ -72,7 +72,7 @@ export class WidgetMobileValidationComponent implements OnInit {
   public formPrint;
   uploadForm: FormGroup;
   public postHope: any;
-  public patientOrgId: any;
+  public patientHopeId: any;
   public phoneNumber: any;
   public flagCount: boolean = false;
   public dateBirth: any;
@@ -419,14 +419,14 @@ export class WidgetMobileValidationComponent implements OnInit {
           timer: 4000
         })
       });
-    const { name, sexId, birthPlaceId, birthDate, titleId, maritalStatusId, address, cityId, districtId, 
+    const { patientId, name, sexId, birthPlaceId, birthDate, titleId, maritalStatusId, address, cityId, districtId, 
             subDistrictId, postCode, homePhoneNo, officePhoneNo, mobileNo1, mobileNo2, emailAddress,
             permanentAddress, permanentCityId, permanentPostCode, nationalIdTypeId, nationalIdNo,
             nationalityId, religionId, bloodTypeId, fatherName, motherName, spouseName, contactName,
             contactAddress, contactCityId, contactPhoneNo, contactMobileNo, contactEmailAddress, allergy,
             payerId, payerIdNo, notes } = body;
             
-    this.patientOrgId = val.patientOrganizationId;
+    this.patientHopeId = patientId;
 
     let bodyTwo = {
       name, sexId, birthPlaceId, birthDate, titleId, maritalStatusId, address, cityId, districtId, 
@@ -434,7 +434,7 @@ export class WidgetMobileValidationComponent implements OnInit {
       permanentAddress, permanentCityId, permanentPostCode, nationalIdTypeId, nationalIdNo,
       nationalityId, religionId, bloodTypeId, fatherName, motherName, spouseName, contactName,
       contactAddress, contactCityId, contactPhoneNo, contactMobileNo, contactEmailAddress, allergy,
-      payerId, payerIdNo, notes, patientOrganizationId : this.patientOrgId, organizationId: val.hospitalId
+      payerId, payerIdNo, notes, patientOrganizationId : val.patientOrganizationId, organizationId: val.hospitalId
     }
 
     this.phoneNumber = mobileNo1;
@@ -451,7 +451,11 @@ export class WidgetMobileValidationComponent implements OnInit {
 
   confirmSavePhoneNumber() {
     this.postHope.mobileNo1 = this.charRemove(this.phoneNumber);
-    this.patientService.searchByPatientHopeId(this.patientOrgId, this.postHope).subscribe(
+    this.postHope.channelId = channelId.FRONT_OFFICE;
+    this.postHope.userId = this.user.id;
+    this.postHope.source = sourceApps;
+    this.postHope.userName = this.user.fullname;
+    this.patientService.updatePatientComplete(this.postHope, this.patientHopeId).subscribe(
       data => {
         if(this.searchPatient === true) this.getSearchedPatient1();
         else this.getSearchedPatient2();

@@ -4,7 +4,7 @@ import { PatientService } from '../../../services/patient.service';
 import { GeneralService } from '../../../services/general.service';
 import { AccountMobile } from '../../../models/patients/account-mobile';
 import { sourceApps, mobileStatus, contactStatus } from '../../../variables/common.variable';
-import { NgbModal, NgbActiveModal } from '@ng-bootstrap/ng-bootstrap';
+import { NgbModal, NgbActiveModal, ModalDismissReasons, NgbModalConfig } from '@ng-bootstrap/ng-bootstrap';
 import { AlertService } from '../../../services/alert.service';
 import { Alert, AlertType } from '../../../models/alerts/alert';
 import * as moment from 'moment';
@@ -71,6 +71,12 @@ export class WidgetMobileValidationComponent implements OnInit {
   public assetDisclaimer: any = null;
   public formPrint;
   uploadForm: FormGroup;
+  public postHope: any;
+  public patientOrgId: any;
+  public phoneNumber: any;
+  public flagCount: boolean = false;
+  public dateBirth: any;
+  public searchPatient: boolean = false;
 
   constructor(
     private patientService: PatientService,
@@ -79,6 +85,7 @@ export class WidgetMobileValidationComponent implements OnInit {
     private activeModal: NgbActiveModal,
     private formBuilder: FormBuilder,
     private sanitizer: DomSanitizer,
+    modalSetting: NgbModalConfig,
   ) {
     this.formPrint = [
       {header: 'Name'},
@@ -86,6 +93,9 @@ export class WidgetMobileValidationComponent implements OnInit {
       {header: 'No. MR Central'},
       {header: 'Mobile Number'},
       {header: 'Email'}];
+
+    modalSetting.backdrop = 'static';
+    modalSetting.keyboard = false;
    }
 
   ngOnInit() {
@@ -219,6 +229,14 @@ export class WidgetMobileValidationComponent implements OnInit {
     this.modalService.open(modal);
   }
 
+  openLarge(modal: any) {
+    this.modalService.open(modal, { windowClass: 'fo_modal_admission' }).result.then((result) => {
+      this.closeResult = `Closed with: ${result}`;
+    }, (reason) => {
+      this.closeResult = `Dismissed ${this.getDismissReason(reason)}`;
+    });
+  }
+
   async verifyPatient() {
     this.activeModal.close();
     const payload = {
@@ -316,10 +334,11 @@ export class WidgetMobileValidationComponent implements OnInit {
   }
 
   getSearchedPatient1() {
+    this.searchPatient = true;
     this.flagSearch = false;
     this.loadingBarTwo = true;
-    let dateBirth = moment(this.selectedAccount.birth_date, 'DD-MM-YYYY').format('YYYY-MM-DD');
-    this.patientService.searchPatientAccessMr(this.selectedAccount.name, dateBirth).subscribe(
+    this.dateBirth = moment(this.selectedAccount.birth_date, 'DD-MM-YYYY').format('YYYY-MM-DD');
+    this.patientService.searchPatientAccessMr(this.selectedAccount.name, this.dateBirth).subscribe(
       data => {
         this.loadingBarTwo = false;
         this.flagSearch = true;
@@ -353,6 +372,7 @@ export class WidgetMobileValidationComponent implements OnInit {
   }
 
   getSearchedPatient2() {
+    this.searchPatient = false;
     this.flagSearch = false;
     this.loadingBarTwo = true;
     this.patientService.searchPatientAccessMr2(this.hospital.id, this.mrLocal).subscribe(
@@ -377,6 +397,75 @@ export class WidgetMobileValidationComponent implements OnInit {
       }, error => {
         this.loadingBarTwo = false;
         this.flagSearch = true;
+        Swal.fire({
+          type: 'error',
+          title: 'Oops...',
+          text: error.error.message,
+          timer: 4000
+        })
+      }
+    )
+  }
+
+  async getPatientHopeId(val, content) {
+    let body = await this.patientService.getPatientHopeDetail(val.patientId)
+      .toPromise().then(res => {
+        return res.data;
+      }).catch(err => {
+        Swal.fire({
+          type: 'error',
+          title: 'Oops...',
+          text: err.error.message,
+          timer: 4000
+        })
+      });
+    const { name, sexId, birthPlaceId, birthDate, titleId, maritalStatusId, address, cityId, districtId, 
+            subDistrictId, postCode, homePhoneNo, officePhoneNo, mobileNo1, mobileNo2, emailAddress,
+            permanentAddress, permanentCityId, permanentPostCode, nationalIdTypeId, nationalIdNo,
+            nationalityId, religionId, bloodTypeId, fatherName, motherName, spouseName, contactName,
+            contactAddress, contactCityId, contactPhoneNo, contactMobileNo, contactEmailAddress, allergy,
+            payerId, payerIdNo, notes } = body;
+            
+    this.patientOrgId = val.patientOrganizationId;
+
+    let bodyTwo = {
+      name, sexId, birthPlaceId, birthDate, titleId, maritalStatusId, address, cityId, districtId, 
+      subDistrictId, postCode, homePhoneNo, officePhoneNo, mobileNo2, emailAddress,
+      permanentAddress, permanentCityId, permanentPostCode, nationalIdTypeId, nationalIdNo,
+      nationalityId, religionId, bloodTypeId, fatherName, motherName, spouseName, contactName,
+      contactAddress, contactCityId, contactPhoneNo, contactMobileNo, contactEmailAddress, allergy,
+      payerId, payerIdNo, notes, patientOrganizationId : this.patientOrgId, organizationId: val.hospitalId
+    }
+
+    this.phoneNumber = mobileNo1;
+    this.postHope = bodyTwo;
+    this.openLarge(content);
+  }
+
+  checkCountChar() {
+    let countChar = this.charRemove(this.phoneNumber);
+    if(countChar) {
+      this.flagCount = countChar.length > 8 ? true : false;
+    }
+  }
+
+  confirmSavePhoneNumber() {
+    this.postHope.mobileNo1 = this.charRemove(this.phoneNumber);
+    this.patientService.searchByPatientHopeId(this.patientOrgId, this.postHope).subscribe(
+      data => {
+        if(this.searchPatient === true) this.getSearchedPatient1();
+        else this.getSearchedPatient2();
+        
+        Swal.fire({
+          position: 'top-end',
+          type: 'success',
+          title: 'Success',
+          text: 'Edit Phone Number Success',
+          showConfirmButton: false,
+          timer: 3000
+        })
+        this.modalService.dismissAll();
+      }, error => {
         Swal.fire({
           type: 'error',
           title: 'Oops...',
@@ -551,6 +640,17 @@ export class WidgetMobileValidationComponent implements OnInit {
         return 'info';
       case AlertType.Warning:
         return 'warning';
+    }
+  }
+
+  private getDismissReason(reason: any): string {
+
+    if (reason === ModalDismissReasons.ESC) {
+      return 'by pressing ESC';
+    } else if (reason === ModalDismissReasons.BACKDROP_CLICK) {
+      return 'by clicking on a backdrop';
+    } else {
+      return `with: ${reason}`;
     }
   }
 

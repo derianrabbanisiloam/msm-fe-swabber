@@ -143,6 +143,7 @@
                 <th width="100px">Local MR</th>
                 <th>Mobile Number</th>
                 <th style="min-width: 13em">Address</th>
+                <th>Action</th>
               </thead>
               <tbody class="quota-list">
                 <tr *ngFor="let itr of patientHope"
@@ -156,6 +157,11 @@
                   <td>{{itr.mrNoUnit}}</td>
                   <td>{{itr.mobileNo1}}</td>
                   <td>{{itr.address}}</td>
+                  <td>
+                    <button type="button" class="btn-default" (click)="getPatientHopeId(itr, confirmEdit)">
+                      <i class="fa fa-edit"></i>
+                    </button>
+                  </td>
                 </tr>
               </tbody>
               <tbody *ngIf="loadingBarTwo">
@@ -715,6 +721,20 @@
       <div class="modal-footer">
         <button type="button" class="btn ms_btn_black" (click)="modal.close()">Cancel</button>
         <button class="btn ms_btn_green" [ngClass]="{'disable': flagConfirm}" (click)="onSubmitUpload()" (click)="modal.close()">Confirm</button>
+      </div>
+    </ng-template>
+
+    <ng-template #confirmEdit let-modal let-c="close">
+      <div class="modal-header">
+        <div class="header-2 modal-padding">Edit Phone Number</div>
+      </div>
+      <div class="modal-body">
+        Phone Number : <input [textMask]="{mask: mask}" class="form-control mob_valid_6" type="text" (keyup)="checkCountChar()" [(ngModel)]="phoneNumber">
+        <span *ngIf="!flagCount || phoneNumber?.length === 0" style="color: red;">* min 9 character</span>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn ms_btn_black" (click)="c('Cross click')">Cancel</button>
+        <button class="btn ms_btn_green" [disabled]="!flagCount || phoneNumber?.length === 0" (click)="confirmSavePhoneNumber()">Confirm</button>
       </div>
     </ng-template>
   

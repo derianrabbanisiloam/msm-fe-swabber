@@ -11,6 +11,7 @@ import * as moment from 'moment';
 import { DomSanitizer } from '@angular/platform-browser';
 import { environment } from '../../../../environments/environment';
 import Swal from 'sweetalert2';
+import { dateFormatter } from '../../../utils/helpers.util';
 
 @Component({
   selector: 'app-widget-mobile-validation',
@@ -73,10 +74,15 @@ export class WidgetMobileValidationComponent implements OnInit {
   uploadForm: FormGroup;
   public postHope: any;
   public patientHopeId: any;
-  public phoneNumber: any;
-  public flagCount: boolean = false;
+  public phoneNumberOne: any;
+  public phoneNumberTwo: any;
+  public flagCountOne: boolean = false;
+  public flagCountTwo: boolean = false;
   public dateBirth: any;
   public searchPatient: boolean = false;
+  public nameHope: any;
+  public birthDateFormat: any;
+  public addressHope: any;
 
   constructor(
     private patientService: PatientService,
@@ -437,20 +443,31 @@ export class WidgetMobileValidationComponent implements OnInit {
       payerId, payerIdNo, notes, patientOrganizationId : val.patientOrganizationId, organizationId: val.hospitalId
     }
 
-    this.phoneNumber = mobileNo1;
+    this.phoneNumberOne = mobileNo1;
+    this.phoneNumberTwo = mobileNo2;
+    this.nameHope = name;
+    this.addressHope = address;
+    this.birthDateFormat = dateFormatter(birthDate, true);
     this.postHope = bodyTwo;
+    this.checkCountChar();
     this.openLarge(content);
   }
 
   checkCountChar() {
-    let countChar = this.charRemove(this.phoneNumber);
-    if(countChar) {
-      this.flagCount = countChar.length > 8 ? true : false;
+    let countCharOne = this.charRemove(this.phoneNumberOne);
+    let countCharTwo = this.charRemove(this.phoneNumberTwo);
+    
+    if(countCharOne) {
+      this.flagCountOne = countCharOne.length > 8 ? true : false;
+    }
+    if(countCharTwo) {
+      this.flagCountTwo = countCharTwo.length > 8 ? true : false;
     }
   }
 
   confirmSavePhoneNumber() {
-    this.postHope.mobileNo1 = this.charRemove(this.phoneNumber);
+    this.postHope.mobileNo1 = this.charRemove(this.phoneNumberOne);
+    this.postHope.mobileNo2 = this.charRemove(this.phoneNumberTwo);
     this.postHope.channelId = channelId.FRONT_OFFICE;
     this.postHope.userId = this.user.id;
     this.postHope.source = sourceApps;

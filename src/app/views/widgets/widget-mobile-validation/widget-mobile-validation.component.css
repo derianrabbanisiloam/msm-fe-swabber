@@ -1,3 +1,7 @@
+.spacing-row {
+  margin-bottom: 1em;
+}
+
 ::ng-deep .fo_modal_admission .modal-dialog {
   margin: 10% auto;
   max-width: 35%;

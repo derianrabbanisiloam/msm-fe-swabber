@@ -19,6 +19,7 @@ import { dateFormatter } from '../../../utils/helpers.util';
   styleUrls: ['./widget-mobile-validation.component.css']
 })
 export class WidgetMobileValidationComponent implements OnInit {
+  public maxSize10MB: number = 10485760;
   public assetPath = environment.ASSET_PATH;
   public urlDisclaimer = environment.GET_IMAGE_DISCLAIMER;
   public getDisclaimer;
@@ -152,9 +153,19 @@ export class WidgetMobileValidationComponent implements OnInit {
   uploadDisclaimer(event){
     if (event.target.files.length > 0) {
       if(event.target.files[0].type === typeFile.image || event.target.files[0].type === typeFile.pdf) {
-        this.flagFile1 = true;
-        const file = event.target.files[0];
-        this.uploadForm.get('disclaimer').setValue(file);
+        if(event.target.files[0].size > this.maxSize10MB) {
+          Swal.fire({
+            position: 'center',
+            type: 'error',
+            title: 'Max size 10MB',
+            showConfirmButton: false,
+            timer: 2000
+          })
+        } else {
+          this.flagFile1 = true;
+          const file = event.target.files[0];
+          this.uploadForm.get('disclaimer').setValue(file);
+        }
       } else {
         Swal.fire({
           position: 'center',

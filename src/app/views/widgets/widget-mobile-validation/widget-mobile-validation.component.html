@@ -420,12 +420,14 @@
                     <label for="file-input">
                       <img style="height: 3rem; width: 4rem; margin-left: 0.5em;margin-right: 0.5rem" src="../../../../assets/icons/ic_folder.png">
                     </label>
-                      <input id="file-input" type="file" (change)="uploadDisclaimer($event)" accept="application/pdf"/> UPLOAD DATA
-                      <!-- <i *ngIf="f.submitted && !this.uploadForm.get('disclaimer').value" class="error-msg">* Disclaimer is required</i> -->
+                      <input id="file-input" type="file" (change)="uploadDisclaimer($event)" accept="application/pdf, .jpg, .jpeg"/> UPLOAD DATA
                       <img *ngIf="flagFile1" src="../../../../assets/icons/ic_checklist.png" style="width: 3em; height: 3em;">
                       <div style="float: right;">
                         <img *ngIf="flagFile1" src="../../../../assets/icons/ic_delete.svg" (click)="deleteDisclaimer()" style="width: 3em; height: 3em;">
                       </div>
+                  </div>
+                  <div style="color: red; font-style: italic; font-size: 12px">
+                    * Format file JPG and PDF only
                   </div>
                 </div>
               </div>
@@ -648,8 +650,15 @@
                     </div>
                   </div>
                 </div>
-                <div *ngIf="getDisclaimer" class="col-md-4" style="padding: 0">
+                <div *ngIf="getDisclaimer && formatFlag" class="col-md-4" style="padding: 0">
                   <iframe [src]="getDisclaimer" style="width:25em; height:17em;" frameborder="0"></iframe>
+                  <hr>
+                  <span>{{fileName}}</span>
+                </div>
+                <div *ngIf="getDisclaimer && !formatFlag" class="col-md-4" style="padding: 0">
+                  <img style="width: 25em; height: 17em;" src="{{getDisclaimer}}">
+                  <hr>
+                  <span>{{fileName}}</span>
                 </div>
               </div>
               <form [formGroup] = "uploadForm" (ngSubmit)="onSubmitUpload()" enctype="multipart/form-data">
@@ -670,12 +679,14 @@
                       <label for="file-input">
                         <img style="height: 3rem; width: 4rem; margin-left: 0.5em;margin-right: 0.5rem" src="../../../../assets/icons/ic_folder.png">
                       </label>
-                        <input id="file-input" type="file" (change)="uploadDisclaimer($event)" accept="application/pdf"/> UPLOAD DATA
-                        <!-- <i *ngIf="f.submitted && !this.uploadForm.get('disclaimer').value" class="error-msg">* Disclaimer is required</i> -->
+                        <input id="file-input" type="file" (change)="uploadDisclaimer($event)" accept="application/pdf, .jpg, .jpeg"/> UPLOAD DATA
                         <img *ngIf="flagFile1" src="../../../../assets/icons/ic_checklist.png" style="width: 3em; height: 3em;">
                         <div style="float: right;">
                           <img *ngIf="flagFile1" src="../../../../assets/icons/ic_delete.svg" (click)="deleteDisclaimer()" style="width: 3em; height: 3em;">
                         </div>
+                    </div>
+                    <div style="color: red; font-style: italic; font-size: 12px">
+                      * Format file JPG and PDF only
                     </div>
                   </div>
                 </div>

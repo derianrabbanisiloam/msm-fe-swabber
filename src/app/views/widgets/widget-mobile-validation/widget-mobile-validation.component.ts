@@ -3,7 +3,7 @@ import { FormBuilder, FormGroup, FormControl } from '@angular/forms';
 import { PatientService } from '../../../services/patient.service';
 import { GeneralService } from '../../../services/general.service';
 import { AccountMobile } from '../../../models/patients/account-mobile';
-import { sourceApps, mobileStatus, contactStatus, channelId } from '../../../variables/common.variable';
+import { sourceApps, mobileStatus, contactStatus, channelId, typeFile, formatFile } from '../../../variables/common.variable';
 import { NgbModal, NgbActiveModal, ModalDismissReasons, NgbModalConfig } from '@ng-bootstrap/ng-bootstrap';
 import { AlertService } from '../../../services/alert.service';
 import { Alert, AlertType } from '../../../models/alerts/alert';
@@ -83,6 +83,10 @@ export class WidgetMobileValidationComponent implements OnInit {
   public nameHope: any;
   public birthDateFormat: any;
   public addressHope: any;
+  public formatFileServer: any;
+  public formatFlag: boolean = false;
+  public urlDownload: any;
+  public fileName: any;
 
   constructor(
     private patientService: PatientService,
@@ -147,9 +151,19 @@ export class WidgetMobileValidationComponent implements OnInit {
 
   uploadDisclaimer(event){
     if (event.target.files.length > 0) {
-      this.flagFile1 = true;
-      const file = event.target.files[0];
-      this.uploadForm.get('disclaimer').setValue(file);
+      if(event.target.files[0].type === typeFile.image || event.target.files[0].type === typeFile.pdf) {
+        this.flagFile1 = true;
+        const file = event.target.files[0];
+        this.uploadForm.get('disclaimer').setValue(file);
+      } else {
+        Swal.fire({
+          position: 'center',
+          type: 'error',
+          title: 'Format file JPG and PDF only',
+          showConfirmButton: false,
+          timer: 2000
+        })
+      }
     }
   }
 
@@ -315,7 +329,16 @@ export class WidgetMobileValidationComponent implements OnInit {
         this.getListAccount();
         if(disclaimer) {
           this.getDisclaimer = null;
-          this.getDisclaimer = this.sanitizer.bypassSecurityTrustResourceUrl(this.urlDisclaimer + disclaimer);
+          this.formatFileServer = disclaimer.split('.');
+          this.fileName = disclaimer;
+          this.urlDownload = this.urlDisclaimer + disclaimer;
+          if(this.formatFileServer[1] === formatFile.pdf) {
+            this.formatFlag = true;
+            this.getDisclaimer = this.sanitizer.bypassSecurityTrustResourceUrl(this.urlDisclaimer + disclaimer);
+          } else {
+            this.formatFlag = false;
+            this.getDisclaimer = this.urlDisclaimer + disclaimer;
+          }
         }
         this.flagFile1 = false;
         this.uploadForm.get('disclaimer').setValue(null);
@@ -600,7 +623,16 @@ export class WidgetMobileValidationComponent implements OnInit {
             });
           this.editEmail = this.dataContact.email_address;
           if(this.dataContact.disclaimer_1) {
-            this.getDisclaimer = this.sanitizer.bypassSecurityTrustResourceUrl(this.urlDisclaimer + this.dataContact.disclaimer_1);
+            this.formatFileServer = this.dataContact.disclaimer_1.split('.');
+            this.urlDownload = this.urlDisclaimer + this.dataContact.disclaimer_1;
+            this.fileName = this.dataContact.disclaimer_1;
+            if(this.formatFileServer[1] === formatFile.pdf) {
+              this.formatFlag = true;
+              this.getDisclaimer = this.sanitizer.bypassSecurityTrustResourceUrl(this.urlDisclaimer + this.dataContact.disclaimer_1);
+            } else {
+              this.formatFlag = false;
+              this.getDisclaimer = this.urlDisclaimer + this.dataContact.disclaimer_1;
+            }
           } else {
             this.getDisclaimer = null
           }

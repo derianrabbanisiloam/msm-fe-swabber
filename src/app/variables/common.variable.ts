@@ -80,3 +80,13 @@ export const contactStatus = {
 export const hospitalId = {
   yogyakarta: '8c09908a-2eb3-4e5e-a7d3-ab2400df0b82'
 }
+
+export const typeFile = {
+  image: 'image/jpeg',
+  pdf: 'application/pdf'
+}
+
+export const formatFile = {
+  image: 'jpg',
+  pdf: 'pdf'
+}

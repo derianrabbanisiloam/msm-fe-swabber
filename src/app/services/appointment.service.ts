@@ -21,6 +21,7 @@ export class AppointmentService {
   private rescheduleUrl = environment.CALL_CENTER_SERVICE + '/appointments/reschedules';
   private reserveSlotAppUrl = environment.CALL_CENTER_SERVICE + '/appointments/reserved-slot';
   private appointmentRescheduleCount = environment.CALL_CENTER_SERVICE + '/appointments/reschedules/count';
+  private aidoWorklistUrl = environment.FRONT_OFFICE_SERVICE + '/undefined';
 
   private rescheduleAppSource = new Subject<any>();
   public rescheduleAppSource$ = this.rescheduleAppSource.asObservable();
@@ -123,6 +124,22 @@ export class AppointmentService {
     let url = `${this.rescheduleUrl}?hospitalId=${hospitalId}&from=${fromDate}&to=${toDate}`;
     url = name ? `${url}&patientName=${name}` : url;
     url = doctor ? `${url}&doctorId=${doctor}` : url;
+    url = `${url}&limit=${limit}&offset=${offset}`;
+    
+    // return of(APPOINTMENT)
+    return this.http.get<any>(url, httpOptions);
+  }
+
+  getAidoWorklist(
+    hospitalId: string,
+    fromDate: string,
+    toDate: string,
+    name?: string,
+    offset?: number,
+    limit?: number
+  ): Observable<any> {
+    let url = `${this.aidoWorklistUrl}?hospitalId=${hospitalId}&from=${fromDate}&to=${toDate}`;
+    url = name ? `${url}&patientName=${name}` : url;
     url = `${url}&limit=${limit}&offset=${offset}`;
     
     // return of(APPOINTMENT)

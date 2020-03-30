@@ -1,0 +1,83 @@
+<div>
+  <div class="container-appointment-input">
+    <div class="filter-box">
+      <span class="foot-note">Appointment date</span>
+      <div class="date-picker-element">
+        <my-date-range-picker name="mydaterange" [options]="myDateRangePickerOptions" [(ngModel)]="datePickerModel"
+          (dateRangeChanged)="changeDateRange($event)" #date>
+        </my-date-range-picker>
+      </div>
+    </div>
+  </div>
+
+  <div class="ms_container ms_shadow_4" id="tutorial_reschedule_table">
+    <table class="table">
+      <thead>
+        <tr>
+          <th class="header-2" colspan="9" style="padding: 0.5vw 1.5vw">TeleConsultation Worklist</th>
+        </tr>
+        <tr>
+          <th>Patient Name</th>
+          <th width="100px">MR No.</th>
+          <th>Date of Birth</th>
+          <th width="100px" style="white-space: nowrap">App Date</th>
+          <th>Time Slot</th>
+          <th>Doctor</th>
+          <th>Hospital</th>
+          <th>Phone Number</th>
+          <th>Note</th>
+          <th>Action</th>
+        </tr>
+      </thead>
+
+      <tbody>
+
+        <tr>
+          <td>
+            <div class="inner-addon right-addon">
+              <input type="text" class="form-control filter-input filter" placeholder="Filter by name"
+                [(ngModel)]="keywordsModel.patientName" (change)="getRescheduleWorklist()" />
+            </div>
+          </td>
+          <td></td>
+          <td></td>
+          <td></td>
+          <td></td>
+          <td></td>
+          <td></td>
+          <td></td>
+          <td></td>
+          <td></td>
+        </tr>
+
+        <tr *ngFor="let r of aidoAppointments; let i = index">
+          <td>{{r.patient_name != null ? r.patient_name.substr(0,30) : ''}}</td>
+          <td>{{ r.medical_record_number }}</td>
+          <td>{{ r.birth_date }}</td>
+          <td style="white-space: nowrap">{{ r.appointment_date }}</td>
+          <td>{{ r.appointment_from_time }} - {{ r.appointment_to_time }}</td>
+          <td>{{ r.doctor_name }}</td>
+          <td>{{ r.hospital_alias }}</td>
+          <td>{{ r.phone_number_1 }}</td>
+          <td><a ngbPopover="{{r.note}}" popoverTitle=""
+              triggers="mouseenter:mouseleave">{{r.note && r.note.length > 30 ? r.note.substr(0,30)+"..." : r.note}}</a>
+          </td>
+          <td>
+            <div>
+              <button (click)="verifyAppointment(r.appointment_temp_id)" class="btn ms_btn_green">Check</button>
+            </div>
+          </td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+
+  <div class="pagination-bottom">
+    <button *ngIf="isCanPrevPage" (click)="prevPage()" class="btn ms_btn_blue">
+      <img src="{{assetPath}}icons/ic_ArrowRight_White.png"> Prev
+    </button>
+    <span style="width:10px">&nbsp;</span>
+    <button *ngIf="isCanNextPage" (click)="nextPage()" class="btn ms_btn_blue">
+      Next <img src="{{assetPath}}icons/ic_ArrowLeft_White.png">
+    </button>
+  </div>

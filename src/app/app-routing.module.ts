@@ -48,6 +48,11 @@ const routes: Routes = [
     loadChildren: './views/pages/page-reschedule-worklist/page-reschedule-worklist.module#PageRescheduleWorklistModule',
   },
   {
+    path: 'teleconsultation-worklist',
+    canActivate: [AuthGuard],
+    loadChildren: './views/pages/page-aido-worklist/page-aido-worklist.module#PageAidoWorklistModule',
+  },
+  {
     path: 'send-notification',
     canActivate: [AuthGuard],
     loadChildren: './views/pages/page-send-notification/page-send-notification.module#PageSendNotificationModule',

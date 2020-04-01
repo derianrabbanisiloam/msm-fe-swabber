@@ -12,8 +12,8 @@ import { ModalRescheduleAppointmentComponent } from '../modal-reschedule-appoint
 import { RescheduleAppointment } from '../../../models/appointments/reschedule-appointment';
 import { environment } from '../../../../environments/environment';
 import {
-  ModalPatientVerificationComponent
-} from '../../widgets/modal-patient-verification/modal-patient-verification.component';
+  ModalVerificationAidoComponent
+} from '../../widgets/modal-verification-aido/modal-verification-aido.component';
 
 @Component({
   selector: 'app-widget-aido-worklist',
@@ -59,6 +59,15 @@ export class WidgetAidoWorklistComponent implements OnInit {
     this.initializeDateRangePicker();
     this.getCollectionAlert();
     this.getAidoWorklist();
+    this.emitVerifyApp();
+  }
+
+  emitVerifyApp() {
+    this.appointmentService.verifyAppSource$.subscribe(
+      async () => {
+        await this.getAidoWorklist();
+      }
+    );
   }
 
   getDoctors(hospitalId: string) {
@@ -108,52 +117,33 @@ export class WidgetAidoWorklistComponent implements OnInit {
     }
     const {
       hospitalId = '', fromDate = this.todayDateISO, toDate = this.todayDateISO,
-      patientName = '', offset = 0, limit = 10
+      patientName = '', doctorId = '', offset = 0, limit = 10
     } = this.keywordsModel;
     this.appointmentService.getAidoWorklist(
       hospitalId,
       fromDate,
       toDate,
       patientName,
+      doctorId,
       offset,
       limit
     ).subscribe(
       data => {
-        // this.aidoAppointments = data.data;
-        // this.aidoAppointments.map(x => {
-        //   x.birth_date = moment(x.birth_date).format('DD-MM-YYYY');
-        //   x.appointment_date = moment(x.appointment_date).format('DD-MM-YYYY');
-        //   x.appointment_from_time = x.appointment_from_time.substr(0, 5);
-        //   x.appointment_to_time = x.appointment_to_time.substr(0, 5);
-        // });
+        this.aidoAppointments = data.data;
+        this.aidoAppointments.map(x => {
+          x.data_of_birth = moment(x.data_of_birth).format('DD-MM-YYYY');
+          x.appointment_date = moment(x.appointment_date).format('DD-MM-YYYY');
+          x.appointment_from_time = x.appointment_from_time.substr(0, 5);
+          x.appointment_to_time = x.appointment_to_time.substr(0, 5);
+        });
         this.isCanNextPage = this.aidoAppointments.length >= 10 ? true : false;
       }
     );
-    this.aidoAppointments = [
-      {
-        appointment_temp_id: 13876,
-        patient_name: 'Rimuru',
-        medical_record_number: 12382,
-        birth_date: '07-07-1994',
-        appointment_date: '2020-03-30',
-        appointment_from_time: '16:00',
-        appointment_to_time: '17:00',
-        doctor_name: 'albert agung',
-        hospital_alias: 'SHLV',
-        phone_number_1: '08292737449',
-        note: ''
-      }
-    ]
   }
 
-  async verifyAppointment(appointmentId: string, temp = false) {
-    await this.appointmentService.getTempAppointment(appointmentId).toPromise().then(
-      data => {
-        this.detailTemp = data.data;
-        const modalRef = this.modalService.open(ModalPatientVerificationComponent, { windowClass: 'modal_verification', size: 'lg' });
-        modalRef.componentInstance.tempAppointmentSelected = this.detailTemp;
-      }
-    );
+  async verifyAppointment(data) {
+    const modalRef = this.modalService.open(ModalVerificationAidoComponent, { windowClass: 'modal_verification', size: 'lg' });
+        modalRef.componentInstance.appointmentAidoSelected = data;
   }
 
   private page: number = 0;

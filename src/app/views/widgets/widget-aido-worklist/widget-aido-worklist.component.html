@@ -14,18 +14,17 @@
     <table class="table">
       <thead>
         <tr>
-          <th class="header-2" colspan="9" style="padding: 0.5vw 1.5vw">TeleConsultation Worklist</th>
+          <th class="header-2" colspan="10" style="padding: 0.5vw 1.5vw">TeleConsultation Worklist</th>
         </tr>
         <tr>
           <th>Patient Name</th>
-          <th width="100px">MR No.</th>
           <th>Date of Birth</th>
-          <th width="100px" style="white-space: nowrap">App Date</th>
-          <th>Time Slot</th>
-          <th>Doctor</th>
-          <th>Hospital</th>
           <th>Phone Number</th>
-          <th>Note</th>
+          <th>Address</th>
+          <th width="100px" style="white-space: nowrap">App Date</th>
+          <th>Appointment Time</th>
+          <th>Doctor</th>
+          <th>Modified By</th>
           <th>Action</th>
         </tr>
       </thead>
@@ -36,7 +35,7 @@
           <td>
             <div class="inner-addon right-addon">
               <input type="text" class="form-control filter-input filter" placeholder="Filter by name"
-                [(ngModel)]="keywordsModel.patientName" (change)="getRescheduleWorklist()" />
+                [(ngModel)]="keywordsModel.patientName" (change)="getAidoWorklist()" />
             </div>
           </td>
           <td></td>
@@ -44,27 +43,42 @@
           <td></td>
           <td></td>
           <td></td>
-          <td></td>
-          <td></td>
+          <td style="white-space: nowrap">
+            <div class="tab-pane fade show active" id="doctor-pane" role="tabpanel" aria-labelledby="home-tab">
+              <div class="form-group">
+                <div class="ng-autocomplete" class="angular-autocomplete">
+                  <ng-autocomplete placeHolder="Search Doctor..." [data]="doctors" searchKeyword="name"
+                    (selected)='getAidoWorklist($event)' [itemTemplate]="itemTemplateDoctor"
+                    [notFoundTemplate]="notFoundTemplate">
+                  </ng-autocomplete>
+
+                  <ng-template #itemTemplateDoctor let-item>
+                    <a [innerHTML]="item.name"></a>
+                  </ng-template>
+
+                  <ng-template #notFoundTemplate let-notFound>
+                    <div [innerHTML]="notFound"></div>
+                  </ng-template>
+                </div>
+              </div>
+            </div>
+          </td>
           <td></td>
           <td></td>
         </tr>
 
         <tr *ngFor="let r of aidoAppointments; let i = index">
-          <td>{{r.patient_name != null ? r.patient_name.substr(0,30) : ''}}</td>
-          <td>{{ r.medical_record_number }}</td>
-          <td>{{ r.birth_date }}</td>
+          <td>{{r.contact_name != null ? r.contact_name.substr(0,30) : ''}}</td>
+          <td>{{ r.date_of_birth }}</td>
+          <td>{{ r.phone_number }}</td>
+          <td>{{r.delivery_address}}</td>
           <td style="white-space: nowrap">{{ r.appointment_date }}</td>
           <td>{{ r.appointment_from_time }} - {{ r.appointment_to_time }}</td>
           <td>{{ r.doctor_name }}</td>
-          <td>{{ r.hospital_alias }}</td>
-          <td>{{ r.phone_number_1 }}</td>
-          <td><a ngbPopover="{{r.note}}" popoverTitle=""
-              triggers="mouseenter:mouseleave">{{r.note && r.note.length > 30 ? r.note.substr(0,30)+"..." : r.note}}</a>
-          </td>
+          <td>{{r.modified_by}}</td>
           <td>
             <div>
-              <button (click)="verifyAppointment(r.appointment_temp_id)" class="btn ms_btn_green">Check</button>
+              <button (click)="verifyAppointment(r)" class="btn ms_btn_green">Check</button>
             </div>
           </td>
         </tr>

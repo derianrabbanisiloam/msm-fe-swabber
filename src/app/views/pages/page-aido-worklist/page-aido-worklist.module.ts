@@ -14,8 +14,8 @@ import { SectionFooterModule } from '../../sections/section-footer/section-foote
 import { PageAidoWorklistRoutingModule } from './page-aido-worklist-routing.module';
 import { PageAidoWorklistComponent } from './page-aido-worklist.component';
 import { WidgetAidoWorklistComponent } from '../../widgets/widget-aido-worklist/widget-aido-worklist.component';
-import { ModalPatientVerificationModule } from '../../widgets/modal-patient-verification/modal-patient-verification.module';
-import { ModalPatientVerificationComponent } from '../../widgets/modal-patient-verification/modal-patient-verification.component';
+import { ModalVerificationAidoComponent } from '../../widgets/modal-verification-aido/modal-verification-aido.component';
+import { ModalVerificationAidoModule } from '../../widgets/modal-verification-aido/modal-verification-aido.module';
 
 @NgModule({
   declarations: [
@@ -36,10 +36,10 @@ import { ModalPatientVerificationComponent } from '../../widgets/modal-patient-v
     SectionHeaderModule,
     SectionSidebarModule,
     SectionFooterModule,
-    ModalPatientVerificationModule
+    ModalVerificationAidoModule
   ],
   entryComponents: [
-    ModalPatientVerificationComponent,
+    ModalVerificationAidoComponent,
   ]
 })
 export class PageAidoWorklistModule { }

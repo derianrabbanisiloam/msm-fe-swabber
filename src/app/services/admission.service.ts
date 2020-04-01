@@ -33,6 +33,12 @@ export class AdmissionService {
     return this.http.get<any>(url, httpOptions);
   }
 
+  createAdmissionAido(payload: any): Observable<any> {
+    const url = `${this.admissionUrl}/aido`;
+    const body = JSON.stringify(payload);
+    return this.http.post<any>(url, body, httpOptions);
+  }
+
   private handleError<T>(operation = 'operation', result?: T) {
     return (error: any): Observable<T> => {
 

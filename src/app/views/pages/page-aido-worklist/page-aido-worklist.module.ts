@@ -2,7 +2,7 @@ import { NgModule } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { 
-  NgbPaginationModule, NgbModalModule, NgbPopoverModule, NgbProgressbarModule,
+  NgbPaginationModule, NgbModalModule, NgbPopoverModule, NgbProgressbarModule, NgbAlertModule
 } from '@ng-bootstrap/ng-bootstrap';
 
 import { AutocompleteLibModule } from 'angular-ng-autocomplete';
@@ -36,7 +36,8 @@ import { ModalVerificationAidoModule } from '../../widgets/modal-verification-ai
     SectionHeaderModule,
     SectionSidebarModule,
     SectionFooterModule,
-    ModalVerificationAidoModule
+    ModalVerificationAidoModule,
+    NgbAlertModule
   ],
   entryComponents: [
     ModalVerificationAidoComponent,

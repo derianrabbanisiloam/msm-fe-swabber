@@ -126,6 +126,7 @@ input[type="date" i]::-webkit-inner-spin-button, input[type="date"]::-webkit-cal
 .ms_btn_red{ background: #C43D32; color: white}
 .ms_btn_red:active{ background: #a2342a; color: white}
 .ms_btn_green{ background: #4D9B35; color: white}
+.ms_btn_blue{ background: dodgerblue; color: white}
 .ms_btn_green_light { background: chartreuse; color: white}
 .ms_btn_green:active{ background: #42852e; color: white}
 .ms_btn_black{ background: #000000; color: white}

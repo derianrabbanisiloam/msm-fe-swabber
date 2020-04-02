@@ -8,7 +8,6 @@ import { TextMaskModule } from 'angular2-text-mask';
 
 import { ModalVerificationAidoComponent } from './modal-verification-aido.component';
 
-
 @NgModule({
   declarations: [
     ModalVerificationAidoComponent,

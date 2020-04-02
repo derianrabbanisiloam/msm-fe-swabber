@@ -136,12 +136,16 @@ export class AppointmentService {
     toDate: string,
     name?: string,
     doctor?: string,
+    isDoubleMr?: boolean,
+    admStatus?: string,
     offset?: number,
     limit?: number
   ): Observable<any> {
     let url = `${this.aidoWorklistUrl}/hospital/${hospitalId}?fromDate=${fromDate}&toDate=${toDate}`;
     url = name ? `${url}&patientName=${name}` : url;
     url = doctor ? `${url}&doctorId=${doctor}` : url;
+    url = isDoubleMr ? `${url}&isDoubleMr=${isDoubleMr}` : url;
+    url = admStatus ? `${url}&admStatus=${admStatus}` : url;
     url = `${url}&limit=${limit}&offset=${offset}`;
     
     // return of(APPOINTMENT)

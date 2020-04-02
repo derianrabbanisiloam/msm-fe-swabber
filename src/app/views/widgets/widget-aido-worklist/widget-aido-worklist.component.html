@@ -59,7 +59,7 @@
             <i class="glyphicon fa fa-search"></i>
             <div class="ng-autocomplete" class="angular-autocomplete">
               <ng-autocomplete placeHolder="Search Doctor..." [data]="doctors" searchKeyword="name"
-                (selected)='getAidoWorklist($event)' [itemTemplate]="itemTemplateDoctor"
+                (selected)='getAidoWorklist($event)' (inputCleared)='getAidoWorklist()' [itemTemplate]="itemTemplateDoctor"
                 [notFoundTemplate]="notFoundTemplate">
               </ng-autocomplete>
 
@@ -121,14 +121,16 @@
             </div>
           </div>
         </td>
-        <td style="text-align: center">{{r.modified_by}}</td>
+        <td style="text-align: center; font-size: 11px;">{{r.modified_by}}</td>
         <td style="text-align: center; width: 4vw">
+        <div *ngIf="r.admission_status_id != 2">
           <div *ngIf="r.is_double_mr === true">
             <button (click)="verifyAppointment(r)" class="btn ms_btn_blue" style="font-size: 10px;">Verify MR</button>
           </div>
           <div *ngIf="r.is_double_mr === false">
             <button (click)="createAdmModal(r, confirmAdmission)" class="btn ms_btn_green" style="font-size: 11px;">Create</button>
           </div>
+        </div>
         </td>
       </tr>
 

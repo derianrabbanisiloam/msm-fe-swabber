@@ -116,11 +116,10 @@ export class WidgetAidoWorklistComponent implements OnInit {
   }
 
   getAidoWorklist(doctor?: any) {
+    this.aidoAppointments = null;
     this.showWaitMsg = true;
     this.showNotFoundMsg = false;
-    if (doctor) {
-      this.keywordsModel.doctorId = doctor.doctor_id;
-    }
+    this.keywordsModel.doctorId = doctor ? doctor.doctor_id : '';
     const {
       hospitalId = '', fromDate = this.todayDateISO, toDate = this.todayDateISO,
       patientName = '', doctorId = '', isDoubleMr = null, admStatus = '', offset = 0, limit = 10
@@ -150,6 +149,7 @@ export class WidgetAidoWorklistComponent implements OnInit {
           this.isCanNextPage = this.aidoAppointments.length >= 10 ? true : false;
         }
         else {
+          this.aidoAppointments = null;
           this.showWaitMsg = false;
           this.showNotFoundMsg = true;
         }

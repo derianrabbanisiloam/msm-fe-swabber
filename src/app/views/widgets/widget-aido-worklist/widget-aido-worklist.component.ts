@@ -141,7 +141,7 @@ export class WidgetAidoWorklistComponent implements OnInit {
           this.showNotFoundMsg = false;
           this.aidoAppointments = data.data;
           this.aidoAppointments.map(x => {
-            x.data_of_birth = moment(x.data_of_birth).format('DD-MM-YYYY');
+            x.date_of_birth = moment(x.date_of_birth).format('DD-MM-YYYY');
             x.appointment_date = moment(x.appointment_date).format('DD-MM-YYYY');
             x.appointment_from_time = x.appointment_from_time.substr(0, 5);
             x.appointment_to_time = x.appointment_to_time.substr(0, 5);

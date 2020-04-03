@@ -12,7 +12,7 @@
 
 <div class="fo_container_list shadow-4">
   <table class="table table-bordered">
-    <thead class="fo_color_blue foot-note">
+    <thead class="fo_color_blue foot-note" style="text-align: center;">
       <th style="min-width: 14em">
         Patient Name
       </th>
@@ -58,8 +58,8 @@
           <div class="inner-addon right-addon">
             <i class="glyphicon fa fa-search"></i>
             <div class="ng-autocomplete" class="angular-autocomplete">
-              <ng-autocomplete placeHolder="Search Doctor..." [data]="doctors" searchKeyword="name"
-                (selected)='getAidoWorklist($event)' (inputCleared)='getAidoWorklist()' [itemTemplate]="itemTemplateDoctor"
+              <ng-autocomplete placeHolder="Search Doctor..." [data]="doctors" searchKeyword="name" [(ngModel)]="keywordsModel.doctorId"
+                (selected)='getAidoWorklist()' (inputCleared)='getAidoWorklist()' [itemTemplate]="itemTemplateDoctor"
                 [notFoundTemplate]="notFoundTemplate">
               </ng-autocomplete>
 
@@ -90,7 +90,9 @@
 
       <tr *ngFor="let r of aidoAppointments; let i = index">
         <td style="text-transform: uppercase">
-          {{ r.contact_name }}
+          <a ngbPopover="{{r.contact_name}}" popoverTitle=""
+            triggers="mouseenter:mouseleave">{{r.contact_name && r.contact_name.length > 30 ?
+               r.contact_name.substr(0,30)+"..." : r.contact_name}}</a>
         </td>
         <td style="width: 1%;">{{ r.date_of_birth }}</td>
         <td style="text-align: center; white-space: nowrap; width: 1%">
@@ -104,25 +106,37 @@
           </div>
         </td>
         <td style="text-align: center">{{ r.phone_number }}</td>
-        <td style="text-align: center; white-space: nowrap;">{{r.delivery_address}}</td>
+        <td style="text-align: center; white-space: nowrap;">
+          <a ngbPopover="{{r.delivery_address}}" popoverTitle=""
+            triggers="mouseenter:mouseleave">{{r.delivery_address && r.delivery_address.length > 10 ?
+               r.delivery_address.substr(0,10)+"..." : r.delivery_address}}</a>
+        </td>
         <td style="text-align: center; white-space: nowrap;">{{ r.appointment_date }}</td>
         <td style="min-width: 8em">{{ r.appointment_from_time }} - {{ r.appointment_to_time }}</td>
-        <td class="kolom-type">{{ r.doctor_name }}</td>
+        <td class="kolom-type">
+          <a ngbPopover="{{r.doctor_name}}" popoverTitle=""
+            triggers="mouseenter:mouseleave">{{r.doctor_name && r.doctor_name.length > 30 ?
+               r.doctor_name.substr(0,30)+"..." : r.doctor_name}}</a>
+        </td>
         <td style="text-align: center">
           <div style="color: white;">
-            <div style="background: yellow; border-radius: 2em;" *ngIf="r.admission_status_id == 1">
+            <div style="background: #CFC900; border-radius: 1em; padding: 0.2em" *ngIf="r.admission_status_id == 1">
               <span>Not Processed</span>
             </div>
-            <div style="background: green; border-radius: 2em;" *ngIf="r.admission_status_id == 2">
+            <div style="background: green; border-radius: 1em;" *ngIf="r.admission_status_id == 2">
               <span>Success</span>
             </div>
-            <div style="background: red; border-radius: 2em;" *ngIf="r.admission_status_id == 3">
+            <div style="background: red; border-radius: 1em;" *ngIf="r.admission_status_id == 3">
               <span>Failed</span>
             </div>
           </div>
         </td>
-        <td style="text-align: center; font-size: 11px;">{{r.modified_by}}</td>
-        <td style="text-align: center; width: 4vw">
+        <td style="text-align: center; font-size: 11px;">
+          <a ngbPopover="{{r.modified_by}}" popoverTitle=""
+            triggers="mouseenter:mouseleave">{{r.modified_by && r.modified_by.length > 15 ?
+               r.modified_by.substr(0,15)+"..." : r.modified_by}}</a>
+        </td>
+        <td style="text-align: center; min-width: 8em">
         <div *ngIf="r.admission_status_id != 2">
           <div *ngIf="r.is_double_mr === true">
             <button (click)="verifyAppointment(r)" class="btn ms_btn_blue" style="font-size: 10px;">Verify MR</button>

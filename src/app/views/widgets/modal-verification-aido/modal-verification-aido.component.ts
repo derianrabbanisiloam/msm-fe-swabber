@@ -79,7 +79,7 @@ export class ModalVerificationAidoComponent implements OnInit {
     if (!this.searchPatientModel) {
       this.searchPatientModel = {
         patientName: this.appointmentAidoSelected.contact_name,
-        patientBirth: moment(this.appointmentAidoSelected.date_of_birth).format('DD-MM-YYYY'),
+        patientBirth: this.appointmentAidoSelected.date_of_birth,
         hospitalId: this.appointmentAidoSelected.hospital_id,
       };
     }

@@ -38,8 +38,6 @@ export class WidgetAidoWorklistComponent implements OnInit {
   public datePickerModel: any = {};
   public hospitalFormModel: any;
   public keywordsModel: KeywordsModel = new KeywordsModel;
-  public keywordTemp: any;
-  public keywordTempTwo: any;
   public maskBirth = [/\d/, /\d/, '-', /\d/, /\d/, '-', /\d/, /\d/, /\d/, /\d/];
   public alerts: Alert[] = [];
   public showWaitMsg: boolean = false;

@@ -38,6 +38,8 @@ export class WidgetAidoWorklistComponent implements OnInit {
   public datePickerModel: any = {};
   public hospitalFormModel: any;
   public keywordsModel: KeywordsModel = new KeywordsModel;
+  public keywordTemp: any;
+  public keywordTempTwo: any;
   public maskBirth = [/\d/, /\d/, '-', /\d/, /\d/, '-', /\d/, /\d/, /\d/, /\d/];
   public alerts: Alert[] = [];
   public showWaitMsg: boolean = false;
@@ -45,6 +47,11 @@ export class WidgetAidoWorklistComponent implements OnInit {
   public isCanPrevPage: boolean = false;
   public isCanNextPage: boolean = false;
   public closeResult: string;
+  public count: number = -1;
+  public bodyKeyword: any = { valueOne: null, valueTwo: null, valueThree: null, valueFour: null,
+    valueFive: null, valueSix: null, valueSeven: null };
+  public bodyKeywordTwo: any = { valueOne: null, valueTwo: null, valueThree: null, valueFour: null,
+    valueFive: null, valueSix: null, valueSeven: null };
   constructor(
     private appointmentService: AppointmentService,
     private doctorService: DoctorService,
@@ -115,24 +122,56 @@ export class WidgetAidoWorklistComponent implements OnInit {
     }
   }
 
-  getAidoWorklist(doctor?: any) {
+  async getAidoWorklist() {
+    this.count+=1;
     this.aidoAppointments = null;
     this.showWaitMsg = true;
     this.showNotFoundMsg = false;
-    this.keywordsModel.doctorId = doctor ? doctor.doctor_id : '';
+    let offsetTemp;
     const {
       hospitalId = '', fromDate = this.todayDateISO, toDate = this.todayDateISO,
-      patientName = '', doctorId = '', isDoubleMr = null, admStatus = '', offset = 0, limit = 10
-    } = this.keywordsModel;
+      patientName = '', doctorId, isDoubleMr = null, admStatus = '', offset = 0, limit = 10
+    } = await this.keywordsModel;
+    offsetTemp = offset;
+    
+    if(this.count === 0) {
+      this.bodyKeyword.valueOne = hospitalId, this.bodyKeyword.valueTwo = fromDate, this.bodyKeyword.valueThree = toDate;
+      this.bodyKeyword.valueFour = patientName, this.bodyKeyword.valueFive = doctorId ? doctorId.doctor_id : '';
+      this.bodyKeyword.valueSix = isDoubleMr, this.bodyKeyword.valueSeven = admStatus;
+
+      this.bodyKeywordTwo.valueOne = hospitalId, this.bodyKeywordTwo.valueTwo = fromDate, this.bodyKeywordTwo.valueThree = toDate;
+      this.bodyKeywordTwo.valueFour = patientName, this.bodyKeywordTwo.valueFive = doctorId ? doctorId.doctor_id : '';
+      this.bodyKeywordTwo.valueSix = isDoubleMr, this.bodyKeywordTwo.valueSeven = admStatus;
+    } else if(this.count > 0) {
+      this.bodyKeyword.valueOne = hospitalId, this.bodyKeyword.valueTwo = fromDate, this.bodyKeyword.valueThree = toDate;
+      this.bodyKeyword.valueFour = patientName, this.bodyKeyword.valueFive = doctorId ? doctorId.doctor_id : '';
+      this.bodyKeyword.valueSix = isDoubleMr, this.bodyKeyword.valueSeven = admStatus;
+
+      if(this.bodyKeyword.valueOne !== this.bodyKeywordTwo.valueOne || this.bodyKeyword.valueTwo !== this.bodyKeywordTwo.valueTwo ||
+        this.bodyKeyword.valueThree !== this.bodyKeywordTwo.valueThree || this.bodyKeyword.valueFour !== this.bodyKeywordTwo.valueFour ||
+        this.bodyKeyword.valueFive !== this.bodyKeywordTwo.valueFive || this.bodyKeyword.valueSix !== this.bodyKeywordTwo.valueSix ||
+        this.bodyKeyword.valueSeven !== this.bodyKeywordTwo.valueSeven) {    
+          this.bodyKeywordTwo.valueOne = hospitalId, this.bodyKeywordTwo.valueTwo = fromDate, this.bodyKeywordTwo.valueThree = toDate;
+          this.bodyKeywordTwo.valueFour = patientName, this.bodyKeywordTwo.valueFive = doctorId ? doctorId.doctor_id : '';
+          this.bodyKeywordTwo.valueSix = isDoubleMr, this.bodyKeywordTwo.valueSeven = admStatus;
+        
+          this.page = 0;
+          offsetTemp = 0;
+          this.keywordsModel.offset = offsetTemp;
+          this.isCanPrevPage = offsetTemp === 0 ? false : true;
+      }
+    }
+
+    let doctorSearch = doctorId ? doctorId.doctor_id : '';
     this.appointmentService.getAidoWorklist(
       hospitalId,
       fromDate,
       toDate,
       patientName,
-      doctorId,
+      doctorSearch,
       isDoubleMr,
       admStatus,
-      offset,
+      offsetTemp,
       limit
     ).subscribe(
       data => {
@@ -152,6 +191,7 @@ export class WidgetAidoWorklistComponent implements OnInit {
           this.aidoAppointments = null;
           this.showWaitMsg = false;
           this.showNotFoundMsg = true;
+          this.isCanNextPage = false;
         }
       }, error => {
        this.showWaitMsg = false;
@@ -261,7 +301,7 @@ class KeywordsModel {
   patientName: string;
   localMrNo: string;
   birthDate: string;
-  doctorId: string;
+  doctorId: any;
   isDoubleMr: boolean;
   admStatus: string;
   offset: number;

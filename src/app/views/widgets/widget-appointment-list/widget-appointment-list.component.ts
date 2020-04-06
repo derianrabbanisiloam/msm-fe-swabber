@@ -177,7 +177,8 @@ export class WidgetAppointmentListComponent implements OnInit {
     this.emitUpdateContact();
     this.getCollectionAlert();
 
-    this.socket.on(CANCEL_APP, (call) => {
+
+    this.socket.on(CANCEL_APP+'/'+this.hospital.id, (call) => {
       if (call.data.hospital_id == this.hospital.id
         && call.data.appointment_date == this.dateApp) {
         this.appList = this.appList.map((value) => {
@@ -188,7 +189,7 @@ export class WidgetAppointmentListComponent implements OnInit {
         });
       }
     });
-    this.socket.on(CHECK_IN, (call) => {
+    this.socket.on(CHECK_IN+'/'+this.hospital.id, (call) => {
       if (call.data.hospital_id == this.hospital.id
         && call.data.appointment_date == this.dateApp) {
         this.appList = this.appList.map((value) => {
@@ -202,7 +203,7 @@ export class WidgetAppointmentListComponent implements OnInit {
         });
       }
     });
-    this.socketTwo.on(QUEUE_NUMBER, (call) => {
+    this.socketTwo.on(QUEUE_NUMBER+'/'+this.hospital.id, (call) => {
       if (call.data.hospital_id == this.hospital.id
         && call.data.appointment_date == this.dateApp) {
         this.appList = this.appList.map((value) => {

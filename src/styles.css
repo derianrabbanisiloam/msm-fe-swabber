@@ -372,6 +372,10 @@ div{
 }
 .fo_btn_red{ background: #C43D32; color: white; border-radius: 4px; border: none}
 .fo_btn_black{ background: black; color: white}
+.fo_btn_black_new{ border: none;
+  background: black;
+  color: white;
+  border-radius: 4px;}
 .fo_btn_save{ width: 16rem; color: white; background: #4D9B35}
 .fo_btn_blue{ width: 16rem; color: white; background: #1A2269}
 .fo_btn_black{ width: 16rem; color: white; background: black}

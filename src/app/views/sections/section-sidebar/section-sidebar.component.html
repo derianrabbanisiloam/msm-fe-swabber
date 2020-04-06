@@ -125,6 +125,22 @@
 
 </div>
 <div class="container-button shadow-4">
+  <a class="side_button shadow-4" aria-expanded="false" href="/teleconsultation-worklist" target="_parent"
+    [routerLink]="['/teleconsultation-worklist']" [routerLinkActive]="['active']">
+
+    <div>
+      <img class="icon" src="{{assetPath}}icons/ic_RescheduleWorklist@2x.png">
+      <img class="icon" src="{{assetPath}}icons/ic_RescheduleWorklist_Yellow@2x.png">
+    </div>
+    <div class="header-3 collapse show width fo_minimized" popoverTitle="TeleConsultation Worklist"
+      ngbPopover="Melihat daftar pasien dari Aido" triggers="mouseenter:mouseleave" placement="right"
+      container="body">
+      <div class="fo_minimized_text">TeleConsultation Worklist</div>
+    </div>
+  </a>
+
+</div>
+<div class="container-button shadow-4">
   <a class="side_button shadow-4" aria-expanded="false" href="/doctor-notes" target="_parent"
     [routerLink]="['/doctor-notes']" [routerLinkActive]="['active']">
 

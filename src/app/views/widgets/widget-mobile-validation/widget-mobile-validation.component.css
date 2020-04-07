@@ -1,3 +1,39 @@
+.padding-input {
+  padding-left: 11em;
+}
+
+.padding-paragraf-left {
+  padding-left: 10em; 
+  padding-right: 6px;
+}
+
+.padding-paragraf-right {
+  padding-right: 10em; 
+  padding-left: 6px;
+}
+
+.padding-right {
+  padding-right: 10em;
+}
+
+.header-print {
+  font-weight: bold; 
+  font-size: 15pt; 
+  text-align: center; 
+  margin-top: 11em; 
+  margin-bottom: 2em;
+}
+
+.header-print-2 {
+  font-size: 13pt; 
+  text-align: center; 
+  margin-top: 2em;
+}
+
+.set-default {
+  text-align: left;
+}
+
 .spacing-row {
   margin-bottom: 1em;
 }
@@ -181,7 +217,15 @@
     display: none;
   }
   @media print {
-    #print-section {display: block;}
+    /* Apply this to your `table` element. */
+
+
+    #print-section {display: block; border-collapse: collapse;}
+    /* And this to your table's `td` elements. */
+    td {
+      border: 1px solid black;
+      padding: 0;
+    }
     #siloam-image {
       display: block;
       margin-left: auto;

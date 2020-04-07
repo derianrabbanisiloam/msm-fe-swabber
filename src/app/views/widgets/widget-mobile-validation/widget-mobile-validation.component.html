@@ -1,324 +1,342 @@
-<div *ngFor="let alert of alerts">
-    <ngb-alert *ngIf="alert" type="{{cssAlertType(alert)}}" (close)="removeAlert(alert)">{{ alert.message }}</ngb-alert>
-  </div>
-  
-  <div class="d-flex justify-content-start fo_container_container_list">
-    <div class="fo_validation_list fo_container_list shadow-3">
-      <div class="">
-        <table class="table">
-          <thead>
-            <tr>
-              <th class="fo_list_header">
-                <div>
-                  Mobile Account
+<div class="unprintable" *ngFor="let alert of alerts">
+  <ngb-alert *ngIf="alert" type="{{cssAlertType(alert)}}" (close)="removeAlert(alert)">{{ alert.message }}</ngb-alert>
+</div>
+
+<div class="d-flex justify-content-start fo_container_container_list">
+  <div class="fo_validation_list fo_container_list shadow-3 unprintable">
+    <div class="">
+      <table class="table">
+        <thead>
+          <tr>
+            <th class="fo_list_header">
+              <div>
+                Mobile Account
+              </div>
+              <div style="font-size: 10px;">
+                <img style="width: 20px; height: 20px" src="../../../../assets/icons/ic_mobile_linked_mr.svg">
+                : Mobile Account Linked to MR <br>
+                <img style="width: 20px; height: 20px" src="../../../../assets/icons/ic_access_opened.svg">
+                : MR Access Opened
+              </div>
+            </th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr id="filter-quota" class="fo_grey">
+            <td class="fo_validation_filter">
+              <div class="input-group">
+                <input class="form-control input-patient" placeholder="Filter by Phone Number" name="searchString"
+                  [(ngModel)]="keywords.searchString" (change)="getListAccount()" ngbTooltip="Press 'Enter' to Search">
+              </div>
+            </td>
+          </tr>
+          <tr>
+            <td *ngIf="showNotFoundMsg" colspan="1">Displaying no data</td>
+            <td *ngIf="showWaitMsg" colspan="1">
+              <ngb-progressbar value="1000">Loading...</ngb-progressbar>
+            </td>
+          </tr>
+        </tbody>
+
+        <tbody class="quota-list">
+            <tr *ngFor="let itr of accountList" 
+            [ngClass]="{'selectedPatient': selectedAccount && itr.contact_id == selectedAccount.contact_id}" (click)="choosedAccount(itr)">
+              <td>
+                <div class="fo_validation_list_name">{{itr.name}}</div>
+                <div class="fo_validation_list_date">{{itr.birth_date}}</div>
+                <div class="fo_validation_list_name">
+                  <span>{{itr.phone_number_1}}</span>
+                  <span style="float: right;">
+                    <span class="mobile-status-1" *ngIf="itr.mobile_status === mobileStatus.ACTIVE && itr.contact_status_id === contactStatus.VERIFIED">
+                      <img style="width: 30px; height: 30px" src="../../../../assets/icons/ic_mobile_linked_mr.svg">
+                    </span>
+                    <span class="mobile-status-2" *ngIf="itr.mobile_status === mobileStatus.ACCESSED">
+                      <img style="width: 30px; height: 30px" src="../../../../assets/icons/ic_access_opened.svg">
+                    </span>
+                  </span>
                 </div>
-                <div style="font-size: 10px;">
-                  <img style="width: 20px; height: 20px" src="../../../../assets/icons/ic_mobile_linked_mr.svg">
-                  : Mobile Account Linked to MR <br>
-                  <img style="width: 20px; height: 20px" src="../../../../assets/icons/ic_access_opened.svg">
-                  : MR Access Opened
-                </div>
-              </th>
-            </tr>
-          </thead>
-          <tbody>
-            <tr id="filter-quota" class="fo_grey">
-              <td class="fo_validation_filter">
-                <div class="input-group">
-                  <input class="form-control input-patient" placeholder="Filter by Phone Number" name="searchString"
-                    [(ngModel)]="keywords.searchString" (change)="getListAccount()" ngbTooltip="Press 'Enter' to Search">
-                </div>
-              </td>
-            </tr>
-            <tr>
-              <td *ngIf="showNotFoundMsg" colspan="1">Displaying no data</td>
-              <td *ngIf="showWaitMsg" colspan="1">
-                <ngb-progressbar value="1000">Loading...</ngb-progressbar>
               </td>
             </tr>
           </tbody>
-  
-          <tbody class="quota-list">
-              <tr *ngFor="let itr of accountList" 
-              [ngClass]="{'selectedPatient': selectedAccount && itr.contact_id == selectedAccount.contact_id}" (click)="choosedAccount(itr)">
-                <td>
-                  <div class="fo_validation_list_name">{{itr.name}}</div>
-                  <div class="fo_validation_list_date">{{itr.birth_date}}</div>
-                  <div class="fo_validation_list_name">
-                    <span>{{itr.phone_number_1}}</span>
-                    <span style="float: right;">
-                      <span class="mobile-status-1" *ngIf="itr.mobile_status === mobileStatus.ACTIVE && itr.contact_status_id === contactStatus.VERIFIED">
-                        <img style="width: 30px; height: 30px" src="../../../../assets/icons/ic_mobile_linked_mr.svg">
-                      </span>
-                      <span class="mobile-status-2" *ngIf="itr.mobile_status === mobileStatus.ACCESSED">
-                        <img style="width: 30px; height: 30px" src="../../../../assets/icons/ic_access_opened.svg">
-                      </span>
-                    </span>
-                  </div>
-                </td>
-              </tr>
-            </tbody>
-        </table>
-      </div>
+      </table>
     </div>
-  
-    <div class="fo_container_list_2" *ngIf="selectedAccount">
-      <div class="row">
-        <div class="col-md-12">
-          <div style="background-color: white;">
-            <div class="progressbar-wrapper" style="height: 7em;">
-              <ul class="progressbar" style="margin-left: -21em; margin-right: -18em">
-                <li [ngClass]="{'active': (selectedAccount.mobile_status === mobileStatus.ACTIVE 
-                && selectedAccount.contact_status_id === contactStatus.VERIFIED) || (selectedAccount.mobile_status === mobileStatus.ACCESSED 
-                && selectedAccount.contact_status_id === contactStatus.VERIFIED)}">Mobile Account Linked to MR</li>
-                <li [ngClass]="{'active': (selectedAccount.mobile_status === mobileStatus.ACTIVE 
-                && selectedAccount.contact_status_id === contactStatus.ACCESSED) || (selectedAccount.mobile_status === mobileStatus.ACCESSED 
-                && selectedAccount.contact_status_id === contactStatus.VERIFIED)}">Patient Portal Registered</li>
-              </ul>
-            </div>
+  </div>
+
+  <div class="fo_container_list_2" *ngIf="selectedAccount">
+    <div class="row">
+      <div class="col-md-12">
+        <div style="background-color: white;">
+          <div class="progressbar-wrapper unprintable" style="height: 7em;">
+            <ul class="progressbar" style="margin-left: -21em; margin-right: -18em">
+              <li [ngClass]="{'active': (selectedAccount.mobile_status === mobileStatus.ACTIVE 
+              && selectedAccount.contact_status_id === contactStatus.VERIFIED) || (selectedAccount.mobile_status === mobileStatus.ACCESSED 
+              && selectedAccount.contact_status_id === contactStatus.VERIFIED)}">Mobile Account Linked to MR</li>
+              <li [ngClass]="{'active': (selectedAccount.mobile_status === mobileStatus.ACTIVE 
+              && selectedAccount.contact_status_id === contactStatus.ACCESSED) || (selectedAccount.mobile_status === mobileStatus.ACCESSED 
+              && selectedAccount.contact_status_id === contactStatus.VERIFIED)}">Patient Portal Registered</li>
+            </ul>
           </div>
         </div>
       </div>
-      <div class="row">
-        <div class="col-md-12">
-          <div style="background-color: white; margin-top: 1em">
-          <div *ngIf="loadingBar" style="text-align: center;">
-            <img src="../../../../assets/icons/Logo-Animation---S(FAST).gif" width="200px" height="200px">
-          </div>
-          <div *ngIf="selectedAccount.mobile_status === mobileStatus.ACTIVE 
-              && selectedAccount.contact_status_id === contactStatus.MOBILE_ACTIVE" style="min-height: 19em;">
-            <table>
-              <thead>
-                <th style="width: 19em; padding-left: 1.2em">Date of birth</th>
-                <th style="width: 19em; padding-left: 1.2em">Name</th>
-                <th></th>
-                <th style="width: 4em"></th>
-                <th style="width: 18em; padding-left: 0.2em">Local MR</th>
-                <th style="width: 4em"></th>
-              </thead>
-              <tbody>
-                <td>
-                  <input 
-                    style="width: 17em; margin-left: 1em"
-                    [textMask]="{mask: mask_birth}"
-                    type="text"
-                    [(ngModel)]="selectedAccount.birth_date"
-                    class="form-control"
-                    placeholder="dd-mm-yyyy"/>
-                </td>
-                <td>
-                  <input 
-                    style="width: 17em; margin-left: 1em" 
-                    class="form-control" 
-                    placeholder="Name" 
-                    type="text"
-                    [(ngModel)]="selectedAccount.name"/>
-                </td>
-                <td>
-                  <button class="btn-grey" type="button" (click)="getSearchedPatient1()">
-                    <i style="width: 1em; height: 1.5em" class="fa fa-search"></i>
-                  </button>
-                </td>
-                <td style="text-align: center;">or</td>
-                <td>
-                  <input 
-                  style="width: 17em;" 
-                  class="form-control" 
-                  placeholder="Local MR" 
+    </div>
+    <div class="row">
+      <div class="col-md-12">
+        <div class="unprintable" style="background-color: white; margin-top: 1em">
+        <div class="unprintable" *ngIf="loadingBar" style="text-align: center;">
+          <img src="../../../../assets/icons/Logo-Animation---S(FAST).gif" width="200px" height="200px">
+        </div>
+        <div *ngIf="selectedAccount.mobile_status === mobileStatus.ACTIVE 
+            && selectedAccount.contact_status_id === contactStatus.MOBILE_ACTIVE" style="min-height: 19em;">
+          <table>
+            <thead>
+              <th style="width: 19em; padding-left: 1.2em">Date of birth</th>
+              <th style="width: 19em; padding-left: 1.2em">Name</th>
+              <th></th>
+              <th style="width: 4em"></th>
+              <th style="width: 18em; padding-left: 0.2em">Local MR</th>
+              <th style="width: 4em"></th>
+            </thead>
+            <tbody>
+              <td>
+                <input 
+                  style="width: 17em; margin-left: 1em"
+                  [textMask]="{mask: mask_birth}"
                   type="text"
-                  [(ngModel)]="mrLocal"></td>
+                  [(ngModel)]="selectedAccount.birth_date"
+                  class="form-control"
+                  placeholder="dd-mm-yyyy"/>
+              </td>
+              <td>
+                <input 
+                  style="width: 17em; margin-left: 1em" 
+                  class="form-control" 
+                  placeholder="Name" 
+                  type="text"
+                  [(ngModel)]="selectedAccount.name"/>
+              </td>
+              <td>
+                <button class="btn-grey" type="button" (click)="getSearchedPatient1()">
+                  <i style="width: 1em; height: 1.5em" class="fa fa-search"></i>
+                </button>
+              </td>
+              <td style="text-align: center;">or</td>
+              <td>
+                <input 
+                style="width: 17em;" 
+                class="form-control" 
+                placeholder="Local MR" 
+                type="text"
+                [(ngModel)]="mrLocal"></td>
+              <td>
+                <button class="btn-grey" type="button" (click)="getSearchedPatient2()">
+                  <i style="width: 1em; height: 1.5em" class="fa fa-search"></i>
+                </button>
+              </td>
+            </tbody>
+          </table>
+          <table class="table table-bordered" style="margin-top: 1em">
+            <thead class="fo_color_blue foot-note">
+              <th style="min-width: 14em">Name</th>
+              <th style="min-width: 8em">Date of birth</th>
+              <th style="white-space: nowrap; text-align: center; min-width: 10em">Central MR</th>
+              <th>Hospital</th>
+              <th width="100px">Local MR</th>
+              <th>Mobile Number</th>
+              <th style="min-width: 13em">Address</th>
+              <th>Action</th>
+            </thead>
+            <tbody class="quota-list">
+              <tr *ngFor="let itr of patientHope"
+              [ngClass]="{'selectedPatient': selectPatient 
+              && itr.patientId == selectPatient.patientId 
+              && itr.patientOrganizationId == selectPatient.patientOrganizationId}" (click)="choosedSearchPatient(itr)">
+                <td>{{itr.name}}</td>
+                <td>{{itr.newBirthDate}}</td>
+                <td>{{itr.mrNo}}</td>
+                <td>{{itr.hospitalAlias}}</td>
+                <td>{{itr.mrNoUnit}}</td>
+                <td>{{itr.mobileNo1}}</td>
+                <td>{{itr.address}}</td>
                 <td>
-                  <button class="btn-grey" type="button" (click)="getSearchedPatient2()">
-                    <i style="width: 1em; height: 1.5em" class="fa fa-search"></i>
+                  <button type="button" class="btn-default" (click)="getPatientHopeId(itr, confirmEdit)">
+                    <i class="fa fa-edit"></i>
                   </button>
                 </td>
-              </tbody>
-            </table>
-            <table class="table table-bordered" style="margin-top: 1em">
-              <thead class="fo_color_blue foot-note">
-                <th style="min-width: 14em">Name</th>
-                <th style="min-width: 8em">Date of birth</th>
-                <th style="white-space: nowrap; text-align: center; min-width: 10em">Central MR</th>
-                <th>Hospital</th>
-                <th width="100px">Local MR</th>
-                <th>Mobile Number</th>
-                <th style="min-width: 13em">Address</th>
-                <th>Action</th>
-              </thead>
-              <tbody class="quota-list">
-                <tr *ngFor="let itr of patientHope"
-                [ngClass]="{'selectedPatient': selectPatient 
-                && itr.patientId == selectPatient.patientId 
-                && itr.patientOrganizationId == selectPatient.patientOrganizationId}" (click)="choosedSearchPatient(itr)">
-                  <td>{{itr.name}}</td>
-                  <td>{{itr.newBirthDate}}</td>
-                  <td>{{itr.mrNo}}</td>
-                  <td>{{itr.hospitalAlias}}</td>
-                  <td>{{itr.mrNoUnit}}</td>
-                  <td>{{itr.mobileNo1}}</td>
-                  <td>{{itr.address}}</td>
-                  <td>
-                    <button type="button" class="btn-default" (click)="getPatientHopeId(itr, confirmEdit)">
-                      <i class="fa fa-edit"></i>
-                    </button>
-                  </td>
-                </tr>
-              </tbody>
-              <tbody *ngIf="loadingBarTwo">
-                <tr>
-                  <td colspan="4" style="text-align: right">
-                    <img src="../../../../assets/icons/Logo-Animation---S(FAST).gif" width="200px" height="200px">
-                  </td>
-                </tr>
-              </tbody>
-              <tbody *ngIf="!patientHope && flagSearch && !loadingBarTwo">
-                <tr>
-                  <td colspan="7" style="text-align: center;">result not found</td>
-                </tr>
-              </tbody>
-              <tbody *ngIf="patientHope && flagSearch && !loadingBarTwo">
-                <tr>
-                  <td colspan="7" style="text-align: right">
-                    <button type="submit" class="fo_btn_registration fo_btn_save"
-                      [disabled]="!selectPatient"
-                      [ngStyle]="{ background: !selectPatient ? '#A5C39F' : '#4D9B35'}"
-                      data-toggle="modal" 
-                      data-target="#confirming" 
-                      data-dismiss="modal"
-                      (click)="openConfirmationModal(verify_patient)">Verify</button>
-                </tr>
-              </tbody>
-            </table>
+              </tr>
+            </tbody>
+            <tbody *ngIf="loadingBarTwo">
+              <tr>
+                <td colspan="4" style="text-align: right">
+                  <img src="../../../../assets/icons/Logo-Animation---S(FAST).gif" width="200px" height="200px">
+                </td>
+              </tr>
+            </tbody>
+            <tbody *ngIf="!patientHope && flagSearch && !loadingBarTwo">
+              <tr>
+                <td colspan="7" style="text-align: center;">result not found</td>
+              </tr>
+            </tbody>
+            <tbody *ngIf="patientHope && flagSearch && !loadingBarTwo">
+              <tr>
+                <td colspan="7" style="text-align: right">
+                  <button type="submit" class="fo_btn_registration fo_btn_save"
+                    [disabled]="!selectPatient"
+                    [ngStyle]="{ background: !selectPatient ? '#A5C39F' : '#4D9B35'}"
+                    data-toggle="modal" 
+                    data-target="#confirming" 
+                    data-dismiss="modal"
+                    (click)="openConfirmationModal(verify_patient)">Verify</button>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+        <div *ngIf="selectedAccount.mobile_status === mobileStatus.ACTIVE 
+          && selectedAccount.contact_status_id === contactStatus.VERIFIED
+          && dataContact && dataPatientHope && !loadingBar">
+          <div class="row">
+            <div class="col-md-9 mob_valid_1 unprintable" style="margin-top: 1em">
+              1. PATIENT DATA FOR CONSENT
+            </div>
+            <div class="col-md-3 mob_valid_1" style="margin-top: 1em">
+              <button class="fo_btn_registration_2 fo_btn_blue unprintable" (click)="dataContact.email_address ? printAll() : ''" style="margin-left: -3em">Print</button>
+              <i *ngIf="!dataContact.email_address" class="error-msg-2">* Email is required</i>
+            </div>
           </div>
-          <div *ngIf="selectedAccount.mobile_status === mobileStatus.ACTIVE 
-            && selectedAccount.contact_status_id === contactStatus.VERIFIED
-            && dataContact && dataPatientHope && !loadingBar">
-            <div class="row">
-              <div class="col-md-9 mob_valid_1" style="margin-top: 1em">
-                1. PATIENT DATA FOR CONSENT
+          <div class="row unprintable">
+            <div class="col-md-3">
+              <div class="row">
+                <div class="col-md-12 mob_valid_2">
+                  Name
+                </div>
               </div>
-              <div class="col-md-3 mob_valid_1" style="margin-top: 1em">
-                <button class="fo_btn_registration_2 fo_btn_blue" (click)="dataContact.email_address ? print() : ''" style="margin-left: -3em">Print</button>
-                <i *ngIf="!dataContact.email_address" class="error-msg-2">* Email is required</i>
-                <div id="print-section">
-                  <table class="table table-bordered" style="margin-top: 8em; margin-left: 4.5em; 
-                    margin-right: 5em; margin-bottom: 5em; width: 80%">
-                    <tr>
-                      <td style="font-weight: bold; text-align: center" colspan="3">Ijin Pembukaan Akses Data Medis / Authorization to Medical Records</td>
-                    </tr>
-                    <tr>
-                      <td style="padding-top: 2.5em" colspan="3">
-                        Yang bertandatangan di bawah ini saya : / The Undersigned below :
-                      </td>
-                    </tr>
-                    <tr>
-                      <td style="height: 2em; width: 50%; padding-left: 1em">Nama / Name</td>
-                      <td style="height: 2em; width: 2%">:</td>
-                      <td style="height: 2em;">{{dataContact.name}}</td>
-                    </tr>
-                    <tr>
-                      <td style="height: 2em; padding-left: 1em">No. MR Central / Central MR. Number</td>
-                      <td style="height: 2em;">:</td>
-                      <td style="height: 2em;">{{dataPatientHope.mrNo}}</td>
-                    </tr>
-                    <tr>
-                      <td style="height: 2em; padding-left: 1em">Tanggal Lahir/ DOB</td>
-                      <td style="height: 2em;">:</td>
-                      <td style="height: 2em;">{{selectedAccount.birth_date}}</td>
-                    </tr>
-                    <tr>
-                      <td style="height: 2em; padding-left: 1em">Nomor HP/ Mobile Number</td>
-                      <td style="height: 2em;">:</td>
-                      <td style="height: 2em;">{{dataContact.phone_number_1}}</td>
-                    </tr>
-                    <tr>
-                      <td style="height: 2em; padding-left: 1em">Email</td>
-                      <td style="height: 2em;">:</td>
-                      <td style="height: 2em;">{{dataContact.email_address}}</td>
-                    </tr>
-                    <tr>
-                      <td colspan="3" style="padding-top: 1.7em">
-                        <p style="text-align: justify; line-height: 1.5em;">Dengan ini mengizinkan Siloam Hospitals untuk membuka akses data medis saya di 
-                          seluruh Unit Siloam Hospitals untuk ditampilkan pada Mobile Application MySiloam
-                          /Hereby give permission to Siloam Hospitals to release my medical record data at all 
-                          Siloam Hospitals Unit to be displayed at MySiloam Mobile Application.</p>
-                      </td>
-                    </tr>
-                      <tr>
-                        <td colspan="3" style="padding-top: 1.7em">
-                          Persetujuan dan otorisasi ini berlaku untuk / This consent and authorization applies to
-                        </td>
-                      </tr>
-                      <tr>
-                        <td colspan="3">
-                          <div class="row">
-                            <div style="margin-left: 0.5em; margin-right: 0.5em; margin-top: 0.3em; float: left;">
-                              <img src="../../../../assets/icons/ic_dot.png" width="7px" height="7px">
-                            </div>
-                            <div>Hasil Laboratorium / Lab Result</div>
-                            <div class="clear: left;"></div>
-                          </div>
-                        </td>
-                      </tr>
-                      <tr>
-                        <td colspan="3">
-                          <div class="row">
-                            <div style="margin-left: 0.5em; margin-right: 0.5em; margin-top: 0.3em; float: left;">
-                              <img src="../../../../assets/icons/ic_dot.png" width="7px" height="7px">
-                            </div>
-                            <div>Hasil Radiologi / Radiology Result</div>
-                            <div class="clear: left;"></div>
-                          </div>
-                        </td>
-                      </tr>
-                      <tr>
-                        <td colspan="3">
-                          <div class="row">
-                            <div style="margin-left: 0.5em; margin-right: 0.5em; margin-top: 0.3em; float: left;">
-                              <img src="../../../../assets/icons/ic_dot.png" width="7px" height="7px">
-                            </div>
-                            <div>Resep / Prescription</div>
-                            <div class="clear: left;"></div>
-                          </div>
-                        </td>
-                      </tr>
-                      <tr>
-                        <td colspan="3">
-                          <div class="row">
-                            <div style="margin-left: 0.5em; margin-right: 0.5em; margin-top: 0.3em; float: left;">
-                              <img src="../../../../assets/icons/ic_dot.png" width="7px" height="7px">
-                            </div>
-                            <div>Tagihan / Ongoing Bill</div>
-                            <div class="clear: left;"></div>
-                          </div>
-                        </td>
-                      </tr>
-                      <tr>
-                        <td colspan="3" style="padding-top: 1.7em;">
-                          Yang bertandatangan / The Undersigned
-                        </td>
-                      </tr>
-                      <tr>
-                        <td style="padding-top: 5em;">
-                          <hr>
-                        </td>
-                      </tr>
-                      <tr>
-                        <td>
-                          Tanggal / date :
-                        </td>
-                      </tr>
-                      <tr>
-                        <td colspan="3" style="padding-top: 8.5em;">
-                          <hr style="margin-top: 0.01em; margin-bottom: 0.01em;">
-                          <hr style="margin-top: 0.01em; margin-bottom: 0.01em;">
-                        </td>
-                      </tr>
-                  </table>
+              <div class="row">
+                <div class="col-md-12 mob_valid_2">
+                  Date of Birth
+                </div>
+              </div>
+              <div class="row">
+                <div class="col-md-12 mob_valid_2">
+                  No. MR Central
+                </div>
+              </div>
+              <div class="row">
+                <div class="col-md-12 mob_valid_2">
+                  Mobile Number
+                </div>
+              </div>
+              <div class="row">
+                <div class="col-md-12 mob_valid_2">
+                  Email
                 </div>
               </div>
             </div>
-            <div class="row">
+            <div class="mob_valid_5">
+              <div class="row">
+                <div class="col-md-12 mob_valid_3">
+                  :
+                </div>
+              </div>
+              <div class="row">
+                <div class="col-md-12 mob_valid_3">
+                  :
+                </div>
+              </div>
+              <div class="row">
+                <div class="col-md-12 mob_valid_3">
+                  :
+                </div>
+              </div>
+              <div class="row">
+                <div class="col-md-12 mob_valid_3">
+                  :
+                </div>
+              </div>
+              <div class="row">
+                <div class="col-md-12 mob_valid_3">
+                  :
+                </div>
+              </div>
+            </div>
+            <div class="col-md-4">
+              <div class="row">
+                <div class="col-md-12 mob_valid_4">
+                    <input class="form-control mob_valid_6" type="text" [(ngModel)]="dataContact.name" disabled>
+                </div>
+              </div>
+              <div class="row">
+                <div class="col-md-12 mob_valid_4">
+                  <input class="form-control mob_valid_6" type="text" [(ngModel)]="selectedAccount.birth_date" disabled>
+                </div>
+              </div>
+              <div class="row">
+                <div class="col-md-12 mob_valid_4">
+                  <input class="form-control mob_valid_6" type="text" [(ngModel)]="dataPatientHope.mrNo" disabled>
+                </div>
+              </div>
+              <div class="row">
+                <div class="col-md-12 mob_valid_4">
+                  <input class="form-control mob_valid_6" type="text" [(ngModel)]="dataContact.phone_number_1" disabled>
+                </div>
+              </div>
+              <div class="row">
+                <div class="col-md-12 mob_valid_4">
+                  <input class="form-control mob_valid_6" type="text" [(ngModel)]="dataContact.email_address" #emailAddress="ngModel" required>
+                  <i *ngIf="f.submitted && !emailAddress.valid" class="error-msg">* Email is required</i>
+                </div>
+              </div>
+            </div>
+          </div>
+          <form [formGroup] = "uploadForm" (ngSubmit)="onSubmitUpload()" #f="ngForm" enctype="multipart/form-data">
+            <div class="row unprintable">
+              <div class="col-md-10 mob_valid_8">
+                <div class="image-upload">
+                    2. 
+                  <label>
+                    <div>
+                      <input formControlName="checkboxPatient" type="checkbox" style="width: 1.5vw; height: 1.5vw; position: absolute; margin-left: 0.5vw" (click)="checkDataPatient()" [(ngModel)]="checkData">
+                      <span style="margin-left: 2.5vw">PATIENT IDENTITY AND CONSENT CHECKED</span>
+                    </div>
+                  </label>
+                </div>
+              </div>
+              <div class="col-md-10 mob_valid_7">
+                <div class="image-upload">
+                  <label for="file-input">
+                    <img style="height: 3rem; width: 4rem; margin-left: 0.5em;margin-right: 0.5rem" src="../../../../assets/icons/ic_folder.png">
+                  </label>
+                    <input id="file-input" type="file" (change)="uploadDisclaimer($event)" accept="application/pdf, .jpg, .jpeg"/> UPLOAD DATA
+                    <img *ngIf="flagFile1" src="../../../../assets/icons/ic_checklist.png" style="width: 3em; height: 3em;">
+                    <div style="float: right;">
+                      <img *ngIf="flagFile1" src="../../../../assets/icons/ic_delete.svg" (click)="deleteDisclaimer()" style="width: 3em; height: 3em;">
+                    </div>
+                </div>
+                <div style="color: red; font-style: italic; font-size: 12px">
+                  * Format file JPG and PDF only
+                </div>
+              </div>
+            </div>
+            <div class="row unprintable">
+              <div class="col-md-12">
+                <div class="tar">
+                  <button type="submit" [disabled]="checkData === false" class="btn fo_btn_registration fo_btn_save">Save</button>
+                </div>
+              </div>
+            </div>
+          </form>
+        </div>
+        <div *ngIf="selectedAccount.mobile_status === mobileStatus.ACCESSED 
+          && selectedAccount.contact_status_id === contactStatus.VERIFIED
+          && dataContact && dataPatientHope && !loadingBar">
+          <div class="row">
+              <div class="col-md-9 mob_valid_1 unprintable" style="margin-top: 1em">
+                1. PATIENT DATA FOR CONSENT
+              </div>
+              <div class="col-md-3 mob_valid_1" style="margin-top: 1em">
+                <button class="fo_btn_registration_2 fo_btn_blue unprintable" (click)="dataContact.email_address ? printAll() : ''" style="margin-left: -3em">Print</button>
+                <i *ngIf="!dataContact.email_address" class="error-msg-2">* Email is required</i>
+              </div>
+            </div>
+            <div class="row unprintable">
               <div class="col-md-3">
                 <div class="row">
                   <div class="col-md-12 mob_valid_2">
@@ -396,18 +414,27 @@
                 </div>
                 <div class="row">
                   <div class="col-md-12 mob_valid_4">
-                    <input class="form-control mob_valid_6" type="text" [(ngModel)]="dataContact.email_address" #emailAddress="ngModel" required>
-                    <i *ngIf="f.submitted && !emailAddress.valid" class="error-msg">* Email is required</i>
+                    <input class="form-control mob_valid_6" type="text" [(ngModel)]="dataContact.email_address">
                   </div>
                 </div>
               </div>
+              <div *ngIf="getDisclaimer && formatFlag" class="col-md-4" style="padding: 0">
+                <iframe [src]="getDisclaimer" style="width:25em; height:17em;" frameborder="0"></iframe>
+                <hr>
+                <span>{{fileName}}</span>
+              </div>
+              <div *ngIf="getDisclaimer && !formatFlag" class="col-md-4" style="padding: 0">
+                <img style="width: 25em; height: 17em;" src="{{getDisclaimer}}">
+                <hr>
+                <span>{{fileName}}</span>
+              </div>
             </div>
-            <form [formGroup] = "uploadForm" (ngSubmit)="onSubmitUpload()" #f="ngForm" enctype="multipart/form-data">
-              <div class="row">
+            <form [formGroup] = "uploadForm" (ngSubmit)="onSubmitUpload()" enctype="multipart/form-data">
+              <div class="row unprintable">
                 <div class="col-md-10 mob_valid_8">
                   <div class="image-upload">
                       2. 
-                    <label>
+                    <label *ngIf="dataContact.email_address !== this.editEmail">
                       <div>
                         <input formControlName="checkboxPatient" type="checkbox" style="width: 1.5vw; height: 1.5vw; position: absolute; margin-left: 0.5vw" (click)="checkDataPatient()" [(ngModel)]="checkData">
                         <span style="margin-left: 2.5vw">PATIENT IDENTITY AND CONSENT CHECKED</span>
@@ -427,358 +454,469 @@
                       </div>
                   </div>
                   <div style="color: red; font-style: italic; font-size: 12px">
-                    * Format file JPG and PDF only
+                    * Format file JPG and PDF only (max 10MB)
                   </div>
                 </div>
               </div>
-              <div class="row">
+              <div class="row unprintable">
                 <div class="col-md-12">
                   <div class="tar">
-                    <button type="submit" [disabled]="checkData === false" class="btn fo_btn_registration fo_btn_save">Save</button>
+                    <div [ngStyle]="{ display: dataContact.email_address !== this.editEmail ? 'block' : 'none'}">
+                      <button type="submit" [disabled]="checkData === false" class="btn fo_btn_registration fo_btn_save">Save</button>
+                    </div>
+                    <div [ngStyle]="{ display: dataContact.email_address === this.editEmail ? 'block' : 'none'}">
+                      <button type="submit" class="btn fo_btn_registration fo_btn_save">Save</button>
+                    </div>
                   </div>
                 </div>
               </div>
             </form>
-          </div>
-          <div *ngIf="selectedAccount.mobile_status === mobileStatus.ACCESSED 
-            && selectedAccount.contact_status_id === contactStatus.VERIFIED
-            && dataContact && dataPatientHope && !loadingBar">
-            <div class="row">
-                <div class="col-md-9 mob_valid_1" style="margin-top: 1em">
-                  1. PATIENT DATA FOR CONSENT
-                </div>
-                <div class="col-md-3 mob_valid_1" style="margin-top: 1em">
-                  <button class="fo_btn_registration_2 fo_btn_blue" (click)="dataContact.email_address ? print() : ''" style="margin-left: -3em">Print</button>
-                  <i *ngIf="!dataContact.email_address" class="error-msg-2">* Email is required</i>
-                  <div id="print-section">
-                    <table class="table table-bordered" style="margin-top: 8em; margin-left: 4.5em; 
-                      margin-right: 5em; margin-bottom: 5em; width: 80%">
-                      <tr>
-                        <td style="font-weight: bold; text-align: center" colspan="3">Ijin Pembukaan Akses Data Medis / Authorization to Medical Records</td>
-                      </tr>
-                      <tr>
-                        <td style="padding-top: 2.5em" colspan="3">
-                          Yang bertandatangan di bawah ini saya : / The Undersigned below :
-                        </td>
-                      </tr>
-                      <tr>
-                        <td style="height: 2em; width: 50%; padding-left: 1em">Nama / Name</td>
-                        <td style="height: 2em; width: 2%">:</td>
-                        <td style="height: 2em;">{{dataContact.name}}</td>
-                      </tr>
-                      <tr>
-                        <td style="height: 2em; padding-left: 1em">No. MR Central / Central MR. Number</td>
-                        <td style="height: 2em;">:</td>
-                        <td style="height: 2em;">{{dataPatientHope.mrNo}}</td>
-                      </tr>
-                      <tr>
-                        <td style="height: 2em; padding-left: 1em">Tanggal Lahir/ DOB</td>
-                        <td style="height: 2em;">:</td>
-                        <td style="height: 2em;">{{selectedAccount.birth_date}}</td>
-                      </tr>
-                      <tr>
-                        <td style="height: 2em; padding-left: 1em">Nomor HP/ Mobile Number</td>
-                        <td style="height: 2em;">:</td>
-                        <td style="height: 2em;">{{dataContact.phone_number_1}}</td>
-                      </tr>
-                      <tr>
-                        <td style="height: 2em; padding-left: 1em">Email</td>
-                        <td style="height: 2em;">:</td>
-                        <td style="height: 2em;">{{dataContact.email_address}}</td>
-                      </tr>
-                      <tr>
-                        <td colspan="3" style="padding-top: 1.7em">
-                          <p style="text-align: justify; line-height: 1.5em;">Dengan ini mengizinkan Siloam Hospitals untuk membuka akses data medis saya di 
-                            seluruh Unit Siloam Hospitals untuk ditampilkan pada Mobile Application MySiloam
-                            /Hereby give permission to Siloam Hospitals to release my medical record data at all 
-                            Siloam Hospitals Unit to be displayed at MySiloam Mobile Application.</p>
-                        </td>
-                      </tr>
-                        <tr>
-                          <td colspan="3" style="padding-top: 1.7em">
-                            Persetujuan dan otorisasi ini berlaku untuk / This consent and authorization applies to
-                          </td>
-                        </tr>
-                        <tr>
-                          <td colspan="3">
-                            <div class="row">
-                              <div style="margin-left: 0.5em; margin-right: 0.5em; margin-top: 0.3em; float: left;">
-                                <img src="../../../../assets/icons/ic_dot.png" width="7px" height="7px">
-                              </div>
-                              <div>Hasil Laboratorium / Lab Result</div>
-                              <div class="clear: left;"></div>
-                            </div>
-                          </td>
-                        </tr>
-                        <tr>
-                          <td colspan="3">
-                            <div class="row">
-                              <div style="margin-left: 0.5em; margin-right: 0.5em; margin-top: 0.3em; float: left;">
-                                <img src="../../../../assets/icons/ic_dot.png" width="7px" height="7px">
-                              </div>
-                              <div>Hasil Radiologi / Radiology Result</div>
-                              <div class="clear: left;"></div>
-                            </div>
-                          </td>
-                        </tr>
-                        <tr>
-                          <td colspan="3">
-                            <div class="row">
-                              <div style="margin-left: 0.5em; margin-right: 0.5em; margin-top: 0.3em; float: left;">
-                                <img src="../../../../assets/icons/ic_dot.png" width="7px" height="7px">
-                              </div>
-                              <div>Resep / Prescription</div>
-                              <div class="clear: left;"></div>
-                            </div>
-                          </td>
-                        </tr>
-                        <tr>
-                          <td colspan="3">
-                            <div class="row">
-                              <div style="margin-left: 0.5em; margin-right: 0.5em; margin-top: 0.3em; float: left;">
-                                <img src="../../../../assets/icons/ic_dot.png" width="7px" height="7px">
-                              </div>
-                              <div>Tagihan / Ongoing Bill</div>
-                              <div class="clear: left;"></div>
-                            </div>
-                          </td>
-                        </tr>
-                        <tr>
-                          <td colspan="3" style="padding-top: 1.7em;">
-                            Yang bertandatangan / The Undersigned
-                          </td>
-                        </tr>
-                        <tr>
-                          <td style="padding-top: 5em;">
-                            <hr>
-                          </td>
-                        </tr>
-                        <tr>
-                          <td>
-                            Tanggal / date :
-                          </td>
-                        </tr>
-                        <tr>
-                          <td colspan="3" style="padding-top: 8.5em;">
-                            <hr style="margin-top: 0.01em; margin-bottom: 0.01em;">
-                            <hr style="margin-top: 0.01em; margin-bottom: 0.01em;">
-                          </td>
-                        </tr>
-                    </table>
-                  </div>
-                </div>
-              </div>
-              <div class="row">
-                <div class="col-md-3">
-                  <div class="row">
-                    <div class="col-md-12 mob_valid_2">
-                      Name
-                    </div>
-                  </div>
-                  <div class="row">
-                    <div class="col-md-12 mob_valid_2">
-                      Date of Birth
-                    </div>
-                  </div>
-                  <div class="row">
-                    <div class="col-md-12 mob_valid_2">
-                      No. MR Central
-                    </div>
-                  </div>
-                  <div class="row">
-                    <div class="col-md-12 mob_valid_2">
-                      Mobile Number
-                    </div>
-                  </div>
-                  <div class="row">
-                    <div class="col-md-12 mob_valid_2">
-                      Email
-                    </div>
-                  </div>
-                </div>
-                <div class="mob_valid_5">
-                  <div class="row">
-                    <div class="col-md-12 mob_valid_3">
-                      :
-                    </div>
-                  </div>
-                  <div class="row">
-                    <div class="col-md-12 mob_valid_3">
-                      :
-                    </div>
-                  </div>
-                  <div class="row">
-                    <div class="col-md-12 mob_valid_3">
-                      :
-                    </div>
-                  </div>
-                  <div class="row">
-                    <div class="col-md-12 mob_valid_3">
-                      :
-                    </div>
-                  </div>
-                  <div class="row">
-                    <div class="col-md-12 mob_valid_3">
-                      :
-                    </div>
-                  </div>
-                </div>
-                <div class="col-md-4">
-                  <div class="row">
-                    <div class="col-md-12 mob_valid_4">
-                        <input class="form-control mob_valid_6" type="text" [(ngModel)]="dataContact.name" disabled>
-                    </div>
-                  </div>
-                  <div class="row">
-                    <div class="col-md-12 mob_valid_4">
-                      <input class="form-control mob_valid_6" type="text" [(ngModel)]="selectedAccount.birth_date" disabled>
-                    </div>
-                  </div>
-                  <div class="row">
-                    <div class="col-md-12 mob_valid_4">
-                      <input class="form-control mob_valid_6" type="text" [(ngModel)]="dataPatientHope.mrNo" disabled>
-                    </div>
-                  </div>
-                  <div class="row">
-                    <div class="col-md-12 mob_valid_4">
-                      <input class="form-control mob_valid_6" type="text" [(ngModel)]="dataContact.phone_number_1" disabled>
-                    </div>
-                  </div>
-                  <div class="row">
-                    <div class="col-md-12 mob_valid_4">
-                      <input class="form-control mob_valid_6" type="text" [(ngModel)]="dataContact.email_address">
-                    </div>
-                  </div>
-                </div>
-                <div *ngIf="getDisclaimer && formatFlag" class="col-md-4" style="padding: 0">
-                  <iframe [src]="getDisclaimer" style="width:25em; height:17em;" frameborder="0"></iframe>
-                  <hr>
-                  <span>{{fileName}}</span>
-                </div>
-                <div *ngIf="getDisclaimer && !formatFlag" class="col-md-4" style="padding: 0">
-                  <img style="width: 25em; height: 17em;" src="{{getDisclaimer}}">
-                  <hr>
-                  <span>{{fileName}}</span>
-                </div>
-              </div>
-              <form [formGroup] = "uploadForm" (ngSubmit)="onSubmitUpload()" enctype="multipart/form-data">
-                <div class="row">
-                  <div class="col-md-10 mob_valid_8">
-                    <div class="image-upload">
-                        2. 
-                      <label *ngIf="dataContact.email_address !== this.editEmail">
-                        <div>
-                          <input formControlName="checkboxPatient" type="checkbox" style="width: 1.5vw; height: 1.5vw; position: absolute; margin-left: 0.5vw" (click)="checkDataPatient()" [(ngModel)]="checkData">
-                          <span style="margin-left: 2.5vw">PATIENT IDENTITY AND CONSENT CHECKED</span>
-                        </div>
-                      </label>
-                    </div>
-                  </div>
-                  <div class="col-md-10 mob_valid_7">
-                    <div class="image-upload">
-                      <label for="file-input">
-                        <img style="height: 3rem; width: 4rem; margin-left: 0.5em;margin-right: 0.5rem" src="../../../../assets/icons/ic_folder.png">
-                      </label>
-                        <input id="file-input" type="file" (change)="uploadDisclaimer($event)" accept="application/pdf, .jpg, .jpeg"/> UPLOAD DATA
-                        <img *ngIf="flagFile1" src="../../../../assets/icons/ic_checklist.png" style="width: 3em; height: 3em;">
-                        <div style="float: right;">
-                          <img *ngIf="flagFile1" src="../../../../assets/icons/ic_delete.svg" (click)="deleteDisclaimer()" style="width: 3em; height: 3em;">
-                        </div>
-                    </div>
-                    <div style="color: red; font-style: italic; font-size: 12px">
-                      * Format file JPG and PDF only (max 10MB)
-                    </div>
-                  </div>
-                </div>
-                <div class="row">
-                  <div class="col-md-12">
-                    <div class="tar">
-                      <div [ngStyle]="{ display: dataContact.email_address !== this.editEmail ? 'block' : 'none'}">
-                        <button type="submit" [disabled]="checkData === false" class="btn fo_btn_registration fo_btn_save">Save</button>
-                      </div>
-                      <div [ngStyle]="{ display: dataContact.email_address === this.editEmail ? 'block' : 'none'}">
-                        <button type="submit" class="btn fo_btn_registration fo_btn_save">Save</button>
-                      </div>
-                    </div>
-                  </div>
-                </div>
-              </form>
-          </div>
-          </div>
+        </div>
         </div>
       </div>
     </div>
-  
-    <ng-template #verify_patient let-modal>
-      <div class="modal-header">
-        <div class="header-2 modal-padding">Verify Patient Confirmation</div>
-      </div>
-      <div class="modal-body">
-        Are you sure?
-      </div>
-      <div class="modal-footer">
-        <button type="button" class="btn ms_btn_black" (click)="modal.close()">Cancel</button>
-        <button class="btn ms_btn_green" [ngClass]="{'disable': flagConfirm}" (click)="verifyPatient()" (click)="modal.close()">Confirm</button>
-      </div>
-    </ng-template>
-  
-    <ng-template #verify_patient_2 let-modal>
-      <div class="modal-header">
-        <div class="header-2 modal-padding">MR Access For Mobile</div>
-      </div>
-      <div class="modal-body">
-        Are you sure?
-      </div>
-      <div class="modal-footer">
-        <button type="button" class="btn ms_btn_black" (click)="modal.close()">Cancel</button>
-        <button class="btn ms_btn_green" [ngClass]="{'disable': flagConfirm}" (click)="onSubmitUpload()" (click)="modal.close()">Confirm</button>
-      </div>
-    </ng-template>
+  </div>
 
-    <ng-template #confirmEdit let-modal let-c="close">
-      <div class="modal-header">
-        <div class="header-2 modal-padding">Update HOPE Data</div>
-      </div>
-      <div class="modal-body">
-        <div class="row spacing-row">
-          <div class="col-md-7">
-            Name <input [(ngModel)]="nameHope" class="form-control mob_valid_6" disabled>
-          </div>
-          <div class="col-md-5">
-            DOB <input [(ngModel)]="birthDateFormat" class="form-control mob_valid_6" disabled>
-          </div>
+  <ng-template #verify_patient let-modal>
+    <div class="modal-header">
+      <div class="header-2 modal-padding">Verify Patient Confirmation</div>
+    </div>
+    <div class="modal-body">
+      Are you sure?
+    </div>
+    <div class="modal-footer">
+      <button type="button" class="btn ms_btn_black" (click)="modal.close()">Cancel</button>
+      <button class="btn ms_btn_green" [ngClass]="{'disable': flagConfirm}" (click)="verifyPatient()" (click)="modal.close()">Confirm</button>
+    </div>
+  </ng-template>
+
+  <ng-template #verify_patient_2 let-modal>
+    <div class="modal-header">
+      <div class="header-2 modal-padding">MR Access For Mobile</div>
+    </div>
+    <div class="modal-body">
+      Are you sure?
+    </div>
+    <div class="modal-footer">
+      <button type="button" class="btn ms_btn_black" (click)="modal.close()">Cancel</button>
+      <button class="btn ms_btn_green" [ngClass]="{'disable': flagConfirm}" (click)="onSubmitUpload()" (click)="modal.close()">Confirm</button>
+    </div>
+  </ng-template>
+
+  <ng-template #confirmEdit let-modal let-c="close">
+    <div class="modal-header">
+      <div class="header-2 modal-padding">Update HOPE Data</div>
+    </div>
+    <div class="modal-body">
+      <div class="row spacing-row">
+        <div class="col-md-7">
+          Name <input [(ngModel)]="nameHope" class="form-control mob_valid_6" disabled>
         </div>
-        <div class="row spacing-row">
-          <div class="col-md-6">
-            Mobile no. (1) <input [textMask]="{mask: mask}" class="form-control mob_valid_6" type="text" (keyup)="checkCountChar()" [(ngModel)]="phoneNumberOne">
-            <span *ngIf="!flagCountOne || phoneNumberOne?.length === 0" style="color: red;">* min 9 character</span>
-          </div>
-          <div class="col-md-6">
-            Mobile no. (2) <input [textMask]="{mask: mask}" class="form-control mob_valid_6" type="text" (keyup)="checkCountChar()" [(ngModel)]="phoneNumberTwo">
-            <span *ngIf="flagCountOne && (!flagCountTwo && phoneNumberTwo?.length > 0)" style="color: red;">* min 9 character</span>
-          </div>
-        </div>
-        <div class="row">
-          <div class="col-md-12">
-            Address <br><textarea [(ngModel)]="addressHope" class="form-control" disabled>testing</textarea>
-          </div>
+        <div class="col-md-5">
+          DOB <input [(ngModel)]="birthDateFormat" class="form-control mob_valid_6" disabled>
         </div>
       </div>
-      <div class="modal-footer">
-        <button type="button" class="btn ms_btn_black" (click)="c('Cross click')">Cancel</button>
-        <button class="btn ms_btn_green" [disabled]="(!flagCountOne || phoneNumberOne?.length === 0) 
-        || (flagCountOne && !flagCountTwo && phoneNumberTwo?.length > 0)" (click)="confirmSavePhoneNumber()">Update HOPE</button>
+      <div class="row spacing-row">
+        <div class="col-md-6">
+          Mobile no. (1) <input [textMask]="{mask: mask}" class="form-control mob_valid_6" type="text" (keyup)="checkCountChar()" [(ngModel)]="phoneNumberOne">
+          <span *ngIf="!flagCountOne || phoneNumberOne?.length === 0" style="color: red;">* min 9 character</span>
+        </div>
+        <div class="col-md-6">
+          Mobile no. (2) <input [textMask]="{mask: mask}" class="form-control mob_valid_6" type="text" (keyup)="checkCountChar()" [(ngModel)]="phoneNumberTwo">
+          <span *ngIf="flagCountOne && (!flagCountTwo && phoneNumberTwo?.length > 0)" style="color: red;">* min 9 character</span>
+        </div>
       </div>
-    </ng-template>
-  
+      <div class="row">
+        <div class="col-md-12">
+          Address <br><textarea [(ngModel)]="addressHope" class="form-control" disabled>testing</textarea>
+        </div>
+      </div>
+    </div>
+    <div class="modal-footer">
+      <button type="button" class="btn ms_btn_black" (click)="c('Cross click')">Cancel</button>
+      <button class="btn ms_btn_green" [disabled]="(!flagCountOne || phoneNumberOne?.length === 0) 
+      || (flagCountOne && !flagCountTwo && phoneNumberTwo?.length > 0)" (click)="confirmSavePhoneNumber()">Update HOPE</button>
+    </div>
+  </ng-template>
+
+</div>
+
+<div class="pagination unprintable">
+  <button *ngIf="isCanPrevPage" (click)="prevPage()" class="btn ms_btn_blue">
+    <img src="{{assetPath}}icons/ic_ArrowRight_White.png"> Prev
+  </button>
+  <span style="width:10px">&nbsp;</span>
+  <button *ngIf="isCanNextPage" (click)="nextPage()" class="btn ms_btn_blue">
+    Next <img src="{{assetPath}}icons/ic_ArrowLeft_White.png">
+  </button>
+</div>
+
+<div class="printable" style="font-size: 14pt;">
+  <!-- page 1 -->
+  <div class="row">
+    <div class="col-print-12 header-print">
+      Ijin Pembukaan Akses Data Medis / Authorization to Medical Data
+    </div>
   </div>
-  
-  <div class="pagination">
-    <button *ngIf="isCanPrevPage" (click)="prevPage()" class="btn ms_btn_blue">
-      <img src="{{assetPath}}icons/ic_ArrowRight_White.png"> Prev
-    </button>
-    <span style="width:10px">&nbsp;</span>
-    <button *ngIf="isCanNextPage" (click)="nextPage()" class="btn ms_btn_blue">
-      Next <img src="{{assetPath}}icons/ic_ArrowLeft_White.png">
-    </button>
+  <div class="row" style="padding-left: 10em; padding-right: 10em;">
+    <div class="col-print-6 set-default">
+      Saya yang bertandatangan di bawah ini:
+    </div>
+    <div class="col-print-6 set-default">
+      I, the undersigned below:
+    </div>
   </div>
+  <div class="row set-default" style="margin-top: 1em;">
+    <div class="col-print-6" style="padding-left: 11em;">
+      Nama / Name
+    </div>
+    <div class="col-print-6">
+      : {{dataContact.name}}
+    </div>
+    <div class="col-print-6 padding-input">
+      No. KTP / ID No.	
+    </div>
+    <div class="col-print-6">
+      : {{dataPatientHope.nationalIdNo}}
+    </div>
+    <div class="col-print-6 padding-input">
+      No. MR Central / Central MR. Number
+    </div>
+    <div class="col-print-6">
+      : {{dataPatientHope.mrNo}}
+    </div>
+    <div class="col-print-6 padding-input">
+      Tanggal Lahir / DOB
+    </div>
+    <div class="col-print-6">
+      : {{selectedAccount.birth_date}}
+    </div>
+    <div class="col-print-6 padding-input">
+      Nomor HP/ Mobile Number
+    </div>
+    <div class="col-print-6">
+      : {{dataContact.phone_number_1}}
+    </div>
+    <div class="col-print-6 padding-input">
+      Email
+    </div>
+    <div class="col-print-6">
+      : {{dataContact.email_address}}
+    </div>
+  </div>
+  <div class="row set-default" style="margin-top: 1em;">
+    <div class="col-print-6 padding-paragraf-left">
+      <p style="text-align: justify; line-height: 1.5em;">
+        dengan ini memberikan persetujuan bagi PT Siloam International Hospitals Tbk berikut 
+        anak-anak perusahaannya (“<b>Siloam</b>”) untuk membuka data medis saya terhitung sejak Januari 
+        2019 di seluruh rumah sakit-rumah sakit dan/atau klinik-klinik medis yang dikelola oleh Siloam 
+        (secara sendiri atau bersama disebut “<b>Unit Siloam</b>”) sehingga dapat diakses melalui fitur patient portal, 
+        aplikasi mobile MySiloam saya ataupun digital channel terkait lainnya yang akan dikembangkan oleh Siloam 
+        (“<b>Digital Channel</b>”).</p>
+    </div>
+    <div class="col-print-6 padding-paragraf-right">
+      <p style="text-align: justify; line-height: 1.5em;">
+        hereby give my consent to PT Siloam International Hospitals Tbk and its subsidiaries (“<b>Siloam</b>”) 
+        to release my medical data from January 2019 in all hospitals and/or medical clinics managed by 
+        Siloam (collectively or individually referred to as the “<b>Siloam Unit</b>”) to be accessed through 
+        the patient portal feature, my MySiloam mobile application or other related digital channels 
+        which may be developed by Siloam (“<b>Digital Channel</b>”).</p>
+    </div>
+
+    <div class="col-print-6 padding-paragraf-left">
+      <p style="text-align: justify; line-height: 1.5em;">
+        Saya menyatakan dan menjamin bahwa saya adalah individu yang memiliki hak untuk menandatangani formulir ini 
+        dan saya telah berusia minimal 21 (dua puluh satu) tahun atau sudah menikah, dalam kondisi kesehatan dan 
+        mental yang baik serta tidak berada di bawah perwalian atau pengampuan. Saya selanjutnya menyatakan dan 
+        menjamin bahwa saya memiliki hak dan kecakapan untuk menandatangani formulir ini maupun memberikan 
+        segala persetujuan atau kewenangan yang</p>
+    </div>
+    <div class="col-print-6 padding-paragraf-right">
+      <p style="text-align: justify; line-height: 1.5em;">
+        I certify and guarantee that I am an individual who is eligible to sign this form and that I am at least 
+        21 (twenty one) years of age or already married, in good health and mental condition and not under guardianship 
+        or custody. I further declare and guarantee that I have the right and capacity to sign this form and provide 
+        all approvals or authorities contained in this form and I act for and on my own behalf.</p>
+    </div>
+  </div>
+  <div class="row set-default" style="margin-top: 1em;">
+    <div class="col-print-12" style="text-align: right; padding-right: 10em;">
+      Paraf: ____________________
+    </div>
+  </div>
+  <!-- page 1 -->
+
+  <!-- page 2 -->
+  <div class="row set-default" style="margin-top: 9em;">
+    <div class="col-print-6 padding-paragraf-left" style="margin-top: 7em;">
+      <p style="text-align: justify; line-height: 1.5em;">
+        terdapat dalam formulir ini dan saya bertindak untuk dan atas nama saya sendiri.
+      </p>
+    </div>
+    <div class="col-print-6 padding-paragraf-right">
+    </div>
+
+    <div class="col-print-6 padding-paragraf-left">
+      <p style="text-align: justify; line-height: 1.5em;">
+        Persetujuan ini berlaku untuk data medis sebagai berikut (“<b>Data Medis</b>”):
+      </p>
+    </div>
+    <div class="col-print-6 padding-paragraf-right">
+      <p style="text-align: justify; line-height: 1.5em;">
+        This consent applies for the medical data as follows (“<b>Medical Data</b>”):
+      </p>
+    </div>
+
+    <div class="col-print-12 padding-paragraf-left">
+      <div style="margin-left: 0.5em; margin-right: 0.5em; float: left;">
+        <img src="../../../../assets/icons/ic_dot.png" width="7px" height="7px">
+      </div>
+      <div>
+        Hasil Laboratorium / Laboratorium Result
+      </div>
+      <div style="margin-left: 0.5em; margin-right: 0.5em; float: left;">
+        <img src="../../../../assets/icons/ic_dot.png" width="7px" height="7px">
+      </div>
+      <div>
+        Hasil Pemeriksaan Kesehatan / Medical Check-Up Result
+      </div>
+      <div style="margin-left: 0.5em; margin-right: 0.5em; float: left;">
+        <img src="../../../../assets/icons/ic_dot.png" width="7px" height="7px">
+      </div>
+      <div>
+        Hasil Radiologi / Radiology Result
+      </div>
+      <div style="margin-left: 0.5em; margin-right: 0.5em; float: left;">
+        <img src="../../../../assets/icons/ic_dot.png" width="7px" height="7px">
+      </div>
+      <div>
+        Riwayat Kunjungan / Visit History
+      </div>
+      <div style="margin-left: 0.5em; margin-right: 0.5em; float: left;">
+        <img src="../../../../assets/icons/ic_dot.png" width="7px" height="7px">
+      </div>
+      <div>
+        Riwayat Pembelian Obat / Drugs Purchase History
+      </div>
+      <div style="margin-left: 0.5em; margin-right: 0.5em; float: left;">
+        <img src="../../../../assets/icons/ic_dot.png" width="7px" height="7px">
+      </div>
+      <div>
+        Tagihan / Ongoing Bill
+      </div>
+    </div>
+
+    <div class="col-print-6 padding-paragraf-left" style="margin-top: 1em;">
+      <p style="text-align: justify; line-height: 1.5em;">
+        Saya mengerti dan memahami bahwa Data Medis yang disediakan Unit Siloam melalui fitur patient 
+        portal, aplikasi mobile MySiloam ataupun Digital Channel adalah demi peningkatan pelayanan 
+        kepada saya serta untuk kemudahan dan kepentingan saya sendiri dalam mengakses data medis 
+        terkait diri saya sendiri. Saya juga mengerti dan menyetujui bahwa Siloam memiliki diskresi 
+        penuh berdasarkan pertimbangannya sendiri, untuk membatasi penampilan data tertentu 
+        (data pilihan) yang ditampilkan dalam fitur patient portal, aplikasi mobile MySiloam maupun 
+        pada Digital Channel.
+      </p>
+    </div>
+    <div class="col-print-6 padding-paragraf-right" style="margin-top: 1em;">
+      <p style="text-align: justify; line-height: 1.5em;">
+        I understand and comprehend that the Medical Data displayed by Siloam Unit through the patient 
+        portal feature, MySiloam mobile application or Digital Channel is provided for added services 
+        as well as to improve my own convenience and benefit, in accessing my own medical data. I 
+        further confirm my understanding and consent that Siloam has full discretion in based on its 
+        own consideration, to withhold the display of any medical data (restricted data) in my patient 
+        portal feature, MySiloam mobile application or Digital Channel.
+      </p>
+    </div>
+
+    <div class="col-print-6 padding-paragraf-left">
+      <p style="text-align: justify; line-height: 1.5em;">
+        Saya menyetujui bahwa segala bentuk penggunaan Data Medis yang ditampilkan di fitur patient portal,
+        aplikasi mobile MySiloam ataupun Digital Channel saya adalah tanggung-jawab saya sendiri, dan dengan
+        ini saya melepaskan Siloam maupun Unit Siloam dari segala tanggung-jawab akibat penggunaan data yang 
+        terdapat dalam fitur patient portal, aplikasi mobile MySiloam ataupun Digital Channel saya.
+      </p>
+    </div>
+    <div class="col-print-6 padding-paragraf-right">
+      <p style="text-align: justify; line-height: 1.5em;">
+        I hereby agree that all forms of usage of my Medical Data displayed in my patient portal feature, 
+        MySiloam mobile application or Digital Channel are my personal responsibility, and I hereby 
+        release Siloam and Siloam Unit from all responsibilities due to the use of data contained in 
+        my patient portal feature, MySiloam mobile application or Digital Channel.
+      </p>
+    </div>
+  </div>
+  <div class="row set-default" style="margin-top: 1.5em;">
+    <div class="col-print-12" style="text-align: right; padding-right: 10em;">
+      Paraf: ____________________
+    </div>
+  </div>
+  <!-- page 2 -->
+
+  <!-- page 3 -->
+  <div class="row set-default" style="margin-top: 9em;">
+    <div class="col-print-6 padding-paragraf-left" style="margin-top: 7em;">
+      <p style="text-align: justify; line-height: 1.5em;">
+        Saya lebih lanjut menyatakan bahwa saya juga mengerti dan menerima bahwa terdapat risiko atas 
+        akses atau penggunaan yang tidak sah dan tanpa kewenangan atas perangkat seluler, fitur patient 
+        portal, akun aplikasi mobile MySiloam dan/atau Digital Channel saya yang berada di luar kendali 
+        Siloam dan Unit Siloam, dan oleh karenanya merupakan tanggung-jawab pribadi saya. Untuk itu dengan 
+        ini saya membebaskan Siloam berikut dengan Unit Siloam dari segala akibat maupun tanggung-jawab 
+        yang mungkin timbul atas akses atau penggunaan yang tidak sah dan tanpa kewenangan atas perangkat 
+        seluler, fitur patient portal, akun aplikasi mobile MySiloam dan/atau Digital Channel saya.
+      </p>
+    </div>
+    <div class="col-print-6 padding-paragraf-right" style="margin-top: 7em;">
+      <p style="text-align: justify; line-height: 1.5em;">
+        I further declare that I understand and accept the risk of unauthorized use and access over 
+        my mobile device, patient portal feature, MySiloam mobile application account that is beyond 
+        the control of Siloam and Siloam Unit, and therefore are my personal responsibility, For this 
+        reason, I hereby release Siloam and Siloam Unit from all consequences and responsibilities 
+        that may arise from unauthorized use and access over my mobile device, patient portal feature, 
+        MySiloam mobile application account, and/or Digital Channel.
+      </p>
+    </div>
+
+    <div class="col-print-6 padding-paragraf-left">
+      <p style="text-align: justify; line-height: 1.5em;">
+        Bahwa saya telah membaca dan memahami prinsip-prinsip kerahasiaan data terkait penggunaan 
+        fitur patient portal, aplikasi mobile MySiloam dan Digital Channel saya sebagaimana dimaksud 
+        dalam Lampiran dari persetujuan ini.
+      </p>
+    </div>
+    <div class="col-print-6 padding-paragraf-right">
+      <p style="text-align: justify; line-height: 1.5em;">
+        I have read and understood the data confidentiality principles relating to the use of the 
+        patient portal feature, MySiloam mobile application and Digital Channel as referred to in 
+        the Appendix of this consent form.
+      </p>
+    </div>
+
+    <div class="row set-default" style="margin-top: 4em; padding-left: 11em;">
+      <div class="col-print-12" style="text-align: left;">
+        Yang bertandatangan / The undersigned
+      </div>
+      <div class="col-print-12" style="text-align: left; margin-top: 2em;">
+        ________________________________________
+      </div>
+      <div class="col-print-12" style="text-align: left;">
+        Nama / name :
+      </div>
+      <div class="col-print-12" style="text-align: left;">
+        Tanggal / date :
+      </div>
+    </div>
+  </div>
+  <!-- page 3 -->
+
+  <!-- page 4 -->
+  <div class="row set-default" style="margin-top: 9em;">
+    <div class="col-print-12" style="margin-top: 14em; text-align: center; font-weight: bold;">
+      Lampiran/Appendix
+    </div>
+
+    <div class="col-print-12" style="padding-left: 9em; margin-top: 2em; font-weight: bold;">
+      Prinsip Kerahasiaan/Confidentiality Principles
+    </div>
+
+    <div class="col-print-2" style="padding-left: 9em; margin-top: 1.5em;">
+      1.
+    </div>
+    <div class="col-print-10 padding-right" style="padding-left: 1.5em; margin-top: 1.5em;">
+      <p style="text-align: justify; line-height: 1.5em; padding: 0; margin: 0">
+        Anda tidak dianjurkan memberikan data medis apapun di fitur patient portal, aplikasi mobile 
+        MySiloam dan/atau Digital Channel Anda kepada pihak manapun. <br> 
+        <span style="font-style: italic; color: #A5A5A5;">You are not recommended 
+          to give any of your medical data in your patient portal feature, MySiloam mobile application and/or 
+          Digital Channel to any party.
+        </span>
+      </p>
+    </div>
+    <div class="col-print-2" style="padding-left: 9em;">
+      2.
+    </div>
+    <div class="col-print-10 padding-right" style="padding-left: 1.5em;">
+      <p style="text-align: justify; line-height: 1.5em; padding: 0; margin: 0">
+        Anda dilarang dengan cara apapun, memberikan kata sandi atas aplikasi mobile MySiloam, 
+        fitur patient portal dan/atau Digital Channel kepada pihak manapun. <br> 
+        <span style="font-style: italic; color: #A5A5A5;">You are prohibited in any 
+          way, to give the password of your MySiloam mobile application, patient portal feature and/or 
+          Digital Channel to any party.
+        </span>
+      </p>
+    </div>
+    <div class="col-print-2" style="padding-left: 9em;">
+      3.
+    </div>
+    <div class="col-print-10 padding-right" style="padding-left: 1.5em;">
+      <p style="text-align: justify; line-height: 1.5em; padding: 0; margin: 0">
+        Anda dianjurkan untuk rutin melakukan pemeriksaan pengaturan keamanan dan penggantian kata 
+        sandi di perangkat seluler, fitur patient portal, aplikasi mobile MySiloam dan/atau Digital Channel. <br>
+        <span style="font-style: italic; color: #A5A5A5;">
+          You are recommended to regularly check your security setting and change the password in your mobile 
+          device, patient portal feature, MySiloam mobile application and/or Digital Channel.
+        </span>
+      </p>
+    </div>
+    <div class="col-print-2" style="padding-left: 9em;">
+      4.
+    </div>
+    <div class="col-print-10 padding-right" style="padding-left: 1.5em;">
+      <p style="text-align: justify; line-height: 1.5em; padding: 0; margin: 0">
+        Anda tidak dianjurkan untuk meninggalkan perangkat seluler diluar pandangan mata anda atau 
+        pengawasan langsung secara pribadi, dengan fitur patient portal, aplikasi mobile MySiloam dan/atau 
+        Digital Channel yang masih terbuka. <br>
+        <span style="font-style: italic; color: #A5A5A5;">
+          You are not recommended to leave your mobile device out of 
+          your sight or unattended with an opened patient portal feature, MySiloam mobile application 
+          and/or Digital Channel.
+        </span>
+      </p>
+    </div>
+    <div class="col-print-2" style="padding-left: 9em;">
+      5.
+    </div>
+    <div class="col-print-10 padding-right" style="padding-left: 1.5em;">
+      <p style="text-align: justify; line-height: 1.5em; padding: 0; margin: 0">
+        Anda wajib memberikan informasi kepada Siloam dalam hal terdapat ketidak-sesuaian atas Data Medis 
+        yang tertera pada fitur patient portal, aplikasi mobile MySiloam dan/atau Digital Channel Anda yang 
+        disebabkan oleh berbagai alasan, termasuk namun tidak terbatas pada, keperluan pemeliharaan atau 
+        masalah teknis. <br>
+        <span style="font-style: italic; color: #A5A5A5;">
+          You are required to inform Siloam of any discrepancy or technical bug relating to 
+          the Medical Data displayed in your patient portal feature, MySiloam mobile application and/or Digital 
+          Channel, which may be caused by various factors, including but not limited to, maintenance purposes 
+          or technical issues.
+        </span>
+      </p>
+    </div>
+    <div class="col-print-2" style="padding-left: 9em;">
+      6.
+    </div>
+    <div class="col-print-10 padding-right" style="padding-left: 1.5em;">
+      <p style="text-align: justify; line-height: 1.5em; padding: 0; margin: 0">
+        Anda mengerti bahwa riwayat pembelian obat yang terdapat pada fitur patient portal, aplikasi mobile 
+        MySiloam dan/atau Digital Channel Anda bukan merupakan resep dari dokter untuk pembelian yang akan 
+        datang, dan adalah merupakan riwayat pembelian obat yang pernah Anda lakukan sebelum tanggal 
+        penampilan data. <br>
+      </p>
+    </div>
+    <div class="col-print-2" style="padding-left: 9em;">
+      
+    </div>
+    <div class="col-print-10 padding-right" style="padding-left: 1.5em;">
+      <p style="text-align: justify; line-height: 1.5em; padding: 0; margin: 0">
+        <span style="font-style: italic; color: #A5A5A5;">
+          You understand that your drugs purchase history in your patient portal feature, MySiloam mobile 
+          application and/or Digital Channel are not your doctor’s prescription for future 
+          redeem, but are historical data of drugs purchases which you have made prior to the display date.
+        </span>
+      </p>
+    </div>
+  </div>
+  <div class="row set-default" style="margin-top: 1em;">
+    <div class="col-print-12" style="text-align: right; padding-right: 10em;">
+      Paraf: ____________________
+    </div>
+  </div>
+  <!-- page 4 -->
+</div>

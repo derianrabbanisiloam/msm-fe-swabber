@@ -122,24 +122,9 @@ export class WidgetMobileValidationComponent implements OnInit {
     window.print();
   }
 
-  print(): void {
-    let printContents, popupWin;
-    printContents = document.getElementById('print-section').innerHTML;
-    popupWin = window.open('', '_blank', 'top=0,left=0,height=100%,width=auto');
-    popupWin.document.open();
-    popupWin.document.write(`
-      <html>
-        <head>
-          <title></title>
-          <style>
-          //........Customized style.......
-          </style>
-        </head>
-    <body onload="document.execCommand('print');window.close()">${printContents}</body>
-      </html>`
-    );
-    popupWin.document.close();
-}
+  printAll() {
+    document.execCommand('print');
+  }
 
   checkDataPatient() {
     this.checkData === false ? this.checkData = true : this.checkData = false;

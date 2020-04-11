@@ -2,6 +2,7 @@ import * as moment from 'moment';
 import { Component, OnInit } from '@angular/core';
 import { DoctorService } from '../../../services/doctor.service';
 import { AppointmentService } from '../../../services/appointment.service';
+import { PatientService } from '../../../services/patient.service';
 import { AlertService } from '../../../services/alert.service';
 import { AdmissionService } from '../../../services/admission.service';
 import { IMyDrpOptions } from 'mydaterangepicker';
@@ -12,7 +13,7 @@ import { environment } from '../../../../environments/environment';
 import {
   ModalVerificationAidoComponent
 } from '../../widgets/modal-verification-aido/modal-verification-aido.component';
-import { sourceApps } from '../../../variables/common.variable';
+import { sourceApps, channelId } from '../../../variables/common.variable';
 
 @Component({
   selector: 'app-widget-aido-worklist',
@@ -46,6 +47,7 @@ export class WidgetAidoWorklistComponent implements OnInit {
   public isCanNextPage: boolean = false;
   public closeResult: string;
   public count: number = -1;
+  public selectedApp: any;
   public bodyKeyword: any = { valueOne: null, valueTwo: null, valueThree: null, valueFour: null,
     valueFive: null, valueSix: null, valueSeven: null };
   public bodyKeywordTwo: any = { valueOne: null, valueTwo: null, valueThree: null, valueFour: null,
@@ -53,6 +55,7 @@ export class WidgetAidoWorklistComponent implements OnInit {
   constructor(
     private appointmentService: AppointmentService,
     private doctorService: DoctorService,
+    private patientService: PatientService,
     private admissionService: AdmissionService,
     private modalService: NgbModal,
     private alertService: AlertService,
@@ -202,6 +205,55 @@ export class WidgetAidoWorklistComponent implements OnInit {
   async verifyAppointment(data) {
     const modalRef = this.modalService.open(ModalVerificationAidoComponent, { windowClass: 'modal_verification', size: 'lg' });
         modalRef.componentInstance.appointmentAidoSelected = data;
+  }
+
+  async createPatientModal(val: any, content: any){
+    this.selectedApp = val;
+    this.open(content);
+  }
+
+  async createPatient(){
+    const contactId = this.selectedApp.contact_id; 
+    const body = {
+      channelId: channelId.AIDO,
+      hospitalId: this.hospital.id,
+      appointmentAidoId: this.selectedApp.appointment_id,
+      userId: this.user.id,
+      source: sourceApps,
+      userName: this.user.fullname,
+    };
+
+    this.patientService.createPatientByContactId(contactId, body)
+      .toPromise().then(res => {
+        this.getAidoWorklist();
+        this.alertService.success(res.message, false, 3000);
+      }).catch(err => {
+        this.alertService.error(err.error.message, false, 3000);
+      })
+  }
+
+  async createMrModal(val: any, content: any){
+    this.selectedApp = val;
+    this.open(content);
+  }
+
+  async createMrLocal(){
+    const body = {
+      patientHopeId: this.selectedApp.patient_hope_id,
+      organizationId: Number(this.hospital.orgId),
+      channelId: channelId.AIDO, 
+      userId: this.user.id,
+      source: sourceApps,
+      userName: this.user.fullname,
+    };
+
+    this.patientService.createMrLocal(body)
+      .toPromise().then(res => {
+        this.getAidoWorklist();
+        this.alertService.success(res.message, false, 3000);
+      }).catch(err => {
+        this.alertService.error(err.error.message, false, 3000);
+      })
   }
 
   async createAdmModal(val, content) {

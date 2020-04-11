@@ -136,18 +136,24 @@
             triggers="mouseenter:mouseleave">{{r.modified_by && r.modified_by.length > 15 ?
                r.modified_by.substr(0,15)+"..." : r.modified_by}}</a>
         </td>
-        <td style="text-align: center; min-width: 8em">
+        <td style="text-align: center; min-width: 12em">
         <div *ngIf="r.admission_status_id != 2">
-          <div *ngIf="r.is_double_mr === true">
-            <button (click)="verifyAppointment(r)" class="btn ms_btn_blue" style="font-size: 10px;">Verify MR</button>
+          <div *ngIf="r.patient_hope_id !== 0 && r.patient_organization_id !== 0 && r.is_double_mr === false">
+            <button (click)="createAdmModal(r, confirmAdmission)" class="btn ms_btn_green" style="font-size: 11px;">Check In</button>
           </div>
-          <div *ngIf="r.is_double_mr === false">
-            <button (click)="createAdmModal(r, confirmAdmission)" class="btn ms_btn_green" style="font-size: 11px;">Create</button>
+          <div *ngIf="r.patient_hope_id === 0 && r.patient_organization_id === 0 && r.is_double_mr === false">
+            <button (click)="createPatientModal(r, confirmCreatePatient)" class="btn ms_btn_red" style="font-size: 11px;">Create Patient</button>
+          </div>
+          <div *ngIf="r.patient_hope_id !== 0 && r.patient_organization_id === 0 && r.is_double_mr === false">
+            <button (click)="createMrModal(r, confirmCreateMr)" class="btn ms_btn_black" style="font-size: 11px;">Create MR</button>
+          </div>
+          <div *ngIf="(r.patient_hope_id === 0 && r.patient_organization_id === 0 && r.is_double_mr === true)
+          || (r.patient_hope_id !== 0 && r.patient_organization_id === 0 && r.is_double_mr === true)">
+            <button (click)="verifyAppointment(r)" class="btn ms_btn_blue" style="font-size: 10px;">Verify MR</button>
           </div>
         </div>
         </td>
       </tr>
-
       <tr>
         <td *ngIf="showNotFoundMsg" colspan="11" style="text-align: center;">Displaying no data</td>
         <td *ngIf="showWaitMsg" colspan="11">
@@ -184,4 +190,41 @@
       </div>
     </div>
   </ng-template>
+
+  <ng-template #confirmCreatePatient let-c="close" let-d="dismiss">
+    <div class="modal-header">
+      <h4 class="modal-title">Confirmation</h4>
+      <button type="button" class="close" aria-label="Close" (click)="d('Cross click')">
+        <span aria-hidden="true">&times;</span>
+      </button>
+    </div>
+    <div class="modal-body">
+      <p>Are you sure to create patient ?</p>
+      <div class="fo_confirmation_button d-flex justify-content-center">
+        <button type="button" class="btn fo_btn_green"
+          (click)="createPatient()"
+          (click)="c('Cross click')">Ok</button>
+        <button type="button" class="btn fo_btn_black" (click)="c('Cross click')">Cancel</button>
+      </div>
+    </div>
+  </ng-template>
+
+  <ng-template #confirmCreateMr let-c="close" let-d="dismiss">
+    <div class="modal-header">
+      <h4 class="modal-title">Confirmation</h4>
+      <button type="button" class="close" aria-label="Close" (click)="d('Cross click')">
+        <span aria-hidden="true">&times;</span>
+      </button>
+    </div>
+    <div class="modal-body">
+      <p>Are you sure to create MR Local ?</p>
+      <div class="fo_confirmation_button d-flex justify-content-center">
+        <button type="button" class="btn fo_btn_green"
+          (click)="createMrLocal()"
+          (click)="c('Cross click')">Ok</button>
+        <button type="button" class="btn fo_btn_black" (click)="c('Cross click')">Cancel</button>
+      </div>
+    </div>
+  </ng-template>
+
 </section>

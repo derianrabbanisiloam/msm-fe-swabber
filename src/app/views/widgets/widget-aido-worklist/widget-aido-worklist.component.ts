@@ -13,7 +13,7 @@ import { environment } from '../../../../environments/environment';
 import {
   ModalVerificationAidoComponent
 } from '../../widgets/modal-verification-aido/modal-verification-aido.component';
-import { sourceApps, channelId } from '../../../variables/common.variable';
+import { sourceApps, channelId, appointmentStatusId } from '../../../variables/common.variable';
 
 @Component({
   selector: 'app-widget-aido-worklist',
@@ -23,6 +23,7 @@ import { sourceApps, channelId } from '../../../variables/common.variable';
 export class WidgetAidoWorklistComponent implements OnInit {
   public key: any = JSON.parse(localStorage.getItem('key'));
   public user = this.key.user;
+  public appStatusId = appointmentStatusId;
   public selectedAdm: any;
   public detailTemp: any;
   public assetPath = environment.ASSET_PATH;

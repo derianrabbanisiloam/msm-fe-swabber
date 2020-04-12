@@ -88,7 +88,8 @@
         <td></td>
       </tr>
 
-      <tr *ngFor="let r of aidoAppointments; let i = index">
+      <tr *ngFor="let r of aidoAppointments; let i = index" [ngClass]="{
+        'row-pink' : r.appointment_status_id === appStatusId.INACTIVE}">
         <td style="text-transform: uppercase">
           <a ngbPopover="{{r.contact_name}}" popoverTitle=""
             triggers="mouseenter:mouseleave">{{r.contact_name && r.contact_name.length > 30 ?
@@ -137,7 +138,7 @@
                r.modified_by.substr(0,15)+"..." : r.modified_by}}</a>
         </td>
         <td style="text-align: center; min-width: 12em">
-        <div *ngIf="r.admission_status_id != 2">
+        <div *ngIf="r.admission_status_id != 2 && r.appointment_status_id !== appStatusId.INACTIVE">
           <div *ngIf="r.patient_hope_id !== 0 && r.patient_organization_id !== 0 && r.is_double_mr === false">
             <button (click)="createAdmModal(r, confirmAdmission)" class="btn ms_btn_green" style="font-size: 11px;">Check In</button>
           </div>
@@ -150,6 +151,8 @@
             <button (click)="verifyAppointment(r)" class="btn ms_btn_blue" style="font-size: 10px;">Verify MR</button>
           </div>
         </div>
+        <div class="span-canceled" *ngIf="r.appointment_status_id === appStatusId.INACTIVE">
+          Cancelled</div>
         </td>
       </tr>
       <tr>

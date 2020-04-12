@@ -567,6 +567,7 @@ export class WidgetAppointmentListComponent implements OnInit {
       organizationId: Number(this.hospital.orgId),
       userId: this.user.id,
       source: sourceApps,
+      userName: this.user.fullname,
     }
 
     this.resMrLocal = await this.mrLocalProcess(body);

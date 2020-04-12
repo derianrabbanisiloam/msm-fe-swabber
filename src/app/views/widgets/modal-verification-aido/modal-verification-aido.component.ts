@@ -58,7 +58,6 @@ export class ModalVerificationAidoComponent implements OnInit {
   ) { }
 
   async ngOnInit() {
-    console.log(this.appointmentAidoSelected, "this.appointmentAidoSelected");
     this.searchPatient();
     this.getCollectionAlert();
     await this.getDoctorProfile();
@@ -164,7 +163,7 @@ export class ModalVerificationAidoComponent implements OnInit {
       }
     );
   }
-  
+
   async createPatient() {
     this.flagConfirm = true;
     const app = this.appointmentAidoSelected;

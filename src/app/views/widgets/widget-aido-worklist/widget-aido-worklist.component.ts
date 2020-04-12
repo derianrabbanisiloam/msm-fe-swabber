@@ -206,32 +206,7 @@ export class WidgetAidoWorklistComponent implements OnInit {
     const modalRef = this.modalService.open(ModalVerificationAidoComponent, { windowClass: 'modal_verification', size: 'lg' });
         modalRef.componentInstance.appointmentAidoSelected = data;
   }
-
-  async createPatientModal(val: any, content: any){
-    this.selectedApp = val;
-    this.open(content);
-  }
-
-  async createPatient(){
-    const contactId = this.selectedApp.contact_id; 
-    const body = {
-      channelId: channelId.AIDO,
-      hospitalId: this.hospital.id,
-      appointmentAidoId: this.selectedApp.appointment_id,
-      userId: this.user.id,
-      source: sourceApps,
-      userName: this.user.fullname,
-    };
-
-    this.patientService.createPatientByContactId(contactId, body)
-      .toPromise().then(res => {
-        this.getAidoWorklist();
-        this.alertService.success(res.message, false, 3000);
-      }).catch(err => {
-        this.alertService.error(err.error.message, false, 3000);
-      })
-  }
-
+  
   async createMrModal(val: any, content: any){
     this.selectedApp = val;
     this.open(content);

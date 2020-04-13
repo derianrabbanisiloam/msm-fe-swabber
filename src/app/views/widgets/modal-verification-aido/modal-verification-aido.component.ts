@@ -164,6 +164,32 @@ export class ModalVerificationAidoComponent implements OnInit {
     );
   }
 
+  async createPatient() {
+    this.flagConfirm = true;
+    const app = this.appointmentAidoSelected;
+    const contactId = app.contact_id;
+    const payload = {
+      channelId: channelId.AIDO,
+      hospitalId: this.hospital.id,
+      appointmentAidoId: app.appointment_id,
+      userId: this.user.id,
+      source: sourceApps,
+      userName: this.user.fullname,
+    };
+
+    await this.patientService.createPatientByContactId(contactId, payload).toPromise().then(
+      data => {
+        this.isSuccessVerifyApp = true;
+        this.flagConfirm = false;
+        this.alertService.success('Successfully create patient');
+        this.appointmentService.emitVerifyApp(true);
+      }, error => {
+        this.flagConfirm = false;
+        this.alertService.error('Failed create patient');
+      }
+    );
+  }
+
   closeAll() {
     this.modalService.dismissAll();
   }

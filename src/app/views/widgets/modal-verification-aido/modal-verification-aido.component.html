@@ -64,6 +64,9 @@
   <button [ngClass]="{'disable': !patientSelected && !contactId}" type="button" class="btn ms_btn_green"
     data-toggle="modal" data-target="#confirming" data-dismiss="modal"
     (click)="openConfirmationModal(verify_patient_modal)">Verify Appointment</button>
+  <button [ngClass]="{'disable': patientSelected }" type="button" class="btn ms_btn_red"
+  data-toggle="modal" data-target="#confirming" data-dismiss="modal"
+  (click)="openConfirmationModal(create_patient_modal)">Create Patient</button>
 </div>
 
 <ng-template #create_contact let-modal>
@@ -139,6 +142,29 @@
     <button type="button" class="btn ms_btn_black" (click)="modal.close()">Cancel</button>
     <button class="btn ms_btn_green" [ngClass]="{'disable': flagConfirm}"
       (click)="verifyPatient()">Confirm</button>
+  </div>
+  <div *ngIf="isSuccessVerifyApp" class="modal-footer">
+    <button class="btn ms_btn_black" (click)="closeAll()">Close</button>
+  </div>
+</ng-template>
+
+<ng-template #create_patient_modal let-modal>
+  <div class="modal-header">
+    <div class="header-2 modal-padding">Create Patient Confirmation</div>
+  </div>
+  <div class="modal-body">
+    <strong>Name:</strong> {{appointmentAidoSelected.contact_name}}<br>
+    <strong>Birth Date:</strong> {{appointmentAidoSelected.date_of_birth}}<br>
+    <strong>Mobile No:</strong> {{appointmentAidoSelected.phone_number}}<br>
+    Are you sure to create patient ? This action can't be changed.
+  </div>
+  <div *ngFor="let alert of alerts">
+    <ngb-alert *ngIf="alert" type="{{cssAlertType(alert)}}" (close)="removeAlert(alert)">{{ alert.message }}</ngb-alert>
+  </div>
+  <div *ngIf="!isSuccessVerifyApp" class="modal-footer">
+    <button type="button" class="btn ms_btn_black" (click)="modal.close()">Cancel</button>
+    <button class="btn ms_btn_green" [ngClass]="{'disable': flagConfirm}"
+      (click)="createPatient()">Confirm</button>
   </div>
   <div *ngIf="isSuccessVerifyApp" class="modal-footer">
     <button class="btn ms_btn_black" (click)="closeAll()">Close</button>

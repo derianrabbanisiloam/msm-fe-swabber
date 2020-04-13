@@ -45,7 +45,7 @@
     <div class="header-3 collapse show width fo_minimized" popoverTitle="Patient Validation"
       ngbPopover="Melakukan verifikasi terhadap akun pasien yang mengunduh aplikasi mobile Siloam. Jika pasien tidak ditemukan datanya harus diregistrasi di menu Patient Registration"
       triggers="mouseenter:mouseleave" placement="right" container="body">
-      <div class="fo_minimized_text">MR Access Registration</div>
+      <div class="fo_minimized_text">Medical Data Access</div>
     </div>
   </a>
 </div>
@@ -60,6 +60,20 @@
       ngbPopover="Melihat daftar antrian pasien appointment, melakukan check-in pasien, mencetak antrian pasien dan membatalkan perjanjian kunjungan pasien"
       triggers="mouseenter:mouseleave" placement="right" container="body">
       <div class="fo_minimized_text">Appointment List</div>
+    </div>
+  </a>
+</div>
+<div *ngIf="hospital.id === yogyaHospitalId" class="container-button shadow-4">
+  <a class="side_button shadow-4" aria-expanded="false" href="/bpjs" target="_parent"
+    [routerLink]="['/bpjs']" [routerLinkActive]="['active']">
+    <div>
+      <img class="icon" src="{{assetPath}}icons/ic_AppointmentList_Black.png">
+      <img class="icon" src="{{assetPath}}icons/ic_AppointmentList_White.png">
+    </div>
+    <div class="header-3 collapse show width fo_minimized" popoverTitle="BPJS"
+      ngbPopover="Melihat daftar pasien dari BPJS"
+      triggers="mouseenter:mouseleave" placement="right" container="body">
+      <div class="fo_minimized_text">Appointment BPJS</div>
     </div>
   </a>
 </div>

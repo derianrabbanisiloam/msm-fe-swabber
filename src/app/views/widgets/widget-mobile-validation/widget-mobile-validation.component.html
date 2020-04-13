@@ -8,7 +8,17 @@
         <table class="table">
           <thead>
             <tr>
-              <th class="fo_list_header">Mobile Account</th>
+              <th class="fo_list_header">
+                <div>
+                  Mobile Account
+                </div>
+                <div style="font-size: 10px;">
+                  <img style="width: 20px; height: 20px" src="../../../../assets/icons/ic_mobile_linked_mr.svg">
+                  : Mobile Account Linked to MR <br>
+                  <img style="width: 20px; height: 20px" src="../../../../assets/icons/ic_access_opened.svg">
+                  : MR Access Opened
+                </div>
+              </th>
             </tr>
           </thead>
           <tbody>
@@ -72,7 +82,10 @@
       <div class="row">
         <div class="col-md-12">
           <div style="background-color: white; margin-top: 1em">
-            <div *ngIf="selectedAccount.mobile_status === mobileStatus.ACTIVE 
+          <div *ngIf="loadingBar" style="text-align: center;">
+            <img src="../../../../assets/icons/Logo-Animation---S(FAST).gif" width="200px" height="200px">
+          </div>
+          <div *ngIf="selectedAccount.mobile_status === mobileStatus.ACTIVE 
               && selectedAccount.contact_status_id === contactStatus.MOBILE_ACTIVE" style="min-height: 19em;">
             <table>
               <thead>
@@ -130,10 +143,13 @@
                 <th width="100px">Local MR</th>
                 <th>Mobile Number</th>
                 <th style="min-width: 13em">Address</th>
+                <th>Action</th>
               </thead>
               <tbody class="quota-list">
                 <tr *ngFor="let itr of patientHope"
-                [ngClass]="{'selectedPatient': selectPatient && itr.patientId == selectPatient.patientId}" (click)="choosedSearchPatient(itr)">
+                [ngClass]="{'selectedPatient': selectPatient 
+                && itr.patientId == selectPatient.patientId 
+                && itr.patientOrganizationId == selectPatient.patientOrganizationId}" (click)="choosedSearchPatient(itr)">
                   <td>{{itr.name}}</td>
                   <td>{{itr.newBirthDate}}</td>
                   <td>{{itr.mrNo}}</td>
@@ -141,14 +157,26 @@
                   <td>{{itr.mrNoUnit}}</td>
                   <td>{{itr.mobileNo1}}</td>
                   <td>{{itr.address}}</td>
+                  <td>
+                    <button type="button" class="btn-default" (click)="getPatientHopeId(itr, confirmEdit)">
+                      <i class="fa fa-edit"></i>
+                    </button>
+                  </td>
                 </tr>
               </tbody>
-              <tbody *ngIf="!patientHope && flagSearch">
+              <tbody *ngIf="loadingBarTwo">
+                <tr>
+                  <td colspan="4" style="text-align: right">
+                    <img src="../../../../assets/icons/Logo-Animation---S(FAST).gif" width="200px" height="200px">
+                  </td>
+                </tr>
+              </tbody>
+              <tbody *ngIf="!patientHope && flagSearch && !loadingBarTwo">
                 <tr>
                   <td colspan="7" style="text-align: center;">result not found</td>
                 </tr>
               </tbody>
-              <tbody *ngIf="patientHope && flagSearch">
+              <tbody *ngIf="patientHope && flagSearch && !loadingBarTwo">
                 <tr>
                   <td colspan="7" style="text-align: right">
                     <button type="submit" class="fo_btn_registration fo_btn_save"
@@ -164,15 +192,16 @@
           </div>
           <div *ngIf="selectedAccount.mobile_status === mobileStatus.ACTIVE 
             && selectedAccount.contact_status_id === contactStatus.VERIFIED
-            && dataContact && dataPatientHope">
+            && dataContact && dataPatientHope && !loadingBar">
             <div class="row">
               <div class="col-md-9 mob_valid_1" style="margin-top: 1em">
-                1. PATIENT DATA FOR DISCLAIMER
+                1. PATIENT DATA FOR CONSENT
               </div>
               <div class="col-md-3 mob_valid_1" style="margin-top: 1em">
-                <button class="fo_btn_registration_2 fo_btn_blue" (click)="print()" style="margin-left: -3em">Print</button>
+                <button class="fo_btn_registration_2 fo_btn_blue" (click)="dataContact.email_address ? print() : ''" style="margin-left: -3em">Print</button>
+                <i *ngIf="!dataContact.email_address" class="error-msg-2">* Email is required</i>
                 <div id="print-section">
-                  <table class="table table-bordered" style="margin-top: 10em; margin-left: 4.5em; 
+                  <table class="table table-bordered" style="margin-top: 8em; margin-left: 4.5em; 
                     margin-right: 5em; margin-bottom: 5em; width: 80%">
                     <tr>
                       <td style="font-weight: bold; text-align: center" colspan="3">Ijin Pembukaan Akses Data Medis / Authorization to Medical Records</td>
@@ -238,6 +267,28 @@
                               <img src="../../../../assets/icons/ic_dot.png" width="7px" height="7px">
                             </div>
                             <div>Hasil Radiologi / Radiology Result</div>
+                            <div class="clear: left;"></div>
+                          </div>
+                        </td>
+                      </tr>
+                      <tr>
+                        <td colspan="3">
+                          <div class="row">
+                            <div style="margin-left: 0.5em; margin-right: 0.5em; margin-top: 0.3em; float: left;">
+                              <img src="../../../../assets/icons/ic_dot.png" width="7px" height="7px">
+                            </div>
+                            <div>Resep / Prescription</div>
+                            <div class="clear: left;"></div>
+                          </div>
+                        </td>
+                      </tr>
+                      <tr>
+                        <td colspan="3">
+                          <div class="row">
+                            <div style="margin-left: 0.5em; margin-right: 0.5em; margin-top: 0.3em; float: left;">
+                              <img src="../../../../assets/icons/ic_dot.png" width="7px" height="7px">
+                            </div>
+                            <div>Tagihan / Ongoing Bill</div>
                             <div class="clear: left;"></div>
                           </div>
                         </td>
@@ -352,58 +403,55 @@
               </div>
             </div>
             <form [formGroup] = "uploadForm" (ngSubmit)="onSubmitUpload()" #f="ngForm" enctype="multipart/form-data">
-            <div class="row">
-              <div class="col-md-10 mob_valid_1">
-                <div class="image-upload">
-                    2. 
-                  <label for="file-input">
-                    <img style="height: 3rem; width: 4rem; margin-left: 0.5em;margin-right: 0.5rem" src="../../../../assets/icons/ic_folder.png">
-                  </label>
-                    <input id="file-input" type="file" (change)="uploadDisclaimer($event)" accept="application/pdf"/> UPLOAD DISCLAIMER
-                    <i *ngIf="f.submitted && !this.uploadForm.get('disclaimer').value" class="error-msg">* Disclaimer is required</i>
-                    <img *ngIf="flagFile1" src="../../../../assets/icons/ic_checklist.png" style="width: 3em; height: 3em;">
-                    <div style="float: right;">
-                      <img *ngIf="flagFile1" src="../../../../assets/icons/ic_delete.svg" (click)="deleteDisclaimer()" style="width: 3em; height: 3em;">
-                    </div>
+              <div class="row">
+                <div class="col-md-10 mob_valid_8">
+                  <div class="image-upload">
+                      2. 
+                    <label>
+                      <div>
+                        <input formControlName="checkboxPatient" type="checkbox" style="width: 1.5vw; height: 1.5vw; position: absolute; margin-left: 0.5vw" (click)="checkDataPatient()" [(ngModel)]="checkData">
+                        <span style="margin-left: 2.5vw">PATIENT IDENTITY AND CONSENT CHECKED</span>
+                      </div>
+                    </label>
+                  </div>
                 </div>
-              </div>
-            </div>
-            <div class="row">
-              <div class="col-md-10 mob_valid_1">
-                <div class="image-upload">
-                    3. 
-                  <label for="file-input-2">
-                    <img style="height: 3rem; width: 4rem; margin-left: 0.5em;margin-right: 0.5rem" src="../../../../assets/icons/ic_folder.png">
-                  </label>
-                  <input id="file-input-2" type="file" (change)="uploadKtp($event)" accept="application/pdf"/> UPLOAD IDENTITY DOCUMENT
-                  <i *ngIf="f.submitted && !this.uploadForm.get('ktp').value" class="error-msg">* KTP is required</i>
-                  <img *ngIf="flagFile2" src="../../../../assets/icons/ic_checklist.png" style="width: 3em; height: 3em;">
-                  <div style="float: right;">
-                    <img *ngIf="flagFile2" src="../../../../assets/icons/ic_delete.svg" (click)="deleteKtp()" style="width: 3em; height: 3em;">
+                <div class="col-md-10 mob_valid_7">
+                  <div class="image-upload">
+                    <label for="file-input">
+                      <img style="height: 3rem; width: 4rem; margin-left: 0.5em;margin-right: 0.5rem" src="../../../../assets/icons/ic_folder.png">
+                    </label>
+                      <input id="file-input" type="file" (change)="uploadDisclaimer($event)" accept="application/pdf, .jpg, .jpeg"/> UPLOAD DATA
+                      <img *ngIf="flagFile1" src="../../../../assets/icons/ic_checklist.png" style="width: 3em; height: 3em;">
+                      <div style="float: right;">
+                        <img *ngIf="flagFile1" src="../../../../assets/icons/ic_delete.svg" (click)="deleteDisclaimer()" style="width: 3em; height: 3em;">
+                      </div>
+                  </div>
+                  <div style="color: red; font-style: italic; font-size: 12px">
+                    * Format file JPG and PDF only
                   </div>
                 </div>
               </div>
-            </div>
-            <div class="row">
-              <div class="col-md-12">
-                <div class="tar">
-                  <button type="submit" class="fo_btn_registration fo_btn_save">Save</button>
+              <div class="row">
+                <div class="col-md-12">
+                  <div class="tar">
+                    <button type="submit" [disabled]="checkData === false" class="btn fo_btn_registration fo_btn_save">Save</button>
+                  </div>
                 </div>
               </div>
-            </div>
             </form>
           </div>
           <div *ngIf="selectedAccount.mobile_status === mobileStatus.ACCESSED 
             && selectedAccount.contact_status_id === contactStatus.VERIFIED
-            && dataContact && dataPatientHope">
+            && dataContact && dataPatientHope && !loadingBar">
             <div class="row">
                 <div class="col-md-9 mob_valid_1" style="margin-top: 1em">
-                  1. PATIENT DATA FOR DISCLAIMER
+                  1. PATIENT DATA FOR CONSENT
                 </div>
                 <div class="col-md-3 mob_valid_1" style="margin-top: 1em">
-                  <button class="fo_btn_registration_2 fo_btn_blue" (click)="print()" style="margin-left: -3em">Print</button>
+                  <button class="fo_btn_registration_2 fo_btn_blue" (click)="dataContact.email_address ? print() : ''" style="margin-left: -3em">Print</button>
+                  <i *ngIf="!dataContact.email_address" class="error-msg-2">* Email is required</i>
                   <div id="print-section">
-                    <table class="table table-bordered" style="margin-top: 10em; margin-left: 4.5em; 
+                    <table class="table table-bordered" style="margin-top: 8em; margin-left: 4.5em; 
                       margin-right: 5em; margin-bottom: 5em; width: 80%">
                       <tr>
                         <td style="font-weight: bold; text-align: center" colspan="3">Ijin Pembukaan Akses Data Medis / Authorization to Medical Records</td>
@@ -469,6 +517,28 @@
                                 <img src="../../../../assets/icons/ic_dot.png" width="7px" height="7px">
                               </div>
                               <div>Hasil Radiologi / Radiology Result</div>
+                              <div class="clear: left;"></div>
+                            </div>
+                          </td>
+                        </tr>
+                        <tr>
+                          <td colspan="3">
+                            <div class="row">
+                              <div style="margin-left: 0.5em; margin-right: 0.5em; margin-top: 0.3em; float: left;">
+                                <img src="../../../../assets/icons/ic_dot.png" width="7px" height="7px">
+                              </div>
+                              <div>Resep / Prescription</div>
+                              <div class="clear: left;"></div>
+                            </div>
+                          </td>
+                        </tr>
+                        <tr>
+                          <td colspan="3">
+                            <div class="row">
+                              <div style="margin-left: 0.5em; margin-right: 0.5em; margin-top: 0.3em; float: left;">
+                                <img src="../../../../assets/icons/ic_dot.png" width="7px" height="7px">
+                              </div>
+                              <div>Tagihan / Ongoing Bill</div>
                               <div class="clear: left;"></div>
                             </div>
                           </td>
@@ -580,33 +650,58 @@
                     </div>
                   </div>
                 </div>
-                <div class="col-md-4" style="padding: 0">
-                  <iframe [src]="getKtp" style="width:25em; height:17em;" frameborder="0"></iframe>
+                <div *ngIf="getDisclaimer && formatFlag" class="col-md-4" style="padding: 0">
+                  <iframe [src]="getDisclaimer" style="width:25em; height:17em;" frameborder="0"></iframe>
+                  <hr>
+                  <span>{{fileName}}</span>
+                </div>
+                <div *ngIf="getDisclaimer && !formatFlag" class="col-md-4" style="padding: 0">
+                  <img style="width: 25em; height: 17em;" src="{{getDisclaimer}}">
+                  <hr>
+                  <span>{{fileName}}</span>
                 </div>
               </div>
               <form [formGroup] = "uploadForm" (ngSubmit)="onSubmitUpload()" enctype="multipart/form-data">
-              <div class="row">
-                <div class="col-md-10 mob_valid_1">
-                  <div class="image-upload">
-                      2. 
-                    <label for="file-input">
-                      <img style="height: 3rem; width: 4rem; margin-left: 0.5em;margin-right: 0.5rem" src="../../../../assets/icons/ic_folder.png">
-                    </label>
-                      <input id="file-input" type="file" (change)="uploadDisclaimer($event)" accept="application/pdf"/> UPLOAD DISCLAIMER
-                      <img *ngIf="flagFile1" src="../../../../assets/icons/ic_checklist.png" style="width: 3em; height: 3em;">
-                      <div style="float: right;">
-                      <img *ngIf="flagFile1" src="../../../../assets/icons/ic_delete.svg" (click)="deleteDisclaimer()" style="width: 3em; height: 3em;">
+                <div class="row">
+                  <div class="col-md-10 mob_valid_8">
+                    <div class="image-upload">
+                        2. 
+                      <label *ngIf="dataContact.email_address !== this.editEmail">
+                        <div>
+                          <input formControlName="checkboxPatient" type="checkbox" style="width: 1.5vw; height: 1.5vw; position: absolute; margin-left: 0.5vw" (click)="checkDataPatient()" [(ngModel)]="checkData">
+                          <span style="margin-left: 2.5vw">PATIENT IDENTITY AND CONSENT CHECKED</span>
+                        </div>
+                      </label>
+                    </div>
+                  </div>
+                  <div class="col-md-10 mob_valid_7">
+                    <div class="image-upload">
+                      <label for="file-input">
+                        <img style="height: 3rem; width: 4rem; margin-left: 0.5em;margin-right: 0.5rem" src="../../../../assets/icons/ic_folder.png">
+                      </label>
+                        <input id="file-input" type="file" (change)="uploadDisclaimer($event)" accept="application/pdf, .jpg, .jpeg"/> UPLOAD DATA
+                        <img *ngIf="flagFile1" src="../../../../assets/icons/ic_checklist.png" style="width: 3em; height: 3em;">
+                        <div style="float: right;">
+                          <img *ngIf="flagFile1" src="../../../../assets/icons/ic_delete.svg" (click)="deleteDisclaimer()" style="width: 3em; height: 3em;">
+                        </div>
+                    </div>
+                    <div style="color: red; font-style: italic; font-size: 12px">
+                      * Format file JPG and PDF only (max 10MB)
+                    </div>
+                  </div>
+                </div>
+                <div class="row">
+                  <div class="col-md-12">
+                    <div class="tar">
+                      <div [ngStyle]="{ display: dataContact.email_address !== this.editEmail ? 'block' : 'none'}">
+                        <button type="submit" [disabled]="checkData === false" class="btn fo_btn_registration fo_btn_save">Save</button>
                       </div>
+                      <div [ngStyle]="{ display: dataContact.email_address === this.editEmail ? 'block' : 'none'}">
+                        <button type="submit" class="btn fo_btn_registration fo_btn_save">Save</button>
+                      </div>
+                    </div>
                   </div>
                 </div>
-              </div>
-              <div class="row">
-                <div class="col-md-12">
-                  <div class="tar">
-                    <button type="submit" class="fo_btn_registration fo_btn_save">Save</button>
-                  </div>
-                </div>
-              </div>
               </form>
           </div>
           </div>
@@ -637,6 +732,42 @@
       <div class="modal-footer">
         <button type="button" class="btn ms_btn_black" (click)="modal.close()">Cancel</button>
         <button class="btn ms_btn_green" [ngClass]="{'disable': flagConfirm}" (click)="onSubmitUpload()" (click)="modal.close()">Confirm</button>
+      </div>
+    </ng-template>
+
+    <ng-template #confirmEdit let-modal let-c="close">
+      <div class="modal-header">
+        <div class="header-2 modal-padding">Update HOPE Data</div>
+      </div>
+      <div class="modal-body">
+        <div class="row spacing-row">
+          <div class="col-md-7">
+            Name <input [(ngModel)]="nameHope" class="form-control mob_valid_6" disabled>
+          </div>
+          <div class="col-md-5">
+            DOB <input [(ngModel)]="birthDateFormat" class="form-control mob_valid_6" disabled>
+          </div>
+        </div>
+        <div class="row spacing-row">
+          <div class="col-md-6">
+            Mobile no. (1) <input [textMask]="{mask: mask}" class="form-control mob_valid_6" type="text" (keyup)="checkCountChar()" [(ngModel)]="phoneNumberOne">
+            <span *ngIf="!flagCountOne || phoneNumberOne?.length === 0" style="color: red;">* min 9 character</span>
+          </div>
+          <div class="col-md-6">
+            Mobile no. (2) <input [textMask]="{mask: mask}" class="form-control mob_valid_6" type="text" (keyup)="checkCountChar()" [(ngModel)]="phoneNumberTwo">
+            <span *ngIf="flagCountOne && (!flagCountTwo && phoneNumberTwo?.length > 0)" style="color: red;">* min 9 character</span>
+          </div>
+        </div>
+        <div class="row">
+          <div class="col-md-12">
+            Address <br><textarea [(ngModel)]="addressHope" class="form-control" disabled>testing</textarea>
+          </div>
+        </div>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn ms_btn_black" (click)="c('Cross click')">Cancel</button>
+        <button class="btn ms_btn_green" [disabled]="(!flagCountOne || phoneNumberOne?.length === 0) 
+        || (flagCountOne && !flagCountTwo && phoneNumberTwo?.length > 0)" (click)="confirmSavePhoneNumber()">Update HOPE</button>
       </div>
     </ng-template>
   

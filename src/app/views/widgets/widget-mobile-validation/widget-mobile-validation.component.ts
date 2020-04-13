@@ -1,15 +1,17 @@
 import { Component, OnInit } from '@angular/core';
-import { FormBuilder, FormGroup } from '@angular/forms';
+import { FormBuilder, FormGroup, FormControl } from '@angular/forms';
 import { PatientService } from '../../../services/patient.service';
 import { GeneralService } from '../../../services/general.service';
 import { AccountMobile } from '../../../models/patients/account-mobile';
-import { sourceApps, mobileStatus, contactStatus } from '../../../variables/common.variable';
-import { NgbModal, NgbActiveModal } from '@ng-bootstrap/ng-bootstrap';
+import { sourceApps, mobileStatus, contactStatus, channelId, typeFile, formatFile } from '../../../variables/common.variable';
+import { NgbModal, NgbActiveModal, ModalDismissReasons, NgbModalConfig } from '@ng-bootstrap/ng-bootstrap';
 import { AlertService } from '../../../services/alert.service';
 import { Alert, AlertType } from '../../../models/alerts/alert';
 import * as moment from 'moment';
 import { DomSanitizer } from '@angular/platform-browser';
 import { environment } from '../../../../environments/environment';
+import Swal from 'sweetalert2';
+import { dateFormatter } from '../../../utils/helpers.util';
 
 @Component({
   selector: 'app-widget-mobile-validation',
@@ -17,9 +19,10 @@ import { environment } from '../../../../environments/environment';
   styleUrls: ['./widget-mobile-validation.component.css']
 })
 export class WidgetMobileValidationComponent implements OnInit {
+  public maxSize10MB: number = 10485760;
   public assetPath = environment.ASSET_PATH;
-  public urlKtp = environment.GET_IMAGE_KTP;
-  public getKtp;
+  public urlDisclaimer = environment.GET_IMAGE_DISCLAIMER;
+  public getDisclaimer;
   public key: any = JSON.parse(localStorage.getItem('key'));
   public hospital = this.key.hospital;
   public user = this.key.user;
@@ -45,10 +48,13 @@ export class WidgetMobileValidationComponent implements OnInit {
   public editEmail: string;
   public editContactPayload: any;
   public flagFile1: boolean = false;
-  public flagFile2: boolean = false;
   public validUpload1: boolean = false;
   public validUpload2: boolean = false;
   public flagEmail: boolean = false;
+  public loadingBar: boolean = false;
+  public loadingBarTwo: boolean = false;
+  public checkData: boolean = false;
+  public flagAlert: boolean = false;
 
   public mask = [/\d/, /\d/, /\d/, /\d/, /\d/, /\d/, /\d/, /\d/, /\d/, /\d/, /\d/, /\d/, /\d/];
   public mask_birth = [/\d/, /\d/, '-', /\d/, /\d/, '-', /\d/, /\d/, /\d/, /\d/];
@@ -64,10 +70,24 @@ export class WidgetMobileValidationComponent implements OnInit {
   public showWaitMsg: boolean = true;
   public mobileStatus = mobileStatus;
   public contactStatus = contactStatus;
-  public assetKtp: any;
-  public assetDisclaimer: any;
+  public assetDisclaimer: any = null;
   public formPrint;
   uploadForm: FormGroup;
+  public postHope: any;
+  public patientHopeId: any;
+  public phoneNumberOne: any;
+  public phoneNumberTwo: any;
+  public flagCountOne: boolean = false;
+  public flagCountTwo: boolean = false;
+  public dateBirth: any;
+  public searchPatient: boolean = false;
+  public nameHope: any;
+  public birthDateFormat: any;
+  public addressHope: any;
+  public formatFileServer: any;
+  public formatFlag: boolean = false;
+  public urlDownload: any;
+  public fileName: any;
 
   constructor(
     private patientService: PatientService,
@@ -76,6 +96,7 @@ export class WidgetMobileValidationComponent implements OnInit {
     private activeModal: NgbActiveModal,
     private formBuilder: FormBuilder,
     private sanitizer: DomSanitizer,
+    modalSetting: NgbModalConfig,
   ) {
     this.formPrint = [
       {header: 'Name'},
@@ -83,6 +104,9 @@ export class WidgetMobileValidationComponent implements OnInit {
       {header: 'No. MR Central'},
       {header: 'Mobile Number'},
       {header: 'Email'}];
+
+    modalSetting.backdrop = 'static';
+    modalSetting.keyboard = false;
    }
 
   ngOnInit() {
@@ -90,7 +114,7 @@ export class WidgetMobileValidationComponent implements OnInit {
     this.getCollectionAlert();
     this.uploadForm = this.formBuilder.group({
       disclaimer: [''],
-      ktp: ['']
+      checkboxPatient: new FormControl('checkboxPatient'),
     });
   }
 
@@ -111,101 +135,137 @@ export class WidgetMobileValidationComponent implements OnInit {
           //........Customized style.......
           </style>
         </head>
-    <body onload="window.print();window.close()">${printContents}</body>
+    <body onload="document.execCommand('print');window.close()">${printContents}</body>
       </html>`
     );
     popupWin.document.close();
 }
+
+  checkDataPatient() {
+    this.checkData === false ? this.checkData = true : this.checkData = false;
+  }
 
   deleteDisclaimer() {
     this.uploadForm.get('disclaimer').setValue(null);
     this.flagFile1 = false;
   }
 
-  deleteKtp() {
-    this.uploadForm.get('ktp').setValue(null);
-    this.flagFile2 = false;
-  }
-  
   uploadDisclaimer(event){
     if (event.target.files.length > 0) {
-      this.flagFile1 = true;
-      const file = event.target.files[0];
-      this.uploadForm.get('disclaimer').setValue(file);
-    }
-  }
-
-  uploadKtp(event){
-    if (event.target.files.length > 0) {
-      this.flagFile2 = true;
-      const file = event.target.files[0];
-      this.uploadForm.get('ktp').setValue(file);
+      if(event.target.files[0].type === typeFile.image || event.target.files[0].type === typeFile.pdf) {
+        if(event.target.files[0].size > this.maxSize10MB) {
+          Swal.fire({
+            position: 'center',
+            type: 'error',
+            title: 'Max size 10MB',
+            showConfirmButton: false,
+            timer: 2000
+          })
+        } else {
+          this.flagFile1 = true;
+          const file = event.target.files[0];
+          this.uploadForm.get('disclaimer').setValue(file);
+        }
+      } else {
+        Swal.fire({
+          position: 'center',
+          type: 'error',
+          title: 'Format file JPG and PDF only',
+          showConfirmButton: false,
+          timer: 2000
+        })
+      }
     }
   }
 
   async onSubmitUpload() {
     const formData_1 = new FormData();
-    const formData_2 = new FormData();
     formData_1.append('uploader', 'disclaimer_1');
     formData_1.append('filePdf', this.uploadForm.get('disclaimer').value);
-    formData_2.append('uploader', 'identity');
-    formData_2.append('filePdf', this.uploadForm.get('ktp').value);
 
     if(this.dataContact.email_address) {
-      this.assetDisclaimer = await this.patientService.uploadImage(formData_1)
-      .toPromise().then(res => {
-        return res.data;
-      }).catch(err => {
-        this.alertService.error(err.error.message, false, 5000);
-      });
-
+      if(this.uploadForm.get('disclaimer').value) {
+        this.assetDisclaimer = await this.patientService.uploadImage(formData_1)
+          .toPromise().then(res => {
+            return res.data;
+          }).catch(err => {
+            Swal.fire({
+              type: 'error',
+              title: 'Oops...',
+              text: err.error.message,
+              timer: 4000
+            })
+          });
+      }
     if(this.selectedAccount.mobile_status !== mobileStatus.ACCESSED) {
-      this.assetKtp = await this.patientService.uploadImage(formData_2)
-        .toPromise().then(res => {
-          return res.data;
-        }).catch(err => {
-          this.alertService.error(err.error.message, false, 5000);
-        });
-        await this.editDataContact(this.assetDisclaimer.name);
-        await this.editContactUpload(this.assetDisclaimer.name, this.assetKtp.name);
+        if(this.assetDisclaimer) {
+          await this.editContactUpload(this.assetDisclaimer.name);
+          await this.editDataContact(this.assetDisclaimer.name);
+        } else {
+          await this.editContactUpload(null);
+          await this.editDataContact(null);
+        }
       }
       else if (this.selectedAccount.mobile_status === mobileStatus.ACCESSED) {
-        this.editDataContact(this.assetDisclaimer.name);
+        if(this.assetDisclaimer) {
+          this.editDataContact(this.assetDisclaimer.name);
+        } else {
+          this.editDataContact(null);
+        }
+        
       }
     }
   }
 
-  async editContactUpload(disclaimer, ktp) {
+  async editContactUpload(disclaimer) { //open access MR
     let body;
     body = {
-      disclaimer: disclaimer,
       contactId: this.dataContact.contact_id,
       userId: this.user.id,
       source: sourceApps,
       userName: this.user.username
     }
-    ktp ? body.identity = ktp : '';
+    if(disclaimer) {
+      body.disclaimer = disclaimer;
+    }
     this.patientService.uploadContact(body).subscribe(
       data => {
-        this.assetKtp = null;
         this.assetDisclaimer = null;
         this.flagFile1 = false;
-        this.flagFile2 = false;
         this.uploadForm.get('disclaimer').setValue(null);
-        this.uploadForm.get('ktp').setValue(null);
-        this.alertService.success('Upload Data Success', false, 5000);
+        this.flagAlert = true;
+        Swal.fire({
+          position: 'center',
+          type: 'success',
+          title: 'Patient portal access opened, please instruct patient to open patient portal',
+          showConfirmButton: false,
+          timer: 5000
+        })
         this.getListAccount();
         this.selectedAccount.contact_status_id = contactStatus.VERIFIED;
         this.selectedAccount.mobile_status = mobileStatus.ACCESSED;
         this.choosedAccount(this.selectedAccount);
       }, error => {
-        this.alertService.error(error.error.message, false, 5000);
+        Swal.fire({
+          type: 'error',
+          title: 'Oops...',
+          text: error.error.message,
+          timer: 4000
+        })
       }
     )
   }
 
   openConfirmationModal(modal: any) {
     this.modalService.open(modal);
+  }
+
+  openLarge(modal: any) {
+    this.modalService.open(modal, { windowClass: 'fo_modal_admission' }).result.then((result) => {
+      this.closeResult = `Closed with: ${result}`;
+    }, (reason) => {
+      this.closeResult = `Dismissed ${this.getDismissReason(reason)}`;
+    });
   }
 
   async verifyPatient() {
@@ -219,19 +279,33 @@ export class WidgetMobileValidationComponent implements OnInit {
     };
     this.patientService.verifyPatient(payload).subscribe(
       data => {
-        this.alertService.success('Verify Patient Success', false, 5000);
+        Swal.fire({
+          position: 'top-end',
+          type: 'success',
+          title: 'Success',
+          text: 'Verify Patient Success',
+          showConfirmButton: false,
+          timer: 3000
+        })
         this.getListAccount();
+        this.selectedAccount.contact_id = data.data.contact_id;
         this.selectedAccount.contact_status_id = contactStatus.VERIFIED;
         this.selectedAccount.mobile_status = mobileStatus.ACTIVE;
         this.choosedAccount(this.selectedAccount);
       }, error => {
-        this.alertService.error(error.error.message, false, 5000);
+        Swal.fire({
+          type: 'error',
+          title: 'Oops...',
+          text: error.error.message,
+          timer: 4000
+        })
       }
     )
 
   }
 
   editDataContact(disclaimer){
+    let body;
     if(this.selectedAccount.mobile_status !== mobileStatus.ACCESSED) {
       this.editContactPayload = {
         contactId: this.dataContact.contact_id,
@@ -242,37 +316,71 @@ export class WidgetMobileValidationComponent implements OnInit {
         userName: this.user.username,
         source: sourceApps
       };
+      body = {
+        ...this.editContactPayload
+      }
     } else if(this.selectedAccount.mobile_status === mobileStatus.ACCESSED) {
       this.editContactPayload = {
         contactId: this.dataContact.contact_id,
-        data: {
-          disclaimer1: disclaimer
-        },
         userId: this.user.id,
         userName: this.user.username,
         source: sourceApps
       };
+      body = {
+        ...this.editContactPayload,
+        data: {}
+      }
       this.editEmail !== this.dataContact.email_address ? 
-      this.editContactPayload.data.emailAddress = this.dataContact.email_address : '';
+      body.data.emailAddress = this.dataContact.email_address : '';
+      disclaimer ? body.data.disclaimer1 = disclaimer : ''; //replace disclaimer when already opened access MR 
     }
 
-    this.patientService.updateContact(this.selectedAccount.contact_id, this.editContactPayload).subscribe(
+    this.patientService.updateContact(this.selectedAccount.contact_id, body).subscribe(
       data => {
         this.getListAccount();
+        if(disclaimer) {
+          this.getDisclaimer = null;
+          this.formatFileServer = disclaimer.split('.');
+          this.fileName = disclaimer;
+          this.urlDownload = this.urlDisclaimer + disclaimer;
+          if(this.formatFileServer[1] === formatFile.pdf) {
+            this.formatFlag = true;
+            this.getDisclaimer = this.sanitizer.bypassSecurityTrustResourceUrl(this.urlDisclaimer + disclaimer);
+          } else {
+            this.formatFlag = false;
+            this.getDisclaimer = this.urlDisclaimer + disclaimer;
+          }
+        }
         this.flagFile1 = false;
         this.uploadForm.get('disclaimer').setValue(null);
-        this.alertService.success('Edit Success', false, 5000);
+        if(this.flagAlert === false) {  
+          Swal.fire({
+            position: 'top-end',
+            type: 'success',
+            title: 'Edit Success',
+            showConfirmButton: false,
+            timer: 3000
+          })
+        }
       }, error => {
-        this.alertService.error(error.error.message, false, 5000);
+        Swal.fire({
+          type: 'error',
+          title: 'Oops...',
+          text: error.error.message,
+          timer: 4000
+        })
       }
     )
   }
 
   getSearchedPatient1() {
+    this.searchPatient = true;
     this.flagSearch = false;
-    let dateBirth = moment(this.selectedAccount.birth_date, 'DD-MM-YYYY').format('YYYY-MM-DD');
-    this.patientService.searchPatientAccessMr(this.selectedAccount.name, dateBirth).subscribe(
+    this.loadingBarTwo = true;
+    this.dateBirth = moment(this.selectedAccount.birth_date, 'DD-MM-YYYY').format('YYYY-MM-DD');
+    this.patientService.searchPatientAccessMr(this.selectedAccount.name, this.dateBirth).subscribe(
       data => {
+        this.loadingBarTwo = false;
         this.flagSearch = true;
         let newData = data.data;
         if(newData.length){
@@ -286,20 +394,30 @@ export class WidgetMobileValidationComponent implements OnInit {
           }
         }
         else {
+          this.loadingBarTwo = false;
           this.flagSearch = true;
           this.patientHope = null;
         }
       }, error => {
+        this.loadingBarTwo = false;
         this.flagSearch = true;
-        this.alertService.error(error.error.message, false, 5000);
+        Swal.fire({
+          type: 'error',
+          title: 'Oops...',
+          text: error.error.message,
+          timer: 4000
+        })
       }
     )
   }
 
   getSearchedPatient2() {
+    this.searchPatient = false;
     this.flagSearch = false;
+    this.loadingBarTwo = true;
     this.patientService.searchPatientAccessMr2(this.hospital.id, this.mrLocal).subscribe(
       data => {
+        this.loadingBarTwo = false;
         this.flagSearch = true;
         let newData = data.data;
         if(newData.length){
@@ -313,11 +431,102 @@ export class WidgetMobileValidationComponent implements OnInit {
           }
         }
         else {
+          this.loadingBarTwo = false;
           this.patientHope = null;
         }
       }, error => {
+        this.loadingBarTwo = false;
         this.flagSearch = true;
-        this.alertService.error(error.error.message, false, 5000);
+        Swal.fire({
+          type: 'error',
+          title: 'Oops...',
+          text: error.error.message,
+          timer: 4000
+        })
+      }
+    )
+  }
+
+  async getPatientHopeId(val, content) {
+    let body = await this.patientService.getPatientHopeDetail(val.patientId)
+      .toPromise().then(res => {
+        return res.data;
+      }).catch(err => {
+        Swal.fire({
+          type: 'error',
+          title: 'Oops...',
+          text: err.error.message,
+          timer: 4000
+        })
+      });
+    const { patientId, name, sexId, birthPlaceId, birthDate, titleId, maritalStatusId, address, cityId, districtId, 
+            subDistrictId, postCode, homePhoneNo, officePhoneNo, mobileNo1, mobileNo2, emailAddress,
+            permanentAddress, permanentCityId, permanentPostCode, nationalIdTypeId, nationalIdNo,
+            nationalityId, religionId, bloodTypeId, fatherName, motherName, spouseName, contactName,
+            contactAddress, contactCityId, contactPhoneNo, contactMobileNo, contactEmailAddress, allergy,
+            payerId, payerIdNo, notes } = body;
+            
+    this.patientHopeId = patientId;
+
+    let bodyTwo = {
+      name, sexId, birthPlaceId, birthDate, titleId, maritalStatusId, address, cityId, districtId, 
+      subDistrictId, postCode, homePhoneNo, officePhoneNo, mobileNo2, emailAddress,
+      permanentAddress, permanentCityId, permanentPostCode, nationalIdTypeId, nationalIdNo,
+      nationalityId, religionId, bloodTypeId, fatherName, motherName, spouseName, contactName,
+      contactAddress, contactCityId, contactPhoneNo, contactMobileNo, contactEmailAddress, allergy,
+      payerId, payerIdNo, notes, patientOrganizationId : val.patientOrganizationId, organizationId: val.hospitalId
+    }
+
+    this.phoneNumberOne = mobileNo1;
+    this.phoneNumberTwo = mobileNo2;
+    this.nameHope = name;
+    this.addressHope = address;
+    this.birthDateFormat = dateFormatter(birthDate, true);
+    this.postHope = bodyTwo;
+    this.checkCountChar();
+    this.openLarge(content);
+  }
+
+  checkCountChar() {
+    let countCharOne = this.charRemove(this.phoneNumberOne);
+    let countCharTwo = this.charRemove(this.phoneNumberTwo);
+    
+    if(countCharOne) {
+      this.flagCountOne = countCharOne.length > 8 ? true : false;
+    }
+    if(countCharTwo) {
+      this.flagCountTwo = countCharTwo.length > 8 ? true : false;
+    }
+  }
+
+  confirmSavePhoneNumber() {
+    this.postHope.mobileNo1 = this.charRemove(this.phoneNumberOne);
+    this.postHope.mobileNo2 = this.charRemove(this.phoneNumberTwo);
+    this.postHope.channelId = channelId.FRONT_OFFICE;
+    this.postHope.userId = this.user.id;
+    this.postHope.source = sourceApps;
+    this.postHope.userName = this.user.fullname;
+    this.patientService.updatePatientComplete(this.postHope, this.patientHopeId).subscribe(
+      data => {
+        if(this.searchPatient === true) this.getSearchedPatient1();
+        else this.getSearchedPatient2();
+        
+        Swal.fire({
+          position: 'top-end',
+          type: 'success',
+          title: 'Success',
+          text: 'Edit Phone Number Success',
+          showConfirmButton: false,
+          timer: 3000
+        })
+        this.modalService.dismissAll();
+      }, error => {
+        Swal.fire({
+          type: 'error',
+          title: 'Oops...',
+          text: error.error.message,
+          timer: 4000
+        })
       }
     )
   }
@@ -364,9 +573,13 @@ export class WidgetMobileValidationComponent implements OnInit {
   }
 
   async choosedAccount(val) {
-    //this.selectedAccount = val;
+    this.checkData = false;
+    this.flagAlert = false;
     this.patientHope = null;
     this.flagSearch = false;
+    this.uploadForm.get('disclaimer').setValue(null);
+    this.flagFile1 = false;
+
     this.selectedAccount = {
       contact_id: val.contact_id,
       name: val.name,
@@ -378,35 +591,74 @@ export class WidgetMobileValidationComponent implements OnInit {
     };
     if(this.selectedAccount.contact_status_id === contactStatus.VERIFIED
       && this.selectedAccount.mobile_status === mobileStatus.ACTIVE) {
+        this.loadingBar = true;
         this.dataContact = await this.patientService.getContact(this.selectedAccount.contact_id)
           .toPromise().then(res => {
             return res.data;
           }).catch(err => {
-            this.alertService.error(err.error.message, false, 5000);
+            Swal.fire({
+              type: 'error',
+              title: 'Oops...',
+              text: err.error.message,
+              timer: 4000
+            })
           });
         this.editEmail = this.dataContact.email_address;
         this.dataPatientHope = await this.patientService.getPatientHopeDetail(this.dataContact.patient_hope_id)
           .toPromise().then(res => {
+            this.loadingBar = false;
             return res.data;
           }).catch(err => {
-            this.alertService.error(err.error.message, false, 5000);
+            this.loadingBar = false;
+            Swal.fire({
+              type: 'error',
+              title: 'Oops...',
+              text: err.error.message,
+              timer: 4000
+            })
           });
       }
       else if(this.selectedAccount.contact_status_id === contactStatus.VERIFIED
         && this.selectedAccount.mobile_status === mobileStatus.ACCESSED) {
+          this.loadingBar = true;
           this.dataContact = await this.patientService.getContact(this.selectedAccount.contact_id)
             .toPromise().then(res => {
               return res.data;
             }).catch(err => {
-              this.alertService.error(err.error.message, false, 5000);
+              Swal.fire({
+                type: 'error',
+                title: 'Oops...',
+                text: err.error.message,
+                timer: 4000
+              })
             });
           this.editEmail = this.dataContact.email_address;
-          this.getKtp = this.sanitizer.bypassSecurityTrustResourceUrl(this.urlKtp + this.dataContact.identity);
+          if(this.dataContact.disclaimer_1) {
+            this.formatFileServer = this.dataContact.disclaimer_1.split('.');
+            this.urlDownload = this.urlDisclaimer + this.dataContact.disclaimer_1;
+            this.fileName = this.dataContact.disclaimer_1;
+            if(this.formatFileServer[1] === formatFile.pdf) {
+              this.formatFlag = true;
+              this.getDisclaimer = this.sanitizer.bypassSecurityTrustResourceUrl(this.urlDisclaimer + this.dataContact.disclaimer_1);
+            } else {
+              this.formatFlag = false;
+              this.getDisclaimer = this.urlDisclaimer + this.dataContact.disclaimer_1;
+            }
+          } else {
+            this.getDisclaimer = null
+          }
           this.dataPatientHope = await this.patientService.getPatientHopeDetail(this.dataContact.patient_hope_id)
             .toPromise().then(res => {
+              this.loadingBar = false;
               return res.data;
             }).catch(err => {
-              this.alertService.error(err.error.message, false, 5000);
+              this.loadingBar = false;
+              Swal.fire({
+                type: 'error',
+                title: 'Oops...',
+                text: err.error.message,
+                timer: 4000
+              })
             });
         }
   }
@@ -452,6 +704,17 @@ export class WidgetMobileValidationComponent implements OnInit {
         return 'info';
       case AlertType.Warning:
         return 'warning';
+    }
+  }
+
+  private getDismissReason(reason: any): string {
+
+    if (reason === ModalDismissReasons.ESC) {
+      return 'by pressing ESC';
+    } else if (reason === ModalDismissReasons.BACKDROP_CLICK) {
+      return 'by clicking on a backdrop';
+    } else {
+      return `with: ${reason}`;
     }
   }
 

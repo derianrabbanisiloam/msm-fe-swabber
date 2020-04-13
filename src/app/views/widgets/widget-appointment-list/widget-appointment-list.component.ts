@@ -177,7 +177,6 @@ export class WidgetAppointmentListComponent implements OnInit {
     this.emitUpdateContact();
     this.getCollectionAlert();
 
-
     this.socket.on(CANCEL_APP+'/'+this.hospital.id, (call) => {
       if (call.data.hospital_id == this.hospital.id
         && call.data.appointment_date == this.dateApp) {

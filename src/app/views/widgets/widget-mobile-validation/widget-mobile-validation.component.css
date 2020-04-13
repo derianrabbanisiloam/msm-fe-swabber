@@ -1,7 +1,22 @@
+.spacing-row {
+  margin-bottom: 1em;
+}
+
+::ng-deep .fo_modal_admission .modal-dialog {
+  margin: 10% auto;
+  max-width: 35%;
+}
+
 .error-msg {
   color: red;
   float: right;
   right:0;
+}
+.error-msg-2 {
+  color: red;
+  float: left;
+  right:0;
+  margin-left: -2vw
 }
 .image-upload>input {
   display: none;
@@ -123,6 +138,17 @@
 }
 .mob_valid_6 {
   height: 3em;
+}
+.mob_valid_7 {
+  padding-left: 3em;
+  font-weight: bold;
+  font-size: small;
+}
+.mob_valid_8{
+  padding-left: 3em;
+  padding-top: 1.5em;
+  font-weight: bold;
+  font-size: small;
 }
 
 .fo_btn_registration{ height: 4rem;

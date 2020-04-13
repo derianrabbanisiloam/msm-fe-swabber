@@ -173,5 +173,12 @@ export class PatientService {
     
     return this.http.post<any>(url, body, httpOptions);
   }
-  
+
+  createPatientByContactId(contactId: any, payload: any){
+    const url = `${this.patientUrl}/${contactId}`;
+    const body = JSON.stringify(payload);
+    
+    return this.http.post<any>(url, body, httpOptions);
+  }
+
 }

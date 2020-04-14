@@ -5,6 +5,7 @@ export class addScheduleBlockPayload {
       toTime: string;
       reason: string;
       isIncludeWaitingList: boolean;
+      isTeleconsultation: boolean;
       userId: string;
       userName: string;
       source: string;
@@ -18,6 +19,7 @@ export class addScheduleBlockPayload {
       toTime: string;
       reason: string;
       isIncludeWaitingList: boolean;
+      isTeleconsultation: boolean;
       userId: string;
       userName: string;
       source: string;

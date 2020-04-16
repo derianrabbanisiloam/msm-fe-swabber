@@ -11,6 +11,7 @@ export class ScheduleBlock {
     th?: string;
     tm?: string;
     is_include_waiting_list: boolean;
+    is_teleconsultation: boolean;
     is_active: boolean;
     created_by: string;
     created_date: string;

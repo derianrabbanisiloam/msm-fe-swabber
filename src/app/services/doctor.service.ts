@@ -134,19 +134,28 @@ export class DoctorService {
     return this.http.get<any>(url, httpOptions);
   }
 
-  getScheduleByDoctorId(doctorId: string, date: string, hospitalId?: string): Observable<any> {
+  getScheduleByDoctorId(doctorId: string, date: string, hospitalId?: string, consultationType?: string): Observable<any> {
     // return of(SCHEDULES);
-    const url = `${this.scheduleUrl}?doctorId=${doctorId}&date=${date}&hospitalId=${hospitalId}`;
+    let url = `${this.scheduleUrl}?doctorId=${doctorId}&date=${date}&hospitalId=${hospitalId}`;
+    url = consultationType ? `${url}&consultationTypeId=${consultationType}` : url;
     return this.http.get<any>(url, httpOptions);
   }
 
-  getScheduleByKeywords(specialityId: string, date: string, areaId?: string, hospitalId?: string): Observable<any> {
+  getScheduleByKeywords(
+    specialityId: string, 
+    date: string, 
+    areaId?: string, 
+    hospitalId?: string,
+    consultationType?: string
+    ): Observable<any> {
     // return of(SCHEDULES2);
     let url = this.scheduleUrl;
     if (areaId) {
       url = `${this.scheduleUrl}?areaId=${areaId}&specialityId=${specialityId}&date=${date}`;
+      url = consultationType ? `${url}&consultationTypeId=${consultationType}` : url;
     } else {
       url = `${this.scheduleUrl}?hospitalId=${hospitalId}&specialityId=${specialityId}&date=${date}`;
+      url = consultationType ? `${url}&consultationTypeId=${consultationType}` : url;
     }
     return this.http.get<any>(url, httpOptions);
   }

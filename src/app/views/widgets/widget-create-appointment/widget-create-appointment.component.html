@@ -15,8 +15,8 @@
       </div>
     </div>
     <div class="" style="margin-bottom: 1vw">
-      <div class="header-2 center-text">{{schedule.doctor_name}} | {{ doctorProfile.doctor_type_name }}</div>
-      <div class="body-text center-text"><span class="bold">Hospital:</span> {{schedule.hospital_name}}</div>
+      <div class="header-2 center-text">{{schedule[0].doctor_name}} | {{ doctorProfile.doctor_type_name }}</div>
+      <div class="body-text center-text"><span class="bold">Hospital:</span> {{schedule[0].hospital_name}}</div>
       <div id="sub-quota-doctor" class="body-text center-text">
         <span class="bold">quota: </span>{{doctorProfile.quota}}
         <span class="bold">reservation: </span>{{doctorProfile.reservation}}
@@ -44,22 +44,26 @@
     </div>
   </div>
 
-  <div class="content-appointment-01-group-col-2">
-    <div class="">
+  <div class="content-appointment-01-group-col-2" *ngFor="let schArray of appList; let i=index;">
+    <div>
       <table class="table shadow-4" id="tutorial8">
-        <thead>
-          <tr>
-            <th colspan="11" class="header-2 left-text no-padding center-text" style="padding: 1rem 1rem">
-              {{ appDateDisplay }} | Floor {{ schedule.floor_name }} - Wing {{ schedule.wing_name }} - Room
-              {{ schedule.room_name }}
+        <thead *ngFor="let schList of schedule">
+          <tr *ngIf="schList.schedule_id === schArray.schedule_id">
+            <th *ngIf="schArray.consultation_type_id != 4" colspan="11" class="header-2 left-text no-padding center-text" style="padding: 1rem 1rem">
+              {{ appDateDisplay }} | Floor {{ schList.floor_name }} - Wing {{ schList.wing_name }} - Room
+              {{ schList.room_name }}
+            </th>
+            <th *ngIf="schArray.consultation_type_id == 4" colspan="11" class="header-2 left-text no-padding center-text" style="padding: 1rem 1rem">
+              <span style="font-weight: bold;">Teleconsultation</span> <span class="flag-tele">TELE</span> 
+              {{ appDateDisplay }}
             </th>
           </tr>
-          <tr class="column-header foot-note blue table-title">
+          <tr class="column-header foot-note blue table-title" *ngIf="schList.schedule_id === schArray.schedule_id">
             <th *ngFor="let header of table1Header">{{header}}</th>
           </tr>
         </thead>
-        <tbody>
-          <tr *ngFor="let app of appList; let i=index"
+        <tbody *ngIf="schArray.consultation_type_id != 4">
+          <tr *ngFor="let app of schArray.appointment; let i=index"
             [ngClass]="{'cc_row_rescheduled': app.is_blocked == true || isOpen == false && app.is_walkin == true }">
             <td class="st-kolom-time">{{app.appointment_range_time}}</td>
             <td>{{app.no}}</td>
@@ -129,83 +133,162 @@
             </td>
           </tr>
         </tbody>
-      </table>
-    </div>
-    <div class="col-md-12" *ngIf="doctorProfile.doctor_type_name !== doctorType.FCFS">
-      <p>Total Waiting List : <strong>{{appListWaiting.length - 1}}</strong></p>
-    </div>
+        <tbody *ngIf="schArray.consultation_type_id == 4">
+          <tr *ngFor="let app of schArray.appointment; let i=index"
+            [ngClass]="{'cc_row_rescheduled': app.is_blocked == true || isOpen == false}">
+            <td class="st-kolom-time">{{app.appointment_range_time}}</td>
+            <td>{{app.no}}</td>
+            <td *ngIf="app.is_can_create && isOriginal && isOpen == true" class="st-kolom-available"
+              (click)="openCreateAppModal(app)"><a>Available</a></td>
+            <td *ngIf="app.is_can_create && isOriginal && isOpen == false" class="st-kolom-available">Available</td>
 
-
-    <!--                              Waiting List                                -->
-    <table class="table shadow-4" *ngIf="doctorProfile.doctor_type_name !== doctorType.FCFS">
-      <thead>
-        <tr>
-          <th colspan="10" class="header-2 left-text no-padding" style="padding: 1rem 1rem">Waiting List</th>
-        </tr>
-        <tr class="column-header foot-note blue table-title">
-          <th *ngFor="let header of table2Header">{{header}}</th>
-        </tr>
-      </thead>
-      <tbody>
-        <tr *ngFor="let app of appListWaiting" [ngClass]="{'cc_row_rescheduled': app.is_blocked == true}">
-          <td class="st-kolom-time">{{app.appointment_range_time}}</td>
-          <td>{{app.no}}</td>
-          <td *ngIf="app.is_can_create && isOriginal" class="st-kolom-available" (click)="openCreateAppModal(app)">
-            <a>Available</a></td>
-          <td *ngIf="app.is_can_create && !isOriginal" class="st-kolom-available" (click)="openCreateAppModal2(app)">
-            <a>Available</a></td>
-          <td *ngIf="!app.is_can_create">
-            {{app.patient_name}}
-            <span class="newPatientIcon">
-              <span *ngIf="app.appointment_temp_id">
-                Tentative
+            <td *ngIf="app.is_can_create && !isOriginal && isOpen == true" class="st-kolom-available"
+              (click)="openCreateAppModal2(app)"><a>Available</a></td>
+            <td *ngIf="app.is_can_create && !isOriginal && isOpen == false" class="st-kolom-available">Available</td>
+            <td *ngIf="!app.is_can_create">
+              {{app.patient_name}}
+              <span *ngIf="app.appointment_temp_id" class="newPatientIcon">
                 <span>
-                  Please verify this patient first
+                  Tentative
+                  <span>
+                    Please verify this patient first
+                  </span>
                 </span>
               </span>
-            </span>
-          </td>
-          <td>{{app.date_of_birth}}</td>
-          <td>{{app.local_mr_no}}</td>
-          <td>{{app.phone_no}}</td>
-          <td>{{app.queue_no}}</td>
-          <td>
-            <a ngbPopover="{{app.note_long}}" popoverTitle="" triggers="mouseenter:mouseleave">{{app.note_short}}</a>
-          </td>
-          <td>
-            <a ngbPopover="{{app.modified_name}}" popoverTitle=""
-              triggers="mouseenter:mouseleave">{{app.modified_name && app.modified_name.length > 10 ? app.modified_name.substr(0,10)+"..." : app.modified_name}}</a>
-          </td>
-          <td class="st-kolom-button">
-
-            <div *ngIf="!app.appointment_temp_id">
-              <div *ngIf="app.is_can_cancel && isOriginal && !app.admission_id"
-                class="cell-img-nav d-flex justify-content-center">
-                <div *ngIf="isOpen" (click)="checkInAppointment(app.appointment_id, confirmCheckIn)">
-                  <img src="{{assetPath}}icons/ic_Check@2x.png">
+            </td>
+            <td>{{app.date_of_birth}}</td>
+            <td>{{app.local_mr_no}}</td>
+            <td>{{app.phone_no}}</td>
+            <td>{{app.queue_no}}</td>
+            <td>
+              <a ngbPopover="{{app.note_long}}" popoverTitle="" triggers="mouseenter:mouseleave">{{app.note_short}}</a>
+            </td>
+            <td>
+              <a ngbPopover="{{app.modified_name}}" popoverTitle=""
+                triggers="mouseenter:mouseleave">{{app.modified_name && app.modified_name.length > 10 ? app.modified_name.substr(0,10)+"..." : app.modified_name}}</a>
+            </td>
+            <td class="st-kolom-button">
+              <div *ngIf="!app.appointment_temp_id && isOpen == true">
+                <div *ngIf="app.is_can_cancel && isOriginal && !app.admission_id"
+                  class="cell-img-nav d-flex justify-content-center">
+                  <div *ngIf="isOpen" (click)="checkInAppointment(app.appointment_id, confirmCheckIn)">
+                    <img src="{{assetPath}}icons/ic_Check@2x.png">
+                  </div>
+                  <span style="opacity: 0; max-width: 0.5em; overflow: hidden">filler</span>
+                  <div (click)="confirmCancelAppointment(app.appointment_id)">
+                    <img src="{{assetPath}}icons/ic_Cancel@2x.png">
+                  </div>
                 </div>
-                <span style="opacity: 0; max-width: 0.5em; overflow: hidden">filler</span>
-                <div (click)="confirmCancelAppointment(app.appointment_id)">
-                  <img src="{{assetPath}}icons/ic_Cancel@2x.png">
+
+                <div *ngIf="app.is_can_cancel && isOriginal && app.admission_id"
+                  class="cell-img-nav d-flex justify-content-center">
+                  <span class="badge badge-success">Checked in</span>
                 </div>
               </div>
 
-              <div *ngIf="app.is_can_cancel && isOriginal && app.admission_id"
-                class="cell-img-nav d-flex justify-content-center">
-                <span class="badge badge-success">Checked in</span>
+              <div *ngIf="app.appointment_temp_id && isOpen == true">
+                <button (click)="verifyAppointment(app.appointment_temp_id)" class="btn ms_btn_green">Verify</button>
+                <span class="filler-05"></span>
+                <button (click)="confirmCancelAppointment(app.appointment_temp_id, true)"
+                  class="btn ms_btn_red">Cancel</button>
               </div>
-            </div>
 
-            <div *ngIf="app.appointment_temp_id">
-              <button (click)="verifyAppointment(app.appointment_temp_id)" class="btn ms_btn_green">Verify</button>
-              <span class="filler-05"></span>
-              <button (click)="confirmCancelAppointment(app.appointment_temp_id, true)"
-                class="btn ms_btn_red">Cancel</button>
-            </div>
-          </td>
-        </tr>
-      </tbody>
-    </table>
+              <!-- button action for teleconsultation -->
+              <div *ngIf="isOpen == false">
+                
+              </div>
+              <!-- button action for teleconsultation -->
+            </td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+
+    <!--                              Waiting List                                -->
+    <div *ngIf="doctorProfile.doctor_type_name !== doctorType.FCFS">
+      <div *ngIf="schArray.consultation_type_id != '4'">
+        <div *ngFor="let appWait of appListWaiting">
+          <div class="col-md-12" *ngIf="appWait.schedule_id === schArray.schedule_id">
+            <p>Total Waiting List : <strong>{{appWait.appointment.length - 1}}</strong></p>
+          </div>
+          <table class="table shadow-4" *ngIf="appWait.schedule_id === schArray.schedule_id">
+            <thead>
+              <tr>
+                <th colspan="10" class="header-2 left-text no-padding" style="padding: 1rem 1rem">Waiting List</th>
+              </tr>
+              <tr class="column-header foot-note blue table-title">
+                <th *ngFor="let header of table2Header">{{header}}</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr *ngFor="let app of appWait.appointment" [ngClass]="{'cc_row_rescheduled': app.is_blocked == true}">
+                <td class="st-kolom-time">{{app.appointment_range_time}}</td>
+                <td>{{app.no}}</td>
+                <td *ngIf="app.is_can_create && isOriginal" class="st-kolom-available" (click)="openCreateAppModal(app)">
+                  <a>Available</a></td>
+                <td *ngIf="app.is_can_create && !isOriginal" class="st-kolom-available" (click)="openCreateAppModal2(app)">
+                  <a>Available</a></td>
+                <td *ngIf="!app.is_can_create">
+                  {{app.patient_name}}
+                  <span class="newPatientIcon">
+                    <span *ngIf="app.appointment_temp_id">
+                      Tentative
+                      <span>
+                        Please verify this patient first
+                      </span>
+                    </span>
+                  </span>
+                </td>
+                <td>{{app.date_of_birth}}</td>
+                <td>{{app.local_mr_no}}</td>
+                <td>{{app.phone_no}}</td>
+                <td>{{app.queue_no}}</td>
+                <td>
+                  <a ngbPopover="{{app.note_long}}" popoverTitle="" triggers="mouseenter:mouseleave">{{app.note_short}}</a>
+                </td>
+                <td>
+                  <a ngbPopover="{{app.modified_name}}" popoverTitle=""
+                    triggers="mouseenter:mouseleave">{{app.modified_name && app.modified_name.length > 10 ? app.modified_name.substr(0,10)+"..." : app.modified_name}}</a>
+                </td>
+                <td class="st-kolom-button">
+      
+                  <div *ngIf="!app.appointment_temp_id">
+                    <div *ngIf="app.is_can_cancel && isOriginal && !app.admission_id"
+                      class="cell-img-nav d-flex justify-content-center">
+                      <div *ngIf="isOpen" (click)="checkInAppointment(app.appointment_id, confirmCheckIn)">
+                        <img src="{{assetPath}}icons/ic_Check@2x.png">
+                      </div>
+                      <span style="opacity: 0; max-width: 0.5em; overflow: hidden">filler</span>
+                      <div (click)="confirmCancelAppointment(app.appointment_id)">
+                        <img src="{{assetPath}}icons/ic_Cancel@2x.png">
+                      </div>
+                    </div>
+      
+                    <div *ngIf="app.is_can_cancel && isOriginal && app.admission_id"
+                      class="cell-img-nav d-flex justify-content-center">
+                      <span class="badge badge-success">Checked in</span>
+                    </div>
+                  </div>
+      
+                  <div *ngIf="app.appointment_temp_id">
+                    <button (click)="verifyAppointment(app.appointment_temp_id)" class="btn ms_btn_green">Verify</button>
+                    <span class="filler-05"></span>
+                    <button (click)="confirmCancelAppointment(app.appointment_temp_id, true)"
+                      class="btn ms_btn_red">Cancel</button>
+                  </div>
+                </td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+      
+    </div>
+
+    <div *ngIf="i < schLength - 1">
+      <hr class="line-border">
+    </div>
+    
   </div>
 </div>
 

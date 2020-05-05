@@ -181,6 +181,11 @@ export class AppointmentService {
     return this.http.get<any>(url, httpOptions);
   }
 
+  getAppointmentByDay(date: string, sortBy?: string, orderBy?: string): Observable<any> {
+    const url = `${this.ccAppointmentUrl}?&date=${date}&sortBy=${sortBy}&orderBy=${orderBy}`;
+    return this.http.get<any>(url, httpOptions);
+  }
+
   reserveSlotApp(reserveSlotAppPayload: any): Observable<any> {
     return this.http.post<any>(this.reserveSlotAppUrl, reserveSlotAppPayload, httpOptions);
   }

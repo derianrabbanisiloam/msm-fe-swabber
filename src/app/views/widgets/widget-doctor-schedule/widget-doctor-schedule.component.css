@@ -1,3 +1,14 @@
+.flag-tele {
+  background-color: #6767ff; 
+  color: white; 
+  border-radius: 5px; 
+  padding: 0.2em; 
+  font-weight: bold; 
+  font-size: 10px; 
+  padding-left: 1em; 
+  padding-right: 1em;
+}
+
 a:hover {
   cursor:pointer;
   text-decoration: underline !important;

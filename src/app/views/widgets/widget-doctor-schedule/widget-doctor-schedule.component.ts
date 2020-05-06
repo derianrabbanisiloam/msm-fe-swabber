@@ -277,7 +277,7 @@ export class WidgetDoctorScheduleComponent implements OnInit {
   gotoCreateApp(item: any, date: string) {
     this.router.navigate(['/create-appointment'], {
       queryParams: {
-        id: item.schedule_id,
+        doctorId: item.doctor_id,
         date: date
       }
     });
@@ -291,7 +291,7 @@ export class WidgetDoctorScheduleComponent implements OnInit {
   gotoCreateApp3(item: any, date: string) {
     this.router.navigate(['/create-appointment-271095'], {
       queryParams: {
-        id: item.schedule_id,
+        doctorId: item.doctor_id,
         date: date
       }
     });

@@ -176,7 +176,7 @@
                           date.dateISO >= todayDateISO && holidaysSpecialty.indexOf(itemSch.doctor_id+'-'+date.dateISO+'-'+itemSch.hospital_id) != -1)"
                             class="unavailable">
                             {{itemSch.from_time.substr(0,5)}} - {{itemSch.to_time.substr(0,5)}}
-                            <span class="flag-tele" *ngIf="itemSch.consultation_type_id == 4">TELE</span>
+                            <span class="flag-tele" *ngIf="itemSch.consultation_type_id == 4">TELE</span><br>
                           </span>
                         </ng-container>
                     </td>

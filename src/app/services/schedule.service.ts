@@ -30,8 +30,18 @@ export class ScheduleService {
     return this.http.get<any>(uri, httpOptions);
   }
 
+  getTimeSlot(hospitalId: string, doctorId: string, date: string){
+    const uri = `${this.timeSlotUrl}/${hospitalId}/doctor/${doctorId}/appointment-date/${date}`;
+    return this.http.get<any>(uri, httpOptions);
+  }
+
   scheduleDetail(scheduleId: string): Observable<any> {
     const uri = `${this.opAdminScheduleUrl}/${scheduleId}`;
+    return this.http.get<any>(uri, httpOptions);
+  }
+
+  getScheduleByDate(hospitalId: string, doctorId: string, date: string): Observable<any> {
+    const uri = `${this.opAdminScheduleUrl}/hospital/${hospitalId}?doctorId=${doctorId}&date=${date}`;
     return this.http.get<any>(uri, httpOptions);
   }
 

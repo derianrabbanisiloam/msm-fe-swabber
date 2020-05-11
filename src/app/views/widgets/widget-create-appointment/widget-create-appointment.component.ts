@@ -49,9 +49,6 @@ import {
 import Security from 'msm-kadapat';
 import { environment } from '../../../../environments/environment';
 
-//dummy data
-import { slotTime, appsList, scheduleDummy } from '../../../models/dummy/dummy';
-
 @Component({
   selector: 'app-widget-create-appointment',
   templateUrl: './widget-create-appointment.component.html',
@@ -67,13 +64,9 @@ export class WidgetCreateAppointmentComponent implements OnInit {
   private socket;
   private socketTwo;
   private socketThree;
-  // public appointments: AppointmentMini[];
-  //dummy
   public appointments: any;
   public appList: any = [];
   public schLength: number = 0;
-  //dummy
-  public appListFake: any = [];
   public appListWaiting: any = [];
   public appointmentPayload: appPayload = new appPayload;
   public schedule: any;
@@ -137,9 +130,9 @@ export class WidgetCreateAppointmentComponent implements OnInit {
 
   public listRoomHope: any = [];
   public roomHope: any;
-
-  //dummy
-  scheduleFlagVal: any = null;
+  public scheduleTemp: string;
+  public doctorName: string;
+  public hospitalName: string;
 
   constructor(
     private router: Router,
@@ -205,48 +198,54 @@ export class WidgetCreateAppointmentComponent implements OnInit {
 
     //scoket create appointment
     this.socket.on(CREATE_APP+'/'+this.hospital.id, (call) => {
-      if (call.data.schedule_id == this.appointmentPayload.scheduleId
-        && call.data.appointment_date == this.appointmentPayload.appointmentDate) {
-        this.appointments = this.appointments.filter((value) => {
-          if(call.data.appointment_temporary_id) {
-            return value.appointment_temporary_id !== call.data.appointment_temporary_id;
-          }
-          else { 
-            return value.appointment_id !== call.data.appointment_id; 
-          }
-        });
-        this.appointments.push(call.data);
-        this.dataProcessing();
+      for(let k = 0, { length } = this.schedule; k < length; k += 1) {
+        if (call.data.schedule_id == this.schedule[k].schedule_id
+          && call.data.appointment_date == this.appointmentPayload.appointmentDate) {
+          this.appointments = this.appointments.filter((value) => {
+            if(call.data.appointment_temporary_id) {
+              return value.appointment_temporary_id !== call.data.appointment_temporary_id;
+            }
+            else { 
+              return value.appointment_id !== call.data.appointment_id; 
+            }
+          });
+          this.appointments.push(call.data);
+          this.dataProcessing();
+        }
       }
     });
 
     //socket cancel appointment
     this.socket.on(CANCEL_APP+'/'+this.hospital.id, (call) => {
-      if (call.data.schedule_id == this.appointmentPayload.scheduleId
-        && call.data.appointment_date == this.appointmentPayload.appointmentDate) {
-        this.appointments = this.appointments.filter((value) => {
-          if(call.data.appointment_temporary_id) {
-            return value.appointment_temporary_id !== call.data.appointment_temporary_id;
-          }
-          else { 
-            return value.appointment_id !== call.data.appointment_id; 
-          }
-        });
-        this.dataProcessing();
+      for(let k = 0, { length } = this.schedule; k < length; k += 1) {
+        if (call.data.schedule_id == this.schedule[k].scheduleId
+          && call.data.appointment_date == this.appointmentPayload.appointmentDate) {
+          this.appointments = this.appointments.filter((value) => {
+            if(call.data.appointment_temporary_id) {
+              return value.appointment_temporary_id !== call.data.appointment_temporary_id;
+            }
+            else { 
+              return value.appointment_id !== call.data.appointment_id; 
+            }
+          });
+          this.dataProcessing();
+        }
       }
     });
 
     //socket checkin appointment
     this.socket.on(CHECK_IN+'/'+this.hospital.id, (call) => {
-      if (call.data.schedule_id == this.appointmentPayload.scheduleId
-        && call.data.appointment_date == this.appointmentPayload.appointmentDate) {
-        this.appointments = this.appointments.map((value) => {
-          if (value.appointment_id === call.data.appointment_id) {
-            value.admission_id = call.data.admission_id;
-          }
-          return value;
-        });
-        this.dataProcessing();
+      for(let k = 0, { length } = this.schedule; k < length; k += 1) {
+        if (call.data.schedule_id == this.schedule[k].schedule_id
+          && call.data.appointment_date == this.appointmentPayload.appointmentDate) {
+          this.appointments = this.appointments.map((value) => {
+            if (value.appointment_id === call.data.appointment_id) {
+              value.admission_id = call.data.admission_id;
+            }
+            return value;
+          });
+          this.dataProcessing();
+        }
       }
     });
 
@@ -311,24 +310,28 @@ export class WidgetCreateAppointmentComponent implements OnInit {
 
     //scoket queue number
     this.socketTwo.on(QUEUE_NUMBER+'/'+this.hospital.id, (call) => {
-      if (call.data.schedule_id == this.appointmentPayload.scheduleId
-        && call.data.appointment_date == this.appointmentPayload.appointmentDate) {
-        this.appointments = this.appointments.map((value) => {
-          if (value.appointment_id === call.data.appointment_id) {
-            value.queue_number = call.data.queue_number;
-          }
-          return value;
-        });
-        this.dataProcessing();
+      for(let k = 0, { length } = this.schedule; k < length; k += 1) {
+        if (call.data.schedule_id == this.schedule[k].schedule_id
+          && call.data.appointment_date == this.appointmentPayload.appointmentDate) {
+          this.appointments = this.appointments.map((value) => {
+            if (value.appointment_id === call.data.appointment_id) {
+              value.queue_number = call.data.queue_number;
+            }
+            return value;
+          });
+          this.dataProcessing();
+        }
       }
     });
 
     //socket block slot
     this.socketThree.on(SCHEDULE_BLOCK+'/'+this.schedule[0].hospital_id, (call) => {
-      if(call.data.schedule_id === this.appointmentPayload.scheduleId
-        && call.data.from_date === this.appointmentPayload.appointmentDate) {
-          this.emitBlockSchedule();
-        }
+      for(let k = 0, { length } = this.schedule; k < length; k += 1) {
+        if(call.data.schedule_id === this.schedule[k].schedule_id
+          && call.data.from_date === this.appointmentPayload.appointmentDate) {
+            this.emitBlockSchedule();
+          }
+      }
     });
   }
 
@@ -497,7 +500,6 @@ export class WidgetCreateAppointmentComponent implements OnInit {
   }
 
   async dataProcessing() {
-    console.log('hello world')
     //this function use to make list appointment base on slot time
     this.appList = [];
     this.appListWaiting = [];
@@ -542,7 +544,6 @@ export class WidgetCreateAppointmentComponent implements OnInit {
                 && this.appointments[j].is_waiting_list === false) {
                 found = true; //appointment slot already taken
                 idx = j;
-                console.log('pertama', this.slotList[i].appointment_no)
               }
             } 
           }
@@ -683,10 +684,7 @@ export class WidgetCreateAppointmentComponent implements OnInit {
           is_can_cancel: false,
           is_blocked: isBlockWaitingList,
           schedule_id: this.schedule[k].schedule_id
-        });
-      console.log('applistwaiting', this.appListWaiting)
-
-      
+        });  
       } else {
         for (let i = 0, { length } = this.appointments; i < length; i++) {
           no += 1;
@@ -758,56 +756,31 @@ export class WidgetCreateAppointmentComponent implements OnInit {
         });
       } 
     }
-
-     
-
-    
-
-    console.log('@@@@@@@applist', this.appList)
   }
 
   async getAppointmentList() {
     const doctorId = this.appointmentPayload.doctorId;
-    const scheduleDummy = '6fce62d5-8f76-47bf-aed3-30ab34493351';
+    const hospitalId = this.hospital.id;
     const date = this.appointmentPayload.appointmentDate;
     const sortBy = 'appointment_no';
     const orderBy = 'ASC';
-    await this.appointmentService.getAppointmentByScheduleId(scheduleDummy, date, sortBy, orderBy).toPromise().then(
+    await this.appointmentService.getAppointmentByDay(hospitalId, doctorId, date, sortBy, orderBy).toPromise().then(
       data => {
-        //this.appointments = data.data;
-        //dummydata
-        this.appointments = appsList;
+        this.appointments = data.data;
       }
     );
-
-    //dummy
-    // await this.appointmentService.getAppointmentByDay(date, sortBy, orderBy).toPromise().then(
-    //   data => {
-    //     //this.appointments = data.data;
-    //     this.appointments = appsList;
-    //   }
-    // );
   }
 
   async getSlotTime() {
     //get time slot
-    const scheduleDummy = '6fce62d5-8f76-47bf-aed3-30ab34493351';
     const doctorId = this.appointmentPayload.doctorId;
     const date = this.appointmentPayload.appointmentDate;
     const hospitalId = this.hospital.id;
-    await this.scheduleService.getTimeSlotSchedule(hospitalId, doctorId, scheduleDummy, date).toPromise().then(
+    await this.scheduleService.getTimeSlot(hospitalId, doctorId, date).toPromise().then(
       data => {
-        // this.slotList = data.data;
-        this.slotList = slotTime; //dummy
+        this.slotList = data.data;
       }
     );
-
-    // await this.scheduleService.getTimeSlot(hospitalId, doctorId, date).toPromise().then(
-    //   data => {
-    //     // this.slotList = data.data;
-    //     this.slotList = slotTime; //dummy
-    //   }
-    // );
   }
 
   async getDoctorProfile() {
@@ -816,7 +789,7 @@ export class WidgetCreateAppointmentComponent implements OnInit {
     const date = this.appointmentPayload.appointmentDate;
     await this.doctorService.getDoctorProfile(hospitalId, doctorId, date).toPromise().then(
       data => {
-        this.doctorProfile = data.data[0];
+        this.doctorProfile = data.data;
       }
     );
   }
@@ -848,12 +821,13 @@ export class WidgetCreateAppointmentComponent implements OnInit {
     const date = this.appointmentPayload.appointmentDate;
     await this.scheduleService.getScheduleByDate(this.hospital.id, doctorId, date).toPromise().then(
       data => {
-        //this.schedule = data.data;
-        this.schedule = scheduleDummy;
+        this.schedule = data.data;
         this.schedule.map(x => {
           x.from_time = x.from_time.substr(0, 5);
           x.to_time = x.to_time.substr(0, 5);
         });
+        this.doctorName = this.schedule[0].doctor_name;
+        this.hospitalName = this.schedule[0].hospital_name;
       }
     );
   }
@@ -918,55 +892,64 @@ export class WidgetCreateAppointmentComponent implements OnInit {
       doctor_type_id: this.doctorProfile.doctor_type_id
     };
 
+    let idx;
+    idx = this.reschCurrentIdx;
     for(let k = 0, { length } = this.schedule; k < length; k += 1) {
-      
+      if(this.schedule[k].schedule_id === this.scheduleTemp) {
+        if (idx) { //delete slot name when do move slot
+          if (idx.is_waiting_list) {
+            this.appListWaiting[k].appointment.map(x => {
+              if (x.appointment_no === idx.appointment_no) {
+                x.patient_name = null;
+                x.is_can_create = true;
+              }
+            });
+          } else {
+            if (this.doctorProfile.doctor_type_id === '1') { //first come first serve
+              this.appList[k].appointment.map(x => {
+                if (x.appointment_no === idx.appointment_no) {
+                  x.patient_name = null;
+                  x.is_can_create = true;
+                }
+              });
+            } else {
+              this.appList[k].appointment[idx.appointment_no].patient_name = null;
+              this.appList[k].appointment[idx.appointment_no].is_can_create = true;
+            }
+          }
+        }
+      }
     }
 
-    let idx = this.reschCurrentIdx;
-    if (idx) {
-      if (idx.is_waiting_list) {
-        this.appListWaiting.map(x => {
-          if (x.appointment_no === idx.appointment_no) {
-            x.patient_name = null;
-            x.is_can_create = true;
-          }
-        });
-      } else {
-        if (this.doctorProfile.doctor_type_id === '1') { //first come first serve
-          this.appList.map(x => {
-            if (x.appointment_no === idx.appointment_no) {
-              x.patient_name = null;
-              x.is_can_create = true;
-            }
-          });
-        } else {
-          this.appList[idx.appointment_no].patient_name = null;
-          this.appList[idx.appointment_no].is_can_create = true;
-        }
-      }
-    }
     idx = item;
     this.reschCurrentIdx = idx;
-    if (idx.is_waiting_list) {
-      this.appListWaiting.map(x => {
-        if (x.appointment_no === idx.appointment_no) {
-          x.patient_name = this.appointmentPayloadInput.name;
-          x.is_can_create = false;
-        }
-      });
-    } else {
-      if (this.doctorProfile.doctor_type_id === '1') {  //first come first serve
-        this.appList.map(x => {
-          if (x.appointment_no === idx.appointment_no) {
-            x.patient_name = this.appointmentPayloadInput.name;
-            x.is_can_create = false;
+    for(let k = 0, { length } = this.schedule; k < length; k += 1) {
+      if(this.schedule[k].schedule_id === idx.schedule_id) {
+        if (idx.is_waiting_list) { //take slot with name in waiting list
+          this.scheduleTemp = idx.schedule_id;
+          this.appListWaiting[k].appointment.map(x => {
+            if (x.appointment_no === idx.appointment_no) {
+              x.patient_name = this.appointmentPayloadInput.name;
+              x.is_can_create = false;
+            }
+          });
+        } else { //take slot with name
+          this.scheduleTemp = idx.schedule_id;
+          if (this.doctorProfile.doctor_type_id === '1') {  //first come first serve
+            this.appList[k].appointment.map(x => {
+              if (x.appointment_no === idx.appointment_no) {
+                x.patient_name = this.appointmentPayloadInput.name;
+                x.is_can_create = false;
+              }
+            });
+          } else {
+            this.appList[k].appointment[idx.appointment_no].patient_name = this.appointmentPayloadInput.name;
+            this.appList[k].appointment[idx.appointment_no].is_can_create = false;
           }
-        });
-      } else {
-        this.appList[idx.appointment_no].patient_name = this.appointmentPayloadInput.name;
-        this.appList[idx.appointment_no].is_can_create = false;
+        }
       }
     }
+
     this.opSlotSelected.emit(data);
   }
 
@@ -1556,9 +1539,8 @@ export class WidgetCreateAppointmentComponent implements OnInit {
   }
 
   async getScheduleBlock() {
-    const { scheduleId, appointmentDate } = this.appointmentPayload;
-    const scheduleDummy = '6fce62d5-8f76-47bf-aed3-30ab34493351';
-    await this.scheduleService.getScheduleBlock(scheduleDummy, appointmentDate).toPromise().then(
+    const { appointmentDate, doctorId } = this.appointmentPayload;
+    await this.scheduleService.getScheduleBlockByDay(this.hospital.id, doctorId, appointmentDate).toPromise().then(
       data => {
         this.scheduleBlocks = data.data;
         this.scheduleBlocks.map(x => {

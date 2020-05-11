@@ -3,7 +3,7 @@
     <h5>{{message1.title}}</h5>
     <p>{{message1.message}}</p>
   </div>
-  <div id="tutorial_week_button" class="btn-box header_right" *ngIf="!showScheduleType2">
+  <div id="tutorial_week_button" class="btn-box header_right" *ngIf="showScheduleType1">
     <div style="padding-right: 0.5em">
       <select class="form-control" (change)="getScheduleByConsType()" [(ngModel)]="consulType">
         <option [ngValue]=null [selected]="consulType === null">All Schedule</option>
@@ -81,7 +81,9 @@
                                     (itemSch.day == date.dateDay &&
                                     date.dateISO >= todayDateISO && holidaysSpecialty.indexOf(sch.doctor_id+'-'+date.dateISO+'-'+sch.hospital_id) != -1)"
                             class="unavailable">
-                            {{itemSch.from_time.substr(0,5)}} - {{itemSch.to_time.substr(0,5)}}<br>
+                            {{itemSch.from_time.substr(0,5)}} - {{itemSch.to_time.substr(0,5)}}
+                            <span class="flag-tele" *ngIf="itemSch.consultation_type_id == 4">TELE</span>
+                            <br>
                           </span>
                         </ng-container>
                     </td>
@@ -165,8 +167,8 @@
                             <span *ngIf="itemSch.is_full" class="danger-light"></span>
                             <a (click)="gotoCreateApp(itemSch, date.dateISO)">
                               {{itemSch.from_time.substr(0,5)}} - {{itemSch.to_time.substr(0,5)}}
-                              <span class="flag-tele" *ngIf="itemSch.consultation_type_id == 4">TELE</span>
                             </a>
+                            <span class="flag-tele" *ngIf="itemSch.consultation_type_id == 4">TELE</span>
                             <br>
                           </span>
                           <span

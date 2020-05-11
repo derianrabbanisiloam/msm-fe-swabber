@@ -181,8 +181,8 @@ export class AppointmentService {
     return this.http.get<any>(url, httpOptions);
   }
 
-  getAppointmentByDay(date: string, sortBy?: string, orderBy?: string): Observable<any> {
-    const url = `${this.ccAppointmentUrl}?&date=${date}&sortBy=${sortBy}&orderBy=${orderBy}`;
+  getAppointmentByDay(hospitalId: string, doctorId: string, date: string, sortBy?: string, orderBy?: string): Observable<any> {
+    const url = `${this.ccAppointmentUrl}?hospitalId=${hospitalId}&doctorId=${doctorId}&date=${date}&sortBy=${sortBy}&orderBy=${orderBy}`;
     return this.http.get<any>(url, httpOptions);
   }
 

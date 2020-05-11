@@ -64,11 +64,12 @@ export class WidgetCreateAppointmentComponent implements OnInit {
   private socket;
   private socketTwo;
   private socketThree;
-  public appointments: AppointmentMini[];
+  public appointments: any;
   public appList: any = [];
+  public schLength: number = 0;
   public appListWaiting: any = [];
   public appointmentPayload: appPayload = new appPayload;
-  public schedule: Schedule = new Schedule;
+  public schedule: any;
   public appDateDisplay: any;
   public table1Header: any = [];
   public table2Header: any = [];
@@ -129,6 +130,9 @@ export class WidgetCreateAppointmentComponent implements OnInit {
 
   public listRoomHope: any = [];
   public roomHope: any;
+  public scheduleTemp: string;
+  public doctorName: string;
+  public hospitalName: string;
 
   constructor(
     private router: Router,
@@ -171,13 +175,13 @@ export class WidgetCreateAppointmentComponent implements OnInit {
 
   async ngOnInit() {
     await this.getQueryParams();
-    await this.enableWalkInChecker();
+    await this.enableWalkInChecker(); 
     await this.getSchedule();
     await this.getDoctorProfile();
     await this.getDoctorNotes();
-    await this.getScheduleBlock();
-    await this.getAppointmentList();
-    await this.getSlotTime();
+    await this.getScheduleBlock(); //mungkin ada perubahan
+    await this.getAppointmentList(); //mungkin ada perubahan
+    await this.getSlotTime(); //mungkin ada perubahan
     await this.dataProcessing();
     await this.getPayer();
     await this.getPatientType();
@@ -194,48 +198,54 @@ export class WidgetCreateAppointmentComponent implements OnInit {
 
     //scoket create appointment
     this.socket.on(CREATE_APP+'/'+this.hospital.id, (call) => {
-      if (call.data.schedule_id == this.appointmentPayload.scheduleId
-        && call.data.appointment_date == this.appointmentPayload.appointmentDate) {
-        this.appointments = this.appointments.filter((value) => {
-          if(call.data.appointment_temporary_id) {
-            return value.appointment_temporary_id !== call.data.appointment_temporary_id;
-          }
-          else { 
-            return value.appointment_id !== call.data.appointment_id; 
-          }
-        });
-        this.appointments.push(call.data);
-        this.dataProcessing();
+      for(let k = 0, { length } = this.schedule; k < length; k += 1) {
+        if (call.data.schedule_id == this.schedule[k].schedule_id
+          && call.data.appointment_date == this.appointmentPayload.appointmentDate) {
+          this.appointments = this.appointments.filter((value) => {
+            if(call.data.appointment_temporary_id) {
+              return value.appointment_temporary_id !== call.data.appointment_temporary_id;
+            }
+            else { 
+              return value.appointment_id !== call.data.appointment_id; 
+            }
+          });
+          this.appointments.push(call.data);
+          this.dataProcessing();
+        }
       }
     });
 
     //socket cancel appointment
     this.socket.on(CANCEL_APP+'/'+this.hospital.id, (call) => {
-      if (call.data.schedule_id == this.appointmentPayload.scheduleId
-        && call.data.appointment_date == this.appointmentPayload.appointmentDate) {
-        this.appointments = this.appointments.filter((value) => {
-          if(call.data.appointment_temporary_id) {
-            return value.appointment_temporary_id !== call.data.appointment_temporary_id;
-          }
-          else { 
-            return value.appointment_id !== call.data.appointment_id; 
-          }
-        });
-        this.dataProcessing();
+      for(let k = 0, { length } = this.schedule; k < length; k += 1) {
+        if (call.data.schedule_id == this.schedule[k].scheduleId
+          && call.data.appointment_date == this.appointmentPayload.appointmentDate) {
+          this.appointments = this.appointments.filter((value) => {
+            if(call.data.appointment_temporary_id) {
+              return value.appointment_temporary_id !== call.data.appointment_temporary_id;
+            }
+            else { 
+              return value.appointment_id !== call.data.appointment_id; 
+            }
+          });
+          this.dataProcessing();
+        }
       }
     });
 
     //socket checkin appointment
     this.socket.on(CHECK_IN+'/'+this.hospital.id, (call) => {
-      if (call.data.schedule_id == this.appointmentPayload.scheduleId
-        && call.data.appointment_date == this.appointmentPayload.appointmentDate) {
-        this.appointments = this.appointments.map((value) => {
-          if (value.appointment_id === call.data.appointment_id) {
-            value.admission_id = call.data.admission_id;
-          }
-          return value;
-        });
-        this.dataProcessing();
+      for(let k = 0, { length } = this.schedule; k < length; k += 1) {
+        if (call.data.schedule_id == this.schedule[k].schedule_id
+          && call.data.appointment_date == this.appointmentPayload.appointmentDate) {
+          this.appointments = this.appointments.map((value) => {
+            if (value.appointment_id === call.data.appointment_id) {
+              value.admission_id = call.data.admission_id;
+            }
+            return value;
+          });
+          this.dataProcessing();
+        }
       }
     });
 
@@ -300,24 +310,28 @@ export class WidgetCreateAppointmentComponent implements OnInit {
 
     //scoket queue number
     this.socketTwo.on(QUEUE_NUMBER+'/'+this.hospital.id, (call) => {
-      if (call.data.schedule_id == this.appointmentPayload.scheduleId
-        && call.data.appointment_date == this.appointmentPayload.appointmentDate) {
-        this.appointments = this.appointments.map((value) => {
-          if (value.appointment_id === call.data.appointment_id) {
-            value.queue_number = call.data.queue_number;
-          }
-          return value;
-        });
-        this.dataProcessing();
+      for(let k = 0, { length } = this.schedule; k < length; k += 1) {
+        if (call.data.schedule_id == this.schedule[k].schedule_id
+          && call.data.appointment_date == this.appointmentPayload.appointmentDate) {
+          this.appointments = this.appointments.map((value) => {
+            if (value.appointment_id === call.data.appointment_id) {
+              value.queue_number = call.data.queue_number;
+            }
+            return value;
+          });
+          this.dataProcessing();
+        }
       }
     });
 
     //socket block slot
-    this.socketThree.on(SCHEDULE_BLOCK+'/'+this.schedule.hospital_id, (call) => {
-      if(call.data.schedule_id === this.appointmentPayload.scheduleId
-        && call.data.from_date === this.appointmentPayload.appointmentDate) {
-          this.emitBlockSchedule();
-        }
+    this.socketThree.on(SCHEDULE_BLOCK+'/'+this.schedule[0].hospital_id, (call) => {
+      for(let k = 0, { length } = this.schedule; k < length; k += 1) {
+        if(call.data.schedule_id === this.schedule[k].schedule_id
+          && call.data.from_date === this.appointmentPayload.appointmentDate) {
+            this.emitBlockSchedule();
+          }
+      }
     });
   }
 
@@ -464,15 +478,15 @@ export class WidgetCreateAppointmentComponent implements OnInit {
   }
 
   getQueryParams() {
-    if (this.appointmentPayloadInput) {
-      this.appointmentPayload.scheduleId = this.appointmentPayloadInput.scheduleId;
+    if (this.appointmentPayloadInput) { //from modal reschedule appointment
+      this.appointmentPayload.doctorId = this.appointmentPayloadInput.doctorId;
       this.appointmentPayload.appointmentDate = this.appointmentPayloadInput.appointmentDate;
       this.isOriginal = false;
-    } else {
-      this.appointmentPayload.scheduleId = this.activatedRoute.snapshot.queryParamMap.get('id');
+    } else { //from menu doctor schedule
+      this.appointmentPayload.doctorId = this.activatedRoute.snapshot.queryParamMap.get('doctorId');
       this.appointmentPayload.appointmentDate = this.activatedRoute.snapshot.queryParamMap.get('date');
     }
-    if (!this.appointmentPayload.scheduleId && !this.appointmentPayload.appointmentDate) {
+    if (!this.appointmentPayload.doctorId && !this.appointmentPayload.appointmentDate) {
       this.router.navigate(['/doctor-schedule']);
     }
     this.appDateDisplay = moment(this.appointmentPayload.appointmentDate).format('dddd, DD MMMM YYYY');
@@ -489,101 +503,133 @@ export class WidgetCreateAppointmentComponent implements OnInit {
     //this function use to make list appointment base on slot time
     this.appList = [];
     this.appListWaiting = [];
+    let count = 0;
 
     const docType = this.doctorProfile.doctor_type_name;
-    const hospitalId = this.schedule.hospital_id;
-    const doctorId = this.schedule.doctor_id;
+    const hospitalId = this.schedule[0].hospital_id;
+    const doctorId = this.schedule[0].doctor_id;
 
     //this param using in waiting list and FCFS
-    let no = 0;
-    const fromTime = this.schedule.from_time;
-    const toTime = this.schedule.to_time;
-    let appTime = `${fromTime} - ${toTime}`;
-
-    //using slot time only for doctor type FIX and HOURLY
-    if (docType === this.doctorType.FIX_APPOINTMENT
+    let no;
+    this.schLength = this.schedule.length;
+    for(let k = 0, { length } = this.schedule; k < length; k += 1) {
+      no = 0;
+      const fromTime = this.schedule[k].from_time;
+      const toTime = this.schedule[k].to_time;
+      let appTime = `${fromTime} - ${toTime}`;
+      this.appList.push(
+        {
+          schedule_id: this.schedule[k].schedule_id,
+          consultation_type_id: this.schedule[k].consultation_type_id,
+          appointment: []
+        }
+      )
+      this.appListWaiting.push(
+        {
+          schedule_id: this.schedule[k].schedule_id,
+          consultation_type_id: this.schedule[k].consultation_type_id,
+          appointment: []
+        }
+      )
+     //using slot time only for doctor type FIX and HOURLY
+     if (docType === this.doctorType.FIX_APPOINTMENT
       || docType === this.doctorType.HOURLY_APPOINTMENT) {
       for (let i = 0, { length } = this.slotList; i < length; i += 1) {
-        let found = false;
-        let idx = 0;
-        for (let j = 0, { length: totalApp } = this.appointments; j < totalApp; j += 1) {
-          if (Number(this.appointments[j].appointment_no) === this.slotList[i].appointment_no
-            && this.appointments[j].is_waiting_list === false) {
-            found = true;
-            idx = j;
+        if(this.appList[k].schedule_id === this.slotList[i].schedule_id) {
+          let found = false;
+          let idx = 0;
+          for (let j = 0, { length: totalApp } = this.appointments; j < totalApp; j += 1) {
+            if(this.slotList[i].schedule_id === this.appointments[j].schedule_id){
+              if (Number(this.appointments[j].appointment_no) === this.slotList[i].appointment_no
+                && this.appointments[j].is_waiting_list === false) {
+                found = true; //appointment slot already taken
+                idx = j;
+              }
+            } 
+          }
+
+          if (found && idx >= 0) {
+            this.appList[k].appointment.push({
+              no: this.slotList[i].no,
+              hospital_id: hospitalId,
+              doctor_id: doctorId,
+              appointment_range_time: this.slotList[i].appointment_range_time,
+              appointment_from_time: this.slotList[i].schedule_from_time,
+              appointment_to_time: this.slotList[i].schedule_to_time,
+              schedule_from_time: fromTime,
+              schedule_to_time: toTime,
+              appointment_id: this.appointments[idx].appointment_id,
+              appointment_temp_id: this.appointments[idx].appointment_temporary_id,
+              admission_id: this.appointments[idx].admission_id,
+              appointment_no: this.appointments[idx].appointment_no,
+              patient_name: this.appointments[idx].contact_name,
+              date_of_birth: moment(this.appointments[idx].birth_date).format('DD-MM-YYYY'),
+              local_mr_no: this.appointments[idx].medical_record_number,
+              phone_no: this.appointments[idx].phone_number,
+              queue_no: this.appointments[idx].queue_number,
+              note: this.appointments[idx].appointment_note ? this.appointments[idx].appointment_note : '',
+              note_long: this.appointments[idx].appointment_note ? this.appointments[idx].appointment_note : '',
+              note_short: this.appointments[idx].appointment_note && this.appointments[idx].appointment_note.length > 30 ? this.appointments[idx].appointment_note.substr(0, 30) + '...' : this.appointments[idx].appointment_note,
+              modified_name: this.appointments[idx].modified_name,
+              modified_by: this.appointments[idx].modified_by,
+              is_waiting_list: this.appointments[idx].is_waiting_list,
+              is_can_create: false,
+              is_can_cancel: this.slotList[i].is_blocked ? false : true,
+              is_blocked: this.slotList[i].is_blocked,
+              is_walkin: this.slotList[i].is_walkin,
+              schedule_id: this.schedule[k].schedule_id
+            });
+          } else {
+            this.appList[k].appointment.push({
+              no: this.slotList[i].no,
+              hospital_id: hospitalId,
+              doctor_id: doctorId,
+              appointment_range_time: this.slotList[i].appointment_range_time,
+              appointment_from_time: this.slotList[i].schedule_from_time,
+              appointment_to_time: this.slotList[i].schedule_to_time,
+              schedule_from_time: fromTime,
+              schedule_to_time: toTime,
+              appointment_id: null,
+              appointment_temp_id: null,
+              admission_id: null,
+              appointment_no: this.slotList[i].appointment_no,
+              patient_name: null,
+              date_of_birth: null,
+              local_mr_no: null,
+              phone_no: null,
+              queue_no: null,
+              note: '',
+              note_long: '',
+              note_short: '',
+              modified_name: '',
+              modified_by: null,
+              is_waiting_list: false,
+              is_can_create: this.slotList[i].is_blocked ? false : true,
+              is_can_cancel: false,
+              is_blocked: this.slotList[i].is_blocked,
+              is_walkin: this.slotList[i].is_walkin,
+              schedule_id: this.schedule[k].schedule_id
+            });
           }
         }
-
-        if (found && idx >= 0) {
-          this.appList.push({
-            no: this.slotList[i].no,
-            hospital_id: hospitalId,
-            doctor_id: doctorId,
-            appointment_range_time: this.slotList[i].appointment_range_time,
-            appointment_from_time: this.slotList[i].schedule_from_time,
-            appointment_to_time: this.slotList[i].schedule_to_time,
-            appointment_id: this.appointments[idx].appointment_id,
-            appointment_temp_id: this.appointments[idx].appointment_temporary_id,
-            admission_id: this.appointments[idx].admission_id,
-            appointment_no: this.appointments[idx].appointment_no,
-            patient_name: this.appointments[idx].contact_name,
-            date_of_birth: moment(this.appointments[idx].birth_date).format('DD-MM-YYYY'),
-            local_mr_no: this.appointments[idx].medical_record_number,
-            phone_no: this.appointments[idx].phone_number,
-            queue_no: this.appointments[idx].queue_number,
-            note: this.appointments[idx].appointment_note ? this.appointments[idx].appointment_note : '',
-            note_long: this.appointments[idx].appointment_note ? this.appointments[idx].appointment_note : '',
-            note_short: this.appointments[idx].appointment_note && this.appointments[idx].appointment_note.length > 30 ? this.appointments[idx].appointment_note.substr(0, 30) + '...' : this.appointments[idx].appointment_note,
-            modified_name: this.appointments[idx].modified_name,
-            modified_by: this.appointments[idx].modified_by,
-            is_waiting_list: this.appointments[idx].is_waiting_list,
-            is_can_create: false,
-            is_can_cancel: this.slotList[i].is_blocked ? false : true,
-            is_blocked: this.slotList[i].is_blocked,
-            is_walkin: this.slotList[i].is_walkin,
-          });
-        } else {
-          this.appList.push({
-            no: this.slotList[i].no,
-            hospital_id: hospitalId,
-            doctor_id: doctorId,
-            appointment_range_time: this.slotList[i].appointment_range_time,
-            appointment_from_time: this.slotList[i].schedule_from_time,
-            appointment_to_time: this.slotList[i].schedule_to_time,
-            appointment_id: null,
-            appointment_temp_id: null,
-            admission_id: null,
-            appointment_no: this.slotList[i].appointment_no,
-            patient_name: null,
-            date_of_birth: null,
-            local_mr_no: null,
-            phone_no: null,
-            queue_no: null,
-            note: '',
-            note_long: '',
-            note_short: '',
-            modified_name: '',
-            modified_by: null,
-            is_waiting_list: false,
-            is_can_create: this.slotList[i].is_blocked ? false : true,
-            is_can_cancel: false,
-            is_blocked: this.slotList[i].is_blocked,
-            is_walkin: this.slotList[i].is_walkin,
-          });
-        }
       }
+
+
 
       /** Appointment waiting list */
       let isBlockWaitingList = false;
       this.scheduleBlocks.map(x => {
-        if (x.is_include_waiting_list === true) isBlockWaitingList = true;
+        if (x.schedule_id === this.appListWaiting[k].schedule_id) {
+          if (x.is_include_waiting_list === true) isBlockWaitingList = true;
+        }
+        
       });
 
-      this.appointments.map(x => {
-        if (x.is_waiting_list === true) {
+      this.appointments.map((x, index) => {
+        if (x.is_waiting_list === true && this.appListWaiting[k].schedule_id === x.schedule_id) {
           no += 1;
           appTime = no === 1 ? appTime : '';
-          this.appListWaiting.push({
+          this.appListWaiting[k].appointment.push({
             no: no,
             appointment_range_time: appTime,
             appointment_from_time: fromTime,
@@ -606,110 +652,119 @@ export class WidgetCreateAppointmentComponent implements OnInit {
             is_can_create: false,
             is_can_cancel: isBlockWaitingList === false ? true : false,
             is_blocked: isBlockWaitingList,
+            schedule_id: this.schedule[k].schedule_id
           });
         }
       });
 
-      let nextWlNo = 0;
-      nextWlNo = this.appListWaiting.length === 0 ? nextWlNo : Math.max.apply(Math, this.appListWaiting.map(function (o) { return o.appointment_no }));
+        let nextWlNo = 0;
+        nextWlNo = this.appListWaiting[k].appointment.length === 0 ? 
+          nextWlNo : Math.max.apply(Math, this.appListWaiting[k].appointment.map(function (o) { return o.appointment_no }));
+        this.appListWaiting[k].appointment.push({
+          no: no + 1,
+          appointment_range_time: this.appListWaiting[k].appointment.length > 0 ? '' : appTime,
+          appointment_from_time: fromTime,
+          appointment_to_time: toTime,
+          appointment_no: this.appListWaiting[k].appointment.length === 0 ? this.appList[k].appointment.length : nextWlNo + 1,
+          appointment_id: null,
+          appointment_temp_id: null,
+          admission_id: null,
+          patient_name: null,
+          date_of_birth: null,
+          local_mr_no: null,
+          phone_no: null,
+          queue_no: null,
+          note: '',
+          note_long: '',
+          note_short: '',
+          modified_name: '',
+          modified_by: null,
+          is_waiting_list: true,
+          is_can_create: isBlockWaitingList === false ? true : false,
+          is_can_cancel: false,
+          is_blocked: isBlockWaitingList,
+          schedule_id: this.schedule[k].schedule_id
+        });  
+      } else {
+        for (let i = 0, { length } = this.appointments; i < length; i++) {
+          no += 1;
+          if(this.appList[k].schedule_id === this.appointments[i].schedule_id) {
+            this.appList[k].appointment.push({
+              no: no,
+              hospital_id: hospitalId,
+              doctor_id: doctorId,
+              appointment_range_time: appTime,
+              appointment_from_time: fromTime,
+              appointment_to_time: toTime,
+              appointment_id: this.appointments[i].appointment_id,
+              appointment_temp_id: this.appointments[i].appointment_temporary_id,
+              admission_id: this.appointments[i].admission_id,
+              appointment_no: this.appointments[i].appointment_no,
+              patient_name: this.appointments[i].contact_name,
+              date_of_birth: moment(this.appointments[i].birth_date).format('DD-MM-YYYY'),
+              local_mr_no: this.appointments[i].medical_record_number,
+              phone_no: this.appointments[i].phone_number,
+              queue_no: this.appointments[i].queue_number,
+              note: this.appointments[i].appointment_note ? this.appointments[i].appointment_note : '',
+              note_long: this.appointments[i].appointment_note ? this.appointments[i].appointment_note : '',
+              note_short: this.appointments[i].appointment_note && this.appointments[i].appointment_note.length > 30 ? this.appointments[i].appointment_note.substr(0, 30) + '...' : this.appointments[i].appointment_note,
+              modified_name: this.appointments[i].modified_name,
+              modified_by: this.appointments[i].modified_by,
+              is_waiting_list: false,
+              is_can_create: false,
+              is_can_cancel: true,
+              is_blocked: false,
+              is_walkin: false,
+              schedule_id: this.schedule[k].schedule_id
+            });
+          }
+        }
 
-      this.appListWaiting.push({
-        no: no + 1,
-        appointment_range_time: this.appListWaiting.length > 0 ? '' : appTime,
-        appointment_from_time: fromTime,
-        appointment_to_time: toTime,
-        appointment_no: this.appListWaiting.length === 0 ? this.appList.length : nextWlNo + 1,
-        appointment_id: null,
-        appointment_temp_id: null,
-        admission_id: null,
-        patient_name: null,
-        date_of_birth: null,
-        local_mr_no: null,
-        phone_no: null,
-        queue_no: null,
-        note: '',
-        note_long: '',
-        note_short: '',
-        modified_name: '',
-        modified_by: null,
-        is_waiting_list: true,
-        is_can_create: isBlockWaitingList === false ? true : false,
-        is_can_cancel: false,
-        is_blocked: isBlockWaitingList,
-      });
-    } else {
-      for (let i = 0, { length } = this.appointments; i < length; i++) {
+        let numberL;
+        numberL = this.appList[k].appointment.length > 0 ? 
+        Math.max.apply(Math, this.appList[k].appointment.map(i => i.appointment_no)) : 0;
+        const appListLength = numberL;
         no += 1;
-        this.appList.push({
+
+        this.appList[k].appointment.push({
           no: no,
           hospital_id: hospitalId,
           doctor_id: doctorId,
-          appointment_range_time: appTime,
+          appointment_range_time: appListLength > 0 ? '' : appTime,
           appointment_from_time: fromTime,
           appointment_to_time: toTime,
-          appointment_id: this.appointments[i].appointment_id,
-          appointment_temp_id: this.appointments[i].appointment_temporary_id,
-          admission_id: this.appointments[i].admission_id,
-          appointment_no: this.appointments[i].appointment_no,
-          patient_name: this.appointments[i].contact_name,
-          date_of_birth: moment(this.appointments[i].birth_date).format('DD-MM-YYYY'),
-          local_mr_no: this.appointments[i].medical_record_number,
-          phone_no: this.appointments[i].phone_number,
-          queue_no: this.appointments[i].queue_number,
-          note: this.appointments[i].appointment_note ? this.appointments[i].appointment_note : '',
-          note_long: this.appointments[i].appointment_note ? this.appointments[i].appointment_note : '',
-          note_short: this.appointments[i].appointment_note && this.appointments[i].appointment_note.length > 30 ? this.appointments[i].appointment_note.substr(0, 30) + '...' : this.appointments[i].appointment_note,
-          modified_name: this.appointments[i].modified_name,
-          modified_by: this.appointments[i].modified_by,
+          appointment_id: null,
+          appointment_temp_id: null,
+          admission_id: null,
+          appointment_no: this.appointments.length > 0 ? numberL + 1 : 0,
+          patient_name: null,
+          date_of_birth: null,
+          local_mr_no: null,
+          phone_no: null,
+          queue_no: null,
+          note: '',
+          note_long: '',
+          note_short: '',
+          modified_name: '',
+          modified_by: null,
           is_waiting_list: false,
-          is_can_create: false,
-          is_can_cancel: true,
+          is_can_create: true,
+          is_can_cancel: false,
           is_blocked: false,
           is_walkin: false,
+          schedule_id: this.schedule[k].schedule_id
         });
-      }
-
-      let numberL;
-      numberL = this.appointments.length > 0 ? Math.max.apply(Math, this.appointments.map(i => i.appointment_no)) : 0;
-      const appListLength = numberL;
-      no += 1;
-
-      this.appList.push({
-        no: no,
-        hospital_id: hospitalId,
-        doctor_id: doctorId,
-        appointment_range_time: appListLength > 0 ? '' : appTime,
-        appointment_from_time: fromTime,
-        appointment_to_time: toTime,
-        appointment_id: null,
-        appointment_temp_id: null,
-        admission_id: null,
-        appointment_no: this.appointments.length > 0 ? numberL + 1 : 0,
-        patient_name: null,
-        date_of_birth: null,
-        local_mr_no: null,
-        phone_no: null,
-        queue_no: null,
-        note: '',
-        note_long: '',
-        note_short: '',
-        modified_name: '',
-        modified_by: null,
-        is_waiting_list: false,
-        is_can_create: true,
-        is_can_cancel: false,
-        is_blocked: false,
-        is_walkin: false,
-      });
+      } 
     }
   }
 
   async getAppointmentList() {
-    const scheduleId = this.appointmentPayload.scheduleId;
+    const doctorId = this.appointmentPayload.doctorId;
+    const hospitalId = this.hospital.id;
     const date = this.appointmentPayload.appointmentDate;
     const sortBy = 'appointment_no';
     const orderBy = 'ASC';
-    await this.appointmentService.getAppointmentByScheduleId(scheduleId, date, sortBy, orderBy).toPromise().then(
+    await this.appointmentService.getAppointmentByDay(hospitalId, doctorId, date, sortBy, orderBy).toPromise().then(
       data => {
         this.appointments = data.data;
       }
@@ -718,11 +773,10 @@ export class WidgetCreateAppointmentComponent implements OnInit {
 
   async getSlotTime() {
     //get time slot
-    const scheduleId = this.appointmentPayload.scheduleId;
+    const doctorId = this.appointmentPayload.doctorId;
     const date = this.appointmentPayload.appointmentDate;
-    const hospitalId = this.schedule.hospital_id;
-    const doctorId = this.schedule.doctor_id;
-    await this.scheduleService.getTimeSlotSchedule(hospitalId, doctorId, scheduleId, date).toPromise().then(
+    const hospitalId = this.hospital.id;
+    await this.scheduleService.getTimeSlot(hospitalId, doctorId, date).toPromise().then(
       data => {
         this.slotList = data.data;
       }
@@ -730,19 +784,19 @@ export class WidgetCreateAppointmentComponent implements OnInit {
   }
 
   async getDoctorProfile() {
-    const hospitalId = this.schedule.hospital_id;
-    const doctorId = this.schedule.doctor_id;
+    const hospitalId = this.hospital.id;
+    const doctorId = this.appointmentPayload.doctorId;
     const date = this.appointmentPayload.appointmentDate;
     await this.doctorService.getDoctorProfile(hospitalId, doctorId, date).toPromise().then(
       data => {
-        this.doctorProfile = data.data[0];
+        this.doctorProfile = data.data;
       }
     );
   }
 
   async getDoctorNotes() {
-    const hospitalId = this.schedule.hospital_id;
-    const doctorId = this.schedule.doctor_id;
+    const hospitalId = this.hospital.id;
+    const doctorId = this.appointmentPayload.doctorId;
     const fromDate = this.appointmentPayload.appointmentDate;
     const toDate = fromDate;
     await this.doctorService.getDoctorNotes(hospitalId, fromDate, toDate, doctorId).toPromise().then(
@@ -763,12 +817,17 @@ export class WidgetCreateAppointmentComponent implements OnInit {
   }
 
   async getSchedule() {
-    const scheduleId = this.appointmentPayload.scheduleId;
-    await this.scheduleService.scheduleDetail(scheduleId).toPromise().then(
+    const doctorId = this.appointmentPayload.doctorId;
+    const date = this.appointmentPayload.appointmentDate;
+    await this.scheduleService.getScheduleByDate(this.hospital.id, doctorId, date).toPromise().then(
       data => {
         this.schedule = data.data;
-        this.schedule.from_time = this.schedule.from_time.substr(0, 5);
-        this.schedule.to_time = this.schedule.to_time.substr(0, 5);
+        this.schedule.map(x => {
+          x.from_time = x.from_time.substr(0, 5);
+          x.to_time = x.to_time.substr(0, 5);
+        });
+        this.doctorName = this.schedule[0].doctor_name;
+        this.hospitalName = this.schedule[0].hospital_name;
       }
     );
   }
@@ -794,14 +853,15 @@ export class WidgetCreateAppointmentComponent implements OnInit {
     if(canReserved.key === null) {
       await this.reserveSlotApp(item);
     }
-    const fromTime = item.appointment_from_time ? item.appointment_from_time : this.schedule.from_time; const toTime = item.appointment_to_time ? item.appointment_to_time : this.schedule.to_time;
+    const fromTime = item.appointment_from_time ? item.appointment_from_time : item.schedule_from_time; 
+    const toTime = item.appointment_to_time ? item.appointment_to_time : item.schedule_to_time;
     const data = {
-      schedule_id: this.appointmentPayload.scheduleId,
+      schedule_id: item.schedule_id,
       appointment_date: this.appointmentPayload.appointmentDate,
       appointment_from_time: fromTime,
       appointment_to_time: toTime,
-      hospital_id: this.schedule.hospital_id,
-      doctor_id: this.schedule.doctor_id,
+      hospital_id: item.hospital_id,
+      doctor_id: item.doctor_id,
       appointment_no: item.appointment_no,
       is_waiting_list: item.is_waiting_list,
       can_reserved: canReserved,
@@ -817,70 +877,85 @@ export class WidgetCreateAppointmentComponent implements OnInit {
     if(canReserved.key === null) {
       await this.reserveSlotApp(item);
     }
-    const fromTime = item.appointment_from_time ? item.appointment_from_time : this.schedule.from_time; const toTime = item.appointment_to_time ? item.appointment_to_time : this.schedule.to_time;
+    const fromTime = item.appointment_from_time ? item.appointment_from_time : item.schedule_from_time;
+    const toTime = item.appointment_to_time ? item.appointment_to_time : item.schedule_to_time;
     const data = {
-      schedule_id: this.appointmentPayload.scheduleId,
+      schedule_id: item.schedule_id,
       appointment_date: this.appointmentPayload.appointmentDate,
       appointment_from_time: fromTime,
       appointment_to_time: toTime,
-      hospital_id: this.schedule.hospital_id,
-      doctor_id: this.schedule.doctor_id,
+      hospital_id: item.hospital_id,
+      doctor_id: item.doctor_id,
       appointment_no: item.appointment_no,
       is_waiting_list: item.is_waiting_list,
       can_reserved: canReserved,
       doctor_type_id: this.doctorProfile.doctor_type_id
     };
-    let idx = this.reschCurrentIdx;
-    if (idx) {
-      if (idx.is_waiting_list) {
-        this.appListWaiting.map(x => {
-          if (x.appointment_no === idx.appointment_no) {
-            x.patient_name = null;
-            x.is_can_create = true;
-          }
-        });
-      } else {
-        if (this.doctorProfile.doctor_type_id === '1') { //first come first serve
-          this.appList.map(x => {
-            if (x.appointment_no === idx.appointment_no) {
-              x.patient_name = null;
-              x.is_can_create = true;
+
+    let idx;
+    idx = this.reschCurrentIdx;
+    for(let k = 0, { length } = this.schedule; k < length; k += 1) {
+      if(this.schedule[k].schedule_id === this.scheduleTemp) {
+        if (idx) { //delete slot name when do move slot
+          if (idx.is_waiting_list) {
+            this.appListWaiting[k].appointment.map(x => {
+              if (x.appointment_no === idx.appointment_no) {
+                x.patient_name = null;
+                x.is_can_create = true;
+              }
+            });
+          } else {
+            if (this.doctorProfile.doctor_type_id === '1') { //first come first serve
+              this.appList[k].appointment.map(x => {
+                if (x.appointment_no === idx.appointment_no) {
+                  x.patient_name = null;
+                  x.is_can_create = true;
+                }
+              });
+            } else {
+              this.appList[k].appointment[idx.appointment_no].patient_name = null;
+              this.appList[k].appointment[idx.appointment_no].is_can_create = true;
             }
-          });
-        } else {
-          this.appList[idx.appointment_no].patient_name = null;
-          this.appList[idx.appointment_no].is_can_create = true;
+          }
         }
       }
     }
+
     idx = item;
     this.reschCurrentIdx = idx;
-    if (idx.is_waiting_list) {
-      this.appListWaiting.map(x => {
-        if (x.appointment_no === idx.appointment_no) {
-          x.patient_name = this.appointmentPayloadInput.name;
-          x.is_can_create = false;
-        }
-      });
-    } else {
-      if (this.doctorProfile.doctor_type_id === '1') {  //first come first serve
-        this.appList.map(x => {
-          if (x.appointment_no === idx.appointment_no) {
-            x.patient_name = this.appointmentPayloadInput.name;
-            x.is_can_create = false;
+    for(let k = 0, { length } = this.schedule; k < length; k += 1) {
+      if(this.schedule[k].schedule_id === idx.schedule_id) {
+        if (idx.is_waiting_list) { //take slot with name in waiting list
+          this.scheduleTemp = idx.schedule_id;
+          this.appListWaiting[k].appointment.map(x => {
+            if (x.appointment_no === idx.appointment_no) {
+              x.patient_name = this.appointmentPayloadInput.name;
+              x.is_can_create = false;
+            }
+          });
+        } else { //take slot with name
+          this.scheduleTemp = idx.schedule_id;
+          if (this.doctorProfile.doctor_type_id === '1') {  //first come first serve
+            this.appList[k].appointment.map(x => {
+              if (x.appointment_no === idx.appointment_no) {
+                x.patient_name = this.appointmentPayloadInput.name;
+                x.is_can_create = false;
+              }
+            });
+          } else {
+            this.appList[k].appointment[idx.appointment_no].patient_name = this.appointmentPayloadInput.name;
+            this.appList[k].appointment[idx.appointment_no].is_can_create = false;
           }
-        });
-      } else {
-        this.appList[idx.appointment_no].patient_name = this.appointmentPayloadInput.name;
-        this.appList[idx.appointment_no].is_can_create = false;
+        }
       }
     }
+
     this.opSlotSelected.emit(data);
   }
 
   async reserveSlotApp(app: any) {
     const payload: reserveSlotPayload = {
-      scheduleId: this.appointmentPayload.scheduleId,
+      scheduleId: app.schedule_id,
       appointmentDate: this.appointmentPayload.appointmentDate,
       appointmentNo: app.appointment_no,
       userId: this.userId,
@@ -1432,7 +1507,7 @@ export class WidgetCreateAppointmentComponent implements OnInit {
   }
 
   async getReservedSlot(app: any) {
-    const scheduleId = this.appointmentPayload.scheduleId;
+    const scheduleId = app.schedule_id;
     const appointmentDate = this.appointmentPayload.appointmentDate;
     const appointmentNo = app.appointment_no;
     const userId = this.userId;
@@ -1464,8 +1539,8 @@ export class WidgetCreateAppointmentComponent implements OnInit {
   }
 
   async getScheduleBlock() {
-    const { scheduleId, appointmentDate } = this.appointmentPayload;
-    await this.scheduleService.getScheduleBlock(scheduleId, appointmentDate).toPromise().then(
+    const { appointmentDate, doctorId } = this.appointmentPayload;
+    await this.scheduleService.getScheduleBlockByDay(this.hospital.id, doctorId, appointmentDate).toPromise().then(
       data => {
         this.scheduleBlocks = data.data;
         this.scheduleBlocks.map(x => {

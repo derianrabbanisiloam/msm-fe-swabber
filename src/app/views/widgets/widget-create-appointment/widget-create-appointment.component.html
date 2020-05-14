@@ -104,7 +104,7 @@
               <div *ngIf="!app.appointment_temp_id">
                 <div *ngIf="app.is_can_cancel && isOriginal && !app.admission_id"
                   class="cell-img-nav d-flex justify-content-center">
-                  <div *ngIf="isOpen" (click)="checkInAppointment(app.appointment_id, confirmCheckIn)">
+                  <div *ngIf="isOpen" (click)="checkInAppointment(app, confirmCheckIn)">
                     <img src="{{assetPath}}icons/ic_Check@2x.png">
                   </div>
                   <span style="opacity: 0; max-width: 0.5em; overflow: hidden">filler</span>
@@ -166,7 +166,7 @@
               <div *ngIf="!app.appointment_temp_id && isOpen == true">
                 <div *ngIf="app.is_can_cancel && isOriginal && !app.admission_id"
                   class="cell-img-nav d-flex justify-content-center">
-                  <div *ngIf="isOpen" (click)="checkInAppointment(app.appointment_id, confirmCheckIn)">
+                  <div *ngIf="isOpen" (click)="checkInAppointment(app, confirmCheckIn)">
                     <img src="{{assetPath}}icons/ic_Check@2x.png">
                   </div>
                   <span style="opacity: 0; max-width: 0.5em; overflow: hidden">filler</span>
@@ -250,7 +250,7 @@
                   <div *ngIf="!app.appointment_temp_id">
                     <div *ngIf="app.is_can_cancel && isOriginal && !app.admission_id"
                       class="cell-img-nav d-flex justify-content-center">
-                      <div *ngIf="isOpen" (click)="checkInAppointment(app.appointment_id, confirmCheckIn)">
+                      <div *ngIf="isOpen" (click)="checkInAppointment(app, confirmCheckIn)">
                         <img src="{{assetPath}}icons/ic_Check@2x.png">
                       </div>
                       <span style="opacity: 0; max-width: 0.5em; overflow: hidden">filler</span>

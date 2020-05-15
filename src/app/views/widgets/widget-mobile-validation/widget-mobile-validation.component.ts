@@ -88,6 +88,8 @@ export class WidgetMobileValidationComponent implements OnInit {
   public formatFlag: boolean = false;
   public urlDownload: any;
   public fileName: any;
+  public loadingBut: boolean = false;
+  public confirmBut: boolean = false;
 
   constructor(
     private patientService: PatientService,
@@ -254,6 +256,7 @@ export class WidgetMobileValidationComponent implements OnInit {
   }
 
   async verifyPatient() {
+    this.confirmBut = true;
     this.activeModal.close();
     const payload = {
       patientHopeId: this.selectPatient.patientId,
@@ -262,8 +265,25 @@ export class WidgetMobileValidationComponent implements OnInit {
       userId: this.user.id,
       source: sourceApps
     };
-    this.patientService.verifyPatient(payload).subscribe(
-      data => {
+    await this.patientService.verifyPatient(payload).toPromise()
+      .then(res => {
+        this.selectedAndUpdate(res.data);
+      }).catch(err => {
+        Swal.fire({
+          type: 'error',
+          title: 'Oops...',
+          text: err.error.message,
+          timer: 4000
+        })
+        return null;
+      });
+  }
+
+  async selectedAndUpdate(result) {
+    let dataUpdate = await this.updateEmailMobile(this.selectPatient, this.selectedAccount);
+      if(dataUpdate) {
+        this.confirmBut = false;
+        this.modalService.dismissAll();
         Swal.fire({
           position: 'top-end',
           type: 'success',
@@ -273,20 +293,27 @@ export class WidgetMobileValidationComponent implements OnInit {
           timer: 3000
         })
         this.getListAccount();
-        this.selectedAccount.contact_id = data.data.contact_id;
+        this.selectedAccount.contact_id = result.contact_id;
         this.selectedAccount.contact_status_id = contactStatus.VERIFIED;
         this.selectedAccount.mobile_status = mobileStatus.ACTIVE;
         this.choosedAccount(this.selectedAccount);
-      }, error => {
+      } else {
+        this.confirmBut = false;
+        this.modalService.dismissAll();
         Swal.fire({
-          type: 'error',
-          title: 'Oops...',
-          text: error.error.message,
-          timer: 4000
+          position: 'top-end',
+          type: 'success',
+          title: 'Success',
+          text: 'Verify Patient Success',
+          showConfirmButton: false,
+          timer: 3000
         })
+        this.getListAccount();
+        this.selectedAccount.contact_id = result.contact_id;
+        this.selectedAccount.contact_status_id = contactStatus.VERIFIED;
+        this.selectedAccount.mobile_status = mobileStatus.ACTIVE;
+        this.choosedAccount(this.selectedAccount);
       }
-    )
-
   }
 
   editDataContact(disclaimer){
@@ -432,7 +459,7 @@ export class WidgetMobileValidationComponent implements OnInit {
     )
   }
 
-  async getPatientHopeId(val, content) {
+  async getPatientHopeId(val) {
     let body = await this.patientService.getPatientHopeDetail(val.patientId)
       .toPromise().then(res => {
         return res.data;
@@ -443,33 +470,86 @@ export class WidgetMobileValidationComponent implements OnInit {
           text: err.error.message,
           timer: 4000
         })
+        return null;
       });
-    const { patientId, name, sexId, birthPlaceId, birthDate, titleId, maritalStatusId, address, cityId, districtId, 
-            subDistrictId, postCode, homePhoneNo, officePhoneNo, mobileNo1, mobileNo2, emailAddress,
-            permanentAddress, permanentCityId, permanentPostCode, nationalIdTypeId, nationalIdNo,
-            nationalityId, religionId, bloodTypeId, fatherName, motherName, spouseName, contactName,
-            contactAddress, contactCityId, contactPhoneNo, contactMobileNo, contactEmailAddress, allergy,
-            payerId, payerIdNo, notes } = body;
-            
-    this.patientHopeId = patientId;
 
-    let bodyTwo = {
-      name, sexId, birthPlaceId, birthDate, titleId, maritalStatusId, address, cityId, districtId, 
-      subDistrictId, postCode, homePhoneNo, officePhoneNo, mobileNo2, emailAddress,
-      permanentAddress, permanentCityId, permanentPostCode, nationalIdTypeId, nationalIdNo,
-      nationalityId, religionId, bloodTypeId, fatherName, motherName, spouseName, contactName,
-      contactAddress, contactCityId, contactPhoneNo, contactMobileNo, contactEmailAddress, allergy,
-      payerId, payerIdNo, notes, patientOrganizationId : val.patientOrganizationId, organizationId: val.hospitalId
+    return body
+  }
+
+  async updateEmailMobile(patientData, contactData) {
+    let body = await this.getPatientHopeId(patientData);
+    if(body) {
+      const { patientId, name, sexId, birthPlaceId, birthDate, titleId, maritalStatusId, address, cityId, districtId, 
+              subDistrictId, postCode, homePhoneNo, officePhoneNo, mobileNo1, mobileNo2, emailAddress,
+              permanentAddress, permanentCityId, permanentPostCode, nationalIdTypeId, nationalIdNo,
+              nationalityId, religionId, bloodTypeId, fatherName, motherName, spouseName, contactName,
+              contactAddress, contactCityId, contactPhoneNo, contactMobileNo, contactEmailAddress, allergy,
+              payerId, payerIdNo, notes } = body;
+
+      let bodyTwo = {
+        name, sexId, birthPlaceId, birthDate, titleId, maritalStatusId, address, cityId, districtId, 
+        subDistrictId, postCode, homePhoneNo, officePhoneNo, mobileNo1, mobileNo2, emailAddress,
+        permanentAddress, permanentCityId, permanentPostCode, nationalIdTypeId, nationalIdNo,
+        nationalityId, religionId, bloodTypeId, fatherName, motherName, spouseName, contactName,
+        contactAddress, contactCityId, contactPhoneNo, contactMobileNo, contactEmailAddress, allergy,
+        payerId, payerIdNo, notes, patientOrganizationId : patientData.patientOrganizationId, organizationId: patientData.hospitalId,
+        channelId: null, userId: null, source: null, userName: null
+      }
+
+      if(contactData.phone_number_1 && contactData.email_address) {
+        bodyTwo.mobileNo1 = this.charRemove(contactData.phone_number_1);
+        bodyTwo.emailAddress = contactData.email_address;
+        bodyTwo.channelId = channelId.FRONT_OFFICE;
+        bodyTwo.userId = this.user.id;
+        bodyTwo.source = sourceApps;
+        bodyTwo.userName = this.user.fullname;
+
+        let dataUpdate = await this.patientService.updatePatientComplete(bodyTwo, patientId)
+        .toPromise().then(res => {
+          return res.data;
+        }).catch(err => {
+          return null;
+        });
+
+        return dataUpdate
+      } else {
+        return null;
+      }
+    } else {
+      return null;
     }
+  }
 
-    this.phoneNumberOne = mobileNo1;
-    this.phoneNumberTwo = mobileNo2;
-    this.nameHope = name;
-    this.addressHope = address;
-    this.birthDateFormat = dateFormatter(birthDate, true);
-    this.postHope = bodyTwo;
-    this.checkCountChar();
-    this.openLarge(content);
+  async editPatientHopeId(val, content) {
+    let body = await this.getPatientHopeId(val);
+    if(body) {
+      const { patientId, name, sexId, birthPlaceId, birthDate, titleId, maritalStatusId, address, cityId, districtId, 
+              subDistrictId, postCode, homePhoneNo, officePhoneNo, mobileNo1, mobileNo2, emailAddress,
+              permanentAddress, permanentCityId, permanentPostCode, nationalIdTypeId, nationalIdNo,
+              nationalityId, religionId, bloodTypeId, fatherName, motherName, spouseName, contactName,
+              contactAddress, contactCityId, contactPhoneNo, contactMobileNo, contactEmailAddress, allergy,
+              payerId, payerIdNo, notes } = body;
+            
+      this.patientHopeId = patientId;
+
+      let bodyTwo = {
+        name, sexId, birthPlaceId, birthDate, titleId, maritalStatusId, address, cityId, districtId, 
+        subDistrictId, postCode, homePhoneNo, officePhoneNo, mobileNo2, emailAddress,
+        permanentAddress, permanentCityId, permanentPostCode, nationalIdTypeId, nationalIdNo,
+        nationalityId, religionId, bloodTypeId, fatherName, motherName, spouseName, contactName,
+        contactAddress, contactCityId, contactPhoneNo, contactMobileNo, contactEmailAddress, allergy,
+        payerId, payerIdNo, notes, patientOrganizationId : val.patientOrganizationId, organizationId: val.hospitalId
+        }
+
+      this.phoneNumberOne = mobileNo1;
+      this.phoneNumberTwo = mobileNo2;
+      this.nameHope = name;
+      this.addressHope = address;
+      this.birthDateFormat = dateFormatter(birthDate, true);
+      this.postHope = bodyTwo;
+      this.checkCountChar();
+      this.openLarge(content);
+    }
   }
 
   checkCountChar() {
@@ -485,6 +565,7 @@ export class WidgetMobileValidationComponent implements OnInit {
   }
 
   confirmSavePhoneNumber() {
+    this.loadingBut = true;
     this.postHope.mobileNo1 = this.charRemove(this.phoneNumberOne);
     this.postHope.mobileNo2 = this.charRemove(this.phoneNumberTwo);
     this.postHope.channelId = channelId.FRONT_OFFICE;
@@ -495,7 +576,7 @@ export class WidgetMobileValidationComponent implements OnInit {
       data => {
         if(this.searchPatient === true) this.getSearchedPatient1();
         else this.getSearchedPatient2();
-        
+        this.loadingBut = false;
         Swal.fire({
           position: 'top-end',
           type: 'success',
@@ -506,6 +587,7 @@ export class WidgetMobileValidationComponent implements OnInit {
         })
         this.modalService.dismissAll();
       }, error => {
+        this.loadingBut = false;
         Swal.fire({
           type: 'error',
           title: 'Oops...',
@@ -569,6 +651,7 @@ export class WidgetMobileValidationComponent implements OnInit {
       contact_id: val.contact_id,
       name: val.name,
       birth_date: val.birth_date,
+      email_address: val.email_address,
       phone_number_1: val.phone_number_1,
       phone_number_2: val.phone_number_2,
       contact_status_id: val.contact_status_id,

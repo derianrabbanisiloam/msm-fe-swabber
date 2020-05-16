@@ -496,9 +496,9 @@ export class WidgetMobileValidationComponent implements OnInit {
         channelId: null, userId: null, source: null, userName: null
       }
 
-      if(contactData.phone_number_1 && contactData.email_address) {
-        bodyTwo.mobileNo1 = this.charRemove(contactData.phone_number_1);
-        bodyTwo.emailAddress = contactData.email_address;
+      if(contactData.phone_number_1 || contactData.email_address) {
+        bodyTwo.mobileNo1 = this.charRemove(contactData.phone_number_1) || mobileNo1;
+        bodyTwo.emailAddress = contactData.email_address || emailAddress;
         bodyTwo.channelId = channelId.FRONT_OFFICE;
         bodyTwo.userId = this.user.id;
         bodyTwo.source = sourceApps;

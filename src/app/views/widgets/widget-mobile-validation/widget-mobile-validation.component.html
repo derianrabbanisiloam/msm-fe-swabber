@@ -158,7 +158,7 @@
                 <td>{{itr.mobileNo1}}</td>
                 <td>{{itr.address}}</td>
                 <td>
-                  <button type="button" class="btn-default" (click)="getPatientHopeId(itr, confirmEdit)">
+                  <button type="button" class="btn-default" (click)="editPatientHopeId(itr, confirmEdit)">
                     <i class="fa fa-edit"></i>
                   </button>
                 </td>
@@ -486,7 +486,7 @@
     </div>
     <div class="modal-footer">
       <button type="button" class="btn ms_btn_black" (click)="modal.close()">Cancel</button>
-      <button class="btn ms_btn_green" [ngClass]="{'disable': flagConfirm}" (click)="verifyPatient()" (click)="modal.close()">Confirm</button>
+      <button class="btn ms_btn_green" [ngClass]="{'disable': confirmBut}" (click)="verifyPatient()">Confirm</button>
     </div>
   </ng-template>
 
@@ -535,7 +535,7 @@
     <div class="modal-footer">
       <button type="button" class="btn ms_btn_black" (click)="c('Cross click')">Cancel</button>
       <button class="btn ms_btn_green" [disabled]="(!flagCountOne || phoneNumberOne?.length === 0) 
-      || (flagCountOne && !flagCountTwo && phoneNumberTwo?.length > 0)" (click)="confirmSavePhoneNumber()">Update HOPE</button>
+      || (flagCountOne && !flagCountTwo && phoneNumberTwo?.length > 0) || loadingBut" (click)="confirmSavePhoneNumber()">Update HOPE</button>
     </div>
   </ng-template>
 

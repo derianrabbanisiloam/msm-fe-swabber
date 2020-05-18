@@ -48,7 +48,6 @@ import {
 } from '../../../variables/common.variable';
 import Security from 'msm-kadapat';
 import { environment } from '../../../../environments/environment';
-import { scheduleList, timeSlot, apppointmentList } from '../../../models/dummy';
 
 @Component({
   selector: 'app-widget-create-appointment',
@@ -180,9 +179,9 @@ export class WidgetCreateAppointmentComponent implements OnInit {
     await this.getSchedule();
     await this.getDoctorProfile();
     await this.getDoctorNotes();
-    await this.getScheduleBlock(); //mungkin ada perubahan
-    await this.getAppointmentList(); //mungkin ada perubahan
-    await this.getSlotTime(); //mungkin ada perubahan
+    await this.getScheduleBlock();
+    await this.getAppointmentList();
+    await this.getSlotTime();
     await this.dataProcessing();
     await this.getPayer();
     await this.getPatientType();
@@ -770,18 +769,9 @@ export class WidgetCreateAppointmentComponent implements OnInit {
     const date = this.appointmentPayload.appointmentDate;
     const sortBy = 'appointment_no';
     const orderBy = 'ASC';
-    // await this.appointmentService.getAppointmentByDay(hospitalId, doctorId, date, sortBy, orderBy).toPromise().then(
-    //   data => {
-    //     this.appointments = data.data;
-    //   }
-    // );
-
-    const scheduleDummy = '6fce62d5-8f76-47bf-aed3-30ab34493351';
-    await this.appointmentService.getAppointmentByScheduleId(scheduleDummy, date, sortBy, orderBy).toPromise().then(
+    await this.appointmentService.getAppointmentByDay(hospitalId, doctorId, date, sortBy, orderBy).toPromise().then(
       data => {
-        //this.appointments = data.data;
-        //dummydata
-        this.appointments = apppointmentList;
+        this.appointments = data.data;
       }
     );
   }
@@ -791,16 +781,9 @@ export class WidgetCreateAppointmentComponent implements OnInit {
     const doctorId = this.appointmentPayload.doctorId;
     const date = this.appointmentPayload.appointmentDate;
     const hospitalId = this.hospital.id;
-    // await this.scheduleService.getTimeSlot(hospitalId, doctorId, date).toPromise().then(
-    //   data => {
-    //     this.slotList = data.data;
-    //   }
-    // );
-
-    const scheduleDummy = '6fce62d5-8f76-47bf-aed3-30ab34493351';
-    await this.scheduleService.getTimeSlotSchedule(hospitalId, doctorId, scheduleDummy, date).toPromise().then(
+    await this.scheduleService.getTimeSlot(hospitalId, doctorId, date).toPromise().then(
       data => {
-        this.slotList = timeSlot;
+        this.slotList = data.data;
       }
     );
   }
@@ -841,21 +824,9 @@ export class WidgetCreateAppointmentComponent implements OnInit {
   async getSchedule() {
     const doctorId = this.appointmentPayload.doctorId;
     const date = this.appointmentPayload.appointmentDate;
-    // await this.scheduleService.getScheduleDoctor(this.hospital.id, doctorId, date).toPromise().then(
-    //   data => {
-    //     this.schedule = data.data;
-    //     this.schedule.map(x => {
-    //       x.from_time = x.from_time.substr(0, 5);
-    //       x.to_time = x.to_time.substr(0, 5);
-    //     });
-    //     this.doctorName = this.schedule[0].doctor_name;
-    //     this.hospitalName = this.schedule[0].hospital_name;
-    //   }
-    // );
-
-    await this.scheduleService.getScheduleByDate(this.hospital.id, doctorId, date).toPromise().then(
+    await this.scheduleService.getScheduleDoctor(this.hospital.id, doctorId, date).toPromise().then(
       data => {
-        this.schedule = scheduleList;
+        this.schedule = data.data;
         this.schedule.map(x => {
           x.from_time = x.from_time.substr(0, 5);
           x.to_time = x.to_time.substr(0, 5);

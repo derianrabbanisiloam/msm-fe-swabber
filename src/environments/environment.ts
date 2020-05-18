@@ -1,7 +1,7 @@
 export const environment = {
   production: false,
   ENVIRONMENT_NAME: 'Development',
-  CALL_CENTER_SERVICE: 'http://10.85.139.13/msm-be-call-center-aido-prod/api/v2',
+  CALL_CENTER_SERVICE: 'http://10.85.139.13/msm-be-call-center-prod-stable/api/v2',
   OPADMIN_SERVICE: 'http://10.85.139.13/msm-be-opadmin-prod/api/v2',
   FRONT_OFFICE_SERVICE: 'http://10.85.139.13/msm-be-front-office-aido-prod/api/v2',
   SSO_SERVICE: 'http://10.85.129.55:7500',

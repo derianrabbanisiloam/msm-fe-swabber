@@ -17,6 +17,7 @@ export class PatientService {
   private updateContactUrl = environment.FRONT_OFFICE_SERVICE + '/contacts/account/open-access-mr';
   private patientUrl = environment.FRONT_OFFICE_SERVICE + '/patients';
   private contactFoUrl = environment.FRONT_OFFICE_SERVICE + '/contacts';
+  private patientHopeFoUrl = environment.FRONT_OFFICE_SERVICE + '/patients/hope';
 
   private patientHopeUrl = environment.CALL_CENTER_SERVICE + '/patients/hope';
   private verifyPatientUrl = environment.CALL_CENTER_SERVICE + '/patients/verify';
@@ -36,6 +37,23 @@ export class PatientService {
   
   emitUpdateContact(params: boolean) {
     this.updateContactSource.next(params);
+  }
+
+  getPatientHopeSearch(name, dob, phoneNumber, hospitalId): Observable<any> {
+    const uri = `${this.contactFoUrl}/confirm?name=${name}&dob=${dob}&phoneNumber=${phoneNumber}&hospitalId=${hospitalId}`;
+    return this.http.get<any>(uri, httpOptions);
+  }
+
+  searchByPatientHopeId(patientHope: number, payload: any): Observable<any> {
+    const url = `${this.patientHopeFoUrl}/${patientHope}`;
+    const body = JSON.stringify(payload);
+    return this.http.put<any>(url, body, httpOptions);
+  }
+
+  postMappingPatient(payload: any): Observable<any> {
+    const uri = `${this.patientUrl}/sync`;
+    const body = JSON.stringify(payload);
+    return this.http.put<any>(uri, body, httpOptions);
   }
 
   uploadImage(formData: any) {

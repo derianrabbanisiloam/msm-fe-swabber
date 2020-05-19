@@ -28,6 +28,10 @@
   display: none;
 }
 
+.printable {
+  display: none;
+}
+
 .printable-table-schedule-doctor-name {
   text-align:center;
   padding-top: 5px
@@ -372,6 +376,10 @@ div{
 }
 .fo_btn_red{ background: #C43D32; color: white; border-radius: 4px; border: none}
 .fo_btn_black{ background: black; color: white}
+.fo_btn_black_new{ border: none;
+  background: black;
+  color: white;
+  border-radius: 4px;}
 .fo_btn_save{ width: 16rem; color: white; background: #4D9B35}
 .fo_btn_blue{ width: 16rem; color: white; background: #1A2269}
 .fo_btn_black{ width: 16rem; color: white; background: black}
@@ -411,6 +419,29 @@ button:disabled { cursor: not-allowed }
 
 @media print
 {
+  .col-print-1 {width:8%;  float:left;}
+  .col-print-2 {width:16%; float:left;}
+  .col-print-3 {width:25%; float:left;}
+  .col-print-4 {width:33%; float:left;}
+  .col-print-5 {width:42%; float:left;}
+  .col-print-6 {width:50%; float:left;}
+  .col-print-7 {width:58%; float:left;}
+  .col-print-8 {width:66%; float:left;}
+  .col-print-9 {width:75%; float:left;}
+  .col-print-10{width:83%; float:left;}
+  .col-print-11{width:92%; float:left;}
+  .col-print-12{width:100%; float:left;}
+
+  .printable {
+    display: block;
+    margin-top: -595px;
+    margin-left: -57px;
+    margin-right: -18px;
+    font-family: 'Times New Roman', Times, serif;
+  }
+  .unprintable {
+    display: none;
+  }
   .container-button{
     display: none;
   }
@@ -577,7 +608,7 @@ button:disabled { cursor: not-allowed }
   .printable-table-schedule-doctor-specialty {
     font-size: 22px;
   }
-  .printable-table-schedule .unprintable {
+  .printable-table-schedule {
     display: none;
   }
   .text-unprintable{

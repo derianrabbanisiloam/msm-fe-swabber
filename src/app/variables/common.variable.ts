@@ -91,3 +91,10 @@ export const formatFile = {
   image: 'jpg',
   pdf: 'pdf'
 }
+
+export const consultationType = {
+  REGULAR: '1',
+  BPJS: '2',
+  EXECUTIVE: '3',
+  TELECONSULTATION: '4'
+}

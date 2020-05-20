@@ -9,5 +9,5 @@ export const environment = {
   HIS_SERVICE: 'http://10.85.139.13/his-service-master',
   ASSET_PATH: 'https://gtn-dev-mysiloam-02.siloamhospitals.com/fo-assets/',
   UPLOAD_IMAGE: 'http://10.85.136.23:3333',
-  GET_IMAGE_KTP: 'http://10.85.136.23/dev/identity/'
+  GET_IMAGE_DISCLAIMER: 'http://10.85.136.23/dev/disclaimer_1/'
 };

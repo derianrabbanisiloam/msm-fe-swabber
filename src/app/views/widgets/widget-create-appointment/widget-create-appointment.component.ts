@@ -1536,7 +1536,7 @@ export class WidgetCreateAppointmentComponent implements OnInit {
 
   openScheduleBlockModal() {
     const params = {
-      scheduleId: this.appointmentPayload.scheduleId,
+      scheduleId: this.schedule,
       date: this.appointmentPayload.appointmentDate
     };
     const modalRef = this.modalService.open(ModalScheduleBlockComponent, { windowClass: 'cc_modal_block' });

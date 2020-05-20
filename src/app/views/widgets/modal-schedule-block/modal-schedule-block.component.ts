@@ -47,6 +47,8 @@ export class ModalScheduleBlockComponent implements OnInit {
   private index: any;
   private undoWaitingList: boolean = false;
   private undoTeleconsultation: boolean = false;
+  private flagRender: boolean = false;
+  private scheduleSel: string;
 
   constructor(
     private modalService: NgbModal,
@@ -68,24 +70,36 @@ export class ModalScheduleBlockComponent implements OnInit {
     this.getCollectionAlert();
   }
 
+  selectSchedule() {
+    console.log('slect', this.scheduleSel)
+  }
+
   getScheduleBlock() {
-    const scheduleId = this.inputedParams.scheduleId;
+    let flagCount = 0;
     const date = this.inputedParams.date;
-    this.scheduleService.getScheduleBlock(scheduleId, date).subscribe(
-      data => {
-        this.scheduleBlocks = data.data;
-        let ft: any;
-        let tt: any;
-        for (let i = 0; i < this.scheduleBlocks.length; i++) {
-          ft = this.scheduleBlocks[i].from_time.split(':');
-          tt = this.scheduleBlocks[i].to_time.split(':');
-          this.scheduleBlocks[i].fh = ft[0];
-          this.scheduleBlocks[i].fm = ft[1];
-          this.scheduleBlocks[i].th = tt[0];
-          this.scheduleBlocks[i].tm = tt[1];
+    for(let i = 0, { length } = this.inputedParams.scheduleId; i < length; i += 1) {
+      this.scheduleService.getScheduleBlock(this.inputedParams.scheduleId[i].schedule_id, date).subscribe(
+        data => {
+          if(data.data.length !== 0) {
+            this.scheduleBlocks+= data.data;
+            let ft: any;
+            let tt: any;
+            for (let i = 0; i < this.scheduleBlocks.length; i++) {
+              ft = this.scheduleBlocks[i].from_time.split(':');
+              tt = this.scheduleBlocks[i].to_time.split(':');
+              this.scheduleBlocks[i].fh += ft[0];
+              this.scheduleBlocks[i].fm += ft[1];
+              this.scheduleBlocks[i].th += tt[0];
+              this.scheduleBlocks[i].tm += tt[1];
+            }
+          }
         }
-      }
-    );
+      );
+      flagCount+=1;
+    }
+    if(this.inputedParams.scheduleId.length === flagCount) {
+      this.flagRender = true;
+    }
   }
 
   rangeTimeChecker(fromTime, toTime) {
@@ -98,6 +112,7 @@ export class ModalScheduleBlockComponent implements OnInit {
     let fTime: any;
     let tTime: any;
     let found: boolean = false;
+    console.log('!!!!!!!!!!!', this.scheduleBlocks)
     for (let i = 0; i < this.scheduleBlocks.length; i++) {
       ft = this.scheduleBlocks[i].from_time.split(':');
       tt = this.scheduleBlocks[i].to_time.split(':');
@@ -111,7 +126,7 @@ export class ModalScheduleBlockComponent implements OnInit {
   }
 
   async addScheduleBlock() {
-    const scheduleId = this.inputedParams.scheduleId;
+    const scheduleId = this.scheduleSel;
     const date = this.inputedParams.date;
     const fromTime = moment('1990-01-01 ' + this.blockModel.fh + ':' + this.blockModel.fm).format('HH:mm');
     const toTime = moment('1990-01-01 ' + this.blockModel.th + ':' + this.blockModel.tm).format('HH:mm');

@@ -52,6 +52,7 @@ export class ScheduleService {
 
   getScheduleBlock(scheduleId: string, date: string): Observable<any> {
     const url = `${this.scheduleBlockUrl}/${scheduleId}?date=${date}`;
+    console.log('!!!!!!!!url', url)
     return this.http.get<any>(url, httpOptions);
   }
 

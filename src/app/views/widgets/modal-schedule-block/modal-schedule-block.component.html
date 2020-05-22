@@ -14,7 +14,7 @@
           <label>Select schedule</label>
           <br>
           <select class="form-control select-schedule" name="selectSchedule"
-          [(ngModel)]="scheduleSel" (change)="selectSchedule()" required>
+          [(ngModel)]="scheduleSel" required>
             <option *ngFor="let schedule of inputedParams.scheduleId" value="{{schedule.schedule_id}}">
               {{schedule.from_time}} - {{schedule.to_time}}</option>
           </select>
@@ -71,9 +71,13 @@
 
   <h5><strong>Block List</strong></h5>
 
-  <div class="col-md-12" *ngFor="let bl of scheduleBlocks; let i=index;">
-      <div class="row" *ngIf="flagRender">
-        <div class="form-group col-md-2" style="padding: 0">
+  <div class="col-md-12" *ngFor="let schBlock of scheduleBlocks; let g=index;" style="margin-top: 1em;">
+    <div class="row" style="font-weight: bold;">
+      SCHEDULE TIME : {{schBlock.schedule_time}}
+    </div>
+    <div *ngIf="schBlock.schedule_block.length > 0">
+      <div class="row" *ngFor="let bl of schBlock.schedule_block; let i=index;" style="margin-top: 0.5em;">
+        <div class="form-group col-md-2" style="padding: 0;">
           <label>From Time</label>
           <br>
           <select class="form-control select-time" (change)="openModalBlockConfirmation(content6, bl)" name="block_model_fh" [(ngModel)]="bl.fh" required>
@@ -101,16 +105,22 @@
         </div>
         <div class="form-group col-md-2">
           <label style="display: block; text-align: center;">Include Waiting List</label>
-          <input class="form-control" type="checkbox" name="block_model_is_waiting_list" (change)="blockCheckBoxEdit(i)" (change)="openModalBlockConfirmation(content6, bl, i)" [(ngModel)]="bl.is_include_waiting_list">
+          <input class="form-control" type="checkbox" name="block_model_is_waiting_list" (change)="blockCheckBoxEdit()" (change)="openModalBlockConfirmation(content6, bl, i)" [(ngModel)]="bl.is_include_waiting_list">
         </div>
         <div class="form-group col-md-2">
           <label style="display: block; text-align: center;">Teleconsultation</label>
-          <input class="form-control" type="checkbox" name="block_model_is_teleconsultation" (change)="blockCheckBoxEditTwo(i)" (change)="openModalBlockConfirmation(content6, bl, i)" [(ngModel)]="bl.is_teleconsultation">
+          <input class="form-control" type="checkbox" name="block_model_is_teleconsultation" (change)="blockCheckBoxEditTwo()" (change)="openModalBlockConfirmation(content6, bl, i)" [(ngModel)]="bl.is_teleconsultation">
         </div>
         <div class="form-group col-md-2">
           <button (click)="openModalBlockConfirmation(content7, bl)" class="btn btn-danger">Delete</button>
         </div>
       </div>
+    </div>
+    <div *ngIf="schBlock.schedule_block.length === 0">
+     <div class="row">
+      Result not found
+     </div>
+    </div>
   </div>
   <div class="col-md-12 block-error-msg">{{ editBlockErrMsg }}</div>
   <div *ngFor="let alert of alerts">
@@ -138,7 +148,7 @@
 <div class="modal-body">
   <p style="padding: 1vw 4vw">Are you sure to permanent delete this block?</p>
   <div style="text-align: center">
-    <button class="ms_btn_border ms_btn_black" style="padding: 0.3vw 0vw; width: 5vw" aria-label="Close">Cancel</button>
+    <button class="ms_btn_border ms_btn_black" style="padding: 0.3vw 0vw; width: 5vw" aria-label="Close" (click)="d('Cross click')">Cancel</button>
     <button class="ms_btn_border ms_btn_red" style="padding: 0.3vw 0vw; width: 5vw" (click)="deleteScheduleBlock()" (click)="d('Cross click')">Yes</button>
   </div>
 </div>

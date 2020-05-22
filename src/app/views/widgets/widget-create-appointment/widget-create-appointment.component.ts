@@ -1537,6 +1537,7 @@ export class WidgetCreateAppointmentComponent implements OnInit {
   openScheduleBlockModal() {
     const params = {
       scheduleId: this.schedule,
+      doctorId: this.appointmentPayload.doctorId,
       date: this.appointmentPayload.appointmentDate
     };
     const modalRef = this.modalService.open(ModalScheduleBlockComponent, { windowClass: 'cc_modal_block' });
@@ -1545,18 +1546,7 @@ export class WidgetCreateAppointmentComponent implements OnInit {
 
   async getScheduleBlock() {
     const { appointmentDate, doctorId } = this.appointmentPayload;
-    // await this.scheduleService.getScheduleBlockByDay(this.hospital.id, doctorId, appointmentDate).toPromise().then(
-    //   data => {
-    //     this.scheduleBlocks = data.data;
-    //     this.scheduleBlocks.map(x => {
-    //       x.from_time = x.from_time.substr(0, 5);
-    //       x.to_time = x.to_time.substr(0, 5);
-    //     });
-    //   }
-    // );
-
-    const scheduleDummy = '6fce62d5-8f76-47bf-aed3-30ab34493351';
-    await this.scheduleService.getScheduleBlock(scheduleDummy, appointmentDate).toPromise().then(
+    await this.scheduleService.getScheduleBlockByDay(this.hospital.id, doctorId, appointmentDate).toPromise().then(
       data => {
         this.scheduleBlocks = data.data;
         this.scheduleBlocks.map(x => {

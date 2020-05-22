@@ -52,12 +52,11 @@ export class ScheduleService {
 
   getScheduleBlock(scheduleId: string, date: string): Observable<any> {
     const url = `${this.scheduleBlockUrl}/${scheduleId}?date=${date}`;
-    console.log('!!!!!!!!url', url)
     return this.http.get<any>(url, httpOptions);
   }
 
   getScheduleBlockByDay(hospitalId: string, doctorId: string, date: string): Observable<any> {
-    const url = `${this.scheduleBlockUrl}/hospital/${hospitalId}/doctor/${doctorId}?date=${date}`;
+    const url = `${this.scheduleBlockUrl}?hospitalId=${hospitalId}&doctorId=${doctorId}&date=${date}`;
     return this.http.get<any>(url, httpOptions);
   }
 

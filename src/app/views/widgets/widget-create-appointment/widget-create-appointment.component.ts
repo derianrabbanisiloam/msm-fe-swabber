@@ -519,6 +519,7 @@ export class WidgetCreateAppointmentComponent implements OnInit {
       this.appList.push(
         {
           schedule_id: this.schedule[k].schedule_id,
+          doctor_type_name: this.schedule[k].doctor_type_name,
           consultation_type_id: this.schedule[k].consultation_type_id,
           appointment: []
         }

@@ -9,7 +9,7 @@
         <div class="btn" style="background: white; padding: 0.2vw 0.5vw" (click)="prevPage()">
           <img style="width: 1vw" src="{{assetPath}}icons/ic_BackGreen@2x.png">
         </div>
-        <div *ngIf="doctorProfile.doctor_type_id !== '1'">
+        <div>
           <button class="btn btn-green" (click)="openScheduleBlockModal()">Manage Block</button>
         </div>
       </div>
@@ -200,7 +200,7 @@
     </div>
 
     <!--                              Waiting List                                -->
-    <div *ngIf="doctorProfile.doctor_type_name !== doctorType.FCFS">
+    <div *ngIf="schArray.doctor_type_name !== doctorType.FCFS">
       <div *ngIf="schArray.consultation_type_id != '4'">
         <div *ngFor="let appWait of appListWaiting">
           <div class="col-md-12" *ngIf="appWait.schedule_id === schArray.schedule_id">

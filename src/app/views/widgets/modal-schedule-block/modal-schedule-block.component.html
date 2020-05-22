@@ -15,7 +15,9 @@
           <br>
           <select class="form-control select-schedule" name="selectSchedule"
           [(ngModel)]="scheduleSel" required>
-            <option *ngFor="let schedule of inputedParams.scheduleId" value="{{schedule.schedule_id}}">
+            <option [disabled]="schedule.doctor_type_id == 1" 
+            [ngStyle]="{'background-color': schedule.doctor_type_id == 1 ? '#E5E7E9 ' : '' }"
+            *ngFor="let schedule of inputedParams.scheduleId" value="{{schedule.schedule_id}}">
               {{schedule.from_time}} - {{schedule.to_time}}</option>
           </select>
           <br>

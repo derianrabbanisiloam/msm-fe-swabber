@@ -179,9 +179,9 @@ export class WidgetCreateAppointmentComponent implements OnInit {
     await this.getSchedule();
     await this.getDoctorProfile();
     await this.getDoctorNotes();
-    await this.getScheduleBlock(); //mungkin ada perubahan
-    await this.getAppointmentList(); //mungkin ada perubahan
-    await this.getSlotTime(); //mungkin ada perubahan
+    await this.getScheduleBlock();
+    await this.getAppointmentList();
+    await this.getSlotTime();
     await this.dataProcessing();
     await this.getPayer();
     await this.getPatientType();
@@ -218,7 +218,7 @@ export class WidgetCreateAppointmentComponent implements OnInit {
     //socket cancel appointment
     this.socket.on(CANCEL_APP+'/'+this.hospital.id, (call) => {
       for(let k = 0, { length } = this.schedule; k < length; k += 1) {
-        if (call.data.schedule_id == this.schedule[k].scheduleId
+        if (call.data.schedule_id == this.schedule[k].schedule_id
           && call.data.appointment_date == this.appointmentPayload.appointmentDate) {
           this.appointments = this.appointments.filter((value) => {
             if(call.data.appointment_temporary_id) {
@@ -503,9 +503,7 @@ export class WidgetCreateAppointmentComponent implements OnInit {
     //this function use to make list appointment base on slot time
     this.appList = [];
     this.appListWaiting = [];
-    let count = 0;
 
-    const docType = this.doctorProfile.doctor_type_name;
     const hospitalId = this.schedule[0].hospital_id;
     const doctorId = this.schedule[0].doctor_id;
 
@@ -513,6 +511,7 @@ export class WidgetCreateAppointmentComponent implements OnInit {
     let no;
     this.schLength = this.schedule.length;
     for(let k = 0, { length } = this.schedule; k < length; k += 1) {
+      const docType = this.schedule[k].doctor_type_name;
       no = 0;
       const fromTime = this.schedule[k].from_time;
       const toTime = this.schedule[k].to_time;
@@ -577,7 +576,8 @@ export class WidgetCreateAppointmentComponent implements OnInit {
               is_can_cancel: this.slotList[i].is_blocked ? false : true,
               is_blocked: this.slotList[i].is_blocked,
               is_walkin: this.slotList[i].is_walkin,
-              schedule_id: this.schedule[k].schedule_id
+              schedule_id: this.schedule[k].schedule_id,
+              doctor_type_id: this.schedule[k].doctor_type_id
             });
           } else {
             this.appList[k].appointment.push({
@@ -608,7 +608,8 @@ export class WidgetCreateAppointmentComponent implements OnInit {
               is_can_cancel: false,
               is_blocked: this.slotList[i].is_blocked,
               is_walkin: this.slotList[i].is_walkin,
-              schedule_id: this.schedule[k].schedule_id
+              schedule_id: this.schedule[k].schedule_id,
+              doctor_type_id: this.schedule[k].doctor_type_id
             });
           }
         }
@@ -652,7 +653,8 @@ export class WidgetCreateAppointmentComponent implements OnInit {
             is_can_create: false,
             is_can_cancel: isBlockWaitingList === false ? true : false,
             is_blocked: isBlockWaitingList,
-            schedule_id: this.schedule[k].schedule_id
+            schedule_id: this.schedule[k].schedule_id,
+            doctor_type_id: this.schedule[k].doctor_type_id
           });
         }
       });
@@ -683,7 +685,8 @@ export class WidgetCreateAppointmentComponent implements OnInit {
           is_can_create: isBlockWaitingList === false ? true : false,
           is_can_cancel: false,
           is_blocked: isBlockWaitingList,
-          schedule_id: this.schedule[k].schedule_id
+          schedule_id: this.schedule[k].schedule_id,
+          doctor_type_id: this.schedule[k].doctor_type_id
         });  
       } else {
         for (let i = 0, { length } = this.appointments; i < length; i++) {
@@ -715,7 +718,8 @@ export class WidgetCreateAppointmentComponent implements OnInit {
               is_can_cancel: true,
               is_blocked: false,
               is_walkin: false,
-              schedule_id: this.schedule[k].schedule_id
+              schedule_id: this.schedule[k].schedule_id,
+              doctor_type_id: this.schedule[k].doctor_type_id
             });
           }
         }
@@ -752,7 +756,8 @@ export class WidgetCreateAppointmentComponent implements OnInit {
           is_can_cancel: false,
           is_blocked: false,
           is_walkin: false,
-          schedule_id: this.schedule[k].schedule_id
+          schedule_id: this.schedule[k].schedule_id,
+          doctor_type_id: this.schedule[k].doctor_type_id
         });
       } 
     }
@@ -819,7 +824,7 @@ export class WidgetCreateAppointmentComponent implements OnInit {
   async getSchedule() {
     const doctorId = this.appointmentPayload.doctorId;
     const date = this.appointmentPayload.appointmentDate;
-    await this.scheduleService.getScheduleByDate(this.hospital.id, doctorId, date).toPromise().then(
+    await this.scheduleService.getScheduleDoctor(this.hospital.id, doctorId, date).toPromise().then(
       data => {
         this.schedule = data.data;
         this.schedule.map(x => {
@@ -865,7 +870,7 @@ export class WidgetCreateAppointmentComponent implements OnInit {
       appointment_no: item.appointment_no,
       is_waiting_list: item.is_waiting_list,
       can_reserved: canReserved,
-      doctor_type_id: this.doctorProfile.doctor_type_id
+      doctor_type_id: item.doctor_type_id
     };
     const modalRef = this.modalService.open(ModalCreateAppointmentComponent);
     modalRef.componentInstance.appointmentInfo = data;
@@ -889,7 +894,7 @@ export class WidgetCreateAppointmentComponent implements OnInit {
       appointment_no: item.appointment_no,
       is_waiting_list: item.is_waiting_list,
       can_reserved: canReserved,
-      doctor_type_id: this.doctorProfile.doctor_type_id
+      doctor_type_id: item.doctor_type_id
     };
 
     let idx;
@@ -905,7 +910,7 @@ export class WidgetCreateAppointmentComponent implements OnInit {
               }
             });
           } else {
-            if (this.doctorProfile.doctor_type_id === '1') { //first come first serve
+            if (this.schedule[k].doctor_type_id === '1') { //first come first serve
               this.appList[k].appointment.map(x => {
                 if (x.appointment_no === idx.appointment_no) {
                   x.patient_name = null;
@@ -935,7 +940,7 @@ export class WidgetCreateAppointmentComponent implements OnInit {
           });
         } else { //take slot with name
           this.scheduleTemp = idx.schedule_id;
-          if (this.doctorProfile.doctor_type_id === '1') {  //first come first serve
+          if (this.schedule[k].doctor_type_id === '1') {  //first come first serve
             this.appList[k].appointment.map(x => {
               if (x.appointment_no === idx.appointment_no) {
                 x.patient_name = this.appointmentPayloadInput.name;
@@ -969,8 +974,8 @@ export class WidgetCreateAppointmentComponent implements OnInit {
     );
   }
 
-  async checkInAppointment(appointmentId, content) {
-    await this.appointmentService.getAppointmentById(appointmentId).subscribe(
+  async checkInAppointment(app, content) {
+    await this.appointmentService.getAppointmentById(app.appointment_id).subscribe(
       data => {
         this.selectedCheckIn = data.data[0];
         this.selectedCheckIn.custome_birth_date = dateFormatter(this.selectedCheckIn.birth_date, true);
@@ -978,8 +983,8 @@ export class WidgetCreateAppointmentComponent implements OnInit {
     );
 
     //if doctor type is not firstcome, check patient is late or not
-    if(this.doctorProfile.doctor_type_id !== '1'){
-      this.late = await this.checkIsLate(appointmentId);
+    if(app.doctor_type_id !== '1'){
+      this.late = await this.checkIsLate(app.appointment_id);
     }else{
       this.late = '';
     }
@@ -1531,7 +1536,8 @@ export class WidgetCreateAppointmentComponent implements OnInit {
 
   openScheduleBlockModal() {
     const params = {
-      scheduleId: this.appointmentPayload.scheduleId,
+      scheduleId: this.schedule,
+      doctorId: this.appointmentPayload.doctorId,
       date: this.appointmentPayload.appointmentDate
     };
     const modalRef = this.modalService.open(ModalScheduleBlockComponent, { windowClass: 'cc_modal_block' });

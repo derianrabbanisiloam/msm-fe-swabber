@@ -32,7 +32,7 @@ export class ModalScheduleBlockComponent implements OnInit {
     '12', '13', '14', '15', '16',
     '17', '18', '19', '20', '21', '22', '23'];
   public minuteOptions: any = ['00', '30'];
-  public scheduleBlocks: ScheduleBlock[];
+  public scheduleBlocks: any = [];
   public addSchBlockPayload: addScheduleBlockPayload;
   public updateSchBlockPayload: updateScheduleBlockPayload;
   public deleteSchBlockPayload: deleteScheduleBlockPayload;
@@ -47,6 +47,7 @@ export class ModalScheduleBlockComponent implements OnInit {
   private index: any;
   private undoWaitingList: boolean = false;
   private undoTeleconsultation: boolean = false;
+  private scheduleSel: string;
 
   constructor(
     private modalService: NgbModal,
@@ -69,26 +70,47 @@ export class ModalScheduleBlockComponent implements OnInit {
   }
 
   getScheduleBlock() {
-    const scheduleId = this.inputedParams.scheduleId;
     const date = this.inputedParams.date;
-    this.scheduleService.getScheduleBlock(scheduleId, date).subscribe(
+    const hospitalId = this.hospital.id;
+    const doctorId = this.inputedParams.doctorId;
+    this.scheduleService.getScheduleBlockByDay(hospitalId, doctorId, date).subscribe(
       data => {
-        this.scheduleBlocks = data.data;
-        let ft: any;
-        let tt: any;
-        for (let i = 0; i < this.scheduleBlocks.length; i++) {
-          ft = this.scheduleBlocks[i].from_time.split(':');
-          tt = this.scheduleBlocks[i].to_time.split(':');
-          this.scheduleBlocks[i].fh = ft[0];
-          this.scheduleBlocks[i].fm = ft[1];
-          this.scheduleBlocks[i].th = tt[0];
-          this.scheduleBlocks[i].tm = tt[1];
+        this.scheduleBlocks = [];
+        if(data.data.length !== 0) {
+          let result = data.data;
+          let ft: any;
+          let tt: any;
+          for(let i = 0, { length } = this.inputedParams.scheduleId; i < length; i += 1) {
+            this.scheduleBlocks.push(
+              {
+                schedule_id: this.inputedParams.scheduleId[i].schedule_id,
+                schedule_time: this.inputedParams.scheduleId[i].from_time+" - "+this.inputedParams.scheduleId[i].to_time,
+                schedule_block: []
+              }
+            )
+
+            for(let j = 0, { length } = result; j < length; j += 1) {
+              if(this.scheduleBlocks[i].schedule_id === result[j].schedule_id) {
+                ft = result[j].from_time.split(':');
+                tt = result[j].to_time.split(':');
+                this.scheduleBlocks[i].schedule_block.push({
+                  ...result[j],
+                  fh: ft[0],
+                  fm: ft[1],
+                  th: tt[0],
+                  tm: tt[1]
+                })
+              }
+            }
+          }
         }
+      }, error => {
+        this.alertService.error(error.error.message, false, 3000);
       }
     );
   }
 
-  rangeTimeChecker(fromTime, toTime) {
+  rangeTimeChecker(fromTime, toTime, scheduleId) {
     const fSplit = fromTime.split(':');
     const tSplit = toTime.split(':');
     const setFT = new Date(this.inputedParams.date).setUTCHours(fSplit[0], fSplit[1], 0, 0);
@@ -98,24 +120,28 @@ export class ModalScheduleBlockComponent implements OnInit {
     let fTime: any;
     let tTime: any;
     let found: boolean = false;
-    for (let i = 0; i < this.scheduleBlocks.length; i++) {
-      ft = this.scheduleBlocks[i].from_time.split(':');
-      tt = this.scheduleBlocks[i].to_time.split(':');
-      fTime = new Date(this.inputedParams.date).setUTCHours(ft[0], ft[1], 0, 0);
-      tTime = new Date(this.inputedParams.date).setUTCHours(tt[0], tt[1], 0, 0);
-      if (((setFT >= fTime) && (setFT < tTime)) || ((setTT > fTime) && (setTT <= tTime))) {
-        found = true;
+    for(let i = 0, { length } = this.scheduleBlocks; i < length; i += 1) {
+      if(this.scheduleBlocks[i].schedule_id === scheduleId) {
+        for (let j = 0; j < this.scheduleBlocks[i].schedule_block.length; j++) {
+          ft = this.scheduleBlocks[i].schedule_block[j].from_time.split(':');
+          tt = this.scheduleBlocks[i].schedule_block[j].to_time.split(':');
+          fTime = new Date(this.inputedParams.date).setUTCHours(ft[0], ft[1], 0, 0);
+          tTime = new Date(this.inputedParams.date).setUTCHours(tt[0], tt[1], 0, 0);
+          if (((setFT >= fTime) && (setFT < tTime)) || ((setTT > fTime) && (setTT <= tTime))) {
+            found = true;
+          }
+        }
+        return found;
       }
     }
-    return found;
   }
 
   async addScheduleBlock() {
-    const scheduleId = this.inputedParams.scheduleId;
+    const scheduleId = this.scheduleSel;
     const date = this.inputedParams.date;
     const fromTime = moment('1990-01-01 ' + this.blockModel.fh + ':' + this.blockModel.fm).format('HH:mm');
     const toTime = moment('1990-01-01 ' + this.blockModel.th + ':' + this.blockModel.tm).format('HH:mm');
-    const checkTime = await this.rangeTimeChecker(fromTime, toTime);
+    const checkTime = await this.rangeTimeChecker(fromTime, toTime, this.scheduleSel);
 
     if (checkTime) {
       this.addBlockErrMsg = 'This range time already exist, please select another range time !';
@@ -163,7 +189,7 @@ export class ModalScheduleBlockComponent implements OnInit {
 
     if (this.isValidBlock == true) {
       this.updateSchBlockPayload = {
-        scheduleId: this.inputedParams.scheduleId,
+        scheduleId: this.schBlockSelected.schedule_id,
         fromDate: fromDate,
         toDate: toDate,
         fromTime: fromTime,
@@ -240,23 +266,25 @@ export class ModalScheduleBlockComponent implements OnInit {
     this.blockModel.isTeleconsultation = this.blockModel.isTeleconsultation ? true : false;
   }
 
-  blockCheckBoxEdit(i) {
+  blockCheckBoxEdit() {
     this.undoWaitingList = true;
-    this.scheduleBlocks[i].is_include_waiting_list = this.scheduleBlocks[i].is_include_waiting_list ? true : false;
   }
 
-  blockCheckBoxEditTwo(i) {
+  blockCheckBoxEditTwo() {
     this.undoTeleconsultation = true;
-    this.scheduleBlocks[i].is_teleconsultation = this.scheduleBlocks[i].is_teleconsultation ? true : false;
   }
 
   cancelCheckBox() {
-    if(this.undoWaitingList === true) {
-      this.undoWaitingList = false;
-      this.scheduleBlocks[this.index].is_include_waiting_list = this.scheduleBlocks[this.index].is_include_waiting_list ? false : true;
-    } else if(this.undoTeleconsultation === true) {
-      this.undoTeleconsultation = false;
-      this.scheduleBlocks[this.index].is_teleconsultation = this.scheduleBlocks[this.index].is_teleconsultation ? false : true;
+    for(let i = 0, { length } = this.scheduleBlocks; i < length; i += 1) {
+      if(this.scheduleBlocks[i].schedule_id === this.schBlockSelected.schedule_id) {
+        if(this.undoWaitingList === true) {
+          this.undoWaitingList = false;
+          this.scheduleBlocks[i].schedule_block[this.index].is_include_waiting_list = this.scheduleBlocks[i].schedule_block[this.index].is_include_waiting_list ? false : true;
+        } else if(this.undoTeleconsultation === true) {
+          this.undoTeleconsultation = false;
+          this.scheduleBlocks[i].schedule_block[this.index].is_teleconsultation = this.scheduleBlocks[i].schedule_block[this.index].is_teleconsultation ? false : true;
+        }
+      }
     }
   }
 

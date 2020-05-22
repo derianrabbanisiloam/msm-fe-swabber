@@ -45,13 +45,18 @@ export class ScheduleService {
     return this.http.get<any>(uri, httpOptions);
   }
 
+  getScheduleDoctor(hospitalId: string, doctorId: string, date: string): Observable<any> {
+    const uri = `${this.opAdminScheduleUrl}/doctor-hospital-consultation?doctorId=${doctorId}&hospitalId=${hospitalId}&date=${date}`;
+    return this.http.get<any>(uri, httpOptions);
+  }
+
   getScheduleBlock(scheduleId: string, date: string): Observable<any> {
     const url = `${this.scheduleBlockUrl}/${scheduleId}?date=${date}`;
     return this.http.get<any>(url, httpOptions);
   }
 
   getScheduleBlockByDay(hospitalId: string, doctorId: string, date: string): Observable<any> {
-    const url = `${this.scheduleBlockUrl}/hospital/${hospitalId}/doctor/${doctorId}?date=${date}`;
+    const url = `${this.scheduleBlockUrl}?hospitalId=${hospitalId}&doctorId=${doctorId}&date=${date}`;
     return this.http.get<any>(url, httpOptions);
   }
 

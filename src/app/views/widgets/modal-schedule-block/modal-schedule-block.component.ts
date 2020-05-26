@@ -47,7 +47,7 @@ export class ModalScheduleBlockComponent implements OnInit {
   private index: any;
   private undoWaitingList: boolean = false;
   private undoTeleconsultation: boolean = false;
-  private scheduleSel: string;
+  public scheduleSel: string;
 
   constructor(
     private modalService: NgbModal,

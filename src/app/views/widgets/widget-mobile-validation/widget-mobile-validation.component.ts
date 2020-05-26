@@ -12,6 +12,7 @@ import { DomSanitizer } from '@angular/platform-browser';
 import { environment } from '../../../../environments/environment';
 import Swal from 'sweetalert2';
 import { dateFormatter } from '../../../utils/helpers.util';
+import { activityType } from '../../../variables/common.variable';
 
 @Component({
   selector: 'app-widget-mobile-validation',
@@ -221,6 +222,7 @@ export class WidgetMobileValidationComponent implements OnInit {
         this.flagFile1 = false;
         this.uploadForm.get('disclaimer').setValue(null);
         this.flagAlert = true;
+        this.userModifiedLog(data.data.contact_id, activityType.OPEN_ACCESS_MR);
         Swal.fire({
           position: 'center',
           type: 'success',
@@ -267,6 +269,7 @@ export class WidgetMobileValidationComponent implements OnInit {
     };
     await this.patientService.verifyPatient(payload).toPromise()
       .then(res => {
+        this.userModifiedLog(res.data.contact_id, activityType.LINKED_TO_MR);
         this.selectedAndUpdate(res.data);
       }).catch(err => {
         Swal.fire({
@@ -277,6 +280,27 @@ export class WidgetMobileValidationComponent implements OnInit {
         })
         return null;
       });
+  }
+
+  async userModifiedLog(contactId, activityTypeId) {
+    const payload = {
+      hospitalId: this.hospital.id,
+      contactId: contactId,
+      channelId: channelId.FRONT_OFFICE,
+      activityTypeId: activityTypeId,
+      userId: this.user.id,
+      userName: this.user.username,
+      source: sourceApps,
+    };
+    
+    let result = await this.patientService.ModifiedLogOpenAccess(payload)
+      .toPromise().then(res => {
+        return res.data;
+      }).catch(err => {
+        return null;
+      });
+    
+    return result
   }
 
   async selectedAndUpdate(result) {

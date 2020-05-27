@@ -98,3 +98,8 @@ export const consultationType = {
   EXECUTIVE: '3',
   TELECONSULTATION: '4'
 }
+
+export const activityType = {
+  LINKED_TO_MR: '1',
+  OPEN_ACCESS_MR: '2',
+};

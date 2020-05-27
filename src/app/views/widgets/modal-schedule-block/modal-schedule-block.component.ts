@@ -136,16 +136,45 @@ export class ModalScheduleBlockComponent implements OnInit {
     }
   }
 
+  rangeTimeCheckerSchedule(fromTime, toTime, scheduleId) {
+    const fSplit = fromTime.split(':');
+    const tSplit = toTime.split(':');
+    const setFT = new Date(this.inputedParams.date).setUTCHours(fSplit[0], fSplit[1], 0, 0);
+    const setTT = new Date(this.inputedParams.date).setUTCHours(tSplit[0], tSplit[1], 0, 0);
+    let ft: any;
+    let tt: any;
+    let fTime: any;
+    let tTime: any;
+    let found: boolean = false;
+    for(let i = 0, { length } = this.inputedParams.scheduleId; i < length; i += 1) {
+      if(this.inputedParams.scheduleId[i].schedule_id === scheduleId) {
+        ft = this.inputedParams.scheduleId[i].from_time.split(':');
+        tt = this.inputedParams.scheduleId[i].to_time.split(':');
+        fTime = new Date(this.inputedParams.date).setUTCHours(ft[0], ft[1], 0, 0);
+        tTime = new Date(this.inputedParams.date).setUTCHours(tt[0], tt[1], 0, 0);
+        if((setFT < fTime) || (setTT > tTime)) {
+          found = true;
+        }
+        return found;
+      }
+    }
+  }
+
   async addScheduleBlock() {
     const scheduleId = this.scheduleSel;
     const date = this.inputedParams.date;
     const fromTime = moment('1990-01-01 ' + this.blockModel.fh + ':' + this.blockModel.fm).format('HH:mm');
     const toTime = moment('1990-01-01 ' + this.blockModel.th + ':' + this.blockModel.tm).format('HH:mm');
     const checkTime = await this.rangeTimeChecker(fromTime, toTime, this.scheduleSel);
+    const checkScheduleTime = await this.rangeTimeCheckerSchedule(fromTime, toTime, this.scheduleSel);
 
     if (checkTime) {
       this.addBlockErrMsg = 'This range time already exist, please select another range time !';
-    } else {
+    } 
+    else if(checkScheduleTime) {
+      this.addBlockErrMsg = 'Out of range time schedule, please select another range time !';
+    }
+    else {
       const { reason, isIncludeWaitingList, isTeleconsultation } = this.blockModel;
       this.addSchBlockPayload = {
         fromDate: date,

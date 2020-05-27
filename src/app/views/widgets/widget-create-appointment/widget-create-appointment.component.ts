@@ -44,7 +44,7 @@ import {
   SecretKey, Jwt,
   CHECK_IN, CREATE_APP,
   CANCEL_APP, RESCHEDULE_APP,
-  QUEUE_NUMBER, keySocket, SCHEDULE_BLOCK
+  QUEUE_NUMBER, keySocket, SCHEDULE_BLOCK, channelId
 } from '../../../variables/common.variable';
 import Security from 'msm-kadapat';
 import { environment } from '../../../../environments/environment';
@@ -539,9 +539,13 @@ export class WidgetCreateAppointmentComponent implements OnInit {
           let found = false;
           let idx = 0;
           for (let j = 0, { length: totalApp } = this.appointments; j < totalApp; j += 1) {
-            if(this.slotList[i].schedule_id === this.appointments[j].schedule_id){
-              if (Number(this.appointments[j].appointment_no) === this.slotList[i].appointment_no
-                && this.appointments[j].is_waiting_list === false) {
+            if((this.slotList[i].schedule_id === this.appointments[j].schedule_id) ||
+                (this.appointments[j].channel_id === channelId.AIDO)){
+              if ((Number(this.appointments[j].appointment_no) === this.slotList[i].appointment_no
+                    && this.appointments[j].is_waiting_list === false) ||
+                  ((this.appointments[j].from_time.substr(0,5) === this.slotList[i].schedule_from_time) &&
+                  (this.appointments[j].to_time.substr(0,5) === this.slotList[i].schedule_to_time) &&
+                  (this.appointments[j].channel_id === channelId.AIDO))) {
                 found = true; //appointment slot already taken
                 idx = j;
               }

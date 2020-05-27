@@ -204,8 +204,12 @@ export class WidgetAidoWorklistComponent implements OnInit {
   }
 
   async verifyAppointment(data) {
+    const parameter = {
+      from_worklist: true,
+      ...data,
+    };
     const modalRef = this.modalService.open(ModalVerificationAidoComponent, { windowClass: 'modal_verification', size: 'lg' });
-        modalRef.componentInstance.appointmentAidoSelected = data;
+        modalRef.componentInstance.appointmentAidoSelected = parameter;
   }
   
   async createMrModal(val: any, content: any){

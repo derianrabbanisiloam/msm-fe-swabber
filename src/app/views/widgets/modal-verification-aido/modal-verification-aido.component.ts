@@ -58,9 +58,25 @@ export class ModalVerificationAidoComponent implements OnInit {
   ) { }
 
   async ngOnInit() {
-    this.searchPatient();
-    this.getCollectionAlert();
+    console.log("this.appointmentAidoSelected", this.appointmentAidoSelected)
+    await this.compareCondition();
+    await this.searchPatient();
+    await this.getCollectionAlert();
     await this.getDoctorProfile();
+  }
+
+  async compareCondition(){
+    if(!this.appointmentAidoSelected.from_worklist){
+      this.appointmentAidoSelected.contact_name = this.appointmentAidoSelected.patient_name;
+    }
+
+    if (!this.searchPatientModel) {
+      this.searchPatientModel = {
+        patientName: this.appointmentAidoSelected.contact_name,
+        patientBirth: this.appointmentAidoSelected.date_of_birth,
+        hospitalId: this.appointmentAidoSelected.hospital_id,
+      };
+    }
   }
 
   async getDoctorProfile() {
@@ -69,12 +85,12 @@ export class ModalVerificationAidoComponent implements OnInit {
     this.doctorService.getDoctorProfileTwo(hospitalId, doctorId).subscribe(
       data => {
         this.dataDoctor = data.data;
-        this.specialist = this.dataDoctor[0].specialization_name_en;
+        this.specialist = this.dataDoctor.specialization_name_en;
       }
     )
   }
 
-  searchPatient() {
+  async searchPatient() {
     this.searchLoader = true;
     if (!this.searchPatientModel) {
       this.searchPatientModel = {

@@ -58,7 +58,6 @@ export class ModalVerificationAidoComponent implements OnInit {
   ) { }
 
   async ngOnInit() {
-    console.log("this.appointmentAidoSelected", this.appointmentAidoSelected)
     await this.compareCondition();
     await this.searchPatient();
     await this.getCollectionAlert();

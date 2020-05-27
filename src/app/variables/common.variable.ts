@@ -91,3 +91,8 @@ export const formatFile = {
   image: 'jpg',
   pdf: 'pdf'
 }
+
+export const activityType = {
+  LINKED_TO_MR: '1',
+  OPEN_ACCESS_MR: '2',
+};

@@ -21,6 +21,7 @@ export class PatientService {
 
   private patientHopeUrl = environment.CALL_CENTER_SERVICE + '/patients/hope';
   private verifyPatientUrl = environment.CALL_CENTER_SERVICE + '/patients/verify';
+  private auditTrailsUrl = environment.CALL_CENTER_SERVICE + '/audit-trails';
 
   private patientHopeDetailUrl = environment.HIS_SERVICE + '/patient';
 
@@ -165,6 +166,13 @@ export class PatientService {
     const body = JSON.stringify(payload);
     
     return this.http.put<any>(url, body, httpOptions);
+  }
+
+  ModifiedLogOpenAccess(payload: any){
+    const url = `${this.auditTrailsUrl}`;
+    const body = JSON.stringify(payload);
+    
+    return this.http.post<any>(url, body, httpOptions);
   }
 
   syncUpdatePatient(payload: any){

@@ -189,8 +189,20 @@
               </div>
 
               <!-- button action for teleconsultation -->
-              <div *ngIf="isOpen == false">
-                
+              <div *ngIf="app.channel_id == aidoChannel">
+                <div *ngIf="app.admission_status_id != 2 && app.appointment_status_id !== appStatusId.INACTIVE">
+                  <div *ngIf="app.patient_hope_id && app.patient_organization_id && app.is_double_mr === false">
+                    <button (click)="createAdmModal(app, confirmAdmission)" class="btn ms_btn_green" style="font-size: 11px;">Check In</button>
+                  </div>
+                  <div *ngIf="app.patient_hope_id && !app.patient_organization_id && app.is_double_mr === false">
+                    <button (click)="createMrModal(app, confirmCreateMr)" class="btn ms_btn_black" style="font-size: 11px;">Create MR</button>
+                  </div>
+                  <div *ngIf="(!app.patient_hope_id && !app.patient_organization_id && app.is_double_mr === true)
+                  || (app.patient_hope_id && !app.patient_organization_id && app.is_double_mr === true)
+                  || (!app.patient_hope_id && !app.patient_organization_id && app.is_double_mr === false)">
+                    <button (click)="verifyAppointmentTele(app)" class="btn ms_btn_blue" style="font-size: 10px;">Verify MR</button>
+                  </div>
+                </div>
               </div>
               <!-- button action for teleconsultation -->
             </td>
@@ -561,6 +573,42 @@
       </button>
       <!-- <button type="button" class="btn fo_btn_blue" (click)="newPatient()" (click)="c('Cross click')">New Patient
       </button> -->
+      <button type="button" class="btn fo_btn_black" (click)="c('Cross click')">Cancel</button>
+    </div>
+  </div>
+</ng-template>
+
+<ng-template #confirmCreateMr let-c="close" let-d="dismiss">
+  <div class="modal-header">
+    <h4 class="modal-title">Confirmation</h4>
+    <button type="button" class="close" aria-label="Close" (click)="d('Cross click')">
+      <span aria-hidden="true">&times;</span>
+    </button>
+  </div>
+  <div class="modal-body">
+    <p>Are you sure to create MR Local ?</p>
+    <div class="fo_confirmation_button d-flex justify-content-center">
+      <button type="button" class="btn fo_btn_green"
+        (click)="processCreateMrLocal()"
+        (click)="c('Cross click')">Ok</button>
+      <button type="button" class="btn fo_btn_black" (click)="c('Cross click')">Cancel</button>
+    </div>
+  </div>
+</ng-template>
+
+<ng-template #confirmAdmission let-c="close" let-d="dismiss">
+  <div class="modal-header">
+    <h4 class="modal-title">Confirmation</h4>
+    <button type="button" class="close" aria-label="Close" (click)="d('Cross click')">
+      <span aria-hidden="true">&times;</span>
+    </button>
+  </div>
+  <div class="modal-body">
+    <p>Are you sure to create admission ?</p>
+    <div class="fo_confirmation_button d-flex justify-content-center">
+      <button type="button" class="btn fo_btn_green"
+        (click)="createAdmTeleconsultation()"
+        (click)="c('Cross click')">Ok</button>
       <button type="button" class="btn fo_btn_black" (click)="c('Cross click')">Cancel</button>
     </div>
   </div>

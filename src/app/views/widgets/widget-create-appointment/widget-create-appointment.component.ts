@@ -44,10 +44,13 @@ import {
   SecretKey, Jwt,
   CHECK_IN, CREATE_APP,
   CANCEL_APP, RESCHEDULE_APP,
-  QUEUE_NUMBER, keySocket, SCHEDULE_BLOCK, channelId
+  QUEUE_NUMBER, keySocket, SCHEDULE_BLOCK, channelId, appointmentStatusId
 } from '../../../variables/common.variable';
 import Security from 'msm-kadapat';
 import { environment } from '../../../../environments/environment';
+import { 
+  ModalVerificationAidoComponent 
+} from '../../widgets/modal-verification-aido/modal-verification-aido.component';
 
 @Component({
   selector: 'app-widget-create-appointment',
@@ -133,6 +136,10 @@ export class WidgetCreateAppointmentComponent implements OnInit {
   public scheduleTemp: string;
   public doctorName: string;
   public hospitalName: string;
+  public aidoChannel: any = channelId.AIDO;
+  public appStatusId = appointmentStatusId;
+  public selectedApp: any;
+  public selectedAdm: any;
 
   constructor(
     private router: Router,
@@ -506,6 +513,7 @@ export class WidgetCreateAppointmentComponent implements OnInit {
 
     const hospitalId = this.schedule[0].hospital_id;
     const doctorId = this.schedule[0].doctor_id;
+    const doctorName = this.schedule[0].doctor_name;
 
     //this param using in waiting list and FCFS
     let no;
@@ -557,16 +565,19 @@ export class WidgetCreateAppointmentComponent implements OnInit {
               no: this.slotList[i].no,
               hospital_id: hospitalId,
               doctor_id: doctorId,
+              doctor_name: doctorName, 
               appointment_range_time: this.slotList[i].appointment_range_time,
               appointment_from_time: this.slotList[i].schedule_from_time,
               appointment_to_time: this.slotList[i].schedule_to_time,
               schedule_from_time: fromTime,
               schedule_to_time: toTime,
               appointment_id: this.appointments[idx].appointment_id,
+              appointment_date: this.appointments[idx].appointment_date,
               appointment_temp_id: this.appointments[idx].appointment_temporary_id,
               admission_id: this.appointments[idx].admission_id,
               appointment_no: this.appointments[idx].appointment_no,
               patient_name: this.appointments[idx].contact_name,
+              contact_id: this.appointments[idx].contact_id,
               date_of_birth: moment(this.appointments[idx].birth_date).format('DD-MM-YYYY'),
               local_mr_no: this.appointments[idx].medical_record_number,
               phone_no: this.appointments[idx].phone_number,
@@ -582,23 +593,32 @@ export class WidgetCreateAppointmentComponent implements OnInit {
               is_blocked: this.slotList[i].is_blocked,
               is_walkin: this.slotList[i].is_walkin,
               schedule_id: this.schedule[k].schedule_id,
-              doctor_type_id: this.schedule[k].doctor_type_id
+              doctor_type_id: this.schedule[k].doctor_type_id,
+              channel_id: this.appointments[idx].channel_id ? this.appointments[idx].channel_id : null,
+              admission_status_id: this.appointments[idx].admission_status_id ? this.appointments[idx].admission_status_id : null,
+              appointment_status_id: this.appointments[idx].appointment_status_id ? this.appointments[idx].appointment_status_id : null,
+              patient_hope_id: this.appointments[idx].patient_hope_id ? this.appointments[idx].patient_hope_id : null,
+              patient_organization_id: this.appointments[idx].patient_organization_id ? this.appointments[idx].patient_organization_id : null,
+              is_double_mr: this.appointments[idx].is_double_mr ? this.appointments[idx].is_double_mr : false
             });
           } else {
             this.appList[k].appointment.push({
               no: this.slotList[i].no,
               hospital_id: hospitalId,
               doctor_id: doctorId,
+              doctor_name: doctorName,
               appointment_range_time: this.slotList[i].appointment_range_time,
               appointment_from_time: this.slotList[i].schedule_from_time,
               appointment_to_time: this.slotList[i].schedule_to_time,
               schedule_from_time: fromTime,
               schedule_to_time: toTime,
               appointment_id: null,
+              appointment_date: null,
               appointment_temp_id: null,
               admission_id: null,
               appointment_no: this.slotList[i].appointment_no,
               patient_name: null,
+              contact_id: null,
               date_of_birth: null,
               local_mr_no: null,
               phone_no: null,
@@ -614,7 +634,13 @@ export class WidgetCreateAppointmentComponent implements OnInit {
               is_blocked: this.slotList[i].is_blocked,
               is_walkin: this.slotList[i].is_walkin,
               schedule_id: this.schedule[k].schedule_id,
-              doctor_type_id: this.schedule[k].doctor_type_id
+              doctor_type_id: this.schedule[k].doctor_type_id,
+              channel_id: null,
+              admission_status_id: null,
+              appointment_status_id: null,
+              patient_hope_id: null,
+              patient_organization_id: null,
+              is_double_mr: false
             });
           }
         }
@@ -637,14 +663,19 @@ export class WidgetCreateAppointmentComponent implements OnInit {
           appTime = no === 1 ? appTime : '';
           this.appListWaiting[k].appointment.push({
             no: no,
+            hospital_id: hospitalId,
+            doctor_id: doctorId,
+            doctor_name: doctorName,
             appointment_range_time: appTime,
             appointment_from_time: fromTime,
             appointment_to_time: toTime,
             appointment_no: x.appointment_no,
             appointment_id: x.appointment_id,
+            appointment_date: x.appointment_date,
             appointment_temp_id: x.appointment_temporary_id,
             admission_id: x.admission_id,
             patient_name: x.contact_name,
+            contact_id: x.contact_id,
             date_of_birth: moment(x.birth_date).format('DD-MM-YYYY'),
             local_mr_no: x.medical_record_number,
             phone_no: x.phone_number,
@@ -659,7 +690,13 @@ export class WidgetCreateAppointmentComponent implements OnInit {
             is_can_cancel: isBlockWaitingList === false ? true : false,
             is_blocked: isBlockWaitingList,
             schedule_id: this.schedule[k].schedule_id,
-            doctor_type_id: this.schedule[k].doctor_type_id
+            doctor_type_id: this.schedule[k].doctor_type_id,
+            channel_id: x.channel_id ? x.channel_id : null,
+            admission_status_id: x.admission_status_id ? x.admission_status_id : null,
+            appointment_status_id: x.appointment_status_id ? x.appointment_status_id : null,
+            patient_hope_id: x.patient_hope_id ? x.patient_hope_id : null,
+            patient_organization_id: x.patient_organization_id ? x.patient_organization_id : null,
+            is_double_mr: x.is_double_mr ? x.is_double_mr : false,
           });
         }
       });
@@ -669,14 +706,19 @@ export class WidgetCreateAppointmentComponent implements OnInit {
           nextWlNo : Math.max.apply(Math, this.appListWaiting[k].appointment.map(function (o) { return o.appointment_no }));
         this.appListWaiting[k].appointment.push({
           no: no + 1,
+          hospital_id: hospitalId,
+          doctor_id: doctorId,
+          doctor_name: doctorName,
           appointment_range_time: this.appListWaiting[k].appointment.length > 0 ? '' : appTime,
           appointment_from_time: fromTime,
           appointment_to_time: toTime,
           appointment_no: this.appListWaiting[k].appointment.length === 0 ? this.appList[k].appointment.length : nextWlNo + 1,
           appointment_id: null,
+          appointment_date: null,
           appointment_temp_id: null,
           admission_id: null,
           patient_name: null,
+          contact_id: null,
           date_of_birth: null,
           local_mr_no: null,
           phone_no: null,
@@ -691,7 +733,13 @@ export class WidgetCreateAppointmentComponent implements OnInit {
           is_can_cancel: false,
           is_blocked: isBlockWaitingList,
           schedule_id: this.schedule[k].schedule_id,
-          doctor_type_id: this.schedule[k].doctor_type_id
+          doctor_type_id: this.schedule[k].doctor_type_id,
+          channel_id: null,
+          admission_status_id: null,
+          appointment_status_id: null,
+          patient_hope_id: null,
+          patient_organization_id: null,
+          is_double_mr: false
         });  
       } else {
         for (let i = 0, { length } = this.appointments; i < length; i++) {
@@ -701,6 +749,7 @@ export class WidgetCreateAppointmentComponent implements OnInit {
               no: no,
               hospital_id: hospitalId,
               doctor_id: doctorId,
+              doctor_name: doctorName,
               appointment_range_time: appTime,
               appointment_from_time: fromTime,
               appointment_to_time: toTime,
@@ -709,6 +758,7 @@ export class WidgetCreateAppointmentComponent implements OnInit {
               admission_id: this.appointments[i].admission_id,
               appointment_no: this.appointments[i].appointment_no,
               patient_name: this.appointments[i].contact_name,
+              contact_id: this.appointments[i].contact_id,
               date_of_birth: moment(this.appointments[i].birth_date).format('DD-MM-YYYY'),
               local_mr_no: this.appointments[i].medical_record_number,
               phone_no: this.appointments[i].phone_number,
@@ -724,7 +774,13 @@ export class WidgetCreateAppointmentComponent implements OnInit {
               is_blocked: false,
               is_walkin: false,
               schedule_id: this.schedule[k].schedule_id,
-              doctor_type_id: this.schedule[k].doctor_type_id
+              doctor_type_id: this.schedule[k].doctor_type_id,
+              channel_id: this.appointments[i].channel_id ? this.appointments[i].channel_id : null,
+              admission_status_id: this.appointments[i].admission_status_id ? this.appointments[i].admission_status_id : null,
+              appointment_status_id: this.appointments[i].appointment_status_id ? this.appointments[i].appointment_status_id : null,
+              patient_hope_id: this.appointments[i].patient_hope_id ? this.appointments[i].patient_hope_id : null,
+              patient_organization_id: this.appointments[i].patient_organization_id ? this.appointments[i].patient_organization_id : null,
+              is_double_mr: this.appointments[i].is_double_mr ? this.appointments[i].is_double_mr : false
             });
           }
         }
@@ -739,6 +795,7 @@ export class WidgetCreateAppointmentComponent implements OnInit {
           no: no,
           hospital_id: hospitalId,
           doctor_id: doctorId,
+          doctor_name: doctorName,
           appointment_range_time: appListLength > 0 ? '' : appTime,
           appointment_from_time: fromTime,
           appointment_to_time: toTime,
@@ -747,6 +804,7 @@ export class WidgetCreateAppointmentComponent implements OnInit {
           admission_id: null,
           appointment_no: this.appointments.length > 0 ? numberL + 1 : 0,
           patient_name: null,
+          contact_id: null,
           date_of_birth: null,
           local_mr_no: null,
           phone_no: null,
@@ -762,7 +820,13 @@ export class WidgetCreateAppointmentComponent implements OnInit {
           is_blocked: false,
           is_walkin: false,
           schedule_id: this.schedule[k].schedule_id,
-          doctor_type_id: this.schedule[k].doctor_type_id
+          doctor_type_id: this.schedule[k].doctor_type_id,
+          channel_id: null,
+          admission_status_id: null,
+          appointment_status_id: null,
+          patient_hope_id: null,
+          patient_organization_id: null,
+          is_double_mr: false
         });
       } 
     }
@@ -1128,6 +1192,71 @@ export class WidgetCreateAppointmentComponent implements OnInit {
       close.click();
       this.open50(modal);
     }
+  }
+
+  async createMrModal(val: any, content: any){
+    this.selectedApp = val;
+    this.open(content);
+  }
+
+  async processCreateMrLocal(){
+    const body = {
+      patientHopeId: this.selectedApp.patient_hope_id,
+      organizationId: Number(this.hospital.orgId),
+      channelId: channelId.AIDO, 
+      userId: this.user.id,
+      source: sourceApps,
+      userName: this.user.fullname,
+    };
+    
+    const resMrLocal = await this.mrLocalProcess(body);
+
+    if(resMrLocal){
+      await this.getAppointmentList();
+      await this.dataProcessing();
+    }
+  }
+
+  processAdmissionTeleconsultation(payload: any) {
+    const admissionTele = this.admissionService.createAdmissionAido(payload)
+      .toPromise().then(res => {
+        this.alertService.success(res.message, false, 3000);
+        return res.data;
+      }).catch(err => {
+        this.alertService.error(err.error.message, false, 3000);
+        return null;
+      })
+
+    return admissionTele;
+  }
+
+  async createAdmModal(val, content) {
+    this.selectedAdm = {
+      appointmentId: val.appointment_id,
+      userId: this.user.id,
+      source: sourceApps,
+      userName: this.user.fullname
+    }
+    this.open(content);
+  }
+
+  async createAdmTeleconsultation() {
+    const resAdmissionTele = await this.processAdmissionTeleconsultation(this.selectedAdm);
+
+    if(resAdmissionTele){
+      await this.getAppointmentList();
+      await this.dataProcessing();
+    }
+  }
+
+  async verifyAppointmentTele(data) {
+    const parameter = {
+      from_worklist: false,
+      ...data,
+    };
+
+    const modalRef = this.modalService.open(ModalVerificationAidoComponent, { windowClass: 'modal_verification', size: 'lg' });
+        modalRef.componentInstance.appointmentAidoSelected = parameter;
   }
 
   checkInValidate(){

@@ -163,29 +163,31 @@
                 triggers="mouseenter:mouseleave">{{app.modified_name && app.modified_name.length > 10 ? app.modified_name.substr(0,10)+"..." : app.modified_name}}</a>
             </td>
             <td class="st-kolom-button">
-              <div *ngIf="!app.appointment_temp_id && isOpen == true">
-                <div *ngIf="app.is_can_cancel && isOriginal && !app.admission_id"
-                  class="cell-img-nav d-flex justify-content-center">
-                  <div *ngIf="isOpen" (click)="checkInAppointment(app, confirmCheckIn)">
-                    <img src="{{assetPath}}icons/ic_Check@2x.png">
+              <div *ngIf="app.channel_id != aidoChannel">
+                <div *ngIf="!app.appointment_temp_id && isOpen == true">
+                  <div *ngIf="app.is_can_cancel && isOriginal && !app.admission_id"
+                    class="cell-img-nav d-flex justify-content-center">
+                    <div *ngIf="isOpen" (click)="checkInAppointment(app, confirmCheckIn)">
+                      <img src="{{assetPath}}icons/ic_Check@2x.png">
+                    </div>
+                    <span style="opacity: 0; max-width: 0.5em; overflow: hidden">filler</span>
+                    <div (click)="confirmCancelAppointment(app.appointment_id)">
+                      <img src="{{assetPath}}icons/ic_Cancel@2x.png">
+                    </div>
                   </div>
-                  <span style="opacity: 0; max-width: 0.5em; overflow: hidden">filler</span>
-                  <div (click)="confirmCancelAppointment(app.appointment_id)">
-                    <img src="{{assetPath}}icons/ic_Cancel@2x.png">
+  
+                  <div *ngIf="app.is_can_cancel && isOriginal && app.admission_id"
+                    class="cell-img-nav d-flex justify-content-center">
+                    <span class="badge badge-success">Checked in</span>
                   </div>
                 </div>
-
-                <div *ngIf="app.is_can_cancel && isOriginal && app.admission_id"
-                  class="cell-img-nav d-flex justify-content-center">
-                  <span class="badge badge-success">Checked in</span>
+  
+                <div *ngIf="app.appointment_temp_id && isOpen == true">
+                  <button (click)="verifyAppointment(app.appointment_temp_id)" class="btn ms_btn_green">Verify</button>
+                  <span class="filler-05"></span>
+                  <button (click)="confirmCancelAppointment(app.appointment_temp_id, true)"
+                    class="btn ms_btn_red">Cancel</button>
                 </div>
-              </div>
-
-              <div *ngIf="app.appointment_temp_id && isOpen == true">
-                <button (click)="verifyAppointment(app.appointment_temp_id)" class="btn ms_btn_green">Verify</button>
-                <span class="filler-05"></span>
-                <button (click)="confirmCancelAppointment(app.appointment_temp_id, true)"
-                  class="btn ms_btn_red">Cancel</button>
               </div>
 
               <!-- button action for teleconsultation -->
@@ -202,6 +204,10 @@
                   || (!app.patient_hope_id && !app.patient_organization_id && app.is_double_mr === false)">
                     <button (click)="verifyAppointmentTele(app)" class="btn ms_btn_blue" style="font-size: 10px;">Verify MR</button>
                   </div>
+                </div>
+
+                <div *ngIf="app.admission_status_id == 2" class="cell-img-nav d-flex justify-content-center">
+                  <span class="badge badge-success">Checked in</span>
                 </div>
               </div>
               <!-- button action for teleconsultation -->

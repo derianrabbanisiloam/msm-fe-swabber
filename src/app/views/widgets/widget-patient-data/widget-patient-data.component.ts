@@ -815,11 +815,16 @@ export class WidgetPatientDataComponent implements OnInit {
 
     let patientName = this.model.patientName ? this.model.patientName.trim() : "";
     let sex = this.isEmpty(this.model.sex) ? null : this.model.sex;
+    let birthPlace = this.isEmpty(this.model.birthPlace) ? null : this.model.birthPlace;
     let address = this.model.address ? this.model.address.trim() : "";
     let mobileNo1 = this.model.mobileNo1 ? this.model.mobileNo1.trim() : "";
+    let email = this.model.email ? this.model.email.trim() : "";
     let contactName = this.model.contactName ? this.model.contactName.trim() : "";
     let contactMobile = this.model.contactMobile ? this.model.contactMobile.trim() : "";
     let contactPhone = this.model.contactPhone ? this.model.contactPhone.trim() : "";
+    let nationalidType = this.isEmpty(this.model.nationalidType) ? null : this.model.nationalidType;
+    let nationalIdNo =  this.model.nationalIdNo ? this.model.nationalIdNo.trim() : ""; 
+
 
     if (!patientName) {
       valid = false; $('.form-pr-name').addClass('form-error');
@@ -840,6 +845,9 @@ export class WidgetPatientDataComponent implements OnInit {
     if (!sex) {
       valid = false; $('.form-pr-sex').addClass('form-error');
     } else { $('.form-pr-sex').removeClass('form-error'); }
+    if (!birthPlace) {
+      valid = false; $('.form-pr-birth-place').addClass('form-error');
+    } else { $('.form-pr-birth-place').removeClass('form-error'); }
     // Contact Detail
     if (!address) {
       valid = false; $('.form-pr-address').addClass('form-error');
@@ -863,6 +871,15 @@ export class WidgetPatientDataComponent implements OnInit {
       $('.form-pr-mobile1no input').attr('placeholder', '(Optional)');
       $('.form-pr-mobile1no').removeClass('form-error');
     }
+    if (!email) {
+      valid = false; $('.form-pr-email').addClass('form-error');
+    } else { $('.form-pr-email').removeClass('form-error'); }
+    if (!nationalidType) {
+      valid = false; $('.form-pr-nationalidtype').addClass('form-error');
+    } else { $('.form-pr-nationalidtype').removeClass('form-error'); }
+    if (!nationalIdNo) {
+      valid = false; $('.form-pr-nationalidno').addClass('form-error');
+    } else { $('.form-pr-nationalidno').removeClass('form-error'); }
 
     if (
       (!address ||

@@ -110,11 +110,13 @@
                 <option *ngFor="let itr of listMarital" [ngValue]="itr">{{itr.description}}</option>
               </select>
             </div>
-            <label for="birthPlace" class="">Birth Place</label>
-            <div class="form-group">
-              <input class="form-control" ngui-auto-complete auto-select-first-item="true" max-num-list="10"
-                placeholder="(Optional)" value-formatter="name" list-formatter="name" [match-formatted]="true"
-                min-chars="3" [source]="listCity" name="birthPlace" [(ngModel)]="model.birthPlace">
+            <div class="form-group form-pr-birth-place">
+              <label for="birthPlace" class="">Birth Place *</label>
+              <div>
+                <input class="form-control" ngui-auto-complete auto-select-first-item="true" max-num-list="10"
+                  placeholder="(Required)" value-formatter="name" list-formatter="name" [match-formatted]="true"
+                  min-chars="3" [source]="listCity" name="birthPlace" [(ngModel)]="model.birthPlace">
+              </div>
             </div>
             <label for="notes" class="">Notes</label>
             <div class="form-group">
@@ -226,10 +228,12 @@
                       </div>
                     </div>
                   </div>
-                  <label for="postCode" class="">Email Address</label>
-                  <div class="">
-                    <input type="email" class="form-control" id="email" [(ngModel)]="model.email" name="email"
-                      placeholder="(Optional)">
+                  <div class="form-pr-email">
+                    <label for="postCode" class="">Email Address *</label>
+                    <div>
+                      <input type="email" class="form-control" id="email" [(ngModel)]="model.email" name="email"
+                        placeholder="(Required)">
+                    </div>
                   </div>
                   <label for="postCode" class="">Allergy</label>
                   <div class="">
@@ -257,8 +261,8 @@
                 </div>
                 <div class="fo_contact_detail_right">
                   <div class="d-flex justify-content-between">
-                    <div>
-                      <label for="city" class="">National Id Type</label>
+                    <div class="form-pr-nationalidtype">
+                      <label for="city" class="">National Id Type *</label>
                       <div class="">
                         <select id="subdistrict" class="form-control" [(ngModel)]="model.nationalidType"
                           name="nationalidType">
@@ -266,11 +270,11 @@
                         </select>
                       </div>
                     </div>
-                    <div>
-                      <label for="postCode" class="">National Id No</label>
+                    <div class="form-pr-nationalidno">
+                      <label for="postCode" class="">National Id No *</label>
                       <div class="">
                         <input type="text" class="form-control" id="nationalIdNo" [(ngModel)]="model.nationalIdNo"
-                          name="nationalIdNo" placeholder="(Optional)">
+                          name="nationalIdNo" placeholder="(Required)">
                       </div>
                     </div>
                   </div>

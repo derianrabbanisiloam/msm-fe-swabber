@@ -73,6 +73,11 @@ const routes: Routes = [
     loadChildren: './views/pages/page-doctor-leave/page-doctor-leave.module#PageDoctorLeaveModule',
   },
   {
+    path: 'request-list',
+    canActivate: [AuthGuard],
+    loadChildren: './views/pages/page-request-list/page-request-list.module#PageRequestListModule',
+  },
+  {
     path: 'home',
     canActivate: [AuthGuard],
     loadChildren: './views/pages/page-home/page-home.module#PageHomeModule'

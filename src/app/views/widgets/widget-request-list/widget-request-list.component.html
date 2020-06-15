@@ -1,0 +1,120 @@
+<div class="fo_container_input_date">
+  <div class="custom-font-bpjs">BPJS Reservation Request List</div>
+  <div *ngFor="let alert of alerts">
+    <ngb-alert *ngIf="alert" type="{{cssAlertType(alert)}}" (close)="removeAlert(alert)">{{ alert.message }}</ngb-alert>
+  </div>
+</div>
+
+<div class="fo_container_list shadow-4">
+  <table class="table table-bordered">
+    <thead class="fo_color_blue foot-note" style="text-align: center">
+      <th style="min-width: 2em">No.</th>
+      <th style="min-width: 2em">Request ID</th>
+      <th style="min-width: 2em">Request Creation Date</th>
+      <th style="min-width: 14em">Patient Name</th>
+      <th style="white-space: nowrap; text-align: center; min-width: 8em">Date of Birth</th>
+      <th>Mobile No.</th>
+      <th>BPJS Number</th>
+      <th>Referral Number</th>
+      <th>Specialty</th>
+      <th style="min-width: 5em">Preferred Appointment Date</th>
+      <th width="90px" style="white-space: nowrap; text-align: center; min-width: 8em">Action</th>
+    </thead>
+
+    <tbody>
+      <tr class="fo_header_grey filter-row">
+        <td></td>
+        <td></td>
+        <td></td>
+        <td>
+          <div class="inner-addon right-addon">
+            <i class="glyphicon fa fa-search"></i>
+            <input type="text" class="form-control" placeholder="Search name" [(ngModel)]="keywordsModel.patientName"
+              (change)="getAidoWorklist()" />
+          </div>
+        </td>
+        <td></td>
+        <td></td>
+        <td></td>
+        <td></td>
+        <td></td>
+        <td></td>
+        <td></td>
+      </tr>
+
+      <tr *ngFor="let r of BJPSReqApp; let i = index" [ngClass]="{
+        'row-pink' : r.appointment_status_id === appStatusId.INACTIVE}">
+        <td>{{r.no}}</td>
+        <td>{{r.request_id}}</td>
+        <td>{{r.request_creation_date}}</td>
+        <td style="text-transform: uppercase; min-width: 8em">
+          <a ngbPopover="{{r.patient_name}}" popoverTitle=""
+            triggers="mouseenter:mouseleave">{{r.patient_name && r.patient_name.length > 30 ?
+               r.patient_name.substr(0,30)+"..." : r.patient_name}}</a>
+        </td>
+        <td style="width: 1%;">{{ r.date_of_birth }}</td>
+        <td style="text-align: center; white-space: nowrap; width: 1%">
+          {{r.phone_no}}
+        </td>
+        <td style="text-align: center">{{ r.bpjs_no }}</td>
+        <td style="text-align: center; white-space: nowrap;">{{ r.referral_no }}</td>
+        <td style="text-align: center; white-space: nowrap;">{{ r.Speciality }}</td>
+        <td style="min-width: 8em">{{ r.preferred_app_date }}</td>
+        <td style="min-width: 13em"><button class="btn fo_btn_green">create apppointment</button></td>
+      </tr>
+      <tr>
+        <td *ngIf="showNotFoundMsg" colspan="11" style="text-align: center;">Displaying no data</td>
+        <td *ngIf="showWaitMsg" colspan="11">
+          <ngb-progressbar value="1000">Loading...</ngb-progressbar>
+        </td>
+      </tr>
+    </tbody>
+  </table>
+</div>
+
+<section class="full-width" id="group-list-appointment">
+  <button *ngIf="isCanPrevPage" (click)="prevPage()" class="btn ms_btn_blue">
+    <img src="{{assetPath}}icons/ic_ArrowRight_White.png"> Prev
+  </button>
+  <span style="width:10px">&nbsp;</span>
+  <button *ngIf="isCanNextPage" (click)="nextPage()" class="btn ms_btn_blue">
+    Next <img src="{{assetPath}}icons/ic_ArrowLeft_White.png">
+  </button>
+
+  <ng-template #confirmAdmission let-c="close" let-d="dismiss">
+    <div class="modal-header">
+      <h4 class="modal-title">Confirmation</h4>
+      <button type="button" class="close" aria-label="Close" (click)="d('Cross click')">
+        <span aria-hidden="true">&times;</span>
+      </button>
+    </div>
+    <div class="modal-body">
+      <p>Are you sure to create admission ?</p>
+      <div class="fo_confirmation_button d-flex justify-content-center">
+        <button type="button" class="btn fo_btn_green"
+          (click)="createAdm()"
+          (click)="c('Cross click')">Ok</button>
+        <button type="button" class="btn fo_btn_black" (click)="c('Cross click')">Cancel</button>
+      </div>
+    </div>
+  </ng-template>
+  
+  <ng-template #confirmCreateMr let-c="close" let-d="dismiss">
+    <div class="modal-header">
+      <h4 class="modal-title">Confirmation</h4>
+      <button type="button" class="close" aria-label="Close" (click)="d('Cross click')">
+        <span aria-hidden="true">&times;</span>
+      </button>
+    </div>
+    <div class="modal-body">
+      <p>Are you sure to create MR Local ?</p>
+      <div class="fo_confirmation_button d-flex justify-content-center">
+        <button type="button" class="btn fo_btn_green"
+          (click)="createMrLocal()"
+          (click)="c('Cross click')">Ok</button>
+        <button type="button" class="btn fo_btn_black" (click)="c('Cross click')">Cancel</button>
+      </div>
+    </div>
+  </ng-template>
+
+</section>

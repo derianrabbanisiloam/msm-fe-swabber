@@ -71,6 +71,7 @@ export class WidgetPatientDataComponent implements OnInit {
   // Input mask
   public mask_birth = [/\d/, /\d/, '-', /\d/, /\d/, '-', /\d/, /\d/, /\d/, /\d/];
   public mask = [/\d/, /\d/, /\d/, /\d/, /\d/, /\d/, /\d/, /\d/, /\d/, /\d/, /\d/, /\d/, /\d/];
+  public checkEmail = '[a-z0-9._%+-]+@[a-z0-9.-]+\\.[a-z]{2,}$';
 
   public alerts: Alert[] = [];
   public closeResult: string;
@@ -126,6 +127,8 @@ export class WidgetPatientDataComponent implements OnInit {
   public flagPoint: boolean = false;
   public bucketOne: any;
   public bucketTwo: any;
+  public validInputNo: boolean = false;
+  public validEmail: boolean = false;
 
   constructor(
     private generalService: GeneralService,
@@ -873,13 +876,31 @@ export class WidgetPatientDataComponent implements OnInit {
     }
     if (!email) {
       valid = false; $('.form-pr-email').addClass('form-error');
-    } else { $('.form-pr-email').removeClass('form-error'); }
+    } else {
+      if(email.match(this.checkEmail)) {
+        $('.form-pr-email').removeClass('form-error'); 
+        this.validEmail = false;
+      } else {
+        valid = false; $('.form-pr-nationalidno').addClass('form-error');
+        this.validEmail = true;
+      }
+    };
     if (!nationalidType) {
       valid = false; $('.form-pr-nationalidtype').addClass('form-error');
     } else { $('.form-pr-nationalidtype').removeClass('form-error'); }
     if (!nationalIdNo) {
       valid = false; $('.form-pr-nationalidno').addClass('form-error');
-    } else { $('.form-pr-nationalidno').removeClass('form-error'); }
+    } else {
+      if(nationalidType.value === '1') {
+        if(nationalIdNo.length !== 16) {
+          this.validInputNo = true;
+          valid = false; $('.form-pr-nationalidno').addClass('form-error');
+        } else {this.validInputNo = false; $('.form-pr-nationalidno').removeClass('form-error');}
+      } else {
+        this.validInputNo = false;
+        $('.form-pr-nationalidno').removeClass('form-error');
+      }
+    };
 
     if (
       (!address ||

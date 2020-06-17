@@ -140,6 +140,9 @@ export class WidgetCreateAppointmentComponent implements OnInit {
   public appStatusId = appointmentStatusId;
   public selectedApp: any;
   public selectedAdm: any;
+  public fromBpjs: boolean = false;
+  public patFromBpjs: any;
+  public bodyBpjs: any;
 
   constructor(
     private router: Router,
@@ -181,6 +184,7 @@ export class WidgetCreateAppointmentComponent implements OnInit {
   }
 
   async ngOnInit() {
+    await this.getAppBpjs();
     await this.getQueryParams();
     await this.enableWalkInChecker(); 
     await this.getSchedule();
@@ -350,6 +354,7 @@ export class WidgetCreateAppointmentComponent implements OnInit {
   }
 
   async ngOnChanges() {
+    await this.getAppBpjs();
     await this.getQueryParams();
     await this.enableWalkInChecker();
     await this.getSchedule();
@@ -371,6 +376,21 @@ export class WidgetCreateAppointmentComponent implements OnInit {
     this.emitScheduleBlock();
     this.emitRescheduleApp();
     this.getCollectionAlert();
+  }
+
+  async getAppBpjs() {
+    if (this.doctorService.searchDoctorSource2) {
+      if(this.doctorService.searchDoctorSource2.fromBpjs === true) { //from BPJS menu
+        localStorage.setItem('fromBPJS', JSON.stringify(this.doctorService.searchDoctorSource2));
+        this.bodyBpjs = this.doctorService.searchDoctorSource2;
+        this.fromBpjs = true;
+        this.patFromBpjs = this.doctorService.searchDoctorSource2.patientBpjs;
+      }
+    } else if(this.activatedRoute.snapshot.queryParamMap.get('fromBpjs')) {
+        this.bodyBpjs = JSON.parse(localStorage.getItem('fromBPJS'));
+        this.fromBpjs = true;
+        this.patFromBpjs = this.bodyBpjs.patientBpjs;
+    }
   }
 
   async enableWalkInChecker() {
@@ -1666,6 +1686,11 @@ export class WidgetCreateAppointmentComponent implements OnInit {
   prevPage() {
     const searchKey = JSON.parse(localStorage.getItem('searchKey'));
     this.router.navigate(['./base-appointment'], { queryParams: searchKey });
+  }
+
+  prevPageTwo() {
+    this.doctorService.searchDoctorSource2 = this.bodyBpjs;
+    this.router.navigate(['./request-list']);
   }
 
   openScheduleBlockModal() {

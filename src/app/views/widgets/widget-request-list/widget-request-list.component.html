@@ -1,11 +1,11 @@
-<div class="fo_container_input_date">
+<div class="fo_container_input_date" *ngIf="!showSchedule">
   <div class="custom-font-bpjs">BPJS Reservation Request List</div>
   <div *ngFor="let alert of alerts">
     <ngb-alert *ngIf="alert" type="{{cssAlertType(alert)}}" (close)="removeAlert(alert)">{{ alert.message }}</ngb-alert>
   </div>
 </div>
 
-<div class="fo_container_list shadow-4">
+<div class="fo_container_list shadow-4" *ngIf="!showSchedule">
   <table class="table table-bordered">
     <thead class="fo_color_blue foot-note" style="text-align: center">
       <th style="min-width: 2em">No.</th>
@@ -58,9 +58,12 @@
         </td>
         <td style="text-align: center">{{ r.bpjs_no }}</td>
         <td style="text-align: center; white-space: nowrap;">{{ r.referral_no }}</td>
-        <td style="text-align: center; white-space: nowrap;">{{ r.Speciality }}</td>
+        <td style="text-align: center; white-space: nowrap;">{{ r.speciality_name }}</td>
         <td style="min-width: 8em">{{ r.preferred_app_date }}</td>
-        <td style="min-width: 13em"><button class="btn fo_btn_green">create apppointment</button></td>
+        <td style="min-width: 13em">
+          <button class="btn fo_btn_green" href="/schedule?hospitalId=hahaha"
+           (click)="searchSchedule2(r)">create appointment</button>
+        </td>
       </tr>
       <tr>
         <td *ngIf="showNotFoundMsg" colspan="11" style="text-align: center;">Displaying no data</td>
@@ -72,7 +75,7 @@
   </table>
 </div>
 
-<section class="full-width" id="group-list-appointment">
+<section class="full-width" id="group-list-appointment" *ngIf="!showSchedule">
   <button *ngIf="isCanPrevPage" (click)="prevPage()" class="btn ms_btn_blue">
     <img src="{{assetPath}}icons/ic_ArrowRight_White.png"> Prev
   </button>
@@ -118,3 +121,5 @@
   </ng-template>
 
 </section>
+
+<app-widget-doctor-schedule *ngIf="showSchedule"></app-widget-doctor-schedule>

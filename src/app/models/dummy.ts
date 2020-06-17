@@ -8,8 +8,9 @@ export const appBPJSReq = [
         phone_no: '08127188837',
         bpjs_no: '1',
         referral_no: '',
-        Speciality: '',
-        preferred_app_date: ''
+        speciality_id: '8646beb4-3cc4-4c62-bdd7-51529311bf11',
+        speciality_name: 'Dokter Umum',
+        preferred_app_date: '15-06-2020'
     },
     {
         no: '2',
@@ -20,8 +21,9 @@ export const appBPJSReq = [
         phone_no: '08127620442',
         bpjs_no: '2',
         referral_no: '',
-        Speciality: '',
-        preferred_app_date: ''
+        speciality_id: '9a5e44fc-49c2-421d-b004-b982938ca870',
+        speciality_name: 'Pediatri(Anak)',
+        preferred_app_date: '15-06-2020'
     },
     {
         no: '3',
@@ -32,8 +34,9 @@ export const appBPJSReq = [
         phone_no: '08125071787',
         bpjs_no: '3',
         referral_no: '',
-        Speciality: '',
-        preferred_app_date: ''
+        speciality_id: '8646beb4-3cc4-4c62-bdd7-51529311bf11',
+        speciality_name: 'Dokter Umum',
+        preferred_app_date: '15-06-2020'
     },
     {
         no: '4',
@@ -44,8 +47,9 @@ export const appBPJSReq = [
         phone_no: '08129235941',
         bpjs_no: '4',
         referral_no: '',
-        Speciality: '',
-        preferred_app_date: ''
+        speciality_id: '8646beb4-3cc4-4c62-bdd7-51529311bf11',
+        speciality_name: 'Dokter Umum',
+        preferred_app_date: '15-06-2020'
     },
     {
         no: '5',
@@ -56,8 +60,9 @@ export const appBPJSReq = [
         phone_no: '08125631777',
         bpjs_no: '5',
         referral_no: '',
-        Speciality: '',
-        preferred_app_date: ''
+        speciality_id: '8646beb4-3cc4-4c62-bdd7-51529311bf11',
+        speciality_name: 'Dokter Umum',
+        preferred_app_date: '15-06-2020'
     },
     {
         no: '6',
@@ -68,8 +73,9 @@ export const appBPJSReq = [
         phone_no: '08126313266',
         bpjs_no: '6',
         referral_no: '',
-        Speciality: '',
-        preferred_app_date: ''
+        speciality_id: '8646beb4-3cc4-4c62-bdd7-51529311bf11',
+        speciality_name: 'Dokter Umum',
+        preferred_app_date: '15-06-2020'
     },
     {
         no: '7',
@@ -80,8 +86,9 @@ export const appBPJSReq = [
         phone_no: '08128460425',
         bpjs_no: '1',
         referral_no: '',
-        Speciality: '',
-        preferred_app_date: ''
+        speciality_id: '8646beb4-3cc4-4c62-bdd7-51529311bf11',
+        speciality_name: 'Dokter Umum',
+        preferred_app_date: '15-06-2020'
     },
     {
         no: '8',
@@ -92,8 +99,9 @@ export const appBPJSReq = [
         phone_no: '08123544016',
         bpjs_no: '8',
         referral_no: '',
-        Speciality: '',
-        preferred_app_date: ''
+        speciality_id: '8646beb4-3cc4-4c62-bdd7-51529311bf11',
+        speciality_name: 'Dokter Umum',
+        preferred_app_date: '15-06-2020'
     },
     {
         no: '9',
@@ -104,8 +112,9 @@ export const appBPJSReq = [
         phone_no: '08122617351',
         bpjs_no: '9',
         referral_no: '',
-        Speciality: '',
-        preferred_app_date: ''
+        speciality_id: '8646beb4-3cc4-4c62-bdd7-51529311bf11',
+        speciality_name: 'Dokter Umum',
+        preferred_app_date: '15-06-2020'
     },
     {
         no: '10',
@@ -116,8 +125,9 @@ export const appBPJSReq = [
         phone_no: '08125246604',
         bpjs_no: '10',
         referral_no: '',
-        Speciality: '',
-        preferred_app_date: ''
+        speciality_id: '8646beb4-3cc4-4c62-bdd7-51529311bf11',
+        speciality_name: 'Dokter Umum',
+        preferred_app_date: '15-06-2020'
     },
     {
         no: '11',
@@ -128,8 +138,9 @@ export const appBPJSReq = [
         phone_no: '08122633022',
         bpjs_no: '11',
         referral_no: '',
-        Speciality: '',
-        preferred_app_date: ''
+        speciality_id: '8646beb4-3cc4-4c62-bdd7-51529311bf11',
+        speciality_name: 'Dokter Umum',
+        preferred_app_date: '15-06-2020'
     },
 
 ];

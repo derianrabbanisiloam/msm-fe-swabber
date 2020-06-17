@@ -15,6 +15,7 @@ import { PageRequestListRoutingModule } from './page-request-list-routing.module
 import { PageRequestListComponent } from './page-request-list.component';
 import { WidgetRequestListComponent } from '../../widgets/widget-request-list/widget-request-list.component';
 import { ModalVerificationAidoModule } from '../../widgets/modal-verification-aido/modal-verification-aido.module';
+import { WidgetDoctorScheduleModule } from '../../widgets/widget-doctor-schedule/widget-doctor-schedule.module';
 
 @NgModule({
   declarations: [
@@ -36,7 +37,8 @@ import { ModalVerificationAidoModule } from '../../widgets/modal-verification-ai
     SectionSidebarModule,
     SectionFooterModule,
     ModalVerificationAidoModule,
-    NgbAlertModule
+    NgbAlertModule,
+    WidgetDoctorScheduleModule
   ],
   exports: [
     PageRequestListComponent,

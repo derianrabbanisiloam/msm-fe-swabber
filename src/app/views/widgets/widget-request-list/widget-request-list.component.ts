@@ -1,5 +1,6 @@
 import * as moment from 'moment';
 import { Component, OnInit } from '@angular/core';
+import { Router, ActivatedRoute } from '@angular/router';
 import { DoctorService } from '../../../services/doctor.service';
 import { AppointmentService } from '../../../services/appointment.service';
 import { PatientService } from '../../../services/patient.service';
@@ -55,6 +56,17 @@ export class WidgetRequestListComponent implements OnInit {
     valueFive: null, valueSix: null, valueSeven: null };
   public bodyKeywordTwo: any = { valueOne: null, valueTwo: null, valueThree: null, valueFour: null,
     valueFive: null, valueSix: null, valueSeven: null };
+  public searchKeywords: any = {
+    doctor: {},
+    area: {},
+    hospital: {},
+    speciality: {}
+  };
+  public showSchedule: boolean = false;
+  public fromBpjs: boolean = false;
+  public patFromBpjs: any;
+  public bodyBpjs: any;
+
   constructor(
     private appointmentService: AppointmentService,
     private doctorService: DoctorService,
@@ -63,18 +75,37 @@ export class WidgetRequestListComponent implements OnInit {
     private modalService: NgbModal,
     private alertService: AlertService,
     modalSetting: NgbModalConfig,
+    private router: Router,
   ) {
     modalSetting.backdrop = 'static';
     modalSetting.keyboard = false;
    }
 
   ngOnInit() {
+    console.log('!!!!!!!!!!!!!!!!!nanana')
+    if(this.doctorService.goBack) { //when click prev page
+      this.showSchedule = false;
+    }
+    this.getAppBpjs();
     this.keywordsModel.hospitalId = this.hospital.id;
     this.getDoctors(this.hospital.id);
     this.initializeDateRangePicker();
     this.getCollectionAlert();
     this.getAidoWorklist();
     this.emitVerifyApp();
+  }
+
+  async getAppBpjs() {
+    console.log('!!!!!!!!!!!!!!!!berhasil')
+    if (this.doctorService.searchDoctorSource2) {
+      if(this.doctorService.searchDoctorSource2.fromBpjs === true) { //from BPJS menu
+        this.bodyBpjs = this.doctorService.searchDoctorSource2;
+        this.fromBpjs = true;
+        this.patFromBpjs = this.doctorService.searchDoctorSource2.patientBpjs;
+        this.showSchedule = true;
+      }
+    }
+    
   }
 
   emitVerifyApp() {
@@ -327,6 +358,44 @@ export class WidgetRequestListComponent implements OnInit {
 
   removeAlert(alert: Alert) {
     this.alerts = this.alerts.filter(x => x !== alert);
+  }
+
+  searchSchedule2(body) {
+    const speciality = body;
+
+    this.searchKeywords = {
+      doctor: {
+        doctor_id: null,
+        name: null,
+      },
+      area: {
+        area_id: null,
+        name: null,
+      },
+      hospital: {
+        hospital_id: this.hospital.id,
+        name: this.hospital.name,
+      },
+      speciality: {
+        speciality_id: speciality.speciality_id,
+        speciality_name: speciality.speciality_name,
+      },
+      fromBpjs: true,
+      patientBpjs: body
+    };
+
+    const searchKey = {
+      type: 'spesialist',
+      speciality_id: speciality.speciality_id,
+      speciality_name: speciality.speciality_name,
+    };
+
+    localStorage.setItem('searchKey', JSON.stringify(searchKey));
+
+    //this.doctorService.changeSearchDoctor(this.searchKeywords);
+    this.doctorService.searchDoctorSource2 = this.searchKeywords;
+
+    this.showSchedule = true;
   }
 
 }

@@ -26,6 +26,7 @@ export class DoctorService {
   private searchDoctorSource = new Subject<any>();
   public searchDoctorSource$ = this.searchDoctorSource.asObservable();
   public searchDoctorSource2: any;
+  public goBack: any;
 
   getDoctorProfileTwo(hospital: string, doctor: string): Observable<any> {
     const url = `${this.doctorUrl}/profiles/hospital/${hospital}/doctor/${doctor}`;

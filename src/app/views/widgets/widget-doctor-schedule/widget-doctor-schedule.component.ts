@@ -41,6 +41,9 @@ export class WidgetDoctorScheduleComponent implements OnInit {
   private leaves = [];
   public holidaysSpecialty: any = [];
   public holidaysName: any = [];
+  public fromBpjs: boolean = false;
+  public patFromBpjs: any;
+  public bodyBpjs: any;
 
   public datePickerModel: any = {
     date: {
@@ -73,6 +76,11 @@ export class WidgetDoctorScheduleComponent implements OnInit {
 
   async ngOnInit() {
     if (this.doctorService.searchDoctorSource2) {
+      if(this.doctorService.searchDoctorSource2.fromBpjs === true) { //from BPJS menu
+        this.bodyBpjs = this.doctorService.searchDoctorSource2;
+        this.fromBpjs = true;
+        this.patFromBpjs = this.doctorService.searchDoctorSource2.patientBpjs;
+      }
       this.keywords = this.doctorService.searchDoctorSource2;
       this.doctorService.searchDoctorSource2 = null;
       await this.getLeaveHeader(this.keywords);
@@ -275,12 +283,23 @@ export class WidgetDoctorScheduleComponent implements OnInit {
   }
 
   gotoCreateApp(item: any, date: string) {
-    this.router.navigate(['/create-appointment'], {
-      queryParams: {
-        doctorId: item.doctor_id,
-        date: date
-      }
-    });
+    if(this.fromBpjs === true) {
+      this.doctorService.searchDoctorSource2 = this.bodyBpjs;
+      this.router.navigate(['/create-appointment'], {
+        queryParams: {
+          doctorId: item.doctor_id,
+          date: date,
+          fromBpjs: true
+        }
+      });
+    } else {
+      this.router.navigate(['/create-appointment'], {
+        queryParams: {
+          doctorId: item.doctor_id,
+          date: date
+        }
+      });
+    }
   }
 
   gotoCreateApp2(item: any, date: string) {
@@ -295,6 +314,12 @@ export class WidgetDoctorScheduleComponent implements OnInit {
         date: date
       }
     });
+  }
+
+  prevPage() {
+    console.log('hehehe')
+    this.doctorService.goBack = false;
+    this.router.navigate(['./request-list']);
   }
 
 }

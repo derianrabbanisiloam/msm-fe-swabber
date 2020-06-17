@@ -231,8 +231,8 @@
                   <div class="form-pr-email">
                     <label for="postCode" class="">Email Address *</label>
                     <div>
-                      <input type="email" class="form-control" id="email" [(ngModel)]="model.email" name="email"
-                        placeholder="(Required)">
+                      <input type="email" class="form-control" id="email" [(ngModel)]="model.email" name="email" placeholder="(Required)">
+                      <span *ngIf="validEmail" style="color: red; font-size: 9px;">*You must enter a valid email address</span>
                     </div>
                   </div>
                   <label for="postCode" class="">Allergy</label>
@@ -275,6 +275,7 @@
                       <div class="">
                         <input type="text" class="form-control" id="nationalIdNo" [(ngModel)]="model.nationalIdNo"
                           name="nationalIdNo" placeholder="(Required)">
+                        <span *ngIf="validInputNo" style="color: red; font-size: 9px;">*You must enter 16 digit ID number</span>
                       </div>
                     </div>
                   </div>

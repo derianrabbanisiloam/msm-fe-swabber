@@ -29,6 +29,9 @@
               <label for="patientName" class="fo_requirement">Name *</label>
               <input type="text" class="form-control" id="patientName" [(ngModel)]="model.patientName"
                 name="patientName" required>
+              <span *ngIf="validName" style="color: red; font-size: 9px;">
+                *Sorry, only letters (a-z), numbers (0-9), (.), and (,) Are allowed.
+              </span>
             </div>
             <div class="form-pr-bdate">
               <label for="birthDate" class="fo_requirement">Birth Date *</label>
@@ -276,6 +279,7 @@
                         <input type="text" class="form-control" id="nationalIdNo" [(ngModel)]="model.nationalIdNo"
                           name="nationalIdNo" placeholder="(Required)">
                         <span *ngIf="validInputNo" style="color: red; font-size: 9px;">*You must enter 16 digit ID number</span>
+                        <span *ngIf="validInputNoSim" style="color: red; font-size: 9px;">*You must enter 12-14 digit number</span>
                       </div>
                     </div>
                   </div>

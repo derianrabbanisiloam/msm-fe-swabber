@@ -72,6 +72,7 @@ export class WidgetPatientDataComponent implements OnInit {
   public mask_birth = [/\d/, /\d/, '-', /\d/, /\d/, '-', /\d/, /\d/, /\d/, /\d/];
   public mask = [/\d/, /\d/, /\d/, /\d/, /\d/, /\d/, /\d/, /\d/, /\d/, /\d/, /\d/, /\d/, /\d/];
   public checkEmail = '[a-z0-9._%+-]+@[a-z0-9.-]+\\.[a-z]{2,}$';
+  public checkNamed = /[*#!@&^'"/[\]{}()?]/;
 
   public alerts: Alert[] = [];
   public closeResult: string;
@@ -129,6 +130,8 @@ export class WidgetPatientDataComponent implements OnInit {
   public bucketTwo: any;
   public validInputNo: boolean = false;
   public validEmail: boolean = false;
+  public validInputNoSim: boolean = false;
+  public validName: boolean = false;
 
   constructor(
     private generalService: GeneralService,
@@ -832,7 +835,13 @@ export class WidgetPatientDataComponent implements OnInit {
     if (!patientName) {
       valid = false; $('.form-pr-name').addClass('form-error');
     } else {
-      $('.form-pr-name').removeClass('form-error');
+      if(!patientName.match(this.checkNamed)) {
+        $('.form-pr-name').removeClass('form-error');
+        this.validName = false;
+      } else {
+        valid = false; $('.form-pr-name').addClass('form-error');
+        this.validName = true;
+      }
     }
 
     if (!this.model.birth) {
@@ -891,13 +900,27 @@ export class WidgetPatientDataComponent implements OnInit {
     if (!nationalIdNo) {
       valid = false; $('.form-pr-nationalidno').addClass('form-error');
     } else {
-      if(nationalidType.value === '1') {
+      if(nationalidType.value === '1') { //ktp
         if(nationalIdNo.length !== 16) {
           this.validInputNo = true;
+          this.validInputNoSim = false;
           valid = false; $('.form-pr-nationalidno').addClass('form-error');
-        } else {this.validInputNo = false; $('.form-pr-nationalidno').removeClass('form-error');}
-      } else {
+        } else {
+          this.validInputNoSim = false;
+          this.validInputNo = false; $('.form-pr-nationalidno').removeClass('form-error');}
+      } else if(nationalidType.value === '2') { //sim
+        if(nationalIdNo.length >= 12 && nationalIdNo.length <= 14) {
+          this.validInputNo = false;
+          this.validInputNoSim = false; $('.form-pr-nationalidno').removeClass('form-error');
+        } else {
+          this.validInputNo = false;
+          this.validInputNoSim = true;
+          valid = false; $('.form-pr-nationalidno').addClass('form-error');
+        }
+      }
+      else {
         this.validInputNo = false;
+        this.validInputNoSim = false;
         $('.form-pr-nationalidno').removeClass('form-error');
       }
     };

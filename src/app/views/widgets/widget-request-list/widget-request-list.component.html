@@ -1,11 +1,11 @@
-<div class="fo_container_input_date" *ngIf="!showSchedule">
+<div class="fo_container_input_date">
   <div class="custom-font-bpjs">BPJS Reservation Request List</div>
   <div *ngFor="let alert of alerts">
     <ngb-alert *ngIf="alert" type="{{cssAlertType(alert)}}" (close)="removeAlert(alert)">{{ alert.message }}</ngb-alert>
   </div>
 </div>
 
-<div class="fo_container_list shadow-4" *ngIf="!showSchedule">
+<div class="fo_container_list shadow-4">
   <table class="table table-bordered">
     <thead class="fo_color_blue foot-note" style="text-align: center">
       <th style="min-width: 2em">No.</th>
@@ -75,7 +75,7 @@
   </table>
 </div>
 
-<section class="full-width" id="group-list-appointment" *ngIf="!showSchedule">
+<section class="full-width" id="group-list-appointment">
   <button *ngIf="isCanPrevPage" (click)="prevPage()" class="btn ms_btn_blue">
     <img src="{{assetPath}}icons/ic_ArrowRight_White.png"> Prev
   </button>
@@ -121,5 +121,3 @@
   </ng-template>
 
 </section>
-
-<app-widget-doctor-schedule *ngIf="showSchedule"></app-widget-doctor-schedule>

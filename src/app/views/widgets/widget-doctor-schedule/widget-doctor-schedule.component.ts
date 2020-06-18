@@ -75,18 +75,25 @@ export class WidgetDoctorScheduleComponent implements OnInit {
   }
 
   async ngOnInit() {
-    if (this.doctorService.searchDoctorSource2) {
-      if(this.doctorService.searchDoctorSource2.fromBpjs === true) { //from BPJS menu
-        this.bodyBpjs = this.doctorService.searchDoctorSource2;
-        this.fromBpjs = true;
-        this.patFromBpjs = this.doctorService.searchDoctorSource2.patientBpjs;
-      }
+  if (this.doctorService.searchDoctorSource2) {
+    if(this.doctorService.searchDoctorSource2.fromBpjs === true) { //from BPJS menu
+      localStorage.setItem('fromBPJS', JSON.stringify(this.doctorService.searchDoctorSource2));
+      this.bodyBpjs = this.doctorService.searchDoctorSource2;
+      this.fromBpjs = true;
+      this.patFromBpjs = this.doctorService.searchDoctorSource2.patientBpjs;
       this.keywords = this.doctorService.searchDoctorSource2;
-      this.doctorService.searchDoctorSource2 = null;
-      await this.getLeaveHeader(this.keywords);
-      await this.generateDates(this.initDate);
-      await this.getSchedulesLogic(this.keywords);
     }
+  } else if(this.activatedRoute.snapshot.queryParamMap.get('fromBpjs')) {
+      this.bodyBpjs = JSON.parse(localStorage.getItem('fromBPJS'));
+      this.fromBpjs = true;
+      this.patFromBpjs = this.bodyBpjs.patientBpjs;
+      this.keywords = this.bodyBpjs;
+    }
+    
+    this.doctorService.searchDoctorSource2 = null;
+    await this.getLeaveHeader(this.keywords);
+    await this.generateDates(this.initDate);
+    await this.getSchedulesLogic(this.keywords);
 
     this.doctorService.searchDoctorSource$.subscribe(
       async (params) => {
@@ -317,7 +324,6 @@ export class WidgetDoctorScheduleComponent implements OnInit {
   }
 
   prevPage() {
-    console.log('hehehe')
     this.doctorService.goBack = false;
     this.router.navigate(['./request-list']);
   }

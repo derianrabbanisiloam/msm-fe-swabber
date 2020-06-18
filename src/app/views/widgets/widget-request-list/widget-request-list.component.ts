@@ -82,7 +82,6 @@ export class WidgetRequestListComponent implements OnInit {
    }
 
   ngOnInit() {
-    console.log('!!!!!!!!!!!!!!!!!nanana')
     if(this.doctorService.goBack) { //when click prev page
       this.showSchedule = false;
     }
@@ -96,7 +95,6 @@ export class WidgetRequestListComponent implements OnInit {
   }
 
   async getAppBpjs() {
-    console.log('!!!!!!!!!!!!!!!!berhasil')
     if (this.doctorService.searchDoctorSource2) {
       if(this.doctorService.searchDoctorSource2.fromBpjs === true) { //from BPJS menu
         this.bodyBpjs = this.doctorService.searchDoctorSource2;
@@ -390,13 +388,54 @@ export class WidgetRequestListComponent implements OnInit {
       speciality_name: speciality.speciality_name,
     };
 
-    localStorage.setItem('searchKey', JSON.stringify(searchKey));
-
-    //this.doctorService.changeSearchDoctor(this.searchKeywords);
     this.doctorService.searchDoctorSource2 = this.searchKeywords;
-
-    this.showSchedule = true;
+    this.router.navigate(['/doctor-schedule'], {
+      queryParams: {
+        fromBpjs: true
+      }
+    });
+    localStorage.setItem('searchKey', JSON.stringify(searchKey));
+    //this.doctorService.changeSearchDoctor(this.searchKeywords);
+    
   }
+
+  // searchSchedule2(body) {
+  //   const speciality = body;
+
+  //   this.searchKeywords = {
+  //     doctor: {
+  //       doctor_id: null,
+  //       name: null,
+  //     },
+  //     area: {
+  //       area_id: null,
+  //       name: null,
+  //     },
+  //     hospital: {
+  //       hospital_id: this.hospital.id,
+  //       name: this.hospital.name,
+  //     },
+  //     speciality: {
+  //       speciality_id: speciality.speciality_id,
+  //       speciality_name: speciality.speciality_name,
+  //     },
+  //     fromBpjs: true,
+  //     patientBpjs: body
+  //   };
+
+  //   const searchKey = {
+  //     type: 'spesialist',
+  //     speciality_id: speciality.speciality_id,
+  //     speciality_name: speciality.speciality_name,
+  //   };
+
+  //   localStorage.setItem('searchKey', JSON.stringify(searchKey));
+
+  //   //this.doctorService.changeSearchDoctor(this.searchKeywords);
+  //   this.doctorService.searchDoctorSource2 = this.searchKeywords;
+
+  //   this.showSchedule = true;
+  // }
 
 }
 

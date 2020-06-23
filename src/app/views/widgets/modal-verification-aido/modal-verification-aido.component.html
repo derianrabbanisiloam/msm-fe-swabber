@@ -61,6 +61,9 @@
 
 <div class="modal-footer">
   <button type="button" class="btn ms_btn_black" data-dismiss="modal" (click)="close()">Close</button>
+  <div *ngIf="appointmentAidoSelected.patient_hope_id !== 0 && appointmentAidoSelected.patient_organization_id === 0 && appointmentAidoSelected.is_double_mr === false">
+    <button (click)="openConfirmationModal(confirmCreateMr)" class="btn ms_btn_green" style="font-size: 11px;">Create MR</button>
+  </div>
   <button [ngClass]="{'disable': !patientSelected && !contactId}" type="button" class="btn ms_btn_green"
     data-toggle="modal" data-target="#confirming" data-dismiss="modal"
     (click)="openConfirmationModal(verify_patient_modal)">Verify Appointment</button>
@@ -167,6 +170,26 @@
       (click)="createPatient()">Confirm</button>
   </div>
   <div *ngIf="isSuccessVerifyApp" class="modal-footer">
+    <button class="btn ms_btn_black" (click)="closeAll()">Close</button>
+  </div>
+</ng-template>
+
+<ng-template #confirmCreateMr let-modal>
+  <div class="modal-header">
+    <div class="header-2 modal-padding">Create MR Local Confirmation</div>
+  </div>
+  <div class="modal-body">
+    <p>Are you sure to create MR Local ?</p>
+  </div>
+  <div *ngFor="let alert of alerts">
+    <ngb-alert *ngIf="alert" type="{{cssAlertType(alert)}}" (close)="removeAlert(alert)">{{ alert.message }}</ngb-alert>
+  </div>
+  <div *ngIf="!isSuccessCreateMr" class="modal-footer">
+    <button type="button" class="btn ms_btn_black" (click)="modal.close()">Cancel</button>
+    <button class="btn ms_btn_green" [ngClass]="{'disable': flagConfirmCreateMr}"
+      (click)="createMrLocal()">Confirm</button>
+  </div>
+  <div *ngIf="isSuccessCreateMr" class="modal-footer">
     <button class="btn ms_btn_black" (click)="closeAll()">Close</button>
   </div>
 </ng-template>

@@ -37,10 +37,12 @@ export class ModalVerificationAidoComponent implements OnInit {
   public source: string = sourceApps;
   public isSuccessCreateContact: boolean = false;
   public isSuccessVerifyApp: boolean = false;
+  public isSuccessCreateMr: boolean = false;
   public createContactMsg: string;
   public contactId: string;
   public alerts: Alert[] = [];
   public flagConfirm: boolean = false;
+  public flagConfirmCreateMr: boolean = false;
   public dataDoctor: any;
   public specialist: any;
   public schedule: any;
@@ -252,4 +254,27 @@ export class ModalVerificationAidoComponent implements OnInit {
     modalRef.componentInstance.appointmentSelected = appointmentSelected;
   }
 
+  async createMrLocal() {
+    this.flagConfirmCreateMr = true;
+    const payload = {
+      patientHopeId: this.appointmentAidoSelected.patient_hope_id,
+      organizationId: Number(this.hospital.orgId),
+      channelId: channelId.AIDO, 
+      userId: this.user.id,
+      source: sourceApps,
+      userName: this.user.fullname,
+    };
+
+    await this.patientService.createMrLocal(payload).toPromise().then(
+      data => {
+        this.isSuccessCreateMr = true;
+        this.flagConfirmCreateMr = false;
+        this.alertService.success('Successfully create MR Local');
+        this.appointmentService.emitVerifyApp(true);
+      }, error => {
+        this.flagConfirmCreateMr = false;
+        this.alertService.error('Failed create MR Local');
+      }
+    );
+  }
 }

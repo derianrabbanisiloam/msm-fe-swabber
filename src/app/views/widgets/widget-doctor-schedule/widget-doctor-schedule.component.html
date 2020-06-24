@@ -98,6 +98,14 @@
     </div>
   </div>
 
+  <div class="row" *ngIf="fromBpjs && !showScheduleType2 && hideLoading">
+    <div class="col-md-12">
+      <div style="text-align: center;">
+        <img src="../../../../assets/icons/Logo-Animation---S(FAST).gif" width="200px" height="200px">
+      </div>
+    </div>
+  </div>
+
   <div class="content-doctor-schedule-group" *ngIf="showScheduleType2">
     <div class="content-header-container" *ngIf="!fromBpjs">
       <div class="content-doctor-schedule-group-1">

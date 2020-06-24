@@ -30,8 +30,11 @@ export class ScheduleService {
     return this.http.get<any>(uri, httpOptions);
   }
 
-  getTimeSlot(hospitalId: string, doctorId: string, date: string){
-    const uri = `${this.timeSlotUrl}/${hospitalId}/doctor/${doctorId}/appointment-date/${date}`;
+  getTimeSlot(hospitalId: string, doctorId: string, date: string, consulType?: string){
+    let uri = `${this.timeSlotUrl}/${hospitalId}/doctor/${doctorId}/appointment-date/${date}`;
+    if (consulType) {
+      uri = `${uri}?consultationTypeId=${consulType}`;
+    } 
     return this.http.get<any>(uri, httpOptions);
   }
 

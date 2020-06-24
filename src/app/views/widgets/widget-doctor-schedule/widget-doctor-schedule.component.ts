@@ -44,6 +44,7 @@ export class WidgetDoctorScheduleComponent implements OnInit {
   public fromBpjs: boolean = false;
   public patFromBpjs: any;
   public bodyBpjs: any;
+  public hideLoading: boolean = false;
 
   public datePickerModel: any = {
     date: {
@@ -81,13 +82,15 @@ export class WidgetDoctorScheduleComponent implements OnInit {
       this.bodyBpjs = this.doctorService.searchDoctorSource2;
       this.fromBpjs = true;
       this.patFromBpjs = this.doctorService.searchDoctorSource2.patientBpjs;
-      this.keywords = this.doctorService.searchDoctorSource2;
+      this.consulType = this.doctorService.searchDoctorSource2.consulType;
     }
-  } else if(this.activatedRoute.snapshot.queryParamMap.get('fromBpjs')) {
+    this.keywords = this.doctorService.searchDoctorSource2;
+    } else if(this.activatedRoute.snapshot.queryParamMap.get('fromBpjs')) {
       this.bodyBpjs = JSON.parse(localStorage.getItem('fromBPJS'));
       this.fromBpjs = true;
       this.patFromBpjs = this.bodyBpjs.patientBpjs;
       this.keywords = this.bodyBpjs;
+      this.consulType = this.bodyBpjs.consulType;
     }
     
     this.doctorService.searchDoctorSource2 = null;
@@ -151,6 +154,7 @@ export class WidgetDoctorScheduleComponent implements OnInit {
       }
       this.getSchedulesByDoctor(doctorId, this.initDate, consultationType);
     } else if ((areaId || hospitalId) && specialityId) {
+      console.log('##############', consultationType)
       this.consulTypeFlag = 2; //reset <select> function
       if(!this.flagCon) this.flagCon = this.consulTypeFlag;
       else {
@@ -160,6 +164,7 @@ export class WidgetDoctorScheduleComponent implements OnInit {
           this.consulType = null;
         }
       }
+      console.log('##############', consultationType)
       this.getSchedulesByKeywords(specialityId, this.initDate, consultationType, areaId, hospitalId);
     }
   }
@@ -207,14 +212,17 @@ export class WidgetDoctorScheduleComponent implements OnInit {
   }
 
   getSchedulesByKeywords(specialityId: string, date: string, consultationType: string, areaId?: string, hospitalId?: string) {
+    this.hideLoading = true;
     this.doctorService.getScheduleByKeywords(specialityId, date, areaId, hospitalId, consultationType)
       .subscribe(data => {
         this.doctorSchedules2 = data.data;
         if (this.doctorSchedules2.length > 0) {
+          this.hideLoading = false;
           this.showScheduleType1 = false;
           this.showScheduleType2 = true;
           this.message1 = null;
         } else {
+          this.hideLoading = false;
           this.message1 = {
             title: 'Data tidak ditemukan',
             description: ''

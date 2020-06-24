@@ -1,0 +1,200 @@
+<div class="modal-content" id="tutorial5" >
+  <div class="modal-header create-appointment-modal">
+    <div class="header-2 modal-padding">Create Appointment</div>
+    <button #close_button type="button" class="close" data-dismiss="modal" aria-label="Close" aria-label="Close"
+            (click)="close()">
+      <span aria-hidden="true">&times;</span>
+    </button>
+  </div>
+  <div class="modal-body create-appointment-modal" style="padding: 0.5rem;">
+
+    <div class="col-md-12 content-appointment-02-group-col" >
+
+      <form name="form" (ngSubmit)="f.form.valid" #f="ngForm" novalidate>
+        <div class="row">
+          <label class="col-md-6 col-form-label foot-note"><span style="font-weight: bold; font-size: 14px;">BPJS No.</span></label>
+          <div class="col-md-6 col-form-label">
+          </div>
+          <div class="col-md-6 input-group">
+            <input 
+              type="text" 
+              class="form-control" 
+              placeholder="input BPJS number..." 
+              name="bpjsNumber" 
+              [(ngModel)]="bpjsCardNumber"
+              [disabled]="isLock">
+          </div>
+          <div class="col-md-2"></div>
+          <div class="col-md-2">
+            <button class="btn fo_btn_blue" (click)="searchDataBPJS()">Check</button>
+          </div>
+          <div class="col-md-2"></div>
+        </div>
+        <div>
+          <span *ngIf="messageBpjs" style="color: red; font-size: 9px;">{{messageBpjs}}</span>
+        </div>
+
+        <div class="form-ca-phoneno form-group row" style="font-weight: bold; margin-top: 0.5em;">
+          <div class="col-md-6">
+            Status Peserta: 
+          </div>
+          <div class="col-md-6">
+
+          </div>
+          <div class="col-md-6">
+            NIK: 
+          </div>
+          <div class="col-md-6">
+          
+          </div>
+          <div class="col-md-6">
+            Nama Peserta: 
+          </div>
+          <div class="col-md-6">
+          
+          </div>
+          <div class="col-md-6">
+            Tanggal Lahir: 
+          </div>
+          <div class="col-md-6">
+          
+          </div>
+          <div class="col-md-6">
+            Diagnosa: 
+          </div>
+          <div class="col-md-6">
+           
+          </div>
+          <div class="col-md-6">
+            No. Rujukan: 
+          </div>
+          <div class="col-md-6">
+          
+          </div>
+          <div class="col-md-6">
+            Dirujuk ke RS: 
+          </div>
+          <div class="col-md-6">
+          
+          </div>
+          <div class="col-md-6">
+            Dirujuk ke Spesialisasi: 
+          </div>
+          <div class="col-md-6">
+           
+          </div>
+        </div>
+
+        <div  id="tutorial6b" class="form-group" style="margin-top: 4em;" [ngStyle]="{'text-align': 'right'}">
+          <button class="btn fo_btn_blue_2" [disabled]="isSubmitting" (click)="close()">Back</button>
+          <button class="btn fo_btn_blue_2" (click)="openModal(searchPatient)">Confirm</button>
+        </div>
+        
+        <div class="form-group" style="width: 37rem">
+          <div *ngFor="let alert of alerts">
+            <ngb-alert *ngIf="alert && !staticAlertClosed" type="{{cssAlertType(alert)}}" (close)="removeAlert(alert)">{{ alert.message }}</ngb-alert>
+          </div>
+        </div>
+
+      </form>
+    </div>
+
+  </div>
+</div>
+
+<ng-template #searchPatient let-c="close" let-d="dismiss">
+  <div class="modal-header">
+    <h4 class="modal-title">Search Patient Data</h4>
+    <button type="button" class="close" aria-label="Close" (click)="d('Cross click')">
+      <span aria-hidden="true">&times;</span>
+    </button>
+  </div>
+  <div class="verifyFilter modal-body d-flex justify-content-start">
+    <div class="body-text">
+      <div>Name</div>
+      <div>
+        <input class="form-control" [(ngModel)]="patientName">
+      </div>
+    </div>
+    <div class="body-text">
+      <div>Date of birth</div>
+      <div class="input-group">
+        <input type="text" class="form-control" [textMask]="{mask: mask_birth}" name="birth" [(ngModel)]="dateBirth"
+           placeholder="dd-mm-yyyy" />
+      </div>
+    </div>
+    <div class="verifySearch" (click)="getSearchedPatient1()">
+      <img src="{{assetPath}}icons/ic_Search_white.png">
+    </div>
+    <div class="textSpan">
+      or
+    </div>
+    <div class="body-text">
+      <div>Local MR</div>
+      <div>
+        <input class="form-control" placeholder="Local MR" type="text" [(ngModel)]="mrLocal">
+      </div>
+    </div>
+    <div class="verifySearch" (click)="getSearchedPatient2()">
+      <img src="{{assetPath}}icons/ic_Search_white.png">
+    </div>
+  </div>
+  <div>
+    <table class="table" style="margin-top: 1em;">
+      <thead class="table-bordered">
+        <td style="min-width: 10em; text-align: center">Name</td>
+        <td style="min-width: 8em; text-align: center">Date of birth</td>
+        <td style="white-space: nowrap; text-align: center; min-width: 8em">Central MR</td>
+        <td style="min-width: 8em; text-align: center">Hospital</td>
+        <td  style="min-width: 8em; text-align: center">Local MR</td>
+        <td style="min-width: 10em; text-align: center">Mobile Number</td>
+        <td style="min-width: 12em; text-align: center">Address</td>
+      </thead>
+      <tbody>
+        <tr *ngFor="let itr of patientHope"
+        [ngClass]="{'selectedPatient': selectPatient 
+        && itr.patientId == selectPatient.patientId 
+        && itr.patientOrganizationId == selectPatient.patientOrganizationId}" (click)="choosedSearchPatient(itr)">
+          <td>{{itr.name}}</td>
+          <td>{{itr.newBirthDate}}</td>
+          <td>{{itr.mrNo}}</td>
+          <td>{{itr.hospitalAlias}}</td>
+          <td>{{itr.mrNoUnit}}</td>
+          <td>{{itr.mobileNo1}}</td>
+          <td>{{itr.address}}</td>
+        </tr>
+        <tr *ngIf="(!flagSearch && !loadingBar) || patientHope">
+          <td colspan="7">
+            <div style="margin-top: 3em;"></div>
+          </td>
+        </tr>
+      </tbody>
+      <tbody *ngIf="loadingBar">
+        <tr>
+          <td colspan="4" style="text-align: right">
+            <img src="../../../../assets/icons/Logo-Animation---S(FAST).gif" width="200px" height="200px">
+          </td>
+        </tr>
+      </tbody>
+      <tbody *ngIf="!patientHope && flagSearch && !loadingBar">
+        <tr>
+          <td colspan="7" style="text-align: center;">result not found</td>
+        </tr>
+      </tbody>
+      <tbody>
+        <tr>
+          <td colspan="7" style="text-align: right">
+            <button 
+            class="btn fo_btn_blue_2" 
+            type="submit" 
+            [disabled]="!selectPatient">Create Appointment</button>
+            <button class="btn fo_btn_red" (click)="d('Cross click')">Cancel</button>
+          </td>
+        </tr>
+      </tbody>
+    </table>
+  
+    <div>
+    </div>
+  </div>
+</ng-template>

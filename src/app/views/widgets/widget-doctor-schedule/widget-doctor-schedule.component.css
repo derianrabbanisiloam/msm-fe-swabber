@@ -1,3 +1,10 @@
+:host(app-widget-doctor-schedule) { width:100% }
+
+.loading-div-bpjs img {
+  width: 8vw;
+  text-align: center;
+}
+
 .center-text{
   text-align: left;
   align-items: center;

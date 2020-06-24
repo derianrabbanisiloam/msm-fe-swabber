@@ -31,6 +31,8 @@ import { ModalPatientVerificationComponent } from '../../widgets/modal-patient-v
 
 import { ModalVerificationAidoModule } from '../../widgets/modal-verification-aido/modal-verification-aido.module';
 import { ModalVerificationAidoComponent } from '../../widgets/modal-verification-aido/modal-verification-aido.component';
+import { ModalCreateAppBpjsComponent } from '../../widgets/modal-create-app-bpjs/modal-create-app-bpjs.component';
+import { ModalCreateAppBpjsModule } from '../../widgets/modal-create-app-bpjs/modal-create-app-bpjs.module';
 
 @NgModule({
   declarations: [
@@ -57,6 +59,7 @@ import { ModalVerificationAidoComponent } from '../../widgets/modal-verification
     ModalVerificationAidoModule,
     NgbPopoverModule,
     NguiAutoCompleteModule,
+    ModalCreateAppBpjsModule
     
   ],
   entryComponents: [
@@ -67,6 +70,7 @@ import { ModalVerificationAidoComponent } from '../../widgets/modal-verification
     ModalPatientVerificationComponent,
     ModalRescheduleAppointmentComponent,
     ModalVerificationAidoComponent,
+    ModalCreateAppBpjsComponent
   ],
   exports: [
     PageCreateAppointmentComponent,

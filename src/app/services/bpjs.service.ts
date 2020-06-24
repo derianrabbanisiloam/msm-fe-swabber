@@ -46,4 +46,38 @@ export class BpjsService {
     const url = `${this.appointmentBpjsUrl}/notify`;
     return this.http.post<any>(url, payload, httpOptions);
   }
+
+  checkNoBpjs(
+    hospitalId?: string,
+    bpjsCardNumber?: string,
+    name?: string,
+    birthDate?: string,
+    specialityId?: string
+    ): Observable<any> {
+    let uri = `${this.appointmentBpjsUrl}/references?hospitalId=${hospitalId}`;
+    uri = bpjsCardNumber ? `${uri}&bpjsCardNumber=${bpjsCardNumber}` : uri;
+    uri = name ? `${uri}&name=${name}` : uri;
+    uri = birthDate ? `${uri}&birthDate=${birthDate}` : uri;
+    uri = specialityId ? `${uri}&specialityId=${specialityId}` : uri;
+    return this.http.get<any>(uri, httpOptions);
+  }
+
+  deleteAppointmentBpjs(appointmentId: string, payload: any, temp = false) {
+    let url = `${this.appointmentBpjsUrl}`;
+
+    if(temp){
+      url = `${url}/temporary/${appointmentId}`;
+    }else{
+      url = `${url}/${appointmentId}`
+    }
+
+    const body = JSON.stringify(payload);
+    
+    const options = {
+      ...httpOptions,
+      body,
+    };
+    
+    return this.http.delete<any>(url, options);
+  }
 }

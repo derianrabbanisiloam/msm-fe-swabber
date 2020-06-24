@@ -1,22 +1,16 @@
 import * as moment from 'moment';
 import { Component, OnInit } from '@angular/core';
-import { Router, ActivatedRoute } from '@angular/router';
+import { Router } from '@angular/router';
 import { DoctorService } from '../../../services/doctor.service';
-import { AppointmentService } from '../../../services/appointment.service';
-import { PatientService } from '../../../services/patient.service';
+import { BpjsService } from '../../../services/bpjs.service';
 import { AlertService } from '../../../services/alert.service';
-import { AdmissionService } from '../../../services/admission.service';
 import { IMyDrpOptions } from 'mydaterangepicker';
 import { NgbModal, NgbModalConfig, ModalDismissReasons } from '@ng-bootstrap/ng-bootstrap';
-import { Doctor } from '../../../models/doctors/doctor';
 import { Alert, AlertType } from '../../../models/alerts/alert';
-import { environment } from '../../../../environments/environment';
-import {
-  ModalVerificationAidoComponent
-} from '../../widgets/modal-verification-aido/modal-verification-aido.component';
-import { sourceApps, channelId, appointmentStatusId } from '../../../variables/common.variable';
+import { sourceApps, consultationType } from '../../../variables/common.variable';
 import { appBPJSReq } from '../../../models/dummy';
-
+import { IMyDpOptions } from 'mydatepicker';
+import { environment } from '../../../../environments/environment';
 
 @Component({
   selector: 'app-widget-request-list',
@@ -26,22 +20,14 @@ import { appBPJSReq } from '../../../models/dummy';
 export class WidgetRequestListComponent implements OnInit {
   public key: any = JSON.parse(localStorage.getItem('key'));
   public user = this.key.user;
-  public appStatusId = appointmentStatusId;
-  public selectedAdm: any;
-  public detailTemp: any;
-  public assetPath = environment.ASSET_PATH;
   public hospital: any = this.key.hospital;
-  public doctors: Doctor[];
-  public BJPSReqApp: any [];
-  public totalAppointments: number;
+  public assetPath = environment.ASSET_PATH;
   public todayDateISO: any = moment().format('YYYY-MM-DD');
-  public pageSelected: number;
   public myDateRangePickerOptions: IMyDrpOptions = {
     dateFormat: 'dd/mm/yyyy',
     height: '30px'
   };
   public datePickerModel: any = {};
-  public hospitalFormModel: any;
   public keywordsModel: KeywordsModel = new KeywordsModel;
   public maskBirth = [/\d/, /\d/, '-', /\d/, /\d/, '-', /\d/, /\d/, /\d/, /\d/];
   public alerts: Alert[] = [];
@@ -52,10 +38,8 @@ export class WidgetRequestListComponent implements OnInit {
   public closeResult: string;
   public count: number = -1;
   public selectedApp: any;
-  public bodyKeyword: any = { valueOne: null, valueTwo: null, valueThree: null, valueFour: null,
-    valueFive: null, valueSix: null, valueSeven: null };
-  public bodyKeywordTwo: any = { valueOne: null, valueTwo: null, valueThree: null, valueFour: null,
-    valueFive: null, valueSix: null, valueSeven: null };
+  public bodyKeyword: any = { valueOne: null, valueTwo: null, valueThree: null, valueFour: null };
+  public bodyKeywordTwo: any = { valueOne: null, valueTwo: null, valueThree: null, valueFour: null };
   public searchKeywords: any = {
     doctor: {},
     area: {},
@@ -66,14 +50,31 @@ export class WidgetRequestListComponent implements OnInit {
   public fromBpjs: boolean = false;
   public patFromBpjs: any;
   public bodyBpjs: any;
+  public myDatePickerOptions: IMyDpOptions = {
+    todayBtnTxt: 'Today',
+    dateFormat: 'dd/mm/yyyy',
+    firstDayOfWeek: 'mo',
+    sunHighlight: true,
+    height: '27px',
+    width: '150px',
+    showInputField: true,
+  };
+  public now = new Date();
+  public dateAppointment: any = {
+    date: {
+      year: this.now.getFullYear(),
+      month: this.now.getMonth() + 1,
+      day: this.now.getDate(),
+    }
+  };
+  public appRequestList: any = [];
+  public selectedPat: any;
 
   constructor(
-    private appointmentService: AppointmentService,
     private doctorService: DoctorService,
-    private patientService: PatientService,
-    private admissionService: AdmissionService,
     private modalService: NgbModal,
     private alertService: AlertService,
+    private bpjsService: BpjsService,
     modalSetting: NgbModalConfig,
     private router: Router,
   ) {
@@ -87,11 +88,9 @@ export class WidgetRequestListComponent implements OnInit {
     }
     this.getAppBpjs();
     this.keywordsModel.hospitalId = this.hospital.id;
-    this.getDoctors(this.hospital.id);
     this.initializeDateRangePicker();
     this.getCollectionAlert();
-    this.getAidoWorklist();
-    this.emitVerifyApp();
+    this.getAppointmentBpjs();
   }
 
   async getAppBpjs() {
@@ -104,24 +103,6 @@ export class WidgetRequestListComponent implements OnInit {
       }
     }
     
-  }
-
-  emitVerifyApp() {
-    this.appointmentService.verifyAppSource$.subscribe(
-      async () => {
-        await this.getAidoWorklist();
-      }
-    );
-  }
-
-  getDoctors(hospitalId: string) {
-    this.doctorService.getListDoctor(hospitalId)
-      .subscribe(data => {
-        this.doctors = data.data;
-      }, err => {
-        this.doctors = [];
-      }
-      );
   }
 
   initializeDateRangePicker() {
@@ -151,42 +132,35 @@ export class WidgetRequestListComponent implements OnInit {
       eDay = Number(eDay) < 10 ? '0' + eDay : eDay;
       this.keywordsModel.fromDate = bYear + '-' + bMonth + '-' + bDay;
       this.keywordsModel.toDate = eYear + '-' + eMonth + '-' + eDay;
-      this.getAidoWorklist();
+      this.getAppointmentBpjs();
     }
   }
 
-  async getAidoWorklist() {
+  async getAppointmentBpjs() {
     this.count+=1;
-    this.BJPSReqApp = null;
     this.showWaitMsg = true;
     this.showNotFoundMsg = false;
     let offsetTemp;
     const {
       hospitalId = '', fromDate = this.todayDateISO, toDate = this.todayDateISO,
-      patientName = '', doctorId, isDoubleMr = null, admStatus = '', offset = 0, limit = 10
+      patientName = '', offset = 0, limit = 10
     } = await this.keywordsModel;
     offsetTemp = offset;
     
     if(this.count === 0) {
       this.bodyKeyword.valueOne = hospitalId, this.bodyKeyword.valueTwo = fromDate, this.bodyKeyword.valueThree = toDate;
-      this.bodyKeyword.valueFour = patientName, this.bodyKeyword.valueFive = doctorId ? doctorId.doctor_id : '';
-      this.bodyKeyword.valueSix = isDoubleMr, this.bodyKeyword.valueSeven = admStatus;
+      this.bodyKeyword.valueFour = patientName,
 
       this.bodyKeywordTwo.valueOne = hospitalId, this.bodyKeywordTwo.valueTwo = fromDate, this.bodyKeywordTwo.valueThree = toDate;
-      this.bodyKeywordTwo.valueFour = patientName, this.bodyKeywordTwo.valueFive = doctorId ? doctorId.doctor_id : '';
-      this.bodyKeywordTwo.valueSix = isDoubleMr, this.bodyKeywordTwo.valueSeven = admStatus;
+      this.bodyKeywordTwo.valueFour = patientName;
     } else if(this.count > 0) {
       this.bodyKeyword.valueOne = hospitalId, this.bodyKeyword.valueTwo = fromDate, this.bodyKeyword.valueThree = toDate;
-      this.bodyKeyword.valueFour = patientName, this.bodyKeyword.valueFive = doctorId ? doctorId.doctor_id : '';
-      this.bodyKeyword.valueSix = isDoubleMr, this.bodyKeyword.valueSeven = admStatus;
+      this.bodyKeyword.valueFour = patientName;
 
       if(this.bodyKeyword.valueOne !== this.bodyKeywordTwo.valueOne || this.bodyKeyword.valueTwo !== this.bodyKeywordTwo.valueTwo ||
-        this.bodyKeyword.valueThree !== this.bodyKeywordTwo.valueThree || this.bodyKeyword.valueFour !== this.bodyKeywordTwo.valueFour ||
-        this.bodyKeyword.valueFive !== this.bodyKeywordTwo.valueFive || this.bodyKeyword.valueSix !== this.bodyKeywordTwo.valueSix ||
-        this.bodyKeyword.valueSeven !== this.bodyKeywordTwo.valueSeven) {    
+        this.bodyKeyword.valueThree !== this.bodyKeywordTwo.valueThree || this.bodyKeyword.valueFour !== this.bodyKeywordTwo.valueFour) {    
           this.bodyKeywordTwo.valueOne = hospitalId, this.bodyKeywordTwo.valueTwo = fromDate, this.bodyKeywordTwo.valueThree = toDate;
-          this.bodyKeywordTwo.valueFour = patientName, this.bodyKeywordTwo.valueFive = doctorId ? doctorId.doctor_id : '';
-          this.bodyKeywordTwo.valueSix = isDoubleMr, this.bodyKeywordTwo.valueSeven = admStatus;
+          this.bodyKeywordTwo.valueFour = patientName;
         
           this.page = 0;
           offsetTemp = 0;
@@ -195,102 +169,61 @@ export class WidgetRequestListComponent implements OnInit {
       }
     }
 
-    let doctorSearch = doctorId ? doctorId.doctor_id : '';
-    // this.appointmentService.getAidoWorklist(
-    //   hospitalId,
-    //   fromDate,
-    //   toDate,
-    //   patientName,
-    //   doctorSearch,
-    //   isDoubleMr,
-    //   admStatus,
-    //   offsetTemp,
-    //   limit
-    // ).subscribe(
-    //   data => {
-    //     if (data.data.length !== 0) {
-    //       this.showWaitMsg = false;
-    //       this.showNotFoundMsg = false;
-    //       this.BJPSReqApp = data.data;
-    //       this.BJPSReqApp.map(x => {
-    //         x.date_of_birth = moment(x.date_of_birth).format('DD-MM-YYYY');
-    //         x.appointment_date = moment(x.appointment_date).format('DD-MM-YYYY');
-    //         x.appointment_from_time = x.appointment_from_time.substr(0, 5);
-    //         x.appointment_to_time = x.appointment_to_time.substr(0, 5);
-    //       });
-    //       this.isCanNextPage = this.BJPSReqApp.length >= 10 ? true : false;
-    //     }
-    //     else {
-    //       this.BJPSReqApp = null;
-    //       this.showWaitMsg = false;
-    //       this.showNotFoundMsg = true;
-    //       this.isCanNextPage = false;
-    //     }
-    //   }, error => {
-    //    this.showWaitMsg = false;
-    //    this.showNotFoundMsg = true;
-    //    this.alertService.error(error.error.message, false, 3000);
-    //  }
-    // );
+    this.bpjsService.getListAppointmentBpjs(
+      hospitalId,
+      fromDate,
+      toDate,
+      patientName,
+      null,
+      offsetTemp,
+      limit
+    ).subscribe(
+      data => {
+        if (data.data.length !== 0) {
+          this.showWaitMsg = false;
+          this.showNotFoundMsg = false;
+          this.appRequestList = data.data;
+          console.log('@@@@@@@@@@@@@@@', this.appRequestList)
 
-    this.showWaitMsg = false;
-    this.showNotFoundMsg = false;
-    this.BJPSReqApp = appBPJSReq;
-    this.isCanNextPage = this.BJPSReqApp.length >= 10 ? true : false;
+          this.appRequestList.map(x => {
+            x.patient_birth_date = moment(x.patient_birth_date).format('DD-MM-YYYY');
+            x.appointment_date = moment(x.appointment_date).format('DD-MM-YYYY');
+            let fixDate;
+            fixDate = x.created_date.substr(0, 10);
+            x.created_date = moment(fixDate).format('DD-MM-YYYY');;
+          });
+          this.isCanNextPage = this.appRequestList.length >= 10 ? true : false;
+        }
+        else {
+          this.appRequestList = null;
+          this.showWaitMsg = false;
+          this.showNotFoundMsg = true;
+          this.isCanNextPage = false;
+        }
+      }, error => {
+       this.showWaitMsg = false;
+       this.showNotFoundMsg = true;
+       this.alertService.error(error.error.message, false, 3000);
+     }
+    );
   }
 
-  async verifyAppointment(data) {
-    const parameter = {
-      from_worklist: true,
-      ...data,
-    };
-    const modalRef = this.modalService.open(ModalVerificationAidoComponent, { windowClass: 'modal_verification', size: 'lg' });
-        modalRef.componentInstance.appointmentAidoSelected = parameter;
-  }
-  
-  async createMrModal(val: any, content: any){
-    this.selectedApp = val;
-    this.open(content);
-  }
+  cancelRequestBpjs() {
+    const appointmentId = this.selectedPat.appointment_id;
+    const body = { userId: this.user.id, source: sourceApps };
 
-  async createMrLocal(){
-    const body = {
-      patientHopeId: this.selectedApp.patient_hope_id,
-      organizationId: Number(this.hospital.orgId),
-      channelId: channelId.AIDO, 
-      userId: this.user.id,
-      source: sourceApps,
-      userName: this.user.fullname,
-    };
-
-    this.patientService.createMrLocal(body)
+    this.bpjsService.deleteAppointmentBpjs(appointmentId, body)
       .toPromise().then(res => {
-        this.getAidoWorklist();
+        this.getAppointmentBpjs();
         this.alertService.success(res.message, false, 3000);
       }).catch(err => {
         this.alertService.error(err.error.message, false, 3000);
       })
   }
 
-  async createAdmModal(val, content) {
-    this.selectedAdm = {
-      appointmentId: val.appointment_id,
-      userId: this.user.id,
-      source: sourceApps,
-      userName: this.user.fullname
-    }
+  openModalCancel(content, body) {
+    this.selectedPat = body;
     this.open(content);
-  }
-
-  async createAdm() {
-    this.admissionService.createAdmissionAido(this.selectedAdm)
-      .subscribe(data => {
-        this.getAidoWorklist();
-        this.alertService.success(data.message, false, 3000);
-      }, err => {
-        this.alertService.error(err.error.message, false, 3000);
-      }
-    );
   }
 
   open(content) {
@@ -316,13 +249,13 @@ export class WidgetRequestListComponent implements OnInit {
     this.page += 1;
     this.keywordsModel.offset = this.page * 10;
     this.isCanPrevPage = this.keywordsModel.offset === 0 ? false : true;
-    this.getAidoWorklist();
+    this.getAppointmentBpjs();
   }
   prevPage() {
     this.page -= 1;
     this.keywordsModel.offset = this.page * 10;
     this.isCanPrevPage = this.keywordsModel.offset === 0 ? false : true;
-    this.getAidoWorklist();
+    this.getAppointmentBpjs();
   }
 
   async getCollectionAlert() {
@@ -379,7 +312,8 @@ export class WidgetRequestListComponent implements OnInit {
         speciality_name: speciality.speciality_name,
       },
       fromBpjs: true,
-      patientBpjs: body
+      patientBpjs: body,
+      //consulType: consultationType.BPJS
     };
 
     const searchKey = {
@@ -395,48 +329,7 @@ export class WidgetRequestListComponent implements OnInit {
       }
     });
     localStorage.setItem('searchKey', JSON.stringify(searchKey));
-    //this.doctorService.changeSearchDoctor(this.searchKeywords);
-    
   }
-
-  // searchSchedule2(body) {
-  //   const speciality = body;
-
-  //   this.searchKeywords = {
-  //     doctor: {
-  //       doctor_id: null,
-  //       name: null,
-  //     },
-  //     area: {
-  //       area_id: null,
-  //       name: null,
-  //     },
-  //     hospital: {
-  //       hospital_id: this.hospital.id,
-  //       name: this.hospital.name,
-  //     },
-  //     speciality: {
-  //       speciality_id: speciality.speciality_id,
-  //       speciality_name: speciality.speciality_name,
-  //     },
-  //     fromBpjs: true,
-  //     patientBpjs: body
-  //   };
-
-  //   const searchKey = {
-  //     type: 'spesialist',
-  //     speciality_id: speciality.speciality_id,
-  //     speciality_name: speciality.speciality_name,
-  //   };
-
-  //   localStorage.setItem('searchKey', JSON.stringify(searchKey));
-
-  //   //this.doctorService.changeSearchDoctor(this.searchKeywords);
-  //   this.doctorService.searchDoctorSource2 = this.searchKeywords;
-
-  //   this.showSchedule = true;
-  // }
-
 }
 
 class KeywordsModel {

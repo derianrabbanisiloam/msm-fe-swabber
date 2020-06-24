@@ -7,7 +7,7 @@
     <div class="content-header-container" *ngIf="fromBpjs">
       <div class="content-doctor-schedule-group-1 custom-app-bpjs">
         <div class="left-text">{{patFromBpjs.patient_name}}, {{patFromBpjs.date_of_birth}}</div>
-        <div class="left-text">{{patFromBpjs.speciality_name}}, Preferred Consultation Date: {{patFromBpjs.preferred_app_date}}</div>
+        <div class="left-text">{{patFromBpjs.speciality_name}}, Preferred Consultation Date: {{patFromBpjs.appointment_date}}</div>
       </div>
     </div>
   </div>
@@ -68,7 +68,7 @@
             <th *ngFor="let header of table1Header">{{header}}</th>
           </tr>
         </thead>
-        <tbody *ngIf="schArray.consultation_type_id != 4">
+        <tbody *ngIf="schArray.consultation_type_id != 4 && !fromBpjs">
           <tr *ngFor="let app of schArray.appointment; let i=index"
             [ngClass]="{'cc_row_rescheduled': app.is_blocked == true || isOpen == false && app.is_walkin == true }">
             <td class="st-kolom-time">{{app.appointment_range_time}}</td>
@@ -139,6 +139,54 @@
             </td>
           </tr>
         </tbody>
+
+        <tbody *ngIf="schArray.consultation_type_id != 4 && fromBpjs">
+          <tr *ngFor="let app of schArray.appointment; let i=index"
+            [ngClass]="{'cc_row_rescheduled': app.is_blocked == true || isOpen == false && app.is_walkin == true }">
+            <td class="st-kolom-time">{{app.appointment_range_time}}</td>
+            <td>{{app.no}}</td>
+            <td *ngIf="app.is_can_create && isOriginal && app.is_walkin == false" class="st-kolom-available"
+              (click)="createAppBPJSOnly(app)"><a>Available</a></td>
+            <td>{{app.date_of_birth}}</td>
+            <td>{{app.local_mr_no}}</td>
+            <td>{{app.phone_no}}</td>
+            <td>{{app.queue_no}}</td>
+            <td>
+              <a ngbPopover="{{app.note_long}}" popoverTitle="" triggers="mouseenter:mouseleave">{{app.note_short}}</a>
+            </td>
+            <td>
+              <a ngbPopover="{{app.modified_name}}" popoverTitle=""
+                triggers="mouseenter:mouseleave">{{app.modified_name && app.modified_name.length > 10 ? app.modified_name.substr(0,10)+"..." : app.modified_name}}</a>
+            </td>
+            <td class="st-kolom-button">
+              <div *ngIf="!app.appointment_temp_id">
+                <div *ngIf="app.is_can_cancel && isOriginal && !app.admission_id"
+                  class="cell-img-nav d-flex justify-content-center">
+                  <div *ngIf="isOpen" (click)="checkInAppointment(app, confirmCheckIn)">
+                    <img src="{{assetPath}}icons/ic_Check@2x.png">
+                  </div>
+                  <span style="opacity: 0; max-width: 0.5em; overflow: hidden">filler</span>
+                  <div (click)="confirmCancelAppointment(app.appointment_id)">
+                    <img src="{{assetPath}}icons/ic_Cancel@2x.png">
+                  </div>
+                </div>
+
+                <div *ngIf="app.is_can_cancel && isOriginal && app.admission_id"
+                  class="cell-img-nav d-flex justify-content-center">
+                  <span class="badge badge-success">Checked in</span>
+                </div>
+              </div>
+
+              <div *ngIf="app.appointment_temp_id">
+                <button (click)="verifyAppointment(app.appointment_temp_id)" class="btn ms_btn_green">Verify</button>
+                <span class="filler-05"></span>
+                <button (click)="confirmCancelAppointment(app.appointment_temp_id, true)"
+                  class="btn ms_btn_red">Cancel</button>
+              </div>
+            </td>
+          </tr>
+        </tbody>
+
         <tbody *ngIf="schArray.consultation_type_id == 4">
           <tr *ngFor="let app of schArray.appointment; let i=index"
             [ngClass]="{'cc_row_rescheduled': app.is_blocked == true || isOpen == false}">

@@ -16,6 +16,7 @@ import { PageRequestListComponent } from './page-request-list.component';
 import { WidgetRequestListComponent } from '../../widgets/widget-request-list/widget-request-list.component';
 import { ModalVerificationAidoModule } from '../../widgets/modal-verification-aido/modal-verification-aido.module';
 import { WidgetDoctorScheduleModule } from '../../widgets/widget-doctor-schedule/widget-doctor-schedule.module';
+import { MyDatePickerModule } from 'mydatepicker';
 
 @NgModule({
   declarations: [
@@ -38,7 +39,10 @@ import { WidgetDoctorScheduleModule } from '../../widgets/widget-doctor-schedule
     SectionFooterModule,
     ModalVerificationAidoModule,
     NgbAlertModule,
-    WidgetDoctorScheduleModule
+    WidgetDoctorScheduleModule,
+    MyDatePickerModule
+  ],
+  entryComponents: [
   ],
   exports: [
     PageRequestListComponent,

@@ -30,6 +30,12 @@
   max-width: min-content !important;
 }
 
+.fo_btn_green_2{
+  color: white; 
+  background: #4D9B35;
+  border-radius: 7px;
+}
+
 .fo_btn_blue_2{
   color: white; 
   background: #1A2269;

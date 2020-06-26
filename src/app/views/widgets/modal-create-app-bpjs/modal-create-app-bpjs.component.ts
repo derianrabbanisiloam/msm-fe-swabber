@@ -1,8 +1,7 @@
 import { Component, OnInit, Input } from '@angular/core';
 import * as $ from 'jquery';
 import * as moment from 'moment';
-import { NgbModal } from '@ng-bootstrap/ng-bootstrap';
-import { NgbActiveModal } from '@ng-bootstrap/ng-bootstrap';
+import { NgbModal, NgbActiveModal, NgbModalConfig, ModalDismissReasons } from '@ng-bootstrap/ng-bootstrap';
 import { appointmentPayload } from '../../../payloads/appointment.payload';
 import { AppointmentService } from '../../../services/appointment.service';
 import { BpjsService } from '../../../services/bpjs.service';
@@ -28,7 +27,7 @@ export class ModalCreateAppBpjsComponent implements OnInit {
   public hospital = this.key.hospital;
   public user = this.key.user;
   public choosedPatient: PatientHope;
-  public addAppPayload: appointmentPayload = new appointmentPayload;
+  public addAppPayload: any;
   public model: any = {};
   public maskPhone = [/\d/, /\d/, /\d/, /\d/, /\d/, /\d/, /\d/, /\d/, /\d/, /\d/, /\d/, /\d/, /\d/];
   public mask_birth = [/\d/, /\d/, '-', /\d/, /\d/, '-', /\d/, /\d/, /\d/, /\d/];
@@ -48,11 +47,13 @@ export class ModalCreateAppBpjsComponent implements OnInit {
   public dateBirth: any;
   public patientHope: any = null;
   public mrLocal: any;
-  public selectPatient: any;
+  public selectPatient: any = null;
   public patientName: any;
   public isSuccessCreateContact: boolean = false;
   public contactId: string;
   public createContactMsg: string;
+  public closeResult: string;
+  public note: string = null;
 
   constructor(
     private modalService: NgbModal,
@@ -60,8 +61,12 @@ export class ModalCreateAppBpjsComponent implements OnInit {
     private appointmentService: AppointmentService,
     private alertService: AlertService,
     private bpjsService: BpjsService,
-    private patientService: PatientService
-  ) { }
+    private patientService: PatientService,
+    modalSetting: NgbModalConfig,
+  ) {
+    modalSetting.backdrop = 'static';
+    modalSetting.keyboard = false;
+   }
 
   ngOnInit() {
     this.bpjsCardNumber = this.bpjsInfo.patientBpjs.bpjs_card_number;
@@ -104,7 +109,6 @@ export class ModalCreateAppBpjsComponent implements OnInit {
         else {
           this.messageBpjs = null;
         }
-        console.log('data', data.data)
       }, err => {
         this.messageBpjs = null;
         this.alertService.error(err.error.message, false, 3000);
@@ -114,35 +118,32 @@ export class ModalCreateAppBpjsComponent implements OnInit {
 
   async createAppointment() {
     this.isSubmitting = true;
-    const isValidForm = this.validateCreateAppointment();
-    if (isValidForm === false) {
-      this.isSubmitting = false;
-      return false;
-    }
     const data = this.bpjsInfo;
-    const { patientName, phoneNumber, address, note } = this.model;
-    const dob = this.model.birthDate.split('-');
-    const birthDate = dob[2] + '-' + dob[1] + '-' + dob[0];
-    const patientHopeId = this.choosedPatient ? this.choosedPatient.patientId : null;
+    const dataBpjs = this.bpjsInfo.patientBpjs;
+    const patientHopeId = this.selectPatient ? this.selectPatient.patientId : null;
     this.addAppPayload = {
-      appointmentDate: data.appointment_date,
+      appointmentTemporaryId: dataBpjs.appointment_bpjs_id,
+      appointmentDate: dataBpjs.appointment_date,
       appointmentFromTime: data.appointment_from_time,
-      appointmentToTime: data.appointment_to_time,
       appointmentNo: data.appointment_no,
-      hospitalId: data.hospital_id,
+      hospitalId: dataBpjs.hospital_id,
       doctorId: data.doctor_id,
       scheduleId: data.schedule_id,
       isWaitingList: data.is_waiting_list,
       patientHopeId: patientHopeId,
-      name: patientName,
-      birthDate: birthDate,
-      phoneNumber1: this.filterizePhoneNumber(phoneNumber),
-      addressLine1: address,
-      note: note,
-      channelId: channelId.FRONT_OFFICE,
+      name: dataBpjs.patient_name,
+      birthDate: dataBpjs.patient_birth_date,
+      phoneNumber1: this.filterizePhoneNumber(dataBpjs.phone_number_1),
+      addressLine1: '',
+      note: this.note,
+      channelId: channelId.BPJS,
       userId: this.userId,
       userName: this.userName,
-      source: this.source
+      source: this.source,
+      isVerify: true,
+      //isInternalReference: dataBpjs.internal_reference,
+      //doctorIdRefference: dataBpjs.doctor_id_refference
+
     };
 
     await this.appointmentService.addAppointment(this.addAppPayload).toPromise().then(
@@ -158,7 +159,7 @@ export class ModalCreateAppBpjsComponent implements OnInit {
   }
 
   createContact() {
-    const app = this.selectPatient;
+    const app = this.bpjsInfo;
     const payload: contactPayload = {
       name: app.contact_name,
       birthDate: app.date_of_birth,
@@ -189,30 +190,6 @@ export class ModalCreateAppBpjsComponent implements OnInit {
         this.createContactMsg = 'Gagal create new contact';
       }
     );
-  }
-
-  resetField() {
-    this.isSubmitting = false;
-    this.model = {};
-    this.isLock = false;
-  }
-
-  validateCreateAppointment() {
-    let isValid = true;
-    const { patientName, phoneNumber } = this.model;
-    if (!patientName) {
-      $('.form-ca-patientname').addClass('form-error');
-      isValid = false;
-    } else {
-      $('.form-ca-patientname').removeClass('form-error');
-    }
-    if (!phoneNumber) {
-      $('.form-ca-phoneno').addClass('form-error');
-      isValid = false;
-    } else {
-      $('.form-ca-phoneno').removeClass('form-error');
-    }
-    return isValid;
   }
 
   filterizePhoneNumber(phoneNumber: string) {
@@ -337,7 +314,37 @@ export class ModalCreateAppBpjsComponent implements OnInit {
   }
 
   choosedSearchPatient(val) {
-    this.selectPatient = val;
+    if(this.selectPatient === null) {
+      this.selectPatient = val;
+    } else {
+      if(this.selectPatient.patientOrganizationId === val.patientOrganizationId) {
+        this.selectPatient = null;
+      } else {
+        this.selectPatient = val;
+      }
+    }
+  }
+
+  openModalCreate(content) {
+    this.open(content);
+  }
+
+  open(content) {
+    this.modalService.open(content).result.then((result) => {
+      this.closeResult = `Closed with: ${result}`;
+    }, (reason) => {
+      this.closeResult = `Dismissed ${this.getDismissReason(reason)}`;
+    });
+  }
+
+  private getDismissReason(reason: any): string {
+    if (reason === ModalDismissReasons.ESC) {
+      return 'by pressing ESC';
+    } else if (reason === ModalDismissReasons.BACKDROP_CLICK) {
+      return 'by clicking on a backdrop';
+    } else {
+      return `with: ${reason}`;
+    }
   }
 
 }

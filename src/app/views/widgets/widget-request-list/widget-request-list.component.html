@@ -7,10 +7,18 @@
   </div>
 </div>
 
+<div class="row">
+  <div class="col-md-12" style="text-align: left; margin-bottom: 0.5em;">
+    <button class="btn fo_btn_green" (click)="downloadDoc()" hidden>Download</button>
+  </div>
+</div>
 <div class="fo_container_list shadow-4">
   <table class="table table-bordered">
     <thead class="fo_color_blue foot-note" style="text-align: center">
-      <th style="min-width: 2em">No.</th>
+      <th>
+        No.
+        <input type="checkbox" (click)="CheckAllOptions()" [(ngModel)]="checkAll" hidden>
+      </th>
       <th style="min-width: 2em">Request ID</th>
       <th style="min-width: 2em">Request Creation Date</th>
       <th style="min-width: 14em">Patient Name</th>
@@ -39,6 +47,22 @@
               (change)="getAppointmentBpjs()" />
           </div>
         </td>
+        <td>
+          <div class="inner-addon right-addon">
+            <i class="glyphicon fa fa-search"></i>
+            <input [textMask]="{mask: maskBirth}" type="text" placeholder="Search dob" class="form-control"
+              [(ngModel)]="keywordsModel.birthDate" (change)="getAppointmentBpjs()" placeholder="dd-mm-yyyy" />
+          </div>
+        </td>
+        <td></td>
+        <td>
+          <div class="inner-addon right-addon">
+            <i class="glyphicon fa fa-search"></i>
+            <input type="text" class="form-control" placeholder="Search no bpjs" [(ngModel)]="keywordsModel.noBpjs"
+              (change)="getAppointmentBpjs()" />
+          </div>
+        </td>
+        <td></td>
         <td></td>
         <td></td>
         <td></td>
@@ -49,7 +73,10 @@
       </tr>
 
       <tr *ngFor="let r of appRequestList; let i = index">
-        <td>{{i+1}}</td>
+        <td>
+          {{i+1}}
+          <input type="checkbox" style="margin-top: 0.7vw" [(ngModel)]="r.checked" [value]="r.checked" hidden>
+        </td>
         <td>{{r.booking_code}}</td>
         <td>{{r.created_date}}</td>
         <td style="text-transform: uppercase; min-width: 8em">
@@ -65,10 +92,26 @@
         <td style="text-align: center; white-space: nowrap;">{{ r.reference_no }}</td>
         <td style="text-align: center; white-space: nowrap;">{{ r.speciality_name }}</td>
         <td style="min-width: 8em">{{ r.appointment_date }}</td>
+        <td>{{r.diagnosed_name}}</td>
+        <td>{{r.control_number}}</td>
         <td></td>
-        <td></td>
-        <td></td>
-        <td></td>
+        <td>
+          <a href=":javascript"
+          (click)="getImage(r.bpjs_card_file)"
+          target="_blank">{{r.bpjs_card_file}}<br></a>
+          <a href=":javascript"
+          (click)="getImage(r.bpjs_card_file)"
+          target="_blank">{{r.family_card_file}}<br></a>
+          <a href=":javascript"
+          (click)="getImage(r.bpjs_card_file)"
+          target="_blank">{{r.identity_card_file}}<br></a>
+          <a href=":javascript"
+          (click)="getImage(r.bpjs_card_file)"
+          target="_blank">{{r.refference_letter_file}}<br></a>
+          <a href=":javascript"
+          (click)="getImage(r.bpjs_card_file)"
+          target="_blank">{{r.selfie_with_identity_file}}<br></a>
+        </td>
         <td style="min-width: 5em">
           <div class="cell-img-nav d-flex justify-content-center">
             <div (click)="searchSchedule2(r)">

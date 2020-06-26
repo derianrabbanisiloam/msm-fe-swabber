@@ -22,7 +22,7 @@
               placeholder="input BPJS number..." 
               name="bpjsNumber" 
               [(ngModel)]="bpjsCardNumber"
-              [disabled]="isLock">
+              disabled>
           </div>
           <div class="col-md-2"></div>
           <div class="col-md-2">
@@ -111,13 +111,13 @@
   </div>
   <div class="verifyFilter modal-body d-flex justify-content-start">
     <div class="body-text">
-      <div>Name</div>
+      <div style="font-weight: bold;">Name</div>
       <div>
         <input class="form-control" [(ngModel)]="patientName">
       </div>
     </div>
     <div class="body-text">
-      <div>Date of birth</div>
+      <div style="font-weight: bold;">Date of birth</div>
       <div class="input-group">
         <input type="text" class="form-control" [textMask]="{mask: mask_birth}" name="birth" [(ngModel)]="dateBirth"
            placeholder="dd-mm-yyyy" />
@@ -130,7 +130,7 @@
       or
     </div>
     <div class="body-text">
-      <div>Local MR</div>
+      <div style="font-weight: bold;">Local MR</div>
       <div>
         <input class="form-control" placeholder="Local MR" type="text" [(ngModel)]="mrLocal">
       </div>
@@ -164,14 +164,19 @@
           <td>{{itr.address}}</td>
         </tr>
         <tr *ngIf="(!flagSearch && !loadingBar) || patientHope">
-          <td colspan="7">
+          <td colspan="7" style="text-align: center;">
             <div style="margin-top: 3em;"></div>
+            <button 
+            class="btn fo_btn_green_2"
+            type="submit" 
+            [disabled]="selectPatient" (click)="openModalCreate(create_app)">Create Appointment & Patient</button>
+            <div style="margin-bottom: 3em;"></div>
           </td>
         </tr>
       </tbody>
       <tbody *ngIf="loadingBar">
         <tr>
-          <td colspan="4" style="text-align: right">
+          <td colspan="7">
             <img src="../../../../assets/icons/Logo-Animation---S(FAST).gif" width="200px" height="200px">
           </td>
         </tr>
@@ -180,14 +185,26 @@
         <tr>
           <td colspan="7" style="text-align: center;">result not found</td>
         </tr>
+        <tr>
+          <td colspan="7" style="text-align: center;">
+            <button 
+            class="btn fo_btn_green_2"
+            type="submit" 
+            [disabled]="selectPatient" (click)="openModalCreate(create_app)">Create Appointment & Patient</button>
+          </td>
+        </tr>
       </tbody>
       <tbody>
         <tr>
-          <td colspan="7" style="text-align: right">
+          <td colspan="3">
+            <label style="font-weight: bold;">Notes</label>
+            <textarea class="form-control" rows="3" name="note" [(ngModel)]="note"></textarea>
+          </td>
+          <td colspan="4" style="text-align: right">
             <button 
             class="btn fo_btn_blue_2" 
             type="submit" 
-            [disabled]="!selectPatient">Create Appointment</button>
+            [disabled]="!selectPatient" (click)="openModalCreate(create_app)">Create Appointment</button>
             <button class="btn fo_btn_red" (click)="d('Cross click')">Cancel</button>
           </td>
         </tr>
@@ -196,5 +213,18 @@
   
     <div>
     </div>
+  </div>
+</ng-template>
+
+<ng-template #create_app let-modal>
+  <div class="modal-header">
+    <div class="header-2 modal-padding">Create Appointment</div>
+  </div>
+  <div class="modal-body">
+    Are you sure?
+  </div>
+  <div class="modal-footer">
+    <button type="button" class="btn ms_btn_black" (click)="modal.close()">Cancel</button>
+    <button class="btn ms_btn_green" [ngClass]="{'disable': confirmBut}" (click)="createAppointment()">Confirm</button>
   </div>
 </ng-template>

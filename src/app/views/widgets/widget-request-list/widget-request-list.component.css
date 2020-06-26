@@ -11,7 +11,7 @@
   
   :host(app-widget-request-list) { width:100% }
   .fo_appointment_date{ width: 15%;}
-  .fo_container_input_date{ margin-bottom: 2rem}
+  .fo_container_input_date{ margin-bottom: 1rem}
   .fo_container_input_date input { width: 200px}
   .fo_container_list{ background: white; border: none; border-radius: 4px;}
   .fo_header_grey{ background: #F4F4F4}

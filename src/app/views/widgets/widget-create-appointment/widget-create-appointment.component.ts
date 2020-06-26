@@ -31,7 +31,7 @@ import { appointmentPayload as appPayload } from '../../../payloads/appointment.
 import { reserveSlotAppPayload as reserveSlotPayload } from '../../../payloads/reserve-slot.payload';
 import { AlertService } from '../../../services/alert.service';
 import { Alert, AlertType } from '../../../models/alerts/alert';
-import { sourceApps, queueType } from '../../../variables/common.variable';
+import { sourceApps, queueType, consultationType } from '../../../variables/common.variable';
 import { QueueService } from '../../../services/queue.service';
 import { dateFormatter, regionTime } from '../../../utils/helpers.util';
 import {
@@ -544,7 +544,6 @@ export class WidgetCreateAppointmentComponent implements OnInit {
     //this param using in waiting list and FCFS
     let no;
     this.schLength = this.schedule.length;
-    console.log('##############', this.schedule)
     for(let k = 0, { length } = this.schedule; k < length; k += 1) {
       const docType = this.schedule[k].doctor_type_name;
       no = 0;
@@ -860,13 +859,13 @@ export class WidgetCreateAppointmentComponent implements OnInit {
   }
 
   async getAppointmentList() {
-    console.log('!!!!!!!!!!!!!!')
     const doctorId = this.appointmentPayload.doctorId;
     const hospitalId = this.hospital.id;
     const date = this.appointmentPayload.appointmentDate;
     const sortBy = 'appointment_no';
     const orderBy = 'ASC';
-    await this.appointmentService.getAppointmentByDay(hospitalId, doctorId, date, sortBy, orderBy).toPromise().then(
+    const isBpjs = this.fromBpjs ? channelId.BPJS : null;
+    await this.appointmentService.getAppointmentByDay(hospitalId, doctorId, date, sortBy, orderBy, isBpjs).toPromise().then(
       data => {
         this.appointments = data.data;
       }
@@ -874,12 +873,12 @@ export class WidgetCreateAppointmentComponent implements OnInit {
   }
 
   async getSlotTime() {
-    console.log('!!!!!!!!!!!!!!')
     //get time slot
     const doctorId = this.appointmentPayload.doctorId;
     const date = this.appointmentPayload.appointmentDate;
     const hospitalId = this.hospital.id;
-    const consulType = this.fromBpjs === true ? this.consulType : null;
+    //const consulType = this.fromBpjs === true ? this.consulType : null;
+    const consulType = null; //dummy
     await this.scheduleService.getTimeSlot(hospitalId, doctorId, date, consulType).toPromise().then(
       data => {
         this.slotList = data.data;

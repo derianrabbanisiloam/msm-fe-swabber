@@ -7,7 +7,7 @@ import { AlertService } from '../../../services/alert.service';
 import { IMyDrpOptions } from 'mydaterangepicker';
 import { NgbModal, NgbModalConfig, ModalDismissReasons } from '@ng-bootstrap/ng-bootstrap';
 import { Alert, AlertType } from '../../../models/alerts/alert';
-import { sourceApps, consultationType } from '../../../variables/common.variable';
+import { sourceApps, consultationType, pathImage } from '../../../variables/common.variable';
 import { appBPJSReq } from '../../../models/dummy';
 import { IMyDpOptions } from 'mydatepicker';
 import { environment } from '../../../../environments/environment';
@@ -22,6 +22,7 @@ export class WidgetRequestListComponent implements OnInit {
   public user = this.key.user;
   public hospital: any = this.key.hospital;
   public assetPath = environment.ASSET_PATH;
+  public urlBpjsCard = environment.GET_IMAGE+pathImage.BPJS_CARD;
   public todayDateISO: any = moment().format('YYYY-MM-DD');
   public myDateRangePickerOptions: IMyDrpOptions = {
     dateFormat: 'dd/mm/yyyy',
@@ -69,6 +70,30 @@ export class WidgetRequestListComponent implements OnInit {
   };
   public appRequestList: any = [];
   public selectedPat: any;
+  public butdownload: boolean = false;
+  public checkAll: boolean = false;
+  public fileDummy: any = [
+    {
+      emergency_id: 18,
+      file_id: "850a4ac3-490b-4918-8886-045cee9b1030",
+      file_name: "emergency-15839814652042757.jpeg",
+    },
+    {
+      emergency_id: 18,
+      file_id: "850a4ac3-490b-4918-8886-045cee9b1030",
+      file_name: "emergency-15839814652042757.jpeg",
+    },
+    {
+      emergency_id: 18,
+      file_id: "850a4ac3-490b-4918-8886-045cee9b1030",
+      file_name: "emergency-15839814652042757.jpeg",
+    },
+    {
+      emergency_id: 18,
+      file_id: "850a4ac3-490b-4918-8886-045cee9b1030",
+      file_name: "emergency-15839814652042757.jpeg",
+    }
+  ];
 
   constructor(
     private doctorService: DoctorService,
@@ -118,6 +143,10 @@ export class WidgetRequestListComponent implements OnInit {
     this.keywordsModel.toDate = this.keywordsModel.fromDate;
   }
 
+  getImage(fileName) {
+    window.open(this.urlBpjsCard + fileName, '_blank', "status=1");
+  }
+
   changeDateRange(dateRange: any) {
     if (dateRange) {
       let bYear = dateRange.beginDate.year;
@@ -143,24 +172,29 @@ export class WidgetRequestListComponent implements OnInit {
     let offsetTemp;
     const {
       hospitalId = '', fromDate = this.todayDateISO, toDate = this.todayDateISO,
-      patientName = '', offset = 0, limit = 10
+      patientName = '', birthDate = '', noBpjs = '',  offset = 0, limit = 10
     } = await this.keywordsModel;
     offsetTemp = offset;
     
     if(this.count === 0) {
       this.bodyKeyword.valueOne = hospitalId, this.bodyKeyword.valueTwo = fromDate, this.bodyKeyword.valueThree = toDate;
-      this.bodyKeyword.valueFour = patientName,
+      this.bodyKeyword.valueFour = patientName, this.bodyKeyword.valueFive = birthDate;
+      this.bodyKeyword.valueSix = noBpjs;
 
       this.bodyKeywordTwo.valueOne = hospitalId, this.bodyKeywordTwo.valueTwo = fromDate, this.bodyKeywordTwo.valueThree = toDate;
-      this.bodyKeywordTwo.valueFour = patientName;
+      this.bodyKeywordTwo.valueFour = patientName, this.bodyKeyword.valueFive = birthDate;
+      this.bodyKeyword.valueSix = noBpjs;
     } else if(this.count > 0) {
       this.bodyKeyword.valueOne = hospitalId, this.bodyKeyword.valueTwo = fromDate, this.bodyKeyword.valueThree = toDate;
-      this.bodyKeyword.valueFour = patientName;
+      this.bodyKeyword.valueFour = patientName, this.bodyKeyword.valueFive = birthDate;
+      this.bodyKeyword.valueSix = noBpjs;
 
       if(this.bodyKeyword.valueOne !== this.bodyKeywordTwo.valueOne || this.bodyKeyword.valueTwo !== this.bodyKeywordTwo.valueTwo ||
-        this.bodyKeyword.valueThree !== this.bodyKeywordTwo.valueThree || this.bodyKeyword.valueFour !== this.bodyKeywordTwo.valueFour) {    
+        this.bodyKeyword.valueThree !== this.bodyKeywordTwo.valueThree || this.bodyKeyword.valueFour !== this.bodyKeywordTwo.valueFour ||
+        this.bodyKeyword.valueFive !== this.bodyKeywordTwo.valueFive || this.bodyKeyword.valueSix !== this.bodyKeywordTwo.valueSix) {    
           this.bodyKeywordTwo.valueOne = hospitalId, this.bodyKeywordTwo.valueTwo = fromDate, this.bodyKeywordTwo.valueThree = toDate;
-          this.bodyKeywordTwo.valueFour = patientName;
+          this.bodyKeywordTwo.valueFour = patientName, this.bodyKeyword.valueFive = birthDate;
+          this.bodyKeyword.valueSix = noBpjs;
         
           this.page = 0;
           offsetTemp = 0;
@@ -183,11 +217,11 @@ export class WidgetRequestListComponent implements OnInit {
           this.showWaitMsg = false;
           this.showNotFoundMsg = false;
           this.appRequestList = data.data;
-          console.log('@@@@@@@@@@@@@@@', this.appRequestList)
 
           this.appRequestList.map(x => {
             x.patient_birth_date = moment(x.patient_birth_date).format('DD-MM-YYYY');
             x.appointment_date = moment(x.appointment_date).format('DD-MM-YYYY');
+            x.checked = false;
             let fixDate;
             fixDate = x.created_date.substr(0, 10);
             x.created_date = moment(fixDate).format('DD-MM-YYYY');;
@@ -221,6 +255,43 @@ export class WidgetRequestListComponent implements OnInit {
       })
   }
 
+  downloadDoc() {
+    let body;
+    let tampung = [];
+    if(this.appRequestList) {
+      this.appRequestList.map(x => {
+        if(x.checked === true) {
+          tampung.push(x)
+        } 
+      });
+    }
+
+    // body = {
+    //   appBpjsId: tampung,
+    //   userId: this.user.id,
+    //   userName: this.user.fullname,
+    //   source: sourceApps
+    // }
+
+    // this.bpjsService.notifyBpjs(body)
+    //   .subscribe(data => {
+    //     this.getAppointmentBpjs();
+    //     this.alertService.success('Success update to BPJS', false, 3000);
+    //   }, err => {
+    //     this.alertService.error(err.error.message);
+    //   }
+    // );
+  }
+
+  CheckAllOptions() {
+    if (this.appRequestList.every(val => val.checked == false)) {
+        this.appRequestList.forEach(val => { val.checked = true });
+      }
+    else {
+      this.appRequestList.forEach(val => { val.checked = false });
+    }
+  }
+
   openModalCancel(content, body) {
     this.selectedPat = body;
     this.open(content);
@@ -246,12 +317,20 @@ export class WidgetRequestListComponent implements OnInit {
 
   private page: number = 0;
   nextPage() {
+    this.checkAll = false;
+    this.appRequestList.map(x => {
+      x.checked = false;
+    });
     this.page += 1;
     this.keywordsModel.offset = this.page * 10;
     this.isCanPrevPage = this.keywordsModel.offset === 0 ? false : true;
     this.getAppointmentBpjs();
   }
   prevPage() {
+    this.checkAll = false;
+    this.appRequestList.map(x => {
+      x.checked = false;
+    });
     this.page -= 1;
     this.keywordsModel.offset = this.page * 10;
     this.isCanPrevPage = this.keywordsModel.offset === 0 ? false : true;
@@ -342,6 +421,7 @@ class KeywordsModel {
   doctorId: any;
   isDoubleMr: boolean;
   admStatus: string;
+  noBpjs: string;
   offset: number;
   limit: number;
 }

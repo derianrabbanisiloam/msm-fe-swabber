@@ -104,3 +104,8 @@ export const activityType = {
   LINKED_TO_MR: '1',
   OPEN_ACCESS_MR: '2',
 };
+
+export const pathImage = {
+  DISCLAIMER: '/disclaimer_1/',
+  BPJS_CARD: '/bpjs_identity_card'
+}

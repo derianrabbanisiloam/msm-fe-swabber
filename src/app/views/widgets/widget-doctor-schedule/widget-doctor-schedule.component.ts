@@ -28,6 +28,7 @@ export class WidgetDoctorScheduleComponent implements OnInit {
   public showScheduleType1: boolean = false;
   public showScheduleType2: boolean = false;
   public todayDateISO: any = moment().format('YYYY-MM-DD');
+  public todayDateISOBPJS: any;
   public initDate: any = moment().format('YYYY-MM-DD');
   public startDateOfWeek = moment().startOf('isoWeek');
   public message1: any;
@@ -62,6 +63,9 @@ export class WidgetDoctorScheduleComponent implements OnInit {
     width: '150px',
     showInputField: true,
   };
+  public myDateRangePickerOptionsTwo: IMyDpOptions;
+  public today: any;
+
   public consulType: string = null;
   public consulTypeFlag: number;
   public flagCon: number;
@@ -72,7 +76,6 @@ export class WidgetDoctorScheduleComponent implements OnInit {
     private router: Router,
     private activatedRoute: ActivatedRoute,
   ) {
-
   }
 
   async ngOnInit() {
@@ -91,6 +94,25 @@ export class WidgetDoctorScheduleComponent implements OnInit {
       this.patFromBpjs = this.bodyBpjs.patientBpjs;
       this.keywords = this.bodyBpjs;
       this.consulType = this.bodyBpjs.consulType;
+    }
+
+    if(this.fromBpjs) {
+      var splitDate = this.patFromBpjs.appointment_date.split('-');
+      var dateFix = splitDate[2]+'-'+splitDate[1]+'-'+splitDate[0];
+      let dateChoosed = moment(dateFix); 
+      this.todayDateISOBPJS = dateChoosed.add(90, 'days').format('YYYY-MM-DD');
+      let today = this.todayDateISOBPJS.split('-');
+      
+      this.myDateRangePickerOptionsTwo = {
+        todayBtnTxt: 'Today',
+        dateFormat: 'dd/mm/yyyy',
+        firstDayOfWeek: 'mo',
+        sunHighlight: true,
+        height: '27px',
+        width: '150px',
+        showInputField: true,
+        disableSince: { year: today[0], month: today[1], day: today[2] }
+      };
     }
     
     this.doctorService.searchDoctorSource2 = null;
@@ -154,7 +176,6 @@ export class WidgetDoctorScheduleComponent implements OnInit {
       }
       this.getSchedulesByDoctor(doctorId, this.initDate, consultationType);
     } else if ((areaId || hospitalId) && specialityId) {
-      console.log('##############', consultationType)
       this.consulTypeFlag = 2; //reset <select> function
       if(!this.flagCon) this.flagCon = this.consulTypeFlag;
       else {
@@ -164,7 +185,6 @@ export class WidgetDoctorScheduleComponent implements OnInit {
           this.consulType = null;
         }
       }
-      console.log('##############', consultationType)
       this.getSchedulesByKeywords(specialityId, this.initDate, consultationType, areaId, hospitalId);
     }
   }
@@ -172,7 +192,7 @@ export class WidgetDoctorScheduleComponent implements OnInit {
   async generateDates(selectedDate?: any) {
     this.dates = [];
     let dateChoosed = selectedDate ? moment(selectedDate) : moment(); 
-    let now = dateChoosed.startOf('isoWeek').format('YYYY-MM-DD'); 
+    let now = dateChoosed.startOf('isoWeek').format('YYYY-MM-DD');
     let date: any = now ? moment(now).startOf('week') : moment().startOf('week');
     let dateTemp: any;
     let dateHeader: any;

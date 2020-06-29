@@ -216,6 +216,8 @@
                             <a (click)="gotoCreateApp(itemSch, date.dateISO)">
                               {{itemSch.from_time.substr(0,5)}} - {{itemSch.to_time.substr(0,5)}}
                             </a>
+                            <span *ngIf="fromBpjs == true"><br></span>
+                            <span *ngIf="fromBpjs == true" style="font-weight: bold;">Available slot = {{itemSch.available_slot}}</span>
                             <span class="flag-tele" *ngIf="itemSch.consultation_type_id == 4">TELE</span>
                             <br>
                           </span>

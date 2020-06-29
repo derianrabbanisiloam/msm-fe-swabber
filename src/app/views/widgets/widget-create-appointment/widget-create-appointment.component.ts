@@ -864,8 +864,9 @@ export class WidgetCreateAppointmentComponent implements OnInit {
     const date = this.appointmentPayload.appointmentDate;
     const sortBy = 'appointment_no';
     const orderBy = 'ASC';
-    const isBpjs = this.fromBpjs ? channelId.BPJS : null;
-    await this.appointmentService.getAppointmentByDay(hospitalId, doctorId, date, sortBy, orderBy, isBpjs).toPromise().then(
+    const exclude = this.fromBpjs === true ? false : true;
+    const isBpjs = channelId.BPJS;
+    await this.appointmentService.getAppointmentByDay(hospitalId, doctorId, date, sortBy, orderBy, isBpjs, exclude).toPromise().then(
       data => {
         this.appointments = data.data;
       }
@@ -877,11 +878,17 @@ export class WidgetCreateAppointmentComponent implements OnInit {
     const doctorId = this.appointmentPayload.doctorId;
     const date = this.appointmentPayload.appointmentDate;
     const hospitalId = this.hospital.id;
-    //const consulType = this.fromBpjs === true ? this.consulType : null;
-    const consulType = null; //dummy
-    await this.scheduleService.getTimeSlot(hospitalId, doctorId, date, consulType).toPromise().then(
+    const consulTypeAll = consultationType.REGULAR+':'+consultationType.EXECUTIVE+':'
+      +consultationType.TELECONSULTATION+':'+consultationType.BPJS_REGULER;
+    const consulTypeList = this.fromBpjs === true ? this.consulType : consulTypeAll;
+    await this.scheduleService.getTimeSlot(hospitalId, doctorId, date, consulTypeList).toPromise().then(
       data => {
         this.slotList = data.data;
+        if(this.fromBpjs === true) {
+          this.slotList.map(x => {
+            x.is_walkin = false;
+          });
+        }
       }
     );
   }
@@ -922,7 +929,10 @@ export class WidgetCreateAppointmentComponent implements OnInit {
   async getSchedule() {
     const doctorId = this.appointmentPayload.doctorId;
     const date = this.appointmentPayload.appointmentDate;
-    await this.scheduleService.getScheduleDoctor(this.hospital.id, doctorId, date).toPromise().then(
+    const consulTypeAll = consultationType.REGULAR+':'+consultationType.EXECUTIVE+':'
+      +consultationType.TELECONSULTATION+':'+consultationType.BPJS_REGULER;
+    const consulTypeList = this.fromBpjs === true ? this.consulType : consulTypeAll;
+    await this.scheduleService.getScheduleDoctor(this.hospital.id, doctorId, date, consulTypeList).toPromise().then(
       data => {
         this.schedule = data.data;
         this.schedule.map(x => {

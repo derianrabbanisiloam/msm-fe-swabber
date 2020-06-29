@@ -277,7 +277,7 @@
     </div>
 
     <!--                              Waiting List                                -->
-    <div *ngIf="schArray.doctor_type_name !== doctorType.FCFS">
+    <div *ngIf="schArray.doctor_type_name !== doctorType.FCFS && fromBpjs === false">
       <div *ngIf="schArray.consultation_type_id != '4'">
         <div *ngFor="let appWait of appListWaiting">
           <div class="col-md-12" *ngIf="appWait.schedule_id === schArray.schedule_id">

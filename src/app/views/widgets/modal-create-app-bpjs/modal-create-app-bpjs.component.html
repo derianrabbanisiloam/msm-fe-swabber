@@ -36,58 +36,109 @@
 
         <div class="form-ca-phoneno form-group row" style="font-weight: bold; margin-top: 0.5em;">
           <div class="col-md-6">
-            Status Peserta: 
+            <div class="row">
+              <div class="col-md-12">
+                Status Peserta: 
+              </div>
+            </div>
+            <div class="row">
+              <div class="col-md-12">
+                NIK: 
+              </div>
+            </div>
+            <div class="row">
+              <div class="col-md-12">
+                Nama Peserta:
+              </div>
+            </div>
+            <div class="row">
+              <div class="col-md-12">
+                Tanggal Lahir:
+              </div>
+            </div>
+            <div class="row">
+              <div class="col-md-12">
+                Diagnosa:
+              </div>
+            </div>
+            <div class="row">
+              <div class="col-md-12">
+                No. Rujukan:
+              </div>
+            </div>
+            <div class="row">
+              <div class="col-md-12">
+                Dirujuk ke RS:
+              </div>
+            </div>
+            <div class="row">
+              <div class="col-md-12">
+                Dirujuk ke Spesialisasi:
+              </div>
+            </div>
+            <div class="row">
+              <div class="col-md-12">
+                Akhir Masa Berlaku Surat Rujukan:
+              </div>
+            </div>
           </div>
-          <div class="col-md-6">
 
+          <div class="col-md-6" *ngIf="!bpjsData?.length">
           </div>
-          <div class="col-md-6">
-            NIK: 
-          </div>
-          <div class="col-md-6">
-          
-          </div>
-          <div class="col-md-6">
-            Nama Peserta: 
-          </div>
-          <div class="col-md-6">
-          
-          </div>
-          <div class="col-md-6">
-            Tanggal Lahir: 
-          </div>
-          <div class="col-md-6">
-          
-          </div>
-          <div class="col-md-6">
-            Diagnosa: 
-          </div>
-          <div class="col-md-6">
-           
-          </div>
-          <div class="col-md-6">
-            No. Rujukan: 
-          </div>
-          <div class="col-md-6">
-          
-          </div>
-          <div class="col-md-6">
-            Dirujuk ke RS: 
-          </div>
-          <div class="col-md-6">
-          
-          </div>
-          <div class="col-md-6">
-            Dirujuk ke Spesialisasi: 
-          </div>
-          <div class="col-md-6">
-           
+
+          <div class="col-md-6" *ngIf="bpjsData?.length">
+            <div class="row">
+              <div class="col-md-12">
+                {{bpjsData.statusPeserta.keterangan}}
+              </div>
+            </div>
+            <div class="row">
+              <div class="col-md-12">
+                {{bpjsData.nik}}
+              </div>
+            </div>
+            <div class="row">
+              <div class="col-md-12">
+                {{bpjsData.nama}}
+              </div>
+            </div>
+            <div class="row">
+              <div class="col-md-12">
+                {{bpjsData.tglLahir}}
+              </div>
+            </div>
+            <div class="row">
+              <div class="col-md-12">
+                {{bpjsData.diagnosa.nama}}
+              </div>
+            </div>
+            <div class="row">
+              <div class="col-md-12">
+                {{bpjsData.noKunjungan}}
+              </div>
+            </div>
+            <div class="row">
+              <div class="col-md-12">
+                {{bpjsData.provPerujuk.nama}}
+              </div>
+            </div>
+            <div class="row">
+              <div class="col-md-12">
+                {{bpjsData.poliRujukan.nama}}
+              </div>
+            </div>
+            <div class="row">
+              <div class="col-md-12">
+                {{bpjsData.expiredDate}}
+              </div>
+            </div>
           </div>
         </div>
 
         <div  id="tutorial6b" class="form-group" style="margin-top: 4em;" [ngStyle]="{'text-align': 'right'}">
           <button class="btn fo_btn_blue_2" [disabled]="isSubmitting" (click)="close()">Back</button>
-          <button class="btn fo_btn_blue_2" (click)="openModal(searchPatient)">Confirm</button>
+          
+          <button class="btn fo_btn_blue_2" [disabled]="!bpjsData" (click)="openModal(searchPatient)">Confirm</button>
         </div>
         
         <div class="form-group" style="width: 37rem">
@@ -149,6 +200,7 @@
         <td  style="min-width: 8em; text-align: center">Local MR</td>
         <td style="min-width: 10em; text-align: center">Mobile Number</td>
         <td style="min-width: 12em; text-align: center">Address</td>
+        <td style="min-width: 8em; text-align: center">Action</td>
       </thead>
       <tbody>
         <tr *ngFor="let itr of patientHope"
@@ -162,9 +214,14 @@
           <td>{{itr.mrNoUnit}}</td>
           <td>{{itr.mobileNo1}}</td>
           <td>{{itr.address}}</td>
+          <td>
+            <button type="button" class="btn-default" (click)="editPatientHopeId(itr, confirmEdit)">
+              <i class="fa fa-edit"></i>
+            </button>
+          </td>
         </tr>
         <tr *ngIf="(!flagSearch && !loadingBar) || patientHope">
-          <td colspan="7" style="text-align: center;">
+          <td colspan="8" style="text-align: center;">
             <div style="margin-top: 3em;"></div>
             <button 
             class="btn fo_btn_green_2"
@@ -176,17 +233,17 @@
       </tbody>
       <tbody *ngIf="loadingBar">
         <tr>
-          <td colspan="7">
+          <td colspan="8">
             <img src="../../../../assets/icons/Logo-Animation---S(FAST).gif" width="200px" height="200px">
           </td>
         </tr>
       </tbody>
       <tbody *ngIf="!patientHope && flagSearch && !loadingBar">
         <tr>
-          <td colspan="7" style="text-align: center;">result not found</td>
+          <td colspan="8" style="text-align: center;">result not found</td>
         </tr>
         <tr>
-          <td colspan="7" style="text-align: center;">
+          <td colspan="8" style="text-align: center;">
             <button 
             class="btn fo_btn_green_2"
             type="submit" 
@@ -200,7 +257,7 @@
             <label style="font-weight: bold;">Notes</label>
             <textarea class="form-control" rows="3" name="note" [(ngModel)]="note"></textarea>
           </td>
-          <td colspan="4" style="text-align: right">
+          <td colspan="5" style="text-align: right">
             <button 
             class="btn fo_btn_blue_2" 
             type="submit" 
@@ -224,7 +281,51 @@
     Are you sure?
   </div>
   <div class="modal-footer">
+    <div class="form-group" style="width: 37rem">
+      <div *ngFor="let alert of alerts">
+        <ngb-alert *ngIf="alert && !staticAlertClosed" type="{{cssAlertType(alert)}}" (close)="removeAlert(alert)">{{ alert.message }}</ngb-alert>
+      </div>
+    </div>
     <button type="button" class="btn ms_btn_black" (click)="modal.close()">Cancel</button>
     <button class="btn ms_btn_green" [ngClass]="{'disable': confirmBut}" (click)="createAppointment()">Confirm</button>
+  </div>
+</ng-template>
+
+<ng-template #confirmEdit let-modal let-c="close">
+  <div class="modal-header">
+    <div class="header-2 modal-padding">Update HOPE Data</div>
+    <button #cls_btn_confirm type="button" class="close" aria-label="Close" (click)="c('Cross click')">
+      <span aria-hidden="true">&times;</span>
+    </button>
+  </div>
+  <div class="modal-body">
+    <div class="row spacing-row">
+      <div class="col-md-7">
+        Name <input [(ngModel)]="nameHope" class="form-control mob_valid_6" disabled>
+      </div>
+      <div class="col-md-5">
+        DOB <input [(ngModel)]="birthDateFormat" class="form-control mob_valid_6" disabled>
+      </div>
+    </div>
+    <div class="row spacing-row">
+      <div class="col-md-6">
+        Mobile no. (1) <input [textMask]="{mask: maskPhone}" class="form-control mob_valid_6" type="text" (keyup)="checkCountChar()" [(ngModel)]="phoneNumberOne">
+        <span *ngIf="!flagCountOne || phoneNumberOne?.length === 0" style="color: red;">* min 9 character</span>
+      </div>
+      <div class="col-md-6">
+        Mobile no. (2) <input [textMask]="{mask: maskPhone}" class="form-control mob_valid_6" type="text" (keyup)="checkCountChar()" [(ngModel)]="phoneNumberTwo">
+        <span *ngIf="flagCountOne && (!flagCountTwo && phoneNumberTwo?.length > 0)" style="color: red;">* min 9 character</span>
+      </div>
+    </div>
+    <div class="row">
+      <div class="col-md-12">
+        Address <br><textarea [(ngModel)]="addressHope" class="form-control" disabled>testing</textarea>
+      </div>
+    </div>
+  </div>
+  <div class="modal-footer">
+    <button type="button" class="btn ms_btn_black" (click)="c('Cross click')">Cancel</button>
+    <button class="btn ms_btn_green" [disabled]="(!flagCountOne || phoneNumberOne?.length === 0) 
+    || (flagCountOne && !flagCountTwo && phoneNumberTwo?.length > 0) || loadingBut" (click)="confirmSavePhoneNumber(cls_btn_confirm)">Update HOPE</button>
   </div>
 </ng-template>

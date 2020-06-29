@@ -1,3 +1,9 @@
+::ng-deep .fo_modal_admission_2 .modal-dialog {
+  margin: 10% auto;
+  max-width: 100%;
+}
+
+
 .selectedPatient {
   background: #4D9B35;
   color: white;

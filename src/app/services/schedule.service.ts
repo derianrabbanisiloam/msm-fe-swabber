@@ -48,8 +48,9 @@ export class ScheduleService {
     return this.http.get<any>(uri, httpOptions);
   }
 
-  getScheduleDoctor(hospitalId: string, doctorId: string, date: string): Observable<any> {
-    const uri = `${this.opAdminScheduleUrl}/doctor-hospital-consultation?doctorId=${doctorId}&hospitalId=${hospitalId}&date=${date}`;
+  getScheduleDoctor(hospitalId: string, doctorId: string, date: string, consulType?: string): Observable<any> {
+    let uri = `${this.opAdminScheduleUrl}/doctor-hospital-consultation?doctorId=${doctorId}&hospitalId=${hospitalId}&date=${date}`;
+    uri = consulType ? `${uri}&consultationTypeId=${consulType}` : uri;
     return this.http.get<any>(uri, httpOptions);
   }
 

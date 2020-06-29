@@ -17,6 +17,7 @@ import { WidgetRequestListComponent } from '../../widgets/widget-request-list/wi
 import { ModalVerificationAidoModule } from '../../widgets/modal-verification-aido/modal-verification-aido.module';
 import { WidgetDoctorScheduleModule } from '../../widgets/widget-doctor-schedule/widget-doctor-schedule.module';
 import { MyDatePickerModule } from 'mydatepicker';
+import { NguiAutoCompleteModule } from '@ngui/auto-complete';
 
 @NgModule({
   declarations: [
@@ -40,7 +41,8 @@ import { MyDatePickerModule } from 'mydatepicker';
     ModalVerificationAidoModule,
     NgbAlertModule,
     WidgetDoctorScheduleModule,
-    MyDatePickerModule
+    MyDatePickerModule,
+    NguiAutoCompleteModule
   ],
   entryComponents: [
   ],

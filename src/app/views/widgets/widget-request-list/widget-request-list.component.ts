@@ -11,6 +11,8 @@ import { sourceApps, consultationType, pathImage } from '../../../variables/comm
 import { appBPJSReq } from '../../../models/dummy';
 import { IMyDpOptions } from 'mydatepicker';
 import { environment } from '../../../../environments/environment';
+import { Speciality } from '../../../models/specialities/speciality';
+import { isEmpty } from 'lodash';
 
 @Component({
   selector: 'app-widget-request-list',
@@ -70,6 +72,7 @@ export class WidgetRequestListComponent implements OnInit {
   };
   public appRequestList: any = [];
   public selectedPat: any;
+  public specialities: Speciality[];
   public butdownload: boolean = false;
   public checkAll: boolean = false;
   public fileDummy: any = [
@@ -112,10 +115,27 @@ export class WidgetRequestListComponent implements OnInit {
       this.showSchedule = false;
     }
     this.getAppBpjs();
+    this.getSpecialities();
     this.keywordsModel.hospitalId = this.hospital.id;
     this.initializeDateRangePicker();
     this.getCollectionAlert();
     this.getAppointmentBpjs();
+  }
+
+  async getSpecialities(specialityname = null, total = null) {
+    this.specialities = await this.doctorService.getSpecialities(specialityname, total)
+      .toPromise().then(res => {
+        return res.data;
+      }).catch(err => {
+        this.alertService.error(err.error.message);
+        return [];
+      });
+
+    if (this.specialities.length !== 0) {
+      this.specialities.map(x => {
+        x.speciality_name = isEmpty(x.speciality_name) ? '' : x.speciality_name;
+      });
+    }
   }
 
   async getAppBpjs() {
@@ -172,29 +192,30 @@ export class WidgetRequestListComponent implements OnInit {
     let offsetTemp;
     const {
       hospitalId = '', fromDate = this.todayDateISO, toDate = this.todayDateISO,
-      patientName = '', birthDate = '', noBpjs = '',  offset = 0, limit = 10
+      patientName = '', birthDate = '', noBpjs = '',  offset = 0, specialtyId = '', limit = 10
     } = await this.keywordsModel;
     offsetTemp = offset;
     
     if(this.count === 0) {
       this.bodyKeyword.valueOne = hospitalId, this.bodyKeyword.valueTwo = fromDate, this.bodyKeyword.valueThree = toDate;
       this.bodyKeyword.valueFour = patientName, this.bodyKeyword.valueFive = birthDate;
-      this.bodyKeyword.valueSix = noBpjs;
+      this.bodyKeyword.valueSix = noBpjs, this.bodyKeyword.valueSeven = specialtyId;
 
       this.bodyKeywordTwo.valueOne = hospitalId, this.bodyKeywordTwo.valueTwo = fromDate, this.bodyKeywordTwo.valueThree = toDate;
       this.bodyKeywordTwo.valueFour = patientName, this.bodyKeyword.valueFive = birthDate;
-      this.bodyKeyword.valueSix = noBpjs;
+      this.bodyKeyword.valueSix = noBpjs, this.bodyKeyword.valueSeven = specialtyId;
     } else if(this.count > 0) {
       this.bodyKeyword.valueOne = hospitalId, this.bodyKeyword.valueTwo = fromDate, this.bodyKeyword.valueThree = toDate;
       this.bodyKeyword.valueFour = patientName, this.bodyKeyword.valueFive = birthDate;
-      this.bodyKeyword.valueSix = noBpjs;
+      this.bodyKeyword.valueSix = noBpjs, this.bodyKeyword.valueSeven = specialtyId;
 
       if(this.bodyKeyword.valueOne !== this.bodyKeywordTwo.valueOne || this.bodyKeyword.valueTwo !== this.bodyKeywordTwo.valueTwo ||
         this.bodyKeyword.valueThree !== this.bodyKeywordTwo.valueThree || this.bodyKeyword.valueFour !== this.bodyKeywordTwo.valueFour ||
-        this.bodyKeyword.valueFive !== this.bodyKeywordTwo.valueFive || this.bodyKeyword.valueSix !== this.bodyKeywordTwo.valueSix) {    
+        this.bodyKeyword.valueFive !== this.bodyKeywordTwo.valueFive || this.bodyKeyword.valueSix !== this.bodyKeywordTwo.valueSix ||
+        this.bodyKeyword.valueSeven !== this.bodyKeywordTwo.valueSeven) {    
           this.bodyKeywordTwo.valueOne = hospitalId, this.bodyKeywordTwo.valueTwo = fromDate, this.bodyKeywordTwo.valueThree = toDate;
           this.bodyKeywordTwo.valueFour = patientName, this.bodyKeyword.valueFive = birthDate;
-          this.bodyKeyword.valueSix = noBpjs;
+          this.bodyKeyword.valueSix = noBpjs, this.bodyKeywordTwo.valueSeven = specialtyId;
         
           this.page = 0;
           offsetTemp = 0;
@@ -208,7 +229,9 @@ export class WidgetRequestListComponent implements OnInit {
       fromDate,
       toDate,
       patientName,
-      null,
+      birthDate,
+      noBpjs,
+      specialtyId,
       offsetTemp,
       limit
     ).subscribe(
@@ -243,8 +266,13 @@ export class WidgetRequestListComponent implements OnInit {
   }
 
   cancelRequestBpjs() {
-    const appointmentId = this.selectedPat.appointment_id;
-    const body = { userId: this.user.id, source: sourceApps };
+    const appointmentId = this.selectedPat.appointment_bpjs_id;
+    const body = { 
+      userNameFromToken: 'siloam',
+      userId: this.user.id,
+      userName: this.user.fullname,
+      source: sourceApps
+    };
 
     this.bpjsService.deleteAppointmentBpjs(appointmentId, body)
       .toPromise().then(res => {
@@ -392,7 +420,7 @@ export class WidgetRequestListComponent implements OnInit {
       },
       fromBpjs: true,
       patientBpjs: body,
-      //consulType: consultationType.BPJS
+      consulType: consultationType.BPJS
     };
 
     const searchKey = {
@@ -422,6 +450,7 @@ class KeywordsModel {
   isDoubleMr: boolean;
   admStatus: string;
   noBpjs: string;
+  specialtyId: string;
   offset: number;
   limit: number;
 }

@@ -12,7 +12,7 @@ import { Alert, AlertType } from '../../../models/alerts/alert';
 import { environment } from '../../../../environments/environment';
 import { PatientService } from '../../../services/patient.service';
 import Swal from 'sweetalert2';
-import { contactPayload } from '../../../payloads/contact.payload';
+import { dateFormatter } from '../../../utils/helpers.util';
 
 @Component({
   selector: 'app-modal-create-app-bpjs',
@@ -54,6 +54,18 @@ export class ModalCreateAppBpjsComponent implements OnInit {
   public createContactMsg: string;
   public closeResult: string;
   public note: string = null;
+  public bpjsData: any = null;
+  //edit hope
+  public patientHopeId: any;
+  public phoneNumberOne: any;
+  public phoneNumberTwo: any;
+  public nameHope: any;
+  public birthDateFormat: any;
+  public addressHope: any;
+  public postHope: any;
+  public flagCountOne: boolean = false;
+  public flagCountTwo: boolean = false;
+  public loadingBut: boolean = false;
 
   constructor(
     private modalService: NgbModal,
@@ -95,6 +107,10 @@ export class ModalCreateAppBpjsComponent implements OnInit {
     } = this.bpjsBody;
     let split = patient_birth_date.split('-');
     let birthDate = split[2]+'-'+split[1]+'-'+split[0];
+    var visitDate;
+    var dateFix;
+    let dateChoosed; 
+    let bpjsDate;
     await this.bpjsService.checkNoBpjs(
       this.hospital.id, 
       this.bpjsCardNumber, 
@@ -103,13 +119,21 @@ export class ModalCreateAppBpjsComponent implements OnInit {
       speciality_id
       ).toPromise().then(
       data => {
-        if(data.data.response === null) {
-          this.messageBpjs = data.data.metaData.message;
-        }
-        else {
-          this.messageBpjs = null;
+        if(data.data.length) {
+          this.bpjsData = data.data[0];
+          this.bpjsData.map(x => {
+            visitDate = x.tglKunjungan.split('-');
+            dateFix = visitDate[2]+'-'+visitDate[1]+'-'+visitDate[0];
+            dateChoosed = moment(dateFix); 
+            bpjsDate = dateChoosed.add(90, 'days').format('YYYY-MM-DD');
+            x.expiredDate = bpjsDate;
+          });
+        } else {
+          this.bpjsData = null;
+          this.messageBpjs = 'Tidak ada rujukan';
         }
       }, err => {
+        this.bpjsData = null;
         this.messageBpjs = null;
         this.alertService.error(err.error.message, false, 3000);
       }
@@ -121,9 +145,12 @@ export class ModalCreateAppBpjsComponent implements OnInit {
     const data = this.bpjsInfo;
     const dataBpjs = this.bpjsInfo.patientBpjs;
     const patientHopeId = this.selectPatient ? this.selectPatient.patientId : null;
+    const addressHope = this.selectPatient ? this.selectPatient.address : '';
+    const splitDateBirth = dataBpjs.patient_birth_date.split('-');
+    const fixDateBirth = splitDateBirth[2]+'-'+splitDateBirth[1]+'-'+splitDateBirth[0];
     this.addAppPayload = {
       appointmentTemporaryId: dataBpjs.appointment_bpjs_id,
-      appointmentDate: dataBpjs.appointment_date,
+      appointmentDate: data.appointment_date,
       appointmentFromTime: data.appointment_from_time,
       appointmentNo: data.appointment_no,
       hospitalId: dataBpjs.hospital_id,
@@ -131,10 +158,11 @@ export class ModalCreateAppBpjsComponent implements OnInit {
       scheduleId: data.schedule_id,
       isWaitingList: data.is_waiting_list,
       patientHopeId: patientHopeId,
+      contactId: dataBpjs.contact_id,
       name: dataBpjs.patient_name,
-      birthDate: dataBpjs.patient_birth_date,
+      birthDate: fixDateBirth,
       phoneNumber1: this.filterizePhoneNumber(dataBpjs.phone_number_1),
-      addressLine1: '',
+      addressLine1: addressHope,
       note: this.note,
       channelId: channelId.BPJS,
       userId: this.userId,
@@ -150,6 +178,7 @@ export class ModalCreateAppBpjsComponent implements OnInit {
       data => {
         this.alertService.success('Success to create appointment', false, 3000);
         this.appointmentService.emitCreateApp(true);
+        this.modalService.dismissAll();
         setTimeout(() => { this.close(); }, 2000);
       }, err => {
         this.alertService.error(err.error.message, false, 3000);
@@ -158,38 +187,100 @@ export class ModalCreateAppBpjsComponent implements OnInit {
     this.isSubmitting = false;
   }
 
-  createContact() {
-    const app = this.bpjsInfo;
-    const payload: contactPayload = {
-      name: app.contact_name,
-      birthDate: app.date_of_birth,
-      phoneNumber1: app.phone_number,
-      channelId: app.channel_id.toString(),
-      emailAddress: app.email_address,
-      cityId: app.city_id,
-      countryId: app.country_id,
-      districtId: app.district_id,
-      subDistrictId: app.sub_district_id,
-      currentAddress: app.address_line_1,
-      genderId: app.gender_id,
-      religionId: app.religion_id,
-      identityTypeId: app.identity_id,
-      identityNumber: app.identity_number,
-      identityAddress: app.identity_address,
-      phoneNumber2: app.phone_number,
-      stateId: app.state_id,
-      userId: this.userId,
-      source: this.source,
-    };
-    this.patientService.addContact(payload).subscribe(
+  async editPatientHopeId(val, content) {
+    let body = await this.getPatientHopeId(val);
+    if(body) {
+      const { patientId, name, sexId, birthPlaceId, birthDate, titleId, maritalStatusId, address, cityId, districtId, 
+              subDistrictId, postCode, homePhoneNo, officePhoneNo, mobileNo1, mobileNo2, emailAddress,
+              permanentAddress, permanentCityId, permanentPostCode, nationalIdTypeId, nationalIdNo,
+              nationalityId, religionId, bloodTypeId, fatherName, motherName, spouseName, contactName,
+              contactAddress, contactCityId, contactPhoneNo, contactMobileNo, contactEmailAddress, allergy,
+              payerId, payerIdNo, notes } = body;
+            
+      this.patientHopeId = patientId;
+
+      let bodyTwo = {
+        name, sexId, birthPlaceId, birthDate, titleId, maritalStatusId, address, cityId, districtId, 
+        subDistrictId, postCode, homePhoneNo, officePhoneNo, mobileNo2, emailAddress,
+        permanentAddress, permanentCityId, permanentPostCode, nationalIdTypeId, nationalIdNo,
+        nationalityId, religionId, bloodTypeId, fatherName, motherName, spouseName, contactName,
+        contactAddress, contactCityId, contactPhoneNo, contactMobileNo, contactEmailAddress, allergy,
+        payerId, payerIdNo, notes, patientOrganizationId : val.patientOrganizationId, organizationId: val.hospitalId
+        }
+
+      this.phoneNumberOne = mobileNo1;
+      this.phoneNumberTwo = mobileNo2;
+      this.nameHope = name;
+      this.addressHope = address;
+      this.birthDateFormat = dateFormatter(birthDate, true);
+      this.postHope = bodyTwo;
+      this.checkCountChar();
+      this.openLarge(content);
+    }
+  }
+
+  confirmSavePhoneNumber(closeModal) {
+    this.loadingBut = true;
+    this.postHope.mobileNo1 = this.charRemove(this.phoneNumberOne);
+    this.postHope.mobileNo2 = this.charRemove(this.phoneNumberTwo);
+    this.postHope.channelId = channelId.FRONT_OFFICE;
+    this.postHope.userId = this.user.id;
+    this.postHope.source = sourceApps;
+    this.postHope.userName = this.user.fullname;
+    this.patientService.updatePatientComplete(this.postHope, this.patientHopeId).subscribe(
       data => {
-        this.isSuccessCreateContact = true;
-        this.patientHope = [];
-        this.contactId = data.data.contact_id;
+        if(this.searchPatient === true) this.getSearchedPatient1();
+        else this.getSearchedPatient2();
+        this.loadingBut = false;
+        Swal.fire({
+          position: 'top-end',
+          type: 'success',
+          title: 'Success',
+          text: 'Edit Phone Number Success',
+          showConfirmButton: false,
+          timer: 3000
+        })
+        closeModal.click();
       }, error => {
-        this.createContactMsg = 'Gagal create new contact';
+        this.loadingBut = false;
+        Swal.fire({
+          type: 'error',
+          title: 'Oops...',
+          text: error.error.message,
+          timer: 4000
+        })
+        closeModal.click();
       }
-    );
+    )
+  }
+
+  checkCountChar() {
+    let countCharOne = this.charRemove(this.phoneNumberOne);
+    let countCharTwo = this.charRemove(this.phoneNumberTwo);
+    
+    if(countCharOne) {
+      this.flagCountOne = countCharOne.length > 8 ? true : false;
+    }
+    if(countCharTwo) {
+      this.flagCountTwo = countCharTwo.length > 8 ? true : false;
+    }
+  }
+
+  async getPatientHopeId(val) {
+    let body = await this.patientService.getPatientHopeDetail(val.patientId)
+      .toPromise().then(res => {
+        return res.data;
+      }).catch(err => {
+        Swal.fire({
+          type: 'error',
+          title: 'Oops...',
+          text: err.error.message,
+          timer: 4000
+        })
+        return null;
+      });
+
+    return body
   }
 
   filterizePhoneNumber(phoneNumber: string) {
@@ -235,10 +326,11 @@ export class ModalCreateAppBpjsComponent implements OnInit {
     this.dateBirth = this.bpjsBody.patient_birth_date;
     this.patientHope = null;
     this.flagSearch = false;
-    this.modalService.open(modal, { size: 'lg' });
+    this.modalService.open(modal, { windowClass: 'fo_modal_admission_2', size: 'lg' });
   }
 
   getSearchedPatient1() {
+    this.searchPatient = true;
     this.flagSearch = false;
     this.loadingBar = true;
     let date;
@@ -278,6 +370,7 @@ export class ModalCreateAppBpjsComponent implements OnInit {
   }
 
   getSearchedPatient2() {
+    this.searchPatient = false;
     this.flagSearch = false;
     this.loadingBar = true;
     this.patientService.searchPatientAccessMr2(this.hospital.id, this.mrLocal).subscribe(
@@ -335,6 +428,25 @@ export class ModalCreateAppBpjsComponent implements OnInit {
     }, (reason) => {
       this.closeResult = `Dismissed ${this.getDismissReason(reason)}`;
     });
+  }
+
+  openLarge(modal: any) {
+    this.modalService.open(modal, { windowClass: 'fo_modal_admission' }).result.then((result) => {
+      this.closeResult = `Closed with: ${result}`;
+    }, (reason) => {
+      this.closeResult = `Dismissed ${this.getDismissReason(reason)}`;
+    });
+  }
+
+  charRemove(str: any) {
+    if (str) {
+      str = str.replace('(+62)', '0');
+      str = str.replace(/_/g, '');
+      str = str.replace(/ /g, '');
+      str = str.replace(/ /g, '');
+      str = str.substr(0, 2) == '00' ? str.substr(1) : str;
+    }
+    return str;
   }
 
   private getDismissReason(reason: any): string {

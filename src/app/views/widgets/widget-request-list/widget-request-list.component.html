@@ -5,6 +5,9 @@
       (dateRangeChanged)="changeDateRange($event)" #date>
     </my-date-range-picker>
   </div>
+  <div *ngFor="let alert of alerts">
+    <ngb-alert *ngIf="alert" type="{{cssAlertType(alert)}}" (close)="removeAlert(alert)">{{ alert.message }}</ngb-alert>
+  </div>
 </div>
 
 <div class="row">
@@ -22,7 +25,7 @@
       <th style="min-width: 2em">Request ID</th>
       <th style="min-width: 2em">Request Creation Date</th>
       <th style="min-width: 14em">Patient Name</th>
-      <th style="white-space: nowrap; text-align: center; min-width: 8em">Date of Birth</th>
+      <th style="white-space: nowrap; text-align: center; min-width: 11em">Date of Birth</th>
       <th>Mobile No.</th>
       <th>BPJS Number</th>
       <th>Referral Number</th>
@@ -63,7 +66,23 @@
           </div>
         </td>
         <td></td>
-        <td></td>
+        <td>
+          <div class="ng-autocomplete" class="angular-autocomplete">
+            <ng-autocomplete placeHolder="Specialty name ..." [(ngModel)]="keywordsModel.specialtyId" [data]="specialities"
+              searchKeyword="speciality_name_en" (selected)='getAppointmentBpjs()' (inputCleared)='getAppointmentBpjs()'
+              [itemTemplate]="itemTemplateDoctor" [notFoundTemplate]="notFoundTemplate">
+            </ng-autocomplete>
+
+            <ng-template #itemTemplateDoctor let-item>
+              <a [innerHTML]="item.speciality_name_en"></a>
+            </ng-template>
+
+            <ng-template #notFoundTemplate let-notFound>
+              <div [innerHTML]="notFound"></div>
+            </ng-template>
+          </div>
+
+        </td>
         <td></td>
         <td></td>
         <td></td>

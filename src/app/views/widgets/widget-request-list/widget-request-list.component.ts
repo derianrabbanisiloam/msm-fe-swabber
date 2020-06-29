@@ -8,7 +8,6 @@ import { IMyDrpOptions } from 'mydaterangepicker';
 import { NgbModal, NgbModalConfig, ModalDismissReasons } from '@ng-bootstrap/ng-bootstrap';
 import { Alert, AlertType } from '../../../models/alerts/alert';
 import { sourceApps, consultationType, pathImage } from '../../../variables/common.variable';
-import { appBPJSReq } from '../../../models/dummy';
 import { IMyDpOptions } from 'mydatepicker';
 import { environment } from '../../../../environments/environment';
 import { Speciality } from '../../../models/specialities/speciality';
@@ -75,28 +74,6 @@ export class WidgetRequestListComponent implements OnInit {
   public specialities: Speciality[];
   public butdownload: boolean = false;
   public checkAll: boolean = false;
-  public fileDummy: any = [
-    {
-      emergency_id: 18,
-      file_id: "850a4ac3-490b-4918-8886-045cee9b1030",
-      file_name: "emergency-15839814652042757.jpeg",
-    },
-    {
-      emergency_id: 18,
-      file_id: "850a4ac3-490b-4918-8886-045cee9b1030",
-      file_name: "emergency-15839814652042757.jpeg",
-    },
-    {
-      emergency_id: 18,
-      file_id: "850a4ac3-490b-4918-8886-045cee9b1030",
-      file_name: "emergency-15839814652042757.jpeg",
-    },
-    {
-      emergency_id: 18,
-      file_id: "850a4ac3-490b-4918-8886-045cee9b1030",
-      file_name: "emergency-15839814652042757.jpeg",
-    }
-  ];
 
   constructor(
     private doctorService: DoctorService,

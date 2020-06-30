@@ -96,10 +96,16 @@ export const consultationType = {
   REGULAR: '1',
   BPJS: '2',
   EXECUTIVE: '3',
-  TELECONSULTATION: '4'
+  TELECONSULTATION: '4',
+  BPJS_REGULER: '5'
 }
 
 export const activityType = {
   LINKED_TO_MR: '1',
   OPEN_ACCESS_MR: '2',
 };
+
+export const pathImage = {
+  DISCLAIMER: '/disclaimer_1/',
+  BPJS_CARD: '/bpjs_identity_card'
+}

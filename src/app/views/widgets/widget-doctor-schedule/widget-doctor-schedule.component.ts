@@ -8,6 +8,7 @@ import * as moment from 'moment';
 import { IMyDpOptions } from 'mydatepicker';
 import { isEmpty } from 'lodash';
 import { environment } from '../../../../environments/environment';
+import { consultationType as conType } from '../../../variables/common.variable';
 
 @Component({
   selector: 'app-widget-doctor-schedule',
@@ -28,6 +29,7 @@ export class WidgetDoctorScheduleComponent implements OnInit {
   public showScheduleType1: boolean = false;
   public showScheduleType2: boolean = false;
   public todayDateISO: any = moment().format('YYYY-MM-DD');
+  public todayDateISOBPJS: any;
   public initDate: any = moment().format('YYYY-MM-DD');
   public startDateOfWeek = moment().startOf('isoWeek');
   public message1: any;
@@ -41,6 +43,10 @@ export class WidgetDoctorScheduleComponent implements OnInit {
   private leaves = [];
   public holidaysSpecialty: any = [];
   public holidaysName: any = [];
+  public fromBpjs: boolean = false;
+  public patFromBpjs: any;
+  public bodyBpjs: any;
+  public hideLoading: boolean = false;
 
   public datePickerModel: any = {
     date: {
@@ -58,6 +64,9 @@ export class WidgetDoctorScheduleComponent implements OnInit {
     width: '150px',
     showInputField: true,
   };
+  public myDateRangePickerOptionsTwo: IMyDpOptions;
+  public today: any;
+
   public consulType: string = null;
   public consulTypeFlag: number;
   public flagCon: number;
@@ -68,17 +77,49 @@ export class WidgetDoctorScheduleComponent implements OnInit {
     private router: Router,
     private activatedRoute: ActivatedRoute,
   ) {
-
   }
 
   async ngOnInit() {
-    if (this.doctorService.searchDoctorSource2) {
-      this.keywords = this.doctorService.searchDoctorSource2;
-      this.doctorService.searchDoctorSource2 = null;
-      await this.getLeaveHeader(this.keywords);
-      await this.generateDates(this.initDate);
-      await this.getSchedulesLogic(this.keywords);
+  if (this.doctorService.searchDoctorSource2) {
+    if(this.doctorService.searchDoctorSource2.fromBpjs === true) { //from BPJS menu
+      localStorage.setItem('fromBPJS', JSON.stringify(this.doctorService.searchDoctorSource2));
+      this.bodyBpjs = this.doctorService.searchDoctorSource2;
+      this.fromBpjs = true;
+      this.patFromBpjs = this.doctorService.searchDoctorSource2.patientBpjs;
+      this.consulType = this.doctorService.searchDoctorSource2.consulType;
     }
+    this.keywords = this.doctorService.searchDoctorSource2;
+    } else if(this.activatedRoute.snapshot.queryParamMap.get('fromBpjs')) {
+      this.bodyBpjs = JSON.parse(localStorage.getItem('fromBPJS'));
+      this.fromBpjs = true;
+      this.patFromBpjs = this.bodyBpjs.patientBpjs;
+      this.keywords = this.bodyBpjs;
+      this.consulType = this.bodyBpjs.consulType;
+    }
+
+    if(this.fromBpjs) {
+      var splitDate = this.patFromBpjs.appointment_date.split('-');
+      var dateFix = splitDate[2]+'-'+splitDate[1]+'-'+splitDate[0];
+      let dateChoosed = moment(dateFix); 
+      this.todayDateISOBPJS = dateChoosed.add(90, 'days').format('YYYY-MM-DD');
+      let today = this.todayDateISOBPJS.split('-');
+      
+      this.myDateRangePickerOptionsTwo = {
+        todayBtnTxt: 'Today',
+        dateFormat: 'dd/mm/yyyy',
+        firstDayOfWeek: 'mo',
+        sunHighlight: true,
+        height: '27px',
+        width: '150px',
+        showInputField: true,
+        disableSince: { year: today[0], month: today[1], day: today[2] }
+      };
+    }
+    
+    this.doctorService.searchDoctorSource2 = null;
+    await this.getLeaveHeader(this.keywords);
+    await this.generateDates(this.initDate);
+    await this.getSchedulesLogic(this.keywords);
 
     this.doctorService.searchDoctorSource$.subscribe(
       async (params) => {
@@ -122,7 +163,9 @@ export class WidgetDoctorScheduleComponent implements OnInit {
     const areaId = keywords.area ? keywords.area.area_id : null;
     const hospitalId = keywords.hospital ? keywords.hospital.hospital_id : null;
     const specialityId = keywords.speciality ? keywords.speciality.speciality_id : null;
-    let consultationType = this.consulType ? this.consulType : null;
+    const consulTypeAll = conType.REGULAR+':'+conType.EXECUTIVE+':'
+      +conType.TELECONSULTATION+':'+conType.BPJS_REGULER;
+    let consultationType = this.consulType ? this.consulType : consulTypeAll;
     this.isOriginal = keywords.original != undefined ? keywords.original : true;
     if (doctorId) {
       this.consulTypeFlag = 1; //reset <select> function
@@ -152,7 +195,7 @@ export class WidgetDoctorScheduleComponent implements OnInit {
   async generateDates(selectedDate?: any) {
     this.dates = [];
     let dateChoosed = selectedDate ? moment(selectedDate) : moment(); 
-    let now = dateChoosed.startOf('isoWeek').format('YYYY-MM-DD'); 
+    let now = dateChoosed.startOf('isoWeek').format('YYYY-MM-DD');
     let date: any = now ? moment(now).startOf('week') : moment().startOf('week');
     let dateTemp: any;
     let dateHeader: any;
@@ -192,14 +235,17 @@ export class WidgetDoctorScheduleComponent implements OnInit {
   }
 
   getSchedulesByKeywords(specialityId: string, date: string, consultationType: string, areaId?: string, hospitalId?: string) {
+    this.hideLoading = true;
     this.doctorService.getScheduleByKeywords(specialityId, date, areaId, hospitalId, consultationType)
       .subscribe(data => {
         this.doctorSchedules2 = data.data;
         if (this.doctorSchedules2.length > 0) {
+          this.hideLoading = false;
           this.showScheduleType1 = false;
           this.showScheduleType2 = true;
           this.message1 = null;
         } else {
+          this.hideLoading = false;
           this.message1 = {
             title: 'Data tidak ditemukan',
             description: ''
@@ -275,12 +321,23 @@ export class WidgetDoctorScheduleComponent implements OnInit {
   }
 
   gotoCreateApp(item: any, date: string) {
-    this.router.navigate(['/create-appointment'], {
-      queryParams: {
-        doctorId: item.doctor_id,
-        date: date
-      }
-    });
+    if(this.fromBpjs === true) {
+      this.doctorService.searchDoctorSource2 = this.bodyBpjs;
+      this.router.navigate(['/create-appointment'], {
+        queryParams: {
+          doctorId: item.doctor_id,
+          date: date,
+          fromBpjs: true
+        }
+      });
+    } else {
+      this.router.navigate(['/create-appointment'], {
+        queryParams: {
+          doctorId: item.doctor_id,
+          date: date
+        }
+      });
+    }
   }
 
   gotoCreateApp2(item: any, date: string) {
@@ -295,6 +352,11 @@ export class WidgetDoctorScheduleComponent implements OnInit {
         date: date
       }
     });
+  }
+
+  prevPage() {
+    this.doctorService.goBack = false;
+    this.router.navigate(['./request-list']);
   }
 
 }

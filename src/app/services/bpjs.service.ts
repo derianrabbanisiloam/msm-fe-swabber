@@ -17,21 +17,27 @@ export class BpjsService {
 
   private appointmentBpjsUrl = environment.BPJS_SERVICE + '/appointments';
 
- getListAppointmentBpjs(
-  hospitalId?: string,
-  fromDate?: string,
-  toDate?: string,
-  name?: string,
-  doctor?: string,
-  offset?: number,
-  limit?: number
-): Observable<any> {
-    let url = `${this.appointmentBpjsUrl}`;
-    url = `${this.appointmentBpjsUrl}?from=${fromDate}&to=${toDate}`;
-    url = `${url}&limit=${limit}&offset=${offset}`;
-    
-    return this.http.get<any>(url, httpOptions);
-  }
+  getListAppointmentBpjs(
+    hospitalId?: string,
+    fromDate?: string,
+    toDate?: string,
+    name?: string,
+    birthDate?: string,
+    noBpjs?: string,
+    specialty?: string,
+    offset?: number,
+    limit?: number
+  ): Observable<any> {
+      let url = `${this.appointmentBpjsUrl}?from=${fromDate}&to=${toDate}`;
+      url = hospitalId ? `${url}&hospitalId=${hospitalId}` : url;
+      url = name ? `${url}&name=${name}` : url;
+      url = birthDate ? `${url}&birthDate=${birthDate}` : url;
+      url = noBpjs ? `${url}&bpjsCardNumber=${noBpjs}` : url;
+      url = specialty ? `${url}&specialityId=${specialty}` : url;
+      url = `${url}&limit=${limit}&offset=${offset}`;
+      
+      return this.http.get<any>(url, httpOptions);
+    }
 
   getAppointmentDetailById(appBpjsId: string): Observable<any> {
     const url = `${this.appointmentBpjsUrl}/${appBpjsId}`;
@@ -45,5 +51,33 @@ export class BpjsService {
   notifyBpjs(payload: any): Observable<any> {
     const url = `${this.appointmentBpjsUrl}/notify`;
     return this.http.post<any>(url, payload, httpOptions);
+  }
+
+  checkNoBpjs(
+    hospitalId?: string,
+    bpjsCardNumber?: string,
+    name?: string,
+    birthDate?: string,
+    specialityId?: string
+    ): Observable<any> {
+    let uri = `${this.appointmentBpjsUrl}/references?hospitalId=${hospitalId}`;
+    uri = bpjsCardNumber ? `${uri}&bpjsCardNumber=${bpjsCardNumber}` : uri;
+    uri = name ? `${uri}&name=${name}` : uri;
+    uri = birthDate ? `${uri}&birthDate=${birthDate}` : uri;
+    uri = specialityId ? `${uri}&specialityId=${specialityId}` : uri;
+    return this.http.get<any>(uri, httpOptions);
+  }
+
+  deleteAppointmentBpjs(appointmentId: string, payload: any) {
+    let url = `${this.appointmentBpjsUrl}/${appointmentId}`;
+
+    const body = JSON.stringify(payload);
+    
+    const options = {
+      ...httpOptions,
+      body,
+    };
+    
+    return this.http.delete<any>(url, options);
   }
 }

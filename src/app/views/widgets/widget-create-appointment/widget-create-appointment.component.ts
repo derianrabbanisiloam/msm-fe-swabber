@@ -31,7 +31,7 @@ import { appointmentPayload as appPayload } from '../../../payloads/appointment.
 import { reserveSlotAppPayload as reserveSlotPayload } from '../../../payloads/reserve-slot.payload';
 import { AlertService } from '../../../services/alert.service';
 import { Alert, AlertType } from '../../../models/alerts/alert';
-import { sourceApps, queueType } from '../../../variables/common.variable';
+import { sourceApps, queueType, consultationType } from '../../../variables/common.variable';
 import { QueueService } from '../../../services/queue.service';
 import { dateFormatter, regionTime } from '../../../utils/helpers.util';
 import {
@@ -51,6 +51,9 @@ import { environment } from '../../../../environments/environment';
 import { 
   ModalVerificationAidoComponent 
 } from '../../widgets/modal-verification-aido/modal-verification-aido.component';
+import {
+  ModalCreateAppBpjsComponent
+} from '../modal-create-app-bpjs/modal-create-app-bpjs.component';
 
 @Component({
   selector: 'app-widget-create-appointment',
@@ -140,6 +143,10 @@ export class WidgetCreateAppointmentComponent implements OnInit {
   public appStatusId = appointmentStatusId;
   public selectedApp: any;
   public selectedAdm: any;
+  public fromBpjs: boolean = false;
+  public patFromBpjs: any;
+  public bodyBpjs: any;
+  public consulType: string = null;
 
   constructor(
     private router: Router,
@@ -181,6 +188,7 @@ export class WidgetCreateAppointmentComponent implements OnInit {
   }
 
   async ngOnInit() {
+    await this.getAppBpjs();
     await this.getQueryParams();
     await this.enableWalkInChecker(); 
     await this.getSchedule();
@@ -350,6 +358,7 @@ export class WidgetCreateAppointmentComponent implements OnInit {
   }
 
   async ngOnChanges() {
+    await this.getAppBpjs();
     await this.getQueryParams();
     await this.enableWalkInChecker();
     await this.getSchedule();
@@ -371,6 +380,23 @@ export class WidgetCreateAppointmentComponent implements OnInit {
     this.emitScheduleBlock();
     this.emitRescheduleApp();
     this.getCollectionAlert();
+  }
+
+  async getAppBpjs() {
+    if (this.doctorService.searchDoctorSource2) {
+      if(this.doctorService.searchDoctorSource2.fromBpjs === true) { //from BPJS menu
+        localStorage.setItem('fromBPJS', JSON.stringify(this.doctorService.searchDoctorSource2));
+        this.bodyBpjs = this.doctorService.searchDoctorSource2;
+        this.fromBpjs = true;
+        this.patFromBpjs = this.doctorService.searchDoctorSource2.patientBpjs;
+        this.consulType = this.doctorService.searchDoctorSource2.consulType;
+      }
+    } else if(this.activatedRoute.snapshot.queryParamMap.get('fromBpjs')) {
+        this.bodyBpjs = JSON.parse(localStorage.getItem('fromBPJS'));
+        this.fromBpjs = true;
+        this.patFromBpjs = this.bodyBpjs.patientBpjs;
+        this.consulType = this.bodyBpjs.consulType;
+    }
   }
 
   async enableWalkInChecker() {
@@ -838,7 +864,9 @@ export class WidgetCreateAppointmentComponent implements OnInit {
     const date = this.appointmentPayload.appointmentDate;
     const sortBy = 'appointment_no';
     const orderBy = 'ASC';
-    await this.appointmentService.getAppointmentByDay(hospitalId, doctorId, date, sortBy, orderBy).toPromise().then(
+    const exclude = this.fromBpjs === true ? false : true;
+    const isBpjs = channelId.BPJS;
+    await this.appointmentService.getAppointmentByDay(hospitalId, doctorId, date, sortBy, orderBy, isBpjs, exclude).toPromise().then(
       data => {
         this.appointments = data.data;
       }
@@ -850,9 +878,17 @@ export class WidgetCreateAppointmentComponent implements OnInit {
     const doctorId = this.appointmentPayload.doctorId;
     const date = this.appointmentPayload.appointmentDate;
     const hospitalId = this.hospital.id;
-    await this.scheduleService.getTimeSlot(hospitalId, doctorId, date).toPromise().then(
+    const consulTypeAll = consultationType.REGULAR+':'+consultationType.EXECUTIVE+':'
+      +consultationType.TELECONSULTATION+':'+consultationType.BPJS_REGULER;
+    const consulTypeList = this.fromBpjs === true ? this.consulType : consulTypeAll;
+    await this.scheduleService.getTimeSlot(hospitalId, doctorId, date, consulTypeList).toPromise().then(
       data => {
         this.slotList = data.data;
+        if(this.fromBpjs === true) {
+          this.slotList.map(x => {
+            x.is_walkin = false;
+          });
+        }
       }
     );
   }
@@ -893,7 +929,10 @@ export class WidgetCreateAppointmentComponent implements OnInit {
   async getSchedule() {
     const doctorId = this.appointmentPayload.doctorId;
     const date = this.appointmentPayload.appointmentDate;
-    await this.scheduleService.getScheduleDoctor(this.hospital.id, doctorId, date).toPromise().then(
+    const consulTypeAll = consultationType.REGULAR+':'+consultationType.EXECUTIVE+':'
+      +consultationType.TELECONSULTATION+':'+consultationType.BPJS_REGULER;
+    const consulTypeList = this.fromBpjs === true ? this.consulType : consulTypeAll;
+    await this.scheduleService.getScheduleDoctor(this.hospital.id, doctorId, date, consulTypeList).toPromise().then(
       data => {
         this.schedule = data.data;
         this.schedule.map(x => {
@@ -920,6 +959,30 @@ export class WidgetCreateAppointmentComponent implements OnInit {
     const modalRef = this.modalService.open(ModalCancelAppointmentComponent);
     const payload = { appointmentId: appointmentId, temp: temp };
     modalRef.componentInstance.payload = payload;
+  }
+
+  async createAppBPJSOnly(item: any) {
+    const canReserved = await this.getReservedSlot(item);
+    if(canReserved.key === null) {
+      await this.reserveSlotApp(item);
+    }
+    const fromTime = item.appointment_from_time ? item.appointment_from_time : item.schedule_from_time; 
+    const toTime = item.appointment_to_time ? item.appointment_to_time : item.schedule_to_time;
+    const data = {
+      schedule_id: item.schedule_id,
+      appointment_date: this.appointmentPayload.appointmentDate,
+      appointment_from_time: fromTime,
+      appointment_to_time: toTime,
+      hospital_id: item.hospital_id,
+      doctor_id: item.doctor_id,
+      appointment_no: item.appointment_no,
+      is_waiting_list: item.is_waiting_list,
+      can_reserved: canReserved,
+      doctor_type_id: item.doctor_type_id,
+      ...this.bodyBpjs
+    };
+    const modalRef = this.modalService.open(ModalCreateAppBpjsComponent);
+    modalRef.componentInstance.bpjsInfo = data;
   }
 
   async openCreateAppModal(item: any) {
@@ -1666,6 +1729,11 @@ export class WidgetCreateAppointmentComponent implements OnInit {
   prevPage() {
     const searchKey = JSON.parse(localStorage.getItem('searchKey'));
     this.router.navigate(['./base-appointment'], { queryParams: searchKey });
+  }
+
+  prevPageTwo() {
+    this.doctorService.searchDoctorSource2 = this.bodyBpjs;
+    this.router.navigate(['./doctor-schedule']);
   }
 
   openScheduleBlockModal() {

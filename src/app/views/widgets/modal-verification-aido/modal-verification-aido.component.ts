@@ -164,7 +164,8 @@ export class ModalVerificationAidoComponent implements OnInit {
       hospitalId: app.hospital_id,
       channelId: channelId.AIDO,
       userId: this.userId,
-      source: this.source
+      source: this.source,
+      userName: this.user.fullname,
     };
 
     await this.patientService.verifyPatient(payload).toPromise().then(

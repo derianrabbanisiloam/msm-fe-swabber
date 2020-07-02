@@ -534,10 +534,12 @@ export class WidgetPatientDataComponent implements OnInit {
 
     const suggestion = await this.patientService.searchPatient(name, birth, this.hospital.orgId)
       .toPromise().then(res => {
+        this.isButtonSave = false;
         return res.data;
       }).catch(err => {
         this.showNotFoundMsg = true;
         this.showWaitMsg = false;
+        this.isButtonSave = false;
         return [];
       })
 
@@ -1048,6 +1050,7 @@ export class WidgetPatientDataComponent implements OnInit {
         this.alertService.success(res.message, false, 5000);
         return res.data;
       }).catch(err => {
+        this.isButtonSave = false;
         this.alertService.error(err.error.message, false, 5000);
         return null;
       })
@@ -1060,13 +1063,14 @@ export class WidgetPatientDataComponent implements OnInit {
       this.isSuccessCreatePatient = true;
       this.isButtonSave = true;
     } else {
-      this.isButtonSave = true;
+      this.isButtonSave = false;
     }
   }
 
   async checkSearchPatientHope(content, fromSaveButton) {
     this.isButtonSave = true;
     let isValid;
+    let error = null;
     isValid = this.checkFormCondition(); // return true if valid (there is no empty mandatory)
 
     let x = this;
@@ -1086,12 +1090,16 @@ export class WidgetPatientDataComponent implements OnInit {
         }).catch(err => {
           this.showNotFoundMsg = true;
           this.showWaitMsg = false;
-          return [];
+          error = err.error.message;
+          return null;
         })
 
         if(!isEmpty(suggestion)) {
           await this.findMatchPatient(content, fromSaveButton);
-        } else {
+        } else if(suggestion === null){
+          this.isButtonSave = false;
+          this.alertService.error(error, false, 5000);
+        }else if(suggestion.length === 0){
           this.newPatient();
         }
         

@@ -394,7 +394,8 @@ export class WidgetRequestListComponent implements OnInit {
     this.doctorService.searchDoctorSource2 = this.searchKeywords;
     this.router.navigate(['/doctor-schedule'], {
       queryParams: {
-        fromBpjs: true
+        fromBpjs: true,
+        fromRegistration: false
       }
     });
     localStorage.setItem('searchKey', JSON.stringify(searchKey));

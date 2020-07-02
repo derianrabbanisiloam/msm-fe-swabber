@@ -44,22 +44,28 @@
 
           <div class="col-md-4 input-group">
             <input 
-              type="text" 
+              onkeydown="return event.keyCode == 69 ? false : true"
+              type="number" 
               class="form-control" 
               placeholder="input BPJS number..." 
               name="bpjsNumber" 
-              [(ngModel)]="bpjsCardNumber">
+              [(ngModel)]="bpjsCardNumber"
+              max="20"
+              [disabled]="nationalIdNo?.length > 0">
           </div>
           <div class="col-md-1 input-group" style="vertical-align: middle;">
             or
           </div>
           <div class="col-md-4 input-group">
-            <input 
-              type="text" 
+            <input
+              onkeydown="return event.keyCode == 69 ? false : true"
+              type="number" 
               class="form-control" 
               placeholder="input national id no..." 
               name="nationalIdNo" 
-              [(ngModel)]="nationalIdNo">
+              [(ngModel)]="nationalIdNo"
+              max="20"
+              [disabled]="bpjsCardNumber?.length > 0">
           </div>
           <div class="col-md-3">
             <button class="btn fo_btn_blue" (click)="searchDataBPJS()" 
@@ -171,7 +177,7 @@
           </div>
         </div>
 
-        <div class="row">
+        <div class="row" *ngIf="fromRegistration === true">
           <div class="col-md-1 form-group">
             <input class="form-control inter-checkbox" type="checkbox" name="isRujukanInternal" (change)="rujukanInternalVal()" [(ngModel)]="isRujukanInternal">
           </div>

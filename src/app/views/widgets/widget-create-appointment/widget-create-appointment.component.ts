@@ -415,7 +415,7 @@ export class WidgetCreateAppointmentComponent implements OnInit {
         this.bodyBpjs = JSON.parse(localStorage.getItem('fromBPJS'));
         this.fromBpjs = true;
         this.fromRegistration = true;
-        this.consulType = this.doctorService.searchDoctorSource2.consulType;
+        this.consulType = this.bodyBpjs.consulType;
     }
   }
 
@@ -1002,7 +1002,7 @@ export class WidgetCreateAppointmentComponent implements OnInit {
       doctor_type_id: item.doctor_type_id,
       ...this.bodyBpjs
     };
-    const modalRef = this.modalService.open(ModalCreateAppBpjsComponent, { windowClass: 'modal_bpjs'});
+    const modalRef = this.modalService.open(ModalCreateAppBpjsComponent);
     modalRef.componentInstance.bpjsInfo = data;
   }
 
@@ -1755,7 +1755,8 @@ export class WidgetCreateAppointmentComponent implements OnInit {
   prevPageTwo() {
     //this.doctorService.searchDoctorSource2 = this.bodyBpjs;
     const searchKey = {
-      fromBpjs: this.bodyBpjs.fromBpjs
+      fromBpjs: this.bodyBpjs.fromBpjs,
+      fromRegistration: this.bodyBpjs.fromRegistration
     };
     this.router.navigate(['./doctor-schedule'], { queryParams: searchKey });
   }

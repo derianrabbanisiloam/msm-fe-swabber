@@ -103,17 +103,21 @@ export class WidgetDoctorScheduleComponent implements OnInit {
     this.keywords = this.doctorService.searchDoctorSource2;
   } else if(this.activatedRoute.snapshot.queryParamMap.get('fromBpjs') === 'true' &&
       this.activatedRoute.snapshot.queryParamMap.get('fromRegistration') === 'false') {
+        console.log('berhasil masuk sini')
       this.bodyBpjs = JSON.parse(localStorage.getItem('fromBPJS'));
       this.fromBpjs = true;
       this.fromRegistration = false;
       this.patFromBpjs = this.bodyBpjs.patientBpjs;
       this.consulType = this.bodyBpjs.consulType;
+      this.keywords = this.bodyBpjs;
   } else if(this.activatedRoute.snapshot.queryParamMap.get('fromBpjs') === 'true' &&
       this.activatedRoute.snapshot.queryParamMap.get('fromRegistration') === 'true') {
+        console.log('berhasil masuk sana')
       this.bodyBpjs = JSON.parse(localStorage.getItem('fromBPJS'));
       this.fromBpjs = true;
       this.fromRegistration = true;
-      this.consulType = this.doctorService.searchDoctorSource2.consulType;
+      this.consulType = this.bodyBpjs.consulType;
+      this.keywords = this.bodyBpjs;
   }
 
     if(this.fromBpjs === true && this.fromRegistration === false) {

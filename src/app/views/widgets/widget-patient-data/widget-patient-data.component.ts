@@ -1070,7 +1070,6 @@ export class WidgetPatientDataComponent implements OnInit {
   async checkSearchPatientHope(content, fromSaveButton) {
     this.isButtonSave = true;
     let isValid;
-    let error = null;
     isValid = this.checkFormCondition(); // return true if valid (there is no empty mandatory)
 
     let x = this;
@@ -1090,16 +1089,12 @@ export class WidgetPatientDataComponent implements OnInit {
         }).catch(err => {
           this.showNotFoundMsg = true;
           this.showWaitMsg = false;
-          error = err.error.message;
-          return null;
+          return [];
         })
 
         if(!isEmpty(suggestion)) {
           await this.findMatchPatient(content, fromSaveButton);
-        } else if(suggestion === null){
-          this.isButtonSave = false;
-          this.alertService.error(error, false, 5000);
-        }else if(suggestion.length === 0){
+        } else {
           this.newPatient();
         }
         

@@ -101,13 +101,20 @@ export class WidgetDoctorScheduleComponent implements OnInit {
         
       }
     this.keywords = this.doctorService.searchDoctorSource2;
-    } else if(this.activatedRoute.snapshot.queryParamMap.get('fromBpjs')) {
+  } else if(this.activatedRoute.snapshot.queryParamMap.get('fromBpjs') === 'true' &&
+      this.activatedRoute.snapshot.queryParamMap.get('fromRegistration') === 'false') {
       this.bodyBpjs = JSON.parse(localStorage.getItem('fromBPJS'));
       this.fromBpjs = true;
+      this.fromRegistration = false;
       this.patFromBpjs = this.bodyBpjs.patientBpjs;
-      this.keywords = this.bodyBpjs;
       this.consulType = this.bodyBpjs.consulType;
-    }
+  } else if(this.activatedRoute.snapshot.queryParamMap.get('fromBpjs') === 'true' &&
+      this.activatedRoute.snapshot.queryParamMap.get('fromRegistration') === 'true') {
+      this.bodyBpjs = JSON.parse(localStorage.getItem('fromBPJS'));
+      this.fromBpjs = true;
+      this.fromRegistration = true;
+      this.consulType = this.doctorService.searchDoctorSource2.consulType;
+  }
 
     if(this.fromBpjs === true && this.fromRegistration === false) {
       var splitDate = this.patFromBpjs.appointment_date.split('-');

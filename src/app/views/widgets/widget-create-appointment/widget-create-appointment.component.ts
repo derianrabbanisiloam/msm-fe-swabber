@@ -397,16 +397,25 @@ export class WidgetCreateAppointmentComponent implements OnInit {
       } else if (this.doctorService.searchDoctorSource2.fromBpjs === true &&
         this.doctorService.searchDoctorSource2.fromRegistration === true) { //from BPJS registration
           localStorage.setItem('fromBPJS', JSON.stringify(this.doctorService.searchDoctorSource2));
+          this.bodyBpjs = this.doctorService.searchDoctorSource2;
           this.fromBpjs = true;
           this.fromRegistration = true;
           this.consulType = this.doctorService.searchDoctorSource2.consulType;
           
         }
-    } else if(this.activatedRoute.snapshot.queryParamMap.get('fromBpjs')) {
+    } else if(this.activatedRoute.snapshot.queryParamMap.get('fromBpjs') === 'true' &&
+        this.activatedRoute.snapshot.queryParamMap.get('fromRegistration') === 'false') {
         this.bodyBpjs = JSON.parse(localStorage.getItem('fromBPJS'));
         this.fromBpjs = true;
+        this.fromRegistration = false;
         this.patFromBpjs = this.bodyBpjs.patientBpjs;
         this.consulType = this.bodyBpjs.consulType;
+    } else if(this.activatedRoute.snapshot.queryParamMap.get('fromBpjs') === 'true' &&
+        this.activatedRoute.snapshot.queryParamMap.get('fromRegistration') === 'true') {
+        this.bodyBpjs = JSON.parse(localStorage.getItem('fromBPJS'));
+        this.fromBpjs = true;
+        this.fromRegistration = true;
+        this.consulType = this.doctorService.searchDoctorSource2.consulType;
     }
   }
 

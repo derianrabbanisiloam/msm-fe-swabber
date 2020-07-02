@@ -1065,6 +1065,7 @@ export class WidgetPatientDataComponent implements OnInit {
   }
 
   async checkSearchPatientHope(content, fromSaveButton) {
+    this.isButtonSave = true;
     let isValid;
     isValid = this.checkFormCondition(); // return true if valid (there is no empty mandatory)
 
@@ -1074,6 +1075,7 @@ export class WidgetPatientDataComponent implements OnInit {
     });
 
     if (!isValid) {
+      this.isButtonSave = false;
       this.alertService.error('Please input all mandatory field', false, 5000);
     } else {
       if(this.model.patientId === undefined && this.model.patientOrganizationId === undefined) {

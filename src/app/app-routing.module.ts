@@ -78,6 +78,11 @@ const routes: Routes = [
     loadChildren: './views/pages/page-request-list/page-request-list.module#PageRequestListModule',
   },
   {
+    path: 'bpjs-registration',
+    canActivate: [AuthGuard],
+    loadChildren: './views/pages/page-reservation-bpjs/page-reservation-bpjs.module#PageReservationBpjsModule',
+  },
+  {
     path: 'doctor-schedule',
     canActivate: [AuthGuard],
     loadChildren: './views/pages/page-doctor-schedule/page-doctor-schedule.module#PageDoctorScheduleModule',

@@ -14,7 +14,7 @@
     margin-top: 7vw;
   }
   
-  :host(app-widget-request-list) { width:100% }
+  :host(app-widget-request-list) { width:150% }
   .fo_appointment_date{ width: 15%;}
   .fo_container_input_date{ margin-bottom: 1rem}
   .fo_container_input_date input { width: 200px}

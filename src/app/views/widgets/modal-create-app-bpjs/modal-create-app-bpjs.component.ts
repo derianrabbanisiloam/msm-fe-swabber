@@ -13,6 +13,7 @@ import { environment } from '../../../../environments/environment';
 import { PatientService } from '../../../services/patient.service';
 import Swal from 'sweetalert2';
 import { dateFormatter } from '../../../utils/helpers.util';
+import { DoctorService } from '../../../services/doctor.service';
 
 @Component({
   selector: 'app-modal-create-app-bpjs',
@@ -39,6 +40,8 @@ export class ModalCreateAppBpjsComponent implements OnInit {
   public alerts: Alert[] = [];
   public doctorTypeFcfs: string = '1';
   public bpjsCardNumber: string = null;
+  public nationalIdNo: string = null;
+  public fromRegistration: boolean = false;
   public bpjsBody: any;
   public messageBpjs: string = null;
   public searchPatient: boolean = false;
@@ -66,6 +69,9 @@ export class ModalCreateAppBpjsComponent implements OnInit {
   public flagCountOne: boolean = false;
   public flagCountTwo: boolean = false;
   public loadingBut: boolean = false;
+  public isRujukanInternal: boolean = false;
+  public doctorId: string = null;
+  public doctorList: any = null;
 
   constructor(
     private modalService: NgbModal,
@@ -74,17 +80,25 @@ export class ModalCreateAppBpjsComponent implements OnInit {
     private alertService: AlertService,
     private bpjsService: BpjsService,
     private patientService: PatientService,
+    private doctorService: DoctorService,
     modalSetting: NgbModalConfig,
   ) {
     modalSetting.backdrop = 'static';
     modalSetting.keyboard = false;
    }
 
-  ngOnInit() {
-    this.bpjsCardNumber = this.bpjsInfo.patientBpjs.bpjs_card_number;
-    this.bpjsBody = this.bpjsInfo.patientBpjs;
+  async ngOnInit() {
+    console.log('bpjsinfo', this.bpjsInfo)
+    if(this.bpjsInfo.fromBpjs === true && this.bpjsInfo.fromRegistration === false) {
+      this.fromRegistration = false;
+      this.bpjsCardNumber = this.bpjsInfo.patientBpjs.bpjs_card_number;
+      this.bpjsBody = this.bpjsInfo.patientBpjs;
+    } else if(this.bpjsInfo.fromBpjs === true && this.bpjsInfo.fromRegistration === true) {
+      this.fromRegistration = true;
+    }
 
-    this.getCollectionAlert();
+    await this.getCollectionAlert();
+    await this.getListDoctor();
     if (this.bpjsInfo.can_reserved.key 
       && this.bpjsInfo.doctor_type_id !== this.doctorTypeFcfs
       && this.bpjsInfo.is_waiting_list === false) {
@@ -95,28 +109,65 @@ export class ModalCreateAppBpjsComponent implements OnInit {
     }
   }
 
+  async getListDoctor() {
+    this.doctorList = await this.doctorService.getDoctorBySpeciality(
+      this.hospital.id, 
+      this.bpjsInfo.speciality.speciality_id
+      )
+      .toPromise().then(res => {
+        return res.data;
+      }).catch(err => {
+        this.alertService.error(err.error.message);
+        return [];
+      });
+
+      console.log('##########', this.doctorList)
+  }
+
+  rujukanInternalVal(e) {
+    this.isRujukanInternal = this.isRujukanInternal ? true : false;
+    if(this.isRujukanInternal === true) {
+      document.getElementById('modal-bpjs').setAttribute('add-width-att', '');
+      document.getElementById('modal-bpjs-2').setAttribute('add-width-att', '');
+      document.getElementById('tutorial5').setAttribute('add-width-percent', '');
+    } else {
+      document.getElementById('modal-bpjs').removeAttribute('add-width-att');
+      document.getElementById('modal-bpjs-2').removeAttribute('add-width-att');
+      document.getElementById('tutorial5').removeAttribute('add-width-percent');
+    }
+  }
+
   close() {
     this.activeModal.close();
   }
 
   async searchDataBPJS(){
-    const { 
-      patient_name,
-      patient_birth_date,
-      speciality_id
-    } = this.bpjsBody;
-    let split = patient_birth_date.split('-');
-    let birthDate = split[2]+'-'+split[1]+'-'+split[0];
+    let split;
+    let birthDate = null;
+    let patientName = null;
+    let patientBirthDate = null;
+    let specialityId = this.fromRegistration === true ? this.bpjsInfo.speciality.speciality_id : null;
+    if(this.fromRegistration === false) {
+      patientName = this.bpjsBody.patient_name;
+      patientBirthDate = this.bpjsBody.patient_birth_date;
+      specialityId = this.bpjsBody.speciality_id;
+      split = patientBirthDate.split('-');
+      birthDate = split[2]+'-'+split[1]+'-'+split[0];
+    } else if(this.fromRegistration === true) {
+
+    }
+    
     var visitDate;
     var dateFix;
     let dateChoosed; 
     let bpjsDate;
     await this.bpjsService.checkNoBpjs(
       this.hospital.id, 
-      this.bpjsCardNumber, 
-      patient_name,
+      this.bpjsCardNumber,
+      this.nationalIdNo,
+      patientName,
       birthDate,
-      speciality_id
+      specialityId
       ).toPromise().then(
       data => {
         if(data.data.length) {

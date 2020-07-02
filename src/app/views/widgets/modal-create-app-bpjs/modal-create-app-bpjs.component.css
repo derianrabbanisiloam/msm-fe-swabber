@@ -1,3 +1,8 @@
+.inter-checkbox {
+  height: 19px;
+  width: 19px;
+}
+
 ::ng-deep .fo_modal_admission_2 .modal-dialog {
   margin: 10% auto;
   max-width: 100%;
@@ -227,8 +232,13 @@
   ::ng-deep .modal-dialog{  width: fit-content; }
   ::ng-deep .modal-searchPatient .modal-dialog { max-width: 100%; width: 80%}
   ::ng-deep .modal-searchPatient .modal-dialog .modal-body { max-height: 60vh; overflow-y: auto}
-  .create-appointment-modal {
-    width: 40rem;
+
+  div[add-width-att] {
+    width: 100%;
+  }
+
+  div[add-width-percent] {
+    width: 120%;
   }
   
   .search-patient-modal {

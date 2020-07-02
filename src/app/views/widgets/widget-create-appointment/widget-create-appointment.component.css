@@ -1,3 +1,9 @@
+::ng-deep .modal_bpjs .modal-dialog { 
+  max-width: 45%;
+  width: 45%;
+  margin-top: 7vw;
+}
+
 .content-header-container{
   display: flex;
   justify-content: space-between;

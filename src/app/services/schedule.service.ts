@@ -35,6 +35,7 @@ export class ScheduleService {
     if (consulType) {
       uri = `${uri}?consultationTypeId=${consulType}`;
     } 
+    console.log('url', uri)
     return this.http.get<any>(uri, httpOptions);
   }
 

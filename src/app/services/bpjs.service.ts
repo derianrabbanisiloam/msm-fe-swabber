@@ -29,7 +29,7 @@ export class BpjsService {
     limit?: number
   ): Observable<any> {
       let url = `${this.appointmentBpjsUrl}?from=${fromDate}&to=${toDate}`;
-      url = hospitalId ? `${url}&hospitalId=${hospitalId}` : url;
+      //url = hospitalId ? `${url}&hospitalId=${hospitalId}` : url;
       url = name ? `${url}&name=${name}` : url;
       url = birthDate ? `${url}&birthDate=${birthDate}` : url;
       url = noBpjs ? `${url}&bpjsCardNumber=${noBpjs}` : url;
@@ -56,12 +56,14 @@ export class BpjsService {
   checkNoBpjs(
     hospitalId?: string,
     bpjsCardNumber?: string,
+    nationalIdNo?: string,
     name?: string,
     birthDate?: string,
     specialityId?: string
     ): Observable<any> {
     let uri = `${this.appointmentBpjsUrl}/references?hospitalId=${hospitalId}`;
     uri = bpjsCardNumber ? `${uri}&bpjsCardNumber=${bpjsCardNumber}` : uri;
+    uri = nationalIdNo ? `${uri}&nationalIdNo=${nationalIdNo}` : uri;
     uri = name ? `${uri}&name=${name}` : uri;
     uri = birthDate ? `${uri}&birthDate=${birthDate}` : uri;
     uri = specialityId ? `${uri}&specialityId=${specialityId}` : uri;

@@ -144,6 +144,7 @@ export class WidgetCreateAppointmentComponent implements OnInit {
   public selectedApp: any;
   public selectedAdm: any;
   public fromBpjs: boolean = false;
+  public fromRegistration: boolean = false;
   public patFromBpjs: any;
   public bodyBpjs: any;
   public consulType: string = null;
@@ -384,13 +385,23 @@ export class WidgetCreateAppointmentComponent implements OnInit {
 
   async getAppBpjs() {
     if (this.doctorService.searchDoctorSource2) {
-      if(this.doctorService.searchDoctorSource2.fromBpjs === true) { //from BPJS menu
-        localStorage.setItem('fromBPJS', JSON.stringify(this.doctorService.searchDoctorSource2));
-        this.bodyBpjs = this.doctorService.searchDoctorSource2;
-        this.fromBpjs = true;
-        this.patFromBpjs = this.doctorService.searchDoctorSource2.patientBpjs;
-        this.consulType = this.doctorService.searchDoctorSource2.consulType;
-      }
+      if(this.doctorService.searchDoctorSource2.fromBpjs === true &&
+        this.doctorService.searchDoctorSource2.fromRegistration === false) { //from BPJS request list
+          localStorage.setItem('fromBPJS', JSON.stringify(this.doctorService.searchDoctorSource2));
+          this.bodyBpjs = this.doctorService.searchDoctorSource2;
+          this.fromBpjs = true;
+          this.fromRegistration = false;
+          this.patFromBpjs = this.doctorService.searchDoctorSource2.patientBpjs;
+          this.consulType = this.doctorService.searchDoctorSource2.consulType;
+  
+      } else if (this.doctorService.searchDoctorSource2.fromBpjs === true &&
+        this.doctorService.searchDoctorSource2.fromRegistration === true) { //from BPJS registration
+          localStorage.setItem('fromBPJS', JSON.stringify(this.doctorService.searchDoctorSource2));
+          this.fromBpjs = true;
+          this.fromRegistration = true;
+          this.consulType = this.doctorService.searchDoctorSource2.consulType;
+          
+        }
     } else if(this.activatedRoute.snapshot.queryParamMap.get('fromBpjs')) {
         this.bodyBpjs = JSON.parse(localStorage.getItem('fromBPJS'));
         this.fromBpjs = true;
@@ -881,6 +892,7 @@ export class WidgetCreateAppointmentComponent implements OnInit {
     const consulTypeAll = consultationType.REGULAR+':'+consultationType.EXECUTIVE+':'
       +consultationType.TELECONSULTATION+':'+consultationType.BPJS_REGULER;
     const consulTypeList = this.fromBpjs === true ? this.consulType : consulTypeAll;
+    console.log('!!!!!!!!!!!!!!!', consulTypeList)
     await this.scheduleService.getTimeSlot(hospitalId, doctorId, date, consulTypeList).toPromise().then(
       data => {
         this.slotList = data.data;
@@ -981,7 +993,7 @@ export class WidgetCreateAppointmentComponent implements OnInit {
       doctor_type_id: item.doctor_type_id,
       ...this.bodyBpjs
     };
-    const modalRef = this.modalService.open(ModalCreateAppBpjsComponent);
+    const modalRef = this.modalService.open(ModalCreateAppBpjsComponent, { windowClass: 'modal_bpjs'});
     modalRef.componentInstance.bpjsInfo = data;
   }
 
@@ -1732,8 +1744,11 @@ export class WidgetCreateAppointmentComponent implements OnInit {
   }
 
   prevPageTwo() {
-    this.doctorService.searchDoctorSource2 = this.bodyBpjs;
-    this.router.navigate(['./doctor-schedule']);
+    //this.doctorService.searchDoctorSource2 = this.bodyBpjs;
+    const searchKey = {
+      fromBpjs: this.bodyBpjs.fromBpjs
+    };
+    this.router.navigate(['./doctor-schedule'], { queryParams: searchKey });
   }
 
   openScheduleBlockModal() {

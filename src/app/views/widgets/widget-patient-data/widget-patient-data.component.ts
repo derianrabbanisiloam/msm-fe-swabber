@@ -534,10 +534,12 @@ export class WidgetPatientDataComponent implements OnInit {
 
     const suggestion = await this.patientService.searchPatient(name, birth, this.hospital.orgId)
       .toPromise().then(res => {
+        this.isButtonSave = false;
         return res.data;
       }).catch(err => {
         this.showNotFoundMsg = true;
         this.showWaitMsg = false;
+        this.isButtonSave = false;
         return [];
       })
 
@@ -1048,6 +1050,7 @@ export class WidgetPatientDataComponent implements OnInit {
         this.alertService.success(res.message, false, 5000);
         return res.data;
       }).catch(err => {
+        this.isButtonSave = false;
         this.alertService.error(err.error.message, false, 5000);
         return null;
       })
@@ -1060,7 +1063,7 @@ export class WidgetPatientDataComponent implements OnInit {
       this.isSuccessCreatePatient = true;
       this.isButtonSave = true;
     } else {
-      this.isButtonSave = true;
+      this.isButtonSave = false;
     }
   }
 

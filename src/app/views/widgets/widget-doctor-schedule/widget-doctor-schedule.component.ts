@@ -103,7 +103,6 @@ export class WidgetDoctorScheduleComponent implements OnInit {
     this.keywords = this.doctorService.searchDoctorSource2;
   } else if(this.activatedRoute.snapshot.queryParamMap.get('fromBpjs') === 'true' &&
       this.activatedRoute.snapshot.queryParamMap.get('fromRegistration') === 'false') {
-        console.log('berhasil masuk sini')
       this.bodyBpjs = JSON.parse(localStorage.getItem('fromBPJS'));
       this.fromBpjs = true;
       this.fromRegistration = false;
@@ -112,7 +111,6 @@ export class WidgetDoctorScheduleComponent implements OnInit {
       this.keywords = this.bodyBpjs;
   } else if(this.activatedRoute.snapshot.queryParamMap.get('fromBpjs') === 'true' &&
       this.activatedRoute.snapshot.queryParamMap.get('fromRegistration') === 'true') {
-        console.log('berhasil masuk sana')
       this.bodyBpjs = JSON.parse(localStorage.getItem('fromBPJS'));
       this.fromBpjs = true;
       this.fromRegistration = true;
@@ -356,7 +354,6 @@ export class WidgetDoctorScheduleComponent implements OnInit {
       });
     } else if(this.fromBpjs === true && this.fromRegistration === true) {
       this.doctorService.searchDoctorSource2 = this.bodyBpjs;
-      console.log('!!!!!!!!!!!!!!!!!!!!!!', this.bodyBpjs)
       this.router.navigate(['/create-appointment'], {
         queryParams: {
           doctorId: item.doctor_id,

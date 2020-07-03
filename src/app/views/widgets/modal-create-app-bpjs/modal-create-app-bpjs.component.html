@@ -45,13 +45,14 @@
           <div class="col-md-4 input-group">
             <input 
               onkeydown="return event.keyCode == 69 ? false : true"
+              onKeyPress="if(this.value.length==16) return false;"
               type="number" 
               class="form-control" 
               placeholder="input BPJS number..." 
               name="bpjsNumber" 
               [(ngModel)]="bpjsCardNumber"
-              max="20"
-              [disabled]="nationalIdNo?.length > 0">
+              min="1" max="5"
+              [disabled]="nationalIdNo">
           </div>
           <div class="col-md-1 input-group" style="vertical-align: middle;">
             or
@@ -59,13 +60,14 @@
           <div class="col-md-4 input-group">
             <input
               onkeydown="return event.keyCode == 69 ? false : true"
+              onKeyPress="if(this.value.length==16) return false;"
               type="number" 
               class="form-control" 
               placeholder="input national id no..." 
               name="nationalIdNo" 
               [(ngModel)]="nationalIdNo"
-              max="20"
-              [disabled]="bpjsCardNumber?.length > 0">
+              min="1" max="5"
+              [disabled]="bpjsCardNumber">
           </div>
           <div class="col-md-3">
             <button class="btn fo_btn_blue" (click)="searchDataBPJS()" 
@@ -79,99 +81,126 @@
         <div class="form-ca-phoneno form-group row" style="font-weight: bold; margin-top: 1em;">
           <div class="col-md-6">
             <div class="row">
-              <div class="col-md-12">
-                Status Peserta: 
+              <div class="col-md-10">
+                Status Peserta
+              </div>
+              <div class="col-md-1" style="padding-right: 0;">
+                :
               </div>
             </div>
             <div class="row">
-              <div class="col-md-12">
-                NIK: 
+              <div class="col-md-10">
+                NIK
+              </div>
+              <div class="col-md-1" style="padding-right: 0;">
+                :
               </div>
             </div>
             <div class="row">
-              <div class="col-md-12">
-                Nama Peserta:
+              <div class="col-md-10">
+                Nama Peserta
+              </div>
+              <div class="col-md-1" style="padding-right: 0;">
+                :
               </div>
             </div>
             <div class="row">
-              <div class="col-md-12">
-                Tanggal Lahir:
+              <div class="col-md-10">
+                Tanggal Lahir
+              </div>
+              <div class="col-md-1" style="padding-right: 0;">
+                :
               </div>
             </div>
             <div class="row">
-              <div class="col-md-12">
-                Diagnosa:
+              <div class="col-md-10">
+                Diagnosa
+              </div>
+              <div class="col-md-1" style="padding-right: 0;">
+                :
               </div>
             </div>
             <div class="row">
-              <div class="col-md-12">
-                No. Rujukan:
+              <div class="col-md-10">
+                No. Rujukan
+              </div>
+              <div class="col-md-1" style="padding-right: 0;">
+                :
               </div>
             </div>
             <div class="row">
-              <div class="col-md-12">
-                Dirujuk ke RS:
+              <div class="col-md-10">
+                Dirujuk ke RS
+              </div>
+              <div class="col-md-1" style="padding-right: 0;">
+                :
               </div>
             </div>
             <div class="row">
-              <div class="col-md-12">
-                Dirujuk ke Spesialisasi:
+              <div class="col-md-10">
+                Dirujuk ke Spesialisasi
+              </div>
+              <div class="col-md-1" style="padding-right: 0;">
+                :
               </div>
             </div>
             <div class="row">
-              <div class="col-md-12">
-                Akhir Masa Berlaku Surat Rujukan:
+              <div class="col-md-10" style="padding-right: 0;">
+                Akhir Masa Berlaku Surat Rujukan
+              </div>
+              <div class="col-md-1" style="padding-right: 0;">
+                :
               </div>
             </div>
           </div>
 
-          <div class="col-md-6" *ngIf="!bpjsData?.length">
+          <div class="col-md-6" *ngIf="!fixBpjsData">
           </div>
 
-          <div class="col-md-6" *ngIf="bpjsData?.length">
+          <div class="col-md-6" *ngIf="fixBpjsData" style="padding-left: 0;">
             <div class="row">
-              <div class="col-md-12">
-                {{bpjsData.statusPeserta.keterangan}}
+              <div class="col-md-12" style="padding-left: 0">
+                {{fixBpjsData.peserta.statusPeserta.keterangan}}
               </div>
             </div>
             <div class="row">
-              <div class="col-md-12">
-                {{bpjsData.nik}}
+              <div class="col-md-12" style="padding-left: 0">
+                {{fixBpjsData.peserta.nik}}
               </div>
             </div>
             <div class="row">
-              <div class="col-md-12">
-                {{bpjsData.nama}}
+              <div class="col-md-12" style="padding-left: 0">
+                {{fixBpjsData.peserta.nama}}
               </div>
             </div>
             <div class="row">
-              <div class="col-md-12">
-                {{bpjsData.tglLahir}}
+              <div class="col-md-12" style="padding-left: 0">
+                {{fixBpjsData.fixTglLahir}}
               </div>
             </div>
             <div class="row">
-              <div class="col-md-12">
-                {{bpjsData.diagnosa.nama}}
+              <div class="col-md-12" style="padding-left: 0">
+                {{fixBpjsData.diagnosa.nama}}
               </div>
             </div>
             <div class="row">
-              <div class="col-md-12">
-                {{bpjsData.noKunjungan}}
+              <div class="col-md-12" style="padding-left: 0">
+                {{fixBpjsData.noKunjungan}}
               </div>
             </div>
             <div class="row">
-              <div class="col-md-12">
-                {{bpjsData.provPerujuk.nama}}
+              <div class="col-md-12" style="padding-left: 0">
+                {{fixBpjsData.provPerujuk.nama}}
               </div>
             </div>
             <div class="row">
-              <div class="col-md-12">
-                {{bpjsData.poliRujukan.nama}}
+              <div class="col-md-12" style="padding-left: 0">
+                {{fixBpjsData.poliRujukan.nama}}
               </div>
             </div>
             <div class="row">
-              <div class="col-md-12">
-                {{bpjsData.expiredDate}}
+              <div class="col-md-12" style="padding-left: 0">
+                {{fixBpjsData.expiredDate}}
               </div>
             </div>
           </div>

@@ -115,21 +115,36 @@
         <td>{{r.control_number}}</td>
         <td></td>
         <td>
-          <a href=":javascript"
-          (click)="getImage(r.bpjs_card_file)"
-          target="_blank">{{r.bpjs_card_file}}<br></a>
-          <a href=":javascript"
-          (click)="getImage(r.bpjs_card_file)"
-          target="_blank">{{r.family_card_file}}<br></a>
-          <a href=":javascript"
-          (click)="getImage(r.bpjs_card_file)"
-          target="_blank">{{r.identity_card_file}}<br></a>
-          <a href=":javascript"
-          (click)="getImage(r.bpjs_card_file)"
-          target="_blank">{{r.refference_letter_file}}<br></a>
-          <a href=":javascript"
-          (click)="getImage(r.bpjs_card_file)"
+          <span *ngIf="r.bpjs_card_file">
+            <a href=":javascript"
+            (click)="getImage(r.bpjs_card_file)"
+            target="_blank">{{r.bpjs_card_file}}<br></a>
+          </span>
+          <span *ngIf="r.family_card_file">
+            <a href=":javascript"
+            (click)="getImage(r.family_card_file)"
+            target="_blank">{{r.family_card_file}}<br></a>
+          </span>
+          <span *ngIf="r.identity_card_file">
+            <a href=":javascript"
+            (click)="getImage(r.identity_card_file)"
+            target="_blank">{{r.identity_card_file}}<br></a>
+          </span>
+          <span *ngIf="r.refference_letter_file">
+            <a href=":javascript"
+            (click)="getImage(r.refference_letter_file)"
+            target="_blank">{{r.refference_letter_file}}<br></a>
+          </span>
+          <span *ngIf="r.refference_letter_file">
+            <a href=":javascript"
+            (click)="getImage(r.refference_letter_file)"
+            target="_blank">{{r.refference_letter_file}}<br></a>
+          </span>'
+          <span *ngIf="r.selfie_with_identity_file">
+            <a href=":javascript"
+          (click)="getImage(r.selfie_with_identity_file)"
           target="_blank">{{r.selfie_with_identity_file}}<br></a>
+          </span>
         </td>
         <td style="min-width: 5em">
           <div class="cell-img-nav d-flex justify-content-center">

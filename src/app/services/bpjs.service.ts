@@ -29,7 +29,7 @@ export class BpjsService {
     limit?: number
   ): Observable<any> {
       let url = `${this.appointmentBpjsUrl}?from=${fromDate}&to=${toDate}`;
-      //url = hospitalId ? `${url}&hospitalId=${hospitalId}` : url;
+      url = hospitalId ? `${url}&hospitalId=${hospitalId}` : url;
       url = name ? `${url}&name=${name}` : url;
       url = birthDate ? `${url}&birthDate=${birthDate}` : url;
       url = noBpjs ? `${url}&bpjsCardNumber=${noBpjs}` : url;

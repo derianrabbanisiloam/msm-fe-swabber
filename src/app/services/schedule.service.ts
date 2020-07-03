@@ -34,8 +34,7 @@ export class ScheduleService {
     let uri = `${this.timeSlotUrl}/${hospitalId}/doctor/${doctorId}/appointment-date/${date}`;
     if (consulType) {
       uri = `${uri}?consultationTypeId=${consulType}`;
-    } 
-    console.log('url', uri)
+    }
     return this.http.get<any>(uri, httpOptions);
   }
 

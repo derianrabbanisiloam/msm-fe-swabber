@@ -42,7 +42,7 @@ export class ModalCreateAppBpjsComponent implements OnInit {
   public bpjsCardNumber: string = null;
   public nationalIdNo: string = null;
   public fromRegistration: boolean = false;
-  public bpjsBody: any;
+  public bpjsBody: any = null;
   public messageBpjs: string = null;
   public searchPatient: boolean = false;
   public flagSearch: boolean = false;
@@ -58,6 +58,7 @@ export class ModalCreateAppBpjsComponent implements OnInit {
   public closeResult: string;
   public note: string = null;
   public bpjsData: any = null;
+  public fixBpjsData: any = null;
   //edit hope
   public patientHopeId: any;
   public phoneNumberOne: any;
@@ -69,9 +70,10 @@ export class ModalCreateAppBpjsComponent implements OnInit {
   public flagCountOne: boolean = false;
   public flagCountTwo: boolean = false;
   public loadingBut: boolean = false;
-  public isRujukanInternal: boolean = false;
+  public isRujukanInternal: boolean = null;
   public doctorId: string = null;
   public doctorList: any = null;
+  public confirmBut: boolean = false;
 
   constructor(
     private modalService: NgbModal,
@@ -88,7 +90,6 @@ export class ModalCreateAppBpjsComponent implements OnInit {
    }
 
   async ngOnInit() {
-    console.log('bpjsinfo', this.bpjsInfo)
     if(this.bpjsInfo.fromBpjs === true && this.bpjsInfo.fromRegistration === false) {
       this.fromRegistration = false;
       this.bpjsCardNumber = this.bpjsInfo.patientBpjs.bpjs_card_number;
@@ -120,8 +121,6 @@ export class ModalCreateAppBpjsComponent implements OnInit {
         this.alertService.error(err.error.message);
         return [];
       });
-
-      console.log('##########', this.doctorList)
   }
 
   rujukanInternalVal(e) {
@@ -158,6 +157,8 @@ export class ModalCreateAppBpjsComponent implements OnInit {
     }
     
     var visitDate;
+    var birthSplit;
+    var fixBirthDate;
     var dateFix;
     let dateChoosed; 
     let bpjsDate;
@@ -171,20 +172,102 @@ export class ModalCreateAppBpjsComponent implements OnInit {
       ).toPromise().then(
       data => {
         if(data.data.length) {
-          this.bpjsData = data.data[0];
+          this.bpjsData = data.data;
           this.bpjsData.map(x => {
             visitDate = x.tglKunjungan.split('-');
+            birthSplit = x.peserta.tglLahir.split('-');
+            fixBirthDate = birthSplit[2]+'-'+birthSplit[1]+'-'+birthSplit[0];
             dateFix = visitDate[2]+'-'+visitDate[1]+'-'+visitDate[0];
             dateChoosed = moment(dateFix); 
             bpjsDate = dateChoosed.add(90, 'days').format('YYYY-MM-DD');
             x.expiredDate = bpjsDate;
+            x.fixTglLahir = dateFix;
           });
+          this.fixBpjsData = this.bpjsData[0];
         } else {
-          this.bpjsData = null;
           this.messageBpjs = 'Tidak ada rujukan';
         }
       }, err => {
-        this.bpjsData = null;
+        this.bpjsData = [{
+          "diagnosa": {
+             "kode": "N40",
+             "nama": "Hyperplasia of prostate"
+          },
+          "keluhan": "kencing tidak puas",
+          "noKunjungan": "030107010217Y001465",
+          "pelayanan": {
+             "kode": "2",
+             "nama": "Rawat Jalan"
+          },
+          "peserta": {
+             "cob": {
+                "nmAsuransi": null,
+                "noAsuransi": null,
+                "tglTAT": null,
+                "tglTMT": null
+             },
+             "hakKelas": {
+                "keterangan": "KELAS I",
+                "kode": "1"
+             },
+             "informasi": {
+                "dinsos": null,
+                "noSKTM": null,
+                "prolanisPRB": null
+             },
+             "jenisPeserta": {
+                "keterangan": "PENERIMA PENSIUN PNS",
+                "kode": "15"
+             },
+             "mr": {
+                "noMR": "298036",
+                "noTelepon": null
+             },
+             "nama": "MUSDIWAR,BA",
+             "nik": 36030807079400002,
+             "noKartu": "0000416382632",
+             "pisa": "2",
+             "provUmum": {
+                "kdProvider": "03010701",
+                "nmProvider": "SITEBA"
+             },
+             "sex": "L",
+             "statusPeserta": {
+                "keterangan": "AKTIF",
+                "kode": "0"
+             },
+             "tglCetakKartu": "2017-11-13",
+             "tglLahir": "1938-08-31",
+             "tglTAT": "2038-08-31",
+             "tglTMT": "1996-08-20",
+             "umur": {
+                "umurSaatPelayanan": "78 tahun ,6 bulan ,6 hari",
+                "umurSekarang": "79 tahun ,3 bulan ,18 hari"
+             }
+          },
+          "poliRujukan": {
+             "kode": "URO",
+             "nama": "UROLOGI"
+          },
+          "provPerujuk": {
+             "kode": "03010701",
+             "nama": "SITEBA"
+          },
+          "tglKunjungan": "2017-02-25"
+       }
+      ];
+       this.bpjsData.map(x => {
+        birthSplit = x.peserta.tglLahir.split('-');
+        fixBirthDate = birthSplit[2]+'-'+birthSplit[1]+'-'+birthSplit[0];
+        dateChoosed = moment(x.tglKunjungan); 
+        dateFix = dateChoosed.add(90, 'days').format('YYYY-MM-DD');
+        visitDate = dateFix.split('-');
+        bpjsDate = visitDate[2]+'-'+visitDate[1]+'-'+visitDate[0];
+        x.expiredDate = bpjsDate;
+        x.fixTglLahir = fixBirthDate;
+      });
+        this.fixBpjsData = this.bpjsData[0];
+        //this.bpjsData = null;
         this.messageBpjs = null;
         this.alertService.error(err.error.message, false, 3000);
       }
@@ -192,46 +275,71 @@ export class ModalCreateAppBpjsComponent implements OnInit {
   }
 
   async createAppointment() {
+    this.confirmBut = true;
     this.isSubmitting = true;
+
     const data = this.bpjsInfo;
-    const dataBpjs = this.bpjsInfo.patientBpjs;
+    let dataBpjs = this.bpjsInfo.patientBpjs ? this.bpjsInfo.patientBpjs : null;
     const patientHopeId = this.selectPatient ? this.selectPatient.patientId : null;
     const addressHope = this.selectPatient ? this.selectPatient.address : '';
-    const splitDateBirth = dataBpjs.patient_birth_date.split('-');
-    const fixDateBirth = splitDateBirth[2]+'-'+splitDateBirth[1]+'-'+splitDateBirth[0];
+
+    let fixDateBirth;
+    let body = {
+      contactId: dataBpjs ? dataBpjs.contact_id : null,
+      appointmentTemporaryId: dataBpjs ? dataBpjs.appointment_bpjs_id : null,
+      hospitalId: dataBpjs ? dataBpjs.hospital_id : this.hospital.id,
+      isInternalReferrence: this.isRujukanInternal,
+      doctorIdReferrence: this.doctorId ? this.doctorId : null,
+      referenceNo: dataBpjs ? dataBpjs.reference_no : null,
+      bpjsCardNumber: dataBpjs ? dataBpjs.bpjs_card_number : this.fixBpjsData.peserta.noKartu,
+      patientHopeId: patientHopeId ? patientHopeId : null,
+      name: dataBpjs ? dataBpjs.patient_name : this.fixBpjsData.peserta.nama,
+      phoneNumber1: dataBpjs ? dataBpjs.phone_number_1 : this.fixBpjsData.peserta.mr.notelepon
+    }
+    if(this.fromRegistration === false) {
+      const splitDateBirth = dataBpjs.patient_birth_date.split('-');
+      fixDateBirth = splitDateBirth[2]+'-'+splitDateBirth[1]+'-'+splitDateBirth[0];
+    } else fixDateBirth = this.fixBpjsData.peserta.tglLahir;
+
     this.addAppPayload = {
-      appointmentTemporaryId: dataBpjs.appointment_bpjs_id,
       appointmentDate: data.appointment_date,
       appointmentFromTime: data.appointment_from_time,
+      appointmentToTime: data.appointment_to_time,
       appointmentNo: data.appointment_no,
-      hospitalId: dataBpjs.hospital_id,
       doctorId: data.doctor_id,
       scheduleId: data.schedule_id,
       isWaitingList: data.is_waiting_list,
-      patientHopeId: patientHopeId,
-      contactId: dataBpjs.contact_id,
-      name: dataBpjs.patient_name,
       birthDate: fixDateBirth,
-      phoneNumber1: this.filterizePhoneNumber(dataBpjs.phone_number_1),
-      addressLine1: addressHope,
-      note: this.note,
       channelId: channelId.BPJS,
       userId: this.userId,
       userName: this.userName,
       source: this.source,
+      addressLine1: addressHope,
+      note: this.note,
       isVerify: true,
-      //isInternalReference: dataBpjs.internal_reference,
-      //doctorIdRefference: dataBpjs.doctor_id_refference
-
     };
+
+    body.contactId ? this.addAppPayload.contactId = body.contactId : '';
+    body.appointmentTemporaryId ? this.addAppPayload.appointmentTemporaryId = body.appointmentTemporaryId : '';
+    body.doctorIdReferrence ? this.addAppPayload.doctorIdReferrence = body.doctorIdReferrence : '';
+    body.isInternalReferrence ? this.addAppPayload.isInternalReferrence = body.isInternalReferrence : '';
+    body.patientHopeId ? this.addAppPayload.patientHopeId = body.patientHopeId : '';
+    body.referenceNo ? this.addAppPayload.referenceNo = body.referenceNo : '';
+    body.bpjsCardNumber ? this.addAppPayload.bpjsCardNumber = body.bpjsCardNumber : '';
+    let numberPhone = body.phoneNumber1 ? this.filterizePhoneNumber(body.phoneNumber1) : null;
+    numberPhone ? this.addAppPayload.phoneNumber1 = numberPhone : '';
+    this.addAppPayload.name = body.name;
 
     await this.appointmentService.addAppointment(this.addAppPayload).toPromise().then(
       data => {
         this.alertService.success('Success to create appointment', false, 3000);
         this.appointmentService.emitCreateApp(true);
         this.modalService.dismissAll();
+        this.isRujukanInternal = null;
+        this.doctorId = null;
         setTimeout(() => { this.close(); }, 2000);
       }, err => {
+        this.confirmBut = false;
         this.alertService.error(err.error.message, false, 3000);
       }
     );
@@ -373,8 +481,8 @@ export class ModalCreateAppBpjsComponent implements OnInit {
   }
 
   openModal(modal: any) {
-    this.patientName = this.bpjsBody.patient_name;
-    this.dateBirth = this.bpjsBody.patient_birth_date;
+    this.patientName = this.bpjsBody ? this.bpjsBody.patient_name: this.fixBpjsData.peserta.nama;
+    this.dateBirth = this.bpjsBody ? this.bpjsBody.patient_birth_date : this.fixBpjsData.fixTglLahir;
     this.patientHope = null;
     this.flagSearch = false;
     this.modalService.open(modal, { windowClass: 'fo_modal_admission_2', size: 'lg' });

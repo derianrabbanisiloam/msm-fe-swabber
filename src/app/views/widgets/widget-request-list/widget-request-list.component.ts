@@ -152,7 +152,7 @@ export class WidgetRequestListComponent implements OnInit {
     this.showNotFoundMsg = false;
     let offsetTemp;
     const {
-      hospitalId = '', fromDate = this.todayDateISO, toDate = this.todayDateISO,
+      hospitalId = this.hospital.id, fromDate = this.todayDateISO, toDate = this.todayDateISO,
       patientName = '', birthDate = '', noBpjs = '',  offset = 0, specialtyId = '', limit = 10
     } = await this.keywordsModel;
     offsetTemp = offset;

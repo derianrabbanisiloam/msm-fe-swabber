@@ -70,7 +70,7 @@ export class WidgetPatientDataComponent implements OnInit {
 
   // Input mask
   public mask_birth = [/\d/, /\d/, '-', /\d/, /\d/, '-', /\d/, /\d/, /\d/, /\d/];
-  public mask = [/\d/, /\d/, /\d/, /\d/, /\d/, /\d/, /\d/, /\d/, /\d/, /\d/, /\d/, /\d/, /\d/];
+  public mask = [/\d/, /\d/, /\d/, /\d/, /\d/, /\d/, /\d/, /\d/, /\d/, /\d/, /\d/, /\d/, /\d/, /\d/, /\d/];
   public checkEmail = '[a-z0-9._%+-]+@[a-z0-9.-]+\\.[a-z]{2,}$';
   public checkNamed = /[*#!@&^'"/[\]{}()?]/;
 
@@ -132,6 +132,14 @@ export class WidgetPatientDataComponent implements OnInit {
   public validEmail: boolean = false;
   public validInputNoSim: boolean = false;
   public validName: boolean = false;
+  public phoneNumber: any;
+
+  public flagErrorMobile1: boolean = false;
+  public flagErrorMobile2: boolean = false;
+  public flagErrorMobile3: boolean = false;
+  public flagErrorMobile4: boolean = false;
+  public flagErrorMobile5: boolean = false;
+  public flagErrorMobile6: boolean = false;
 
   constructor(
     private generalService: GeneralService,
@@ -826,6 +834,9 @@ export class WidgetPatientDataComponent implements OnInit {
     let birthPlace = this.isEmpty(this.model.birthPlace) ? null : this.model.birthPlace;
     let address = this.model.address ? this.model.address.trim() : "";
     let mobileNo1 = this.model.mobileNo1 ? this.model.mobileNo1.trim() : "";
+    let mobileNo2 = this.model.mobileNo2 ? this.model.mobileNo2.trim() : "";
+    let homePhone = this.model.homePhone ? this.model.homePhone.trim() : "";
+    let officePhone = this.model.officePhone ? this.model.officePhone.trim() : "";
     let email = this.model.email ? this.model.email.trim() : "";
     let contactName = this.model.contactName ? this.model.contactName.trim() : "";
     let contactMobile = this.model.contactMobile ? this.model.contactMobile.trim() : "";
@@ -882,8 +893,52 @@ export class WidgetPatientDataComponent implements OnInit {
       valid = false;
       $('.form-pr-mobile1no').addClass('form-error');
     } else {
-      $('.form-pr-mobile1no input').attr('placeholder', '(Optional)');
-      $('.form-pr-mobile1no').removeClass('form-error');
+      let result = this.checkCountChar(mobileNo1);
+      if(result === false) {
+        valid = false;
+        this.flagErrorMobile1 = true;
+        $('.form-pr-mobile1no').addClass('form-error');
+      } else {
+        this.flagErrorMobile1 = false;
+        $('.form-pr-mobile1no input').attr('placeholder', '(Optional)');
+        $('.form-pr-mobile1no').removeClass('form-error');
+      }
+    }
+    if (mobileNo2) {
+      let result = this.checkCountChar(mobileNo2);
+      if(result === false) {
+        valid = false;
+        this.flagErrorMobile4 = true;
+        $('.form-pr-mobile2no').addClass('form-error');
+      } else {
+        this.flagErrorMobile4 = false;
+        $('.form-pr-mobile2no input').attr('placeholder', '(Optional)');
+        $('.form-pr-mobile2no').removeClass('form-error');
+      }
+    }
+    if (homePhone) {
+      let result = this.checkCountChar(homePhone);
+      if(result === false) {
+        valid = false;
+        this.flagErrorMobile5 = true;
+        $('.form-pr-homeno').addClass('form-error');
+      } else {
+        this.flagErrorMobile5 = false;
+        $('.form-pr-homeno input').attr('placeholder', '(Optional)');
+        $('.form-pr-homeno').removeClass('form-error');
+      }
+    }
+    if (officePhone) {
+      let result = this.checkCountChar(officePhone);
+      if(result === false) {
+        valid = false;
+        this.flagErrorMobile6 = true;
+        $('.form-pr-officeno').addClass('form-error');
+      } else {
+        this.flagErrorMobile6 = false;
+        $('.form-pr-officeno input').attr('placeholder', '(Optional)');
+        $('.form-pr-officeno').removeClass('form-error');
+      }
     }
     if (!email) {
       valid = false; $('.form-pr-email').addClass('form-error');
@@ -954,10 +1009,34 @@ export class WidgetPatientDataComponent implements OnInit {
       $('.form-pr-contactmobileno').addClass('form-error');
 
     } else {
-      $('.form-pr-contactphoneno input').attr('placeholder', '(Optional)');
-      $('.form-pr-contactphoneno').removeClass('form-error');
-      $('.form-pr-contactmobileno input').attr('placeholder', '(Optional)');
-      $('.form-pr-contactmobileno').removeClass('form-error');
+      if(contactPhone) {
+        let result = this.checkCountChar(contactPhone);
+        if(result === false) {
+          valid = false;
+          this.flagErrorMobile2 = true;
+          $('.form-pr-contactphoneno').addClass('form-error');
+        } else {
+          this.flagErrorMobile2 = false;
+          $('.form-pr-contactphoneno input').attr('placeholder', '(Optional)');
+          $('.form-pr-contactphoneno').removeClass('form-error');
+          $('.form-pr-contactmobileno input').attr('placeholder', '(Optional)');
+          $('.form-pr-contactmobileno').removeClass('form-error');
+        }
+      }
+      if(contactMobile) {
+        let result = this.checkCountChar(contactMobile);
+        if(result === false) {
+          valid = false;
+          this.flagErrorMobile3 = true;
+          $('.form-pr-contactmobileno').addClass('form-error');
+        } else {
+          this.flagErrorMobile3 = false;
+          $('.form-pr-contactphoneno input').attr('placeholder', '(Optional)');
+          $('.form-pr-contactphoneno').removeClass('form-error');
+          $('.form-pr-contactmobileno input').attr('placeholder', '(Optional)');
+          $('.form-pr-contactmobileno').removeClass('form-error');
+        }
+      }
     }
     if (
       !contactName ||
@@ -974,6 +1053,13 @@ export class WidgetPatientDataComponent implements OnInit {
     $('.form-error select').attr("placeholder", "");
 
     return valid;
+  }
+
+  checkCountChar(no) {
+    let flag;
+    let countChar = this.charRemove(no);
+    if(countChar) flag = countChar.length >= 8 && countChar.length <= 15 ? true : false;
+    return flag;
   }
 
   loadPayload() {

@@ -86,6 +86,7 @@
             <label class="col-md-6 col-form-label foot-note">Mobile Phone<span class="st-error-text">*</span></label>
             <div class="col-md-6 col-form-label">
               <div *ngIf="f.submitted && !model.phoneNumber" class="right-text foot-note unavailable">*Phone number must be filled</div>
+              <div *ngIf="flagErrorMobile" class="right-text foot-note unavailable">*You must enter 8-15 digits</div>
             </div>
             <div class="col-md-6 input-group">
               <input 
@@ -93,6 +94,7 @@
                 type="text" 
                 class="form-control" 
                 name="phoneNumber" 
+                (keyup)="validateCreateAppointment()"
                 [(ngModel)]="model.phoneNumber">
             </div>
           </div>

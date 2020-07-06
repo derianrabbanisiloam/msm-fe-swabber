@@ -29,7 +29,7 @@ export class ModalCreateAppointmentComponent implements OnInit {
   public addAppPayload: appointmentPayload = new appointmentPayload;
   public model: any = {};
   public maskBirth = [/\d/, /\d/, '-', /\d/, /\d/, '-', /\d/, /\d/, /\d/, /\d/];
-  public maskPhone = [/\d/, /\d/, /\d/, /\d/, /\d/, /\d/, /\d/, /\d/, /\d/, /\d/, /\d/, /\d/, /\d/];
+  public maskPhone = [/\d/, /\d/, /\d/, /\d/, /\d/, /\d/, /\d/, /\d/, /\d/, /\d/, /\d/, /\d/, /\d/, /\d/, /\d/];
   public isLock: boolean = false;
   public isSubmitting: boolean = false;
   public userId: string = this.user.id;
@@ -37,6 +37,7 @@ export class ModalCreateAppointmentComponent implements OnInit {
   public source: string = sourceApps;
   public alerts: Alert[] = [];
   public doctorTypeFcfs: string = '1';
+  public flagErrorMobile: boolean = false;
 
   constructor(
     private modalService: NgbModal,
@@ -211,9 +212,35 @@ export class ModalCreateAppointmentComponent implements OnInit {
       $('.form-ca-phoneno').addClass('form-error');
       isValid = false;
     } else {
-      $('.form-ca-phoneno').removeClass('form-error');
+      let result = this.checkCountChar(phoneNumber);
+      if(result === false) {
+        isValid = false;
+        this.flagErrorMobile = true;
+        $('.form-ca-phoneno').addClass('form-error');
+      } else {
+        this.flagErrorMobile = false;
+        $('.form-ca-phoneno').removeClass('form-error');
+      }
     }
     return isValid;
+  }
+
+  checkCountChar(no) {
+    let flag;
+    let countChar = this.charRemove(no);
+    if(countChar) flag = countChar.length >= 8 && countChar.length <= 15 ? true : false;
+    return flag;
+  }
+
+  charRemove(str: any) {
+    if (str) {
+      str = str.replace('(+62)', '0');
+      str = str.replace(/_/g, '');
+      str = str.replace(/ /g, '');
+      str = str.replace(/ /g, '');
+      str = str.substr(0, 2) == '00' ? str.substr(1) : str;
+    }
+    return str;
   }
 
   filterizePhoneNumber(phoneNumber: string) {

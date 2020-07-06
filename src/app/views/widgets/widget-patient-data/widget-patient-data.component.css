@@ -1,3 +1,7 @@
+.error-text {
+  color: red; 
+  font-size: 9px;
+}
 
 .search-patient-modal {
     max-width: 100%;

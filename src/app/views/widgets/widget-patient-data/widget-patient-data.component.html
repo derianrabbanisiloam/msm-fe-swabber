@@ -205,6 +205,7 @@
                       <input type="text" [textMask]="{mask: mask}" class="form-control" id="mobileNo1"
                         [(ngModel)]="model.mobileNo1" name="mobileNo1" placeholder="(Required)">
                     </div>
+                    <span class="error-text" *ngIf="flagErrorMobile1">*You must enter 8-15 digits</span>
                   </div>
                   <div class="form-pr-mobile2no">
                     <label for="postCode" class="">Mobile No 2</label>
@@ -212,6 +213,7 @@
                       <input type="text" [textMask]="{mask: mask}" class="form-control" id="mobileNo2"
                         [(ngModel)]="model.mobileNo2" name="mobileNo2" placeholder="(Optional)">
                     </div>
+                    <span class="error-text" *ngIf="flagErrorMobile4">*You must enter 8-15 digits</span>
                   </div>
 
                   <div class="d-flex justify-content-between">
@@ -221,6 +223,7 @@
                         <input type="text" [textMask]="{mask: mask}" class="form-control" id="homePhone"
                           [(ngModel)]="model.homePhone" name="homePhone" placeholder="(Optional)">
                       </div>
+                      <span class="error-text" *ngIf="flagErrorMobile5">*You must enter 8-15 digits</span>
                     </div>
 
                     <div class="form-pr-officeno">
@@ -229,6 +232,7 @@
                         <input type="text" class="form-control" [textMask]="{mask: mask}" id="officePhone"
                           [(ngModel)]="model.officePhone" name="officePhone" placeholder="(Optional)">
                       </div>
+                      <span class="error-text" *ngIf="flagErrorMobile6">*You must enter 8-15 digits</span>
                     </div>
                   </div>
                   <div class="form-pr-email">
@@ -366,6 +370,7 @@
                       <input type="text" class="form-control" [textMask]="{mask: mask}" [(ngModel)]="model.contactPhone"
                         name="model.contactPhone" id="model.contactPhone" placeholder="(Optional)">
                     </div>
+                    <span class="error-text" *ngIf="flagErrorMobile2">*You must enter 8-15 digits</span>
                   </div>
                   <div class="form-pr-contactmobileno">
                     <label for="postCode" class="">Contact Mobile No</label>
@@ -374,6 +379,7 @@
                         [(ngModel)]="model.contactMobile" name="contactMobile" id="contactMobile"
                         placeholder="(Optional)">
                     </div>
+                    <span class="error-text" *ngIf="flagErrorMobile3">*You must enter 8-15 digits</span>
                   </div>
                   <label for="postCode" class="">Contact Email</label>
                   <div class="">

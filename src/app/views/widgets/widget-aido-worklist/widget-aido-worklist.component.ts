@@ -13,7 +13,7 @@ import { environment } from '../../../../environments/environment';
 import {
   ModalVerificationAidoComponent
 } from '../../widgets/modal-verification-aido/modal-verification-aido.component';
-import { sourceApps, channelId, appointmentStatusId } from '../../../variables/common.variable';
+import { sourceApps, channelId, appointmentStatusId, paymentStatus } from '../../../variables/common.variable';
 
 @Component({
   selector: 'app-widget-aido-worklist',
@@ -50,9 +50,13 @@ export class WidgetAidoWorklistComponent implements OnInit {
   public count: number = -1;
   public selectedApp: any;
   public bodyKeyword: any = { valueOne: null, valueTwo: null, valueThree: null, valueFour: null,
-    valueFive: null, valueSix: null, valueSeven: null };
+    valueFive: null, valueSix: null, valueSeven: null, valueEight: null };
   public bodyKeywordTwo: any = { valueOne: null, valueTwo: null, valueThree: null, valueFour: null,
-    valueFive: null, valueSix: null, valueSeven: null };
+    valueFive: null, valueSix: null, valueSeven: null, valueEight: null };
+  public arrChannel: any = channelId;
+  public payStatus: any = paymentStatus;
+  public selectedCancel: any;
+
   constructor(
     private appointmentService: AppointmentService,
     private doctorService: DoctorService,
@@ -132,30 +136,30 @@ export class WidgetAidoWorklistComponent implements OnInit {
     let offsetTemp;
     const {
       hospitalId = '', fromDate = this.todayDateISO, toDate = this.todayDateISO,
-      patientName = '', doctorId, isDoubleMr = null, admStatus = '', offset = 0, limit = 10
+      patientName = '', doctorId, isDoubleMr = null, admStatus = '', payStatus = '', offset = 0, limit = 10
     } = await this.keywordsModel;
     offsetTemp = offset;
     
     if(this.count === 0) {
       this.bodyKeyword.valueOne = hospitalId, this.bodyKeyword.valueTwo = fromDate, this.bodyKeyword.valueThree = toDate;
       this.bodyKeyword.valueFour = patientName, this.bodyKeyword.valueFive = doctorId ? doctorId.doctor_id : '';
-      this.bodyKeyword.valueSix = isDoubleMr, this.bodyKeyword.valueSeven = admStatus;
+      this.bodyKeyword.valueSix = isDoubleMr, this.bodyKeyword.valueSeven = admStatus, this.bodyKeyword.valueEight = payStatus;
 
       this.bodyKeywordTwo.valueOne = hospitalId, this.bodyKeywordTwo.valueTwo = fromDate, this.bodyKeywordTwo.valueThree = toDate;
       this.bodyKeywordTwo.valueFour = patientName, this.bodyKeywordTwo.valueFive = doctorId ? doctorId.doctor_id : '';
-      this.bodyKeywordTwo.valueSix = isDoubleMr, this.bodyKeywordTwo.valueSeven = admStatus;
+      this.bodyKeywordTwo.valueSix = isDoubleMr, this.bodyKeywordTwo.valueSeven = admStatus, this.bodyKeyword.valueEight = payStatus;
     } else if(this.count > 0) {
       this.bodyKeyword.valueOne = hospitalId, this.bodyKeyword.valueTwo = fromDate, this.bodyKeyword.valueThree = toDate;
       this.bodyKeyword.valueFour = patientName, this.bodyKeyword.valueFive = doctorId ? doctorId.doctor_id : '';
-      this.bodyKeyword.valueSix = isDoubleMr, this.bodyKeyword.valueSeven = admStatus;
+      this.bodyKeyword.valueSix = isDoubleMr, this.bodyKeyword.valueSeven = admStatus, this.bodyKeyword.valueEight = payStatus;
 
       if(this.bodyKeyword.valueOne !== this.bodyKeywordTwo.valueOne || this.bodyKeyword.valueTwo !== this.bodyKeywordTwo.valueTwo ||
         this.bodyKeyword.valueThree !== this.bodyKeywordTwo.valueThree || this.bodyKeyword.valueFour !== this.bodyKeywordTwo.valueFour ||
         this.bodyKeyword.valueFive !== this.bodyKeywordTwo.valueFive || this.bodyKeyword.valueSix !== this.bodyKeywordTwo.valueSix ||
-        this.bodyKeyword.valueSeven !== this.bodyKeywordTwo.valueSeven) {    
+        this.bodyKeyword.valueSeven !== this.bodyKeywordTwo.valueSeven || this.bodyKeyword.valueEight !== this.bodyKeywordTwo.valueEight) {    
           this.bodyKeywordTwo.valueOne = hospitalId, this.bodyKeywordTwo.valueTwo = fromDate, this.bodyKeywordTwo.valueThree = toDate;
           this.bodyKeywordTwo.valueFour = patientName, this.bodyKeywordTwo.valueFive = doctorId ? doctorId.doctor_id : '';
-          this.bodyKeywordTwo.valueSix = isDoubleMr, this.bodyKeywordTwo.valueSeven = admStatus;
+          this.bodyKeywordTwo.valueSix = isDoubleMr, this.bodyKeywordTwo.valueSeven = admStatus, this.bodyKeywordTwo.valueEight = payStatus;
         
           this.page = 0;
           offsetTemp = 0;
@@ -173,6 +177,7 @@ export class WidgetAidoWorklistComponent implements OnInit {
       doctorSearch,
       isDoubleMr,
       admStatus,
+      payStatus,
       offsetTemp,
       limit
     ).subscribe(
@@ -257,6 +262,24 @@ export class WidgetAidoWorklistComponent implements OnInit {
     );
   }
 
+  cancelAppointment(val, content) {
+    this.selectedCancel = val;
+    this.open(content);
+  }
+
+  cancelProcess() {
+    const appointmentId = this.selectedCancel.appointment_id;
+    const body = { userId: this.user.id, source: sourceApps, userName: this.user.fullname };
+    
+    this.appointmentService.deleteAppointment(appointmentId, body, false, true)
+    .toPromise().then(res => {
+      this.getAidoWorklist();
+      this.alertService.success(res.message, false, 3000);
+    }).catch(err => {
+      this.alertService.error(err.error.message, false, 3000);
+    })
+  }
+
   open(content) {
     this.modalService.open(content).result.then((result) => {
       this.closeResult = `Closed with: ${result}`;
@@ -334,6 +357,7 @@ class KeywordsModel {
   doctorId: any;
   isDoubleMr: boolean;
   admStatus: string;
+  payStatus: string;
   offset: number;
   limit: number;
 }

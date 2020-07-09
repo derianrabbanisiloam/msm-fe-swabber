@@ -103,3 +103,9 @@ export const activityType = {
   LINKED_TO_MR: '1',
   OPEN_ACCESS_MR: '2',
 };
+
+export const paymentStatus = {
+  PAID: '1',
+  UNPAID: '2',
+  NOTPAID: '3',
+};

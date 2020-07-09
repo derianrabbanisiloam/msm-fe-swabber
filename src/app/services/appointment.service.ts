@@ -138,6 +138,7 @@ export class AppointmentService {
     doctor?: string,
     isDoubleMr?: boolean,
     admStatus?: string,
+    payStatus?: string,
     offset?: number,
     limit?: number
   ): Observable<any> {
@@ -146,6 +147,7 @@ export class AppointmentService {
     url = doctor ? `${url}&doctorId=${doctor}` : url;
     url = isDoubleMr ? `${url}&isDoubleMr=${isDoubleMr}` : url;
     url = admStatus ? `${url}&admStatus=${admStatus}` : url;
+    url = payStatus ? `${url}&paymentStatus=${payStatus}` : url;
     url = `${url}&limit=${limit}&offset=${offset}`;
     
     // return of(APPOINTMENT)
@@ -156,15 +158,21 @@ export class AppointmentService {
     return this.http.post<any>(this.rescheduleUrl, addReschedulePayload, httpOptions);
   }
 
-  deleteAppointment(appointmentId: string, payload: any, temp = false) {
+  deleteAppointment(appointmentId: string, payload: any, temp = false, isAido = false) {
     let url = `${this.ccAppointmentUrl}`;
+
+    if(isAido){
+      url = `${url}/aido/${appointmentId}`;
+    }
 
     if(temp){
       url = `${url}/temporary/${appointmentId}`;
-    }else{
-      url = `${url}/${appointmentId}`
     }
 
+    if(!temp && !isAido){
+      url = `${url}/${appointmentId}`
+    }
+    
     const body = JSON.stringify(payload);
     
     const options = {

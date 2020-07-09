@@ -192,7 +192,10 @@
 
               <!-- button action for teleconsultation -->
               <div *ngIf="app.channel_id == aidoChannel">
-                <div *ngIf="app.admission_status_id != 2 && app.appointment_status_id !== appStatusId.INACTIVE">
+                <div *ngIf="app.payment_status_id === payStatusId.UNPAID">
+                  <span class="flag-payment">Waiting Payment</span>
+                </div>
+                <div *ngIf="app.admission_status_id != 2 && app.appointment_status_id !== appStatusId.INACTIVE && app.payment_status_id === payStatusId.PAID">
                   <div *ngIf="app.patient_hope_id && app.patient_organization_id && app.is_double_mr === false">
                     <button (click)="createAdmModal(app, confirmAdmission)" class="btn ms_btn_green" style="font-size: 11px;">Check In</button>
                   </div>

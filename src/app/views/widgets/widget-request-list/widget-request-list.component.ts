@@ -208,7 +208,7 @@ export class WidgetRequestListComponent implements OnInit {
             x.checked = false;
             let fixDate;
             fixDate = x.created_date.substr(0, 10);
-            x.created_date = moment(fixDate).format('DD-MM-YYYY');;
+            x.created_date = moment(fixDate).format('DD-MM-YYYY');
           });
           this.isCanNextPage = this.appRequestList.length >= 10 ? true : false;
         }

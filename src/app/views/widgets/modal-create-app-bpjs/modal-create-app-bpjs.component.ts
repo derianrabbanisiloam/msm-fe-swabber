@@ -188,86 +188,85 @@ export class ModalCreateAppBpjsComponent implements OnInit {
           this.messageBpjs = 'Tidak ada rujukan';
         }
       }, err => {
-        this.bpjsData = [{
-          "diagnosa": {
-             "kode": "N40",
-             "nama": "Hyperplasia of prostate"
-          },
-          "keluhan": "kencing tidak puas",
-          "noKunjungan": "030107010217Y001465",
-          "pelayanan": {
-             "kode": "2",
-             "nama": "Rawat Jalan"
-          },
-          "peserta": {
-             "cob": {
-                "nmAsuransi": null,
-                "noAsuransi": null,
-                "tglTAT": null,
-                "tglTMT": null
-             },
-             "hakKelas": {
-                "keterangan": "KELAS I",
-                "kode": "1"
-             },
-             "informasi": {
-                "dinsos": null,
-                "noSKTM": null,
-                "prolanisPRB": null
-             },
-             "jenisPeserta": {
-                "keterangan": "PENERIMA PENSIUN PNS",
-                "kode": "15"
-             },
-             "mr": {
-                "noMR": "298036",
-                "noTelepon": null
-             },
-             "nama": "MUSDIWAR,BA",
-             "nik": 36030807079400002,
-             "noKartu": "0000416382632",
-             "pisa": "2",
-             "provUmum": {
-                "kdProvider": "03010701",
-                "nmProvider": "SITEBA"
-             },
-             "sex": "L",
-             "statusPeserta": {
-                "keterangan": "AKTIF",
-                "kode": "0"
-             },
-             "tglCetakKartu": "2017-11-13",
-             "tglLahir": "1938-08-31",
-             "tglTAT": "2038-08-31",
-             "tglTMT": "1996-08-20",
-             "umur": {
-                "umurSaatPelayanan": "78 tahun ,6 bulan ,6 hari",
-                "umurSekarang": "79 tahun ,3 bulan ,18 hari"
-             }
-          },
-          "poliRujukan": {
-             "kode": "URO",
-             "nama": "UROLOGI"
-          },
-          "provPerujuk": {
-             "kode": "03010701",
-             "nama": "SITEBA"
-          },
-          "tglKunjungan": "2017-02-25"
-       }
-      ];
-       this.bpjsData.map(x => {
-        birthSplit = x.peserta.tglLahir.split('-');
-        fixBirthDate = birthSplit[2]+'-'+birthSplit[1]+'-'+birthSplit[0];
-        dateChoosed = moment(x.tglKunjungan); 
-        dateFix = dateChoosed.add(90, 'days').format('YYYY-MM-DD');
-        visitDate = dateFix.split('-');
-        bpjsDate = visitDate[2]+'-'+visitDate[1]+'-'+visitDate[0];
-        x.expiredDate = bpjsDate;
-        x.fixTglLahir = fixBirthDate;
-      });
-        this.fixBpjsData = this.bpjsData[0];
-        //this.bpjsData = null;
+      //   this.bpjsData = [{ //dummy
+      //     "diagnosa": {
+      //        "kode": "N40",
+      //        "nama": "Hyperplasia of prostate"
+      //     },
+      //     "keluhan": "kencing tidak puas",
+      //     "noKunjungan": "030107010217Y001465",
+      //     "pelayanan": {
+      //        "kode": "2",
+      //        "nama": "Rawat Jalan"
+      //     },
+      //     "peserta": {
+      //        "cob": {
+      //           "nmAsuransi": null,
+      //           "noAsuransi": null,
+      //           "tglTAT": null,
+      //           "tglTMT": null
+      //        },
+      //        "hakKelas": {
+      //           "keterangan": "KELAS I",
+      //           "kode": "1"
+      //        },
+      //        "informasi": {
+      //           "dinsos": null,
+      //           "noSKTM": null,
+      //           "prolanisPRB": null
+      //        },
+      //        "jenisPeserta": {
+      //           "keterangan": "PENERIMA PENSIUN PNS",
+      //           "kode": "15"
+      //        },
+      //        "mr": {
+      //           "noMR": "298036",
+      //           "noTelepon": null
+      //        },
+      //        "nama": "MUSDIWAR,BA",
+      //        "nik": 36030807079400002,
+      //        "noKartu": "0000416382632",
+      //        "pisa": "2",
+      //        "provUmum": {
+      //           "kdProvider": "03010701",
+      //           "nmProvider": "SITEBA"
+      //        },
+      //        "sex": "L",
+      //        "statusPeserta": {
+      //           "keterangan": "AKTIF",
+      //           "kode": "0"
+      //        },
+      //        "tglCetakKartu": "2017-11-13",
+      //        "tglLahir": "1938-08-31",
+      //        "tglTAT": "2038-08-31",
+      //        "tglTMT": "1996-08-20",
+      //        "umur": {
+      //           "umurSaatPelayanan": "78 tahun ,6 bulan ,6 hari",
+      //           "umurSekarang": "79 tahun ,3 bulan ,18 hari"
+      //        }
+      //     },
+      //     "poliRujukan": {
+      //        "kode": "URO",
+      //        "nama": "UROLOGI"
+      //     },
+      //     "provPerujuk": {
+      //        "kode": "03010701",
+      //        "nama": "SITEBA"
+      //     },
+      //     "tglKunjungan": "2017-02-25"
+      //  }];
+      //  this.bpjsData.map(x => {
+      //   birthSplit = x.peserta.tglLahir.split('-');
+      //   fixBirthDate = birthSplit[2]+'-'+birthSplit[1]+'-'+birthSplit[0];
+      //   dateChoosed = moment(x.tglKunjungan); 
+      //   dateFix = dateChoosed.add(90, 'days').format('YYYY-MM-DD');
+      //   visitDate = dateFix.split('-');
+      //   bpjsDate = visitDate[2]+'-'+visitDate[1]+'-'+visitDate[0];
+      //   x.expiredDate = bpjsDate;
+      //   x.fixTglLahir = fixBirthDate;
+      // });
+        //this.fixBpjsData = this.bpjsData[0];
+        this.fixBpjsData = null;
         this.messageBpjs = null;
         this.alertService.error(err.error.message, false, 3000);
       }
@@ -288,8 +287,8 @@ export class ModalCreateAppBpjsComponent implements OnInit {
       contactId: dataBpjs ? dataBpjs.contact_id : null,
       appointmentTemporaryId: dataBpjs ? dataBpjs.appointment_bpjs_id : null,
       hospitalId: dataBpjs ? dataBpjs.hospital_id : this.hospital.id,
-      isInternalReferrence: this.isRujukanInternal,
-      doctorIdReferrence: this.doctorId ? this.doctorId : null,
+      isInternalReference: this.isRujukanInternal,
+      doctorIdReference: this.doctorId ? this.doctorId : null,
       referenceNo: dataBpjs ? dataBpjs.reference_no : null,
       bpjsCardNumber: dataBpjs ? dataBpjs.bpjs_card_number : this.fixBpjsData.peserta.noKartu,
       patientHopeId: patientHopeId ? patientHopeId : null,
@@ -321,8 +320,8 @@ export class ModalCreateAppBpjsComponent implements OnInit {
 
     body.contactId ? this.addAppPayload.contactId = body.contactId : '';
     body.appointmentTemporaryId ? this.addAppPayload.appointmentTemporaryId = body.appointmentTemporaryId : '';
-    body.doctorIdReferrence ? this.addAppPayload.doctorIdReferrence = body.doctorIdReferrence : '';
-    body.isInternalReferrence ? this.addAppPayload.isInternalReferrence = body.isInternalReferrence : '';
+    body.doctorIdReference ? this.addAppPayload.doctorIdReferrence = body.doctorIdReference : '';
+    body.isInternalReference ? this.addAppPayload.isInternalReferrence = body.isInternalReference : '';
     body.patientHopeId ? this.addAppPayload.patientHopeId = body.patientHopeId : '';
     body.referenceNo ? this.addAppPayload.referenceNo = body.referenceNo : '';
     body.bpjsCardNumber ? this.addAppPayload.bpjsCardNumber = body.bpjsCardNumber : '';

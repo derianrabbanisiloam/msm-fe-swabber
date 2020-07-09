@@ -16,6 +16,7 @@ export class BpjsService {
   ) { }
 
   private appointmentBpjsUrl = environment.BPJS_SERVICE + '/appointments';
+  private lakaLantasUrl = environment.BPJS_SERVICE + '/lookups';
 
   getListAppointmentBpjs(
     hospitalId?: string,
@@ -82,4 +83,20 @@ export class BpjsService {
     
     return this.http.delete<any>(url, options);
   }
+
+  getProvinceLakaLantas(hospitalId: string): Observable<any> {
+    let url = `${this.lakaLantasUrl}/bpjs/province?hospitalId=${hospitalId}`;
+    return this.http.get<any>(url, httpOptions);
+  }
+
+  getDistrictLakaLantas(hospitalId: string, provinceId: string): Observable<any> {
+    let url = `${this.lakaLantasUrl}/bpjs/district/${provinceId}?hospitalId=${hospitalId}`;
+    return this.http.get<any>(url, httpOptions);
+  }
+
+  getSubDistrictLakaLantas(hospitalId: string, districtId: string): Observable<any> {
+    let url = `${this.lakaLantasUrl}/bpjs/sub-district/${districtId}?hospitalId=${hospitalId}`;
+    return this.http.get<any>(url, httpOptions);
+  }
+  
 }

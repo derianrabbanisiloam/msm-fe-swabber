@@ -25,7 +25,11 @@
       <th style="min-width: 13em">
         Doctor
       </th>
+      <th>Payment Status</th>
       <th>Admission Status</th>
+      <th>Channel</th>
+      <th>Verify MR</th>
+      <th>App. Manage</th>
       <th style="min-width: 9em">Modified By</th>
       <th width="90px" style="text-align: center">Action</th>
     </thead>
@@ -75,6 +79,17 @@
         </td>
         <td>
           <div class="inner-addon right-addon">
+            <select id="title" class="form-control" (change)="getAidoWorklist()" [(ngModel)]="keywordsModel.payStatus"
+                name="dropDownIsWaitingList">
+                <option [ngValue]=undefined [selected]="keywordsModel.payStatus === undefined">ALL</option>
+                <option value=1>Paid</option>
+                <option value=2>Waiting</option>
+                <option value=3>Cancelled By System</option>
+              </select>
+          </div>
+        </td>
+        <td>
+          <div class="inner-addon right-addon">
             <select id="title" class="form-control" (change)="getAidoWorklist()" [(ngModel)]="keywordsModel.admStatus"
                 name="dropDownIsWaitingList">
                 <option [ngValue]=undefined [selected]="keywordsModel.admStatus === undefined">ALL</option>
@@ -84,6 +99,9 @@
               </select>
           </div>
         </td>
+        <td></td>
+        <td></td>
+        <td></td>
         <td></td>
         <td></td>
       </tr>
@@ -121,6 +139,19 @@
         </td>
         <td style="text-align: center">
           <div style="color: white;">
+            <div style="background:green; border-radius: 1em; padding: 0.2em" *ngIf="r.payment_status_id === payStatus.PAID">
+              <span>Paid</span>
+            </div>
+            <div style="background: black; border-radius: 1em;" *ngIf="r.payment_status_id === payStatus.UNPAID">
+              <span>Waiting</span>
+            </div>
+            <div style="background: red; border-radius: 1em;" *ngIf="r.payment_status_id === payStatus.NOTPAID">
+              <span>Cancelled By System</span>
+            </div>
+          </div>
+        </td>
+        <td style="text-align: center">
+          <div style="color: white;">
             <div style="background: #CFC900; border-radius: 1em; padding: 0.2em" *ngIf="r.admission_status_id == 1">
               <span>Not Processed</span>
             </div>
@@ -132,13 +163,37 @@
             </div>
           </div>
         </td>
+        <td>
+          <div *ngIf="r.channel_id == arrChannel.AIDO">
+            <span>AIDO</span>
+          </div>
+        </td>
+        <td>
+          <div *ngIf="r.patient_hope_id !== 0 && r.patient_organization_id !== 0 && r.is_double_mr === false">
+            <span>Verified</span>
+          </div>
+        </td>
+        <td>
+          <div *ngIf="r.appointment_status_id !== appStatusId.INACTIVE && r.admission_status_id != 2">
+
+            <div class="cell-img-nav d-flex justify-content-center">
+              <div>
+                <!--Button reschedule-->
+              </div>
+              <span style="opacity: 0; max-width: 0.5em; overflow: hidden">filler</span>
+              <div (click)="cancelAppointment(r, confirmCancel)">
+                <img src="{{assetPath}}icons/ic_Cancel@2x.png">
+              </div>
+            </div>
+            </div>
+        </td>
         <td style="text-align: center; font-size: 11px;">
           <a ngbPopover="{{r.modified_by}}" popoverTitle=""
             triggers="mouseenter:mouseleave">{{r.modified_by && r.modified_by.length > 15 ?
                r.modified_by.substr(0,15)+"..." : r.modified_by}}</a>
         </td>
         <td style="text-align: center; min-width: 12em">
-        <div *ngIf="r.admission_status_id != 2 && r.appointment_status_id !== appStatusId.INACTIVE">
+        <div *ngIf="r.admission_status_id != 2 && r.appointment_status_id !== appStatusId.INACTIVE && r.payment_status_id === payStatus.PAID">
           <div *ngIf="r.patient_hope_id !== 0 && r.patient_organization_id !== 0 && r.is_double_mr === false">
             <button (click)="createAdmModal(r, confirmAdmission)" class="btn ms_btn_green" style="font-size: 11px;">Check In</button>
           </div>
@@ -154,8 +209,8 @@
         </td>
       </tr>
       <tr>
-        <td *ngIf="showNotFoundMsg" colspan="11" style="text-align: center;">Displaying no data</td>
-        <td *ngIf="showWaitMsg" colspan="11">
+        <td *ngIf="showNotFoundMsg" colspan="15" style="text-align: center;">Displaying no data</td>
+        <td *ngIf="showWaitMsg" colspan="15">
           <ngb-progressbar value="1000">Loading...</ngb-progressbar>
         </td>
       </tr>
@@ -186,6 +241,23 @@
           (click)="createAdm()"
           (click)="c('Cross click')">Ok</button>
         <button type="button" class="btn fo_btn_black" (click)="c('Cross click')">Cancel</button>
+      </div>
+    </div>
+  </ng-template>
+
+  <ng-template #confirmCancel let-c="close" let-d="dismiss">
+    <div class="modal-header">
+      <h4 class="modal-title">Confirmation</h4>
+      <button type="button" class="close" aria-label="Close" (click)="d('Cross click')">
+        <span aria-hidden="true">&times;</span>
+      </button>
+    </div>
+    <div class="modal-body">
+      <p>Are you sure to cancel appointment aido of {{ selectedCancel.contact_name }} ?</p>
+      <div class="fo_confirmation_button d-flex justify-content-center">
+        <button type="button" class="btn fo_btn_black" (click)="cancelProcess()"
+          (click)="c('Cross click')">Ok</button>
+        <button type="button" class="btn fo_btn_green" (click)="c('Cross click')">Cancel</button>
       </div>
     </div>
   </ng-template>

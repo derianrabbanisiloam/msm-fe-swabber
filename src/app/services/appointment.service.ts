@@ -130,6 +130,24 @@ export class AppointmentService {
     return this.http.get<any>(url, httpOptions);
   }
 
+  getRescheduleWorklistAido(
+    hospitalId: string,
+    fromDate: string,
+    toDate: string,
+    name?: string,
+    doctor?: string,
+    offset?: number,
+    limit?: number
+  ): Observable<any> {
+    let url = `${this.rescheduleUrl}/aido?hospitalId=${hospitalId}&from=${fromDate}&to=${toDate}`;
+    url = name ? `${url}&patientName=${name}` : url;
+    url = doctor ? `${url}&doctorId=${doctor}` : url;
+    url = `${url}&limit=${limit}&offset=${offset}`;
+    
+    // return of(APPOINTMENT)
+    return this.http.get<any>(url, httpOptions);
+  }
+
   getAidoWorklist(
     hospitalId: string,
     fromDate: string,

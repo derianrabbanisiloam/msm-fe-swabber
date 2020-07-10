@@ -29,7 +29,7 @@
       <th>Admission Status</th>
       <th>Channel</th>
       <th>Verify MR</th>
-      <th>App. Manage</th>
+      <th hidden>App. Manage</th>
       <th style="min-width: 9em">Modified By</th>
       <th width="90px" style="text-align: center">Action</th>
     </thead>
@@ -173,7 +173,7 @@
             <span>Verified</span>
           </div>
         </td>
-        <td>
+        <td hidden>
           <div *ngIf="r.appointment_status_id !== appStatusId.INACTIVE && r.admission_status_id != 2">
 
             <div class="cell-img-nav d-flex justify-content-center">

@@ -11,6 +11,7 @@ import { Alert, AlertType } from '../../../models/alerts/alert';
 import { ModalRescheduleAppointmentComponent } from '../modal-reschedule-appointment/modal-reschedule-appointment.component';
 import { RescheduleAppointment } from '../../../models/appointments/reschedule-appointment';
 import { environment } from '../../../../environments/environment';
+import { sourceApps, channelId, appointmentStatusId, paymentStatus } from '../../../variables/common.variable';
 
 @Component({
   selector: 'app-widget-reschedule-worklist',
@@ -37,6 +38,23 @@ export class WidgetRescheduleWorklistComponent implements OnInit {
   public alerts: Alert[] = [];
   public isCanPrevPage: boolean = false;
   public isCanNextPage: boolean = false;
+  public isWorklist: boolean = true;
+  public isAido: boolean = false;
+  //aido
+  public count: number = -1;
+  public aidoAppointments: any [];
+  public showWaitMsg: boolean = false;
+  public showNotFoundMsg: boolean = false;
+  public keywordsModelTwo: KeywordsModelTwo = new KeywordsModelTwo;
+  public bodyKeyword: any = { valueOne: null, valueTwo: null, valueThree: null, valueFour: null,
+    valueFive: null, valueSix: null, valueSeven: null, valueEight: null };
+  public bodyKeywordTwo: any = { valueOne: null, valueTwo: null, valueThree: null, valueFour: null,
+    valueFive: null, valueSix: null, valueSeven: null, valueEight: null };
+  public appStatusId = appointmentStatusId;
+  public payStatus: any = paymentStatus;
+  public arrChannel: any = channelId;
+  public isCanPrevPageTwo: boolean = false;
+  public isCanNextPageTwo: boolean = false;
 
   constructor(
     private appointmentService: AppointmentService,
@@ -47,14 +65,95 @@ export class WidgetRescheduleWorklistComponent implements OnInit {
   ) { }
 
   ngOnInit() {
-    //this.getHospitals();
     this.keywordsModel.hospitalId = this.hospital.id;
+    this.keywordsModelTwo.hospitalId = this.hospital.id;
     this.getDoctors(this.hospital.id);
     this.initializeDateRangePicker();
     this.getCollectionAlert();
     this.emitUpdateContact();
     this.emitRescheduleApp();
     this.getRescheduleWorklist();
+  }
+
+  rescheduleWorklistButton(active) {
+    if(active === 'aido') {this.isAido = true; this.isWorklist = false;}
+    else if(active === 'worklist') {this.isWorklist = true; this.isAido = false;}
+  }
+
+  async getAidoWorklist() {
+    this.count+=1;
+    this.showWaitMsg = true;
+    this.showNotFoundMsg = false;
+    let offsetTemp;
+    const {
+      hospitalId = '', fromDate = this.todayDateISO, toDate = this.todayDateISO,
+      patientName = '', doctorId, isDoubleMr = null, admStatus = '', payStatus = '', offset = 0, limit = 10
+    } = await this.keywordsModelTwo;
+    offsetTemp = offset;
+    
+    if(this.count === 0) {
+      this.bodyKeyword.valueOne = hospitalId, this.bodyKeyword.valueTwo = fromDate, this.bodyKeyword.valueThree = toDate;
+      this.bodyKeyword.valueFour = patientName, this.bodyKeyword.valueFive = doctorId ? doctorId.doctor_id : '';
+      this.bodyKeyword.valueSix = isDoubleMr, this.bodyKeyword.valueSeven = admStatus, this.bodyKeyword.valueEight = payStatus;
+
+      this.bodyKeywordTwo.valueOne = hospitalId, this.bodyKeywordTwo.valueTwo = fromDate, this.bodyKeywordTwo.valueThree = toDate;
+      this.bodyKeywordTwo.valueFour = patientName, this.bodyKeywordTwo.valueFive = doctorId ? doctorId.doctor_id : '';
+      this.bodyKeywordTwo.valueSix = isDoubleMr, this.bodyKeywordTwo.valueSeven = admStatus, this.bodyKeyword.valueEight = payStatus;
+    } else if(this.count > 0) {
+      this.bodyKeyword.valueOne = hospitalId, this.bodyKeyword.valueTwo = fromDate, this.bodyKeyword.valueThree = toDate;
+      this.bodyKeyword.valueFour = patientName, this.bodyKeyword.valueFive = doctorId ? doctorId.doctor_id : '';
+      this.bodyKeyword.valueSix = isDoubleMr, this.bodyKeyword.valueSeven = admStatus, this.bodyKeyword.valueEight = payStatus;
+
+      if(this.bodyKeyword.valueOne !== this.bodyKeywordTwo.valueOne || this.bodyKeyword.valueTwo !== this.bodyKeywordTwo.valueTwo ||
+        this.bodyKeyword.valueThree !== this.bodyKeywordTwo.valueThree || this.bodyKeyword.valueFour !== this.bodyKeywordTwo.valueFour ||
+        this.bodyKeyword.valueFive !== this.bodyKeywordTwo.valueFive || this.bodyKeyword.valueSix !== this.bodyKeywordTwo.valueSix ||
+        this.bodyKeyword.valueSeven !== this.bodyKeywordTwo.valueSeven || this.bodyKeyword.valueEight !== this.bodyKeywordTwo.valueEight) {    
+          this.bodyKeywordTwo.valueOne = hospitalId, this.bodyKeywordTwo.valueTwo = fromDate, this.bodyKeywordTwo.valueThree = toDate;
+          this.bodyKeywordTwo.valueFour = patientName, this.bodyKeywordTwo.valueFive = doctorId ? doctorId.doctor_id : '';
+          this.bodyKeywordTwo.valueSix = isDoubleMr, this.bodyKeywordTwo.valueSeven = admStatus, this.bodyKeywordTwo.valueEight = payStatus;
+        
+          this.page = 0;
+          offsetTemp = 0;
+          this.keywordsModel.offset = offsetTemp;
+          this.isCanPrevPageTwo = offsetTemp === 0 ? false : true;
+      }
+    }
+
+    let doctorSearch = doctorId ? doctorId.doctor_id : '';
+    this.appointmentService.getRescheduleWorklistAido(
+      hospitalId,
+      fromDate,
+      toDate,
+      patientName,
+      doctorSearch,
+      offsetTemp,
+      limit
+    ).subscribe(
+      data => {
+        if (data.data.length !== 0) {
+          this.showWaitMsg = false;
+          this.showNotFoundMsg = false;
+          this.aidoAppointments = data.data;
+          this.aidoAppointments.map(x => {
+            x.date_of_birth = moment(x.date_of_birth).format('DD-MM-YYYY');
+            x.appointment_date = moment(x.appointment_date).format('DD-MM-YYYY');
+            x.appointment_from_time = x.appointment_from_time.substr(0, 5);
+            x.appointment_to_time = x.appointment_to_time.substr(0, 5);
+          });
+          this.isCanNextPageTwo = this.aidoAppointments.length >= 10 ? true : false;
+        }
+        else {
+          this.aidoAppointments = null;
+          this.showWaitMsg = false;
+          this.showNotFoundMsg = true;
+          this.isCanNextPageTwo = false;
+        }
+      }, error => {
+       this.showWaitMsg = false;
+       this.showNotFoundMsg = true;
+       this.alertService.error(error.error.message, false, 3000);
+     }
+    );
   }
 
   getDoctors(hospitalId: string) {
@@ -94,7 +193,16 @@ export class WidgetRescheduleWorklistComponent implements OnInit {
       eDay = Number(eDay) < 10 ? '0' + eDay : eDay;
       this.keywordsModel.fromDate = bYear + '-' + bMonth + '-' + bDay;
       this.keywordsModel.toDate = eYear + '-' + eMonth + '-' + eDay;
-      this.getRescheduleWorklist();
+      if(this.isAido === true) {
+        this.keywordsModelTwo.fromDate = bYear + '-' + bMonth + '-' + bDay;
+        this.keywordsModelTwo.toDate = eYear + '-' + eMonth + '-' + eDay;
+        this.getAidoWorklist();
+      }
+      else if(this.isWorklist === true) {
+        this.keywordsModel.fromDate = bYear + '-' + bMonth + '-' + bDay;
+        this.keywordsModel.toDate = eYear + '-' + eMonth + '-' + eDay;
+        this.getRescheduleWorklist();
+      } 
     }
   }
 
@@ -174,6 +282,19 @@ export class WidgetRescheduleWorklistComponent implements OnInit {
     this.getRescheduleWorklist();
   }
 
+  nextPageAido() {
+    this.page += 1;
+    this.keywordsModelTwo.offset = this.page * 10;
+    this.isCanPrevPageTwo = this.keywordsModelTwo.offset === 0 ? false : true;
+    this.getAidoWorklist();
+  }
+  prevPageAido() {
+    this.page -= 1;
+    this.keywordsModelTwo.offset = this.page * 10;
+    this.isCanPrevPageTwo = this.keywordsModelTwo.offset === 0 ? false : true;
+    this.getAidoWorklist();
+  }
+
   async getCollectionAlert() {
     this.alertService.getAlert().subscribe((alert: Alert) => {
       if (!alert) {
@@ -217,6 +338,21 @@ class KeywordsModel {
   localMrNo: string;
   birthDate: string;
   doctorId: string;
+  offset: number;
+  limit: number;
+}
+
+class KeywordsModelTwo {
+  hospitalId: string;
+  fromDate: string;
+  toDate: string;
+  patientName: string;
+  localMrNo: string;
+  birthDate: string;
+  doctorId: any;
+  isDoubleMr: boolean;
+  admStatus: string;
+  payStatus: string;
   offset: number;
   limit: number;
 }

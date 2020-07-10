@@ -8,6 +8,7 @@ import * as moment from 'moment';
 import { IMyDpOptions } from 'mydatepicker';
 import { isEmpty } from 'lodash';
 import { environment } from '../../../../environments/environment';
+import { consultationType as conType } from '../../../variables/common.variable';
 
 @Component({
   selector: 'app-widget-doctor-schedule',
@@ -122,7 +123,10 @@ export class WidgetDoctorScheduleComponent implements OnInit {
     const areaId = keywords.area ? keywords.area.area_id : null;
     const hospitalId = keywords.hospital ? keywords.hospital.hospital_id : null;
     const specialityId = keywords.speciality ? keywords.speciality.speciality_id : null;
-    let consultationType = this.consulType ? this.consulType : null;
+    const consulTypeAll = conType.REGULAR+':'+conType.EXECUTIVE+':'
+      +conType.TELECONSULTATION+':'+conType.BPJS_REGULER;
+    let consultationType = this.consulType ? this.consulType : consulTypeAll;
+
     this.isOriginal = keywords.original != undefined ? keywords.original : true;
     if (doctorId) {
       this.consulTypeFlag = 1; //reset <select> function

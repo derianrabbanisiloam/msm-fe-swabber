@@ -45,17 +45,13 @@
             <option *ngFor="let m of minuteOptions" value="{{m}}">{{m}}</option>
           </select>
         </div>
-        <div class="form-group col-md-2">
+        <div class="form-group col-md-4">
           <label>Reason</label>
           <input [disabled]="!scheduleSel" class="form-control" type="text" maxlength="100" name="reason" [(ngModel)]="blockModel.reason" required>
         </div>
         <div class="form-group col-md-2">
           <label style="display: block; text-align: center;">Include Waiting List</label>
           <input [disabled]="!scheduleSel" class="form-control" type="checkbox" name="isIncludeWaitingList" (change)="blockCheckBox($event)" [(ngModel)]="blockModel.isIncludeWaitingList">
-        </div>
-        <div class="form-group col-md-2">
-          <label style="display: block; text-align: center;">Teleconsultation</label>
-          <input [disabled]="!scheduleSel" class="form-control" type="checkbox" name="isTeleconsultation" (change)="blockCheckBoxTwo($event)" [(ngModel)]="blockModel.isTeleconsultation">
         </div>
         <div class="form-group col-md-2">
           <button [disabled]="!isValidBlock || !b.form.valid" (click)="addScheduleBlock()" class="btn btn-green">Add Block</button>

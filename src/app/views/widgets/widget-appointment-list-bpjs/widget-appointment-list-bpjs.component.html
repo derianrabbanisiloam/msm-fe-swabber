@@ -13,6 +13,9 @@
 
 <div class="row">
   <div class="col-md-12">
+    <li *ngFor="let img of items">
+      <img [src]="img.value" alt="Smiley face" height="42" width="42" (click)="doDownload(img.value)">
+    </li>
     <button class="btn fo_btn_green" (click)="downloadDoc()">Download Doc</button>
   </div>
 </div>

@@ -33,6 +33,8 @@ import {
 } from '../../../variables/common.variable';
 import Security from 'msm-kadapat';
 import { environment } from '../../../../environments/environment';
+import { HttpClient } from '@angular/common/http';
+import { HttpHeaders } from '@angular/common/http';
 
 @Component({
   selector: 'app-widget-appointment-list-bpjs',
@@ -138,6 +140,7 @@ export class WidgetAppointmentListBpjsComponent implements OnInit {
   //public urlBpjsCard = environment.GET_IMAGE+pathImage.BPJS_CARD;
   public urlBpjsCard = 'https://cdn.pixabay.com';
   public checkAll: boolean = false;
+  public items: any;
 
   constructor(
     private doctorService: DoctorService,
@@ -151,6 +154,7 @@ export class WidgetAppointmentListBpjsComponent implements OnInit {
     private patientService: PatientService,
     private route: ActivatedRoute,
     private router: Router,
+    private http: HttpClient
   ) {
     this.socket = socket(`${environment.WEB_SOCKET_SERVICE + keySocket.APPOINTMENT}`, {
       transports: ['websocket'],
@@ -219,7 +223,67 @@ export class WidgetAppointmentListBpjsComponent implements OnInit {
       }
     });
 
+
+    this.items = [
+      { label: '1.txt', value: 'https://endangcahyapermana.files.wordpress.com/2016/03/belajar-html-dan-css.pdf' },
+      { label: '2.txt', value: 'https://gtn-mysiloam-storage-01.siloamhospitals.com/dev/disclaimer_1/disclaimer_1-1594719597879.pdf' },
+      { label: '3.txt', value: 'https://s3.amazonaws.com/uifaces/faces/twitter/olegpogodaev/128.jpg' }
+    ];
   }
+
+  PrintPDF(value) {
+    let headerOptions = new HttpHeaders({
+        'Content-Type': 'application/json',
+        'Accept': 'application/pdf',
+        //   'Accept': 'application/octet-stream', // for excel file
+    });
+    let requestOptions = { headers: headerOptions, responseType: 'blob' as 'blob' };
+    this.http.get(value, requestOptions).subscribe(val => {
+      this.cek(val);
+      // console.log(val);
+      // let url = URL.createObjectURL(val);
+      // this.downloadUrl(url, 'image.jpg');
+      // URL.revokeObjectURL(url);
+    });
+}
+  
+  cek(data){
+    let blob = new Blob([data], {
+      type: 'application/pdf' // must match the Accept type
+      // type: 'application/octet-stream' // for excel 
+    });
+    var link = document.createElement('a');
+    link.href = window.URL.createObjectURL(blob);
+    // link.download = 'samplePDFFile.pdf';
+    link.target = '_blank';
+    link.click();
+    window.URL.revokeObjectURL(link.href);
+  }
+
+
+  doDownload(value) {
+    let headerOptions = new HttpHeaders({
+      'Accept': 'application/pdf',
+      //   'Accept': 'application/octet-stream', // for excel file
+  });
+  let requestOptions = { headers: headerOptions, responseType: 'blob' as 'blob' };
+    this.http.get(value, requestOptions).subscribe(val => {
+      console.log(val);
+      let url = URL.createObjectURL(val);
+      this.downloadUrl(url, 'image.jpg');
+      URL.revokeObjectURL(url);
+    });
+  }
+
+  downloadUrl(url: string, fileName: string) {
+    let a: any = document.createElement('a');
+    a.href = url;
+    a.download = fileName;
+    document.body.appendChild(a);
+    a.style = 'display: none';
+    a.click();
+    a.remove();
+  };
 
   emitUpdateNotes() {
     this.appointmentService.updateNotesSource$.subscribe(

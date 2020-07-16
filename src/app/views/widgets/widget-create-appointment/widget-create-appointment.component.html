@@ -162,7 +162,7 @@
               <a ngbPopover="{{app.modified_name}}" popoverTitle=""
                 triggers="mouseenter:mouseleave">{{app.modified_name && app.modified_name.length > 10 ? app.modified_name.substr(0,10)+"..." : app.modified_name}}</a>
             </td>
-            <td class="st-kolom-button">
+            <td>
               <div *ngIf="app.channel_id != aidoChannel">
                 <div *ngIf="!app.appointment_temp_id && isOpen == true">
                   <div *ngIf="app.is_can_cancel && isOriginal && !app.admission_id"
@@ -191,7 +191,7 @@
               </div>
 
               <!-- button action for teleconsultation -->
-              <div *ngIf="app.channel_id == aidoChannel">
+              <div *ngIf="app.channel_id == aidoChannel" style="width: 4em;">
                 <div *ngIf="app.payment_status_id === payStatusId.UNPAID">
                   <span class="flag-payment">Waiting Payment</span>
                 </div>

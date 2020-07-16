@@ -84,7 +84,7 @@
                 <option [ngValue]=undefined [selected]="keywordsModel.payStatus === undefined">ALL</option>
                 <option value=1>Paid</option>
                 <option value=2>Waiting</option>
-                <option value=3>Cancelled By System</option>
+                <option value=3>Payment Expired</option>
               </select>
           </div>
         </td>
@@ -145,8 +145,8 @@
             <div style="background: black; border-radius: 1em;" *ngIf="r.payment_status_id === payStatus.UNPAID">
               <span>Waiting</span>
             </div>
-            <div style="background: red; border-radius: 1em;" *ngIf="r.payment_status_id === payStatus.NOTPAID">
-              <span>Cancelled By System</span>
+            <div style="background: red; border-radius: 1em; padding: 0.2em" *ngIf="r.payment_status_id === payStatus.NOTPAID">
+              <span>Payment Expired</span>
             </div>
           </div>
         </td>

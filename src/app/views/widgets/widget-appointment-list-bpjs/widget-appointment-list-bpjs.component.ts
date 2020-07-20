@@ -137,8 +137,8 @@ export class WidgetAppointmentListBpjsComponent implements OnInit {
   public dateApp;
   public listRoomHope: any = [];
   public roomHope: any;
-  //public urlBpjsCard = environment.GET_IMAGE+pathImage.BPJS_CARD;
-  public urlBpjsCard = 'https://cdn.pixabay.com';
+  public urlBpjsCard = environment.GET_IMAGE;
+  //public urlBpjsCard = 'https://cdn.pixabay.com';
   public checkAll: boolean = false;
   public items: any;
 
@@ -225,8 +225,8 @@ export class WidgetAppointmentListBpjsComponent implements OnInit {
 
 
     this.items = [
-      { label: '1.txt', value: 'https://endangcahyapermana.files.wordpress.com/2016/03/belajar-html-dan-css.pdf' },
-      { label: '2.txt', value: 'https://gtn-mysiloam-storage-01.siloamhospitals.com/dev/disclaimer_1/disclaimer_1-1594719597879.pdf' },
+      { label: '1.txt', value: 'https://ilhamcc.files.wordpress.com/2017/01/angularjs-untuk-pemula.pdf' },
+      { label: 'hallo', value: 'disclaimer_1/disclaimer_1-1594719597879.pdf' },
       { label: '3.txt', value: 'https://s3.amazonaws.com/uifaces/faces/twitter/olegpogodaev/128.jpg' }
     ];
   }
@@ -235,6 +235,7 @@ export class WidgetAppointmentListBpjsComponent implements OnInit {
     let headerOptions = new HttpHeaders({
         'Content-Type': 'application/json',
         'Accept': 'application/pdf',
+        'Access-Control-Allow-Headers': 'Origin, X-Requested-With, Content-Type, Accept'
         //   'Accept': 'application/octet-stream', // for excel file
     });
     let requestOptions = { headers: headerOptions, responseType: 'blob' as 'blob' };
@@ -266,12 +267,15 @@ export class WidgetAppointmentListBpjsComponent implements OnInit {
       'Accept': 'application/pdf',
       //   'Accept': 'application/octet-stream', // for excel file
   });
+  let url = this.urlBpjsCard+'/'+value;
   let requestOptions = { headers: headerOptions, responseType: 'blob' as 'blob' };
-    this.http.get(value, requestOptions).subscribe(val => {
+    this.http.get(url, requestOptions).subscribe(val => {
       console.log(val);
       let url = URL.createObjectURL(val);
-      this.downloadUrl(url, 'image.jpg');
+      this.downloadUrl(url, 'image.pdf');
       URL.revokeObjectURL(url);
+    }, error => {
+      console.log('error', error)
     });
   }
 

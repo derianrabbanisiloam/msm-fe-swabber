@@ -231,55 +231,72 @@ export class WidgetAppointmentListBpjsComponent implements OnInit {
     ];
   }
 
-  PrintPDF(value) {
-    let headerOptions = new HttpHeaders({
-        'Content-Type': 'application/json',
-        'Accept': 'application/pdf',
-        'Access-Control-Allow-Headers': 'Origin, X-Requested-With, Content-Type, Accept'
-        //   'Accept': 'application/octet-stream', // for excel file
-    });
-    let requestOptions = { headers: headerOptions, responseType: 'blob' as 'blob' };
-    this.http.get(value, requestOptions).subscribe(val => {
-      this.cek(val);
-      // console.log(val);
-      // let url = URL.createObjectURL(val);
-      // this.downloadUrl(url, 'image.jpg');
-      // URL.revokeObjectURL(url);
-    });
-}
-  
-  cek(data){
-    let blob = new Blob([data], {
-      type: 'application/pdf' // must match the Accept type
-      // type: 'application/octet-stream' // for excel 
-    });
-    var link = document.createElement('a');
-    link.href = window.URL.createObjectURL(blob);
-    // link.download = 'samplePDFFile.pdf';
-    link.target = '_blank';
-    link.click();
-    window.URL.revokeObjectURL(link.href);
+  async downloadDoc() {
+    let tampung = [];
+    if(this.appList) {
+      this.appList.map(x => {
+        if(x.checked === true) {
+          tampung.push(x);
+        } 
+      });
+    }
+    for(let i = 0, { length } = tampung; i < length; i += 1) {
+      this.doDownload(tampung[i]);
+    }
   }
-
 
   doDownload(value) {
-    let headerOptions = new HttpHeaders({
-      'Accept': 'application/pdf',
-      //   'Accept': 'application/octet-stream', // for excel file
-  });
-  let url = this.urlBpjsCard+'/'+value;
-  let requestOptions = { headers: headerOptions, responseType: 'blob' as 'blob' };
-    this.http.get(url, requestOptions).subscribe(val => {
-      console.log(val);
-      let url = URL.createObjectURL(val);
-      this.downloadUrl(url, 'image.pdf');
-      URL.revokeObjectURL(url);
-    }, error => {
-      console.log('error', error)
-    });
+    let objDoc = value;
+    let docLoop = [];
+    
+    if(objDoc.bpjs_card_file) {
+      docLoop.push({
+        file: objDoc.bpjs_card_file,
+        name: objDoc.contact_name
+      });
+    }
+    if(objDoc.family_card_file) {
+      docLoop.push({
+        file: objDoc.family_card_file,
+        name: objDoc.contact_name
+      });
+    }
+    if(objDoc.identity_card_file) {
+      docLoop.push({
+        file: objDoc.identity_card_file,
+        name: objDoc.contact_name
+      });
+    }
+    if(objDoc.refference_letter_file) {
+      docLoop.push({
+        file: objDoc.refference_letter_file,
+        name: objDoc.contact_name
+      });
+    }
+    if(objDoc.selfie_with_identity_file){
+      docLoop.push({
+        file: objDoc.selfie_with_identity_file,
+        name: objDoc.contact_name
+      });
+    }
+
+    for(let i = 0, { length } = docLoop; i < length; i += 1) {
+      let split = docLoop[i].file.split('-');
+      let path = split[0];
+      let nameFile = docLoop[i].name+'-'+docLoop[i].file;
+      let url = this.urlBpjsCard +'/'+ path +'/'+ docLoop[i].file;
+      let requestOptions = { responseType: 'blob' as 'blob' };
+      this.http.get(url, requestOptions).subscribe(val => {
+        let url = URL.createObjectURL(val);
+        this.downloadUrl(url, nameFile);
+        URL.revokeObjectURL(url);
+      }, error => {
+        this.alertService.error(error.error.message, false, 3000);
+      });
+    }
   }
 
-  downloadUrl(url: string, fileName: string) {
+  downloadUrl(url, fileName) {
     let a: any = document.createElement('a');
     a.href = url;
     a.download = fileName;
@@ -287,6 +304,10 @@ export class WidgetAppointmentListBpjsComponent implements OnInit {
     a.style = 'display: none';
     a.click();
     a.remove();
+    this.appList = this.appList.map((value) => {
+      value.checked = false;
+      return value;
+    });
   };
 
   emitUpdateNotes() {
@@ -345,8 +366,9 @@ export class WidgetAppointmentListBpjsComponent implements OnInit {
   }
 
   getImage(fileName) {
-    //window.open(this.urlBpjsCard + fileName, '_blank', "status=1");
-    window.open(this.urlBpjsCard + fileName, '_blank', "status=1");
+    let split = fileName.split('-');
+    let path = split[0];
+    window.open(this.urlBpjsCard +'/'+ path +'/'+ fileName, '_blank', "status=1");
   }
 
   async admissionType() {
@@ -466,35 +488,6 @@ export class WidgetAppointmentListBpjsComponent implements OnInit {
     });
   }
 
-  async downloadDoc() {
-    let body;
-    let tampung;
-    if(this.appList) {
-      this.appList.map(x => {
-        if(x.checked === true) {
-          tampung = x.gambar;
-        } 
-      });
-    }
-    let hahaha = await this.appointmentService.downloadImage(this.urlBpjsCard, tampung);
-
-    // body = {
-    //   appBpjsId: tampung,
-    //   userId: this.user.id,
-    //   userName: this.user.fullname,
-    //   source: sourceApps
-    // }
-
-    // this.bpjsService.notifyBpjs(body)
-    //   .subscribe(data => {
-    //     this.getAppointmentBpjs();
-    //     this.alertService.success('Success update to BPJS', false, 3000);
-    //   }, err => {
-    //     this.alertService.error(err.error.message);
-    //   }
-    // );
-  }
-
   async listAppointment(name = '', birth = '', mr = '', doctor = '', modifiedName = '',
   isWaitingList = null) {
     //const channel = channelId.BPJS; //appointment BPJS
@@ -523,7 +516,11 @@ export class WidgetAppointmentListBpjsComponent implements OnInit {
             res.data[i].custome_from_time = res.data[i].from_time.substring(0, 5);
             res.data[i].custome_to_time = res.data[i].to_time.substring(0, 5);
             res.data[i].checked = false;
-            res.data[i].gambar = '/photo/2017/08/30/01/05/milky-way-2695569_960_720.jpg';
+            res.data[i].bpjs_card_file = 'disclaimer_1-1594719597879.pdf';
+            res.data[i].family_card_file = 'disclaimer_1-1594805030136.pdf';
+            res.data[i].identity_card_file = 'disclaimer_1-1595232503271.pdf';
+            res.data[i].refference_letter_file = 'disclaimer_1-1595232538199.pdf';
+            res.data[i].selfie_with_identity_file = 'disclaimer_1-1595232563389.pdf';
           }
 
           this.showWaitMsg = false;

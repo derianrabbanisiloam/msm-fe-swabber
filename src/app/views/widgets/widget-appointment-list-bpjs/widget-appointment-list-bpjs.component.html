@@ -13,14 +13,7 @@
 
 <div class="row">
   <div class="col-md-12">
-    <li *ngFor="let img of items">
-      <!-- <span (click)="doDownload(img.value)">{{img.label}}</span> -->
-      <a (click)="doDownload(img.value)">Download file dokumen</a>
-    </li>
-    <li *ngFor="let img of items">
-      <img [src]="img.value" alt="Smiley face" height="42" width="42" (click)="doDownload(img.value)">
-    </li>
-    <button class="btn fo_btn_green" (click)="downloadDoc()">Download Doc</button>
+    <button class="btn fo_btn_green" (click)="downloadDoc()" style="margin-bottom: 0.5em;">Download Doc</button>
   </div>
 </div>
 <div class="fo_container_list shadow-4">
@@ -46,7 +39,7 @@
       <th>Notes</th>
       <th width="90px" style="text-align: center">Action</th>
       <th style="min-width: 9em">ModifiedBy</th>
-      <th>Document</th>
+      <th style="min-width: 18rem">Document</th>
     </thead>
 
     <tbody>
@@ -180,7 +173,7 @@
           <a ngbPopover="{{itr.modified_name}}" popoverTitle=""
             triggers="mouseenter:mouseleave">{{itr.modified_name && itr.modified_name.length > 10 ? itr.modified_name.substr(0,10)+"..." : itr.modified_name}}</a>
         </td>
-        <!-- <td>
+        <td>
           <span *ngIf="itr.bpjs_card_file">
             <a href=":javascript"
             (click)="getImage(itr.bpjs_card_file)"
@@ -205,18 +198,18 @@
             <a href=":javascript"
             (click)="getImage(itr.refference_letter_file)"
             target="_blank">{{itr.refference_letter_file}}<br></a>
-          </span>'
+          </span>
           <span *ngIf="itr.selfie_with_identity_file">
             <a href=":javascript"
           (click)="getImage(itr.selfie_with_identity_file)"
           target="_blank">{{itr.selfie_with_identity_file}}<br></a>
           </span>
-        </td> -->
-        <td>
+        </td>
+        <!-- <td>
           <a href=":javascript"
           (click)="getImage(itr.gambar)"
           target="_blank">{{itr.gambar}}<br></a>
-        </td>
+        </td> -->
       </tr>
       <tr>
         <td *ngIf="showNotFoundMsg" colspan="15">Displaying no data</td>

@@ -47,7 +47,7 @@ export class ModalScheduleBlockComponent implements OnInit {
   private index: any;
   private undoWaitingList: boolean = false;
   private undoTeleconsultation: boolean = false;
-  public scheduleSel: string;
+  public scheduleSel: any;
 
   constructor(
     private modalService: NgbModal,
@@ -85,6 +85,7 @@ export class ModalScheduleBlockComponent implements OnInit {
               {
                 schedule_id: this.inputedParams.scheduleId[i].schedule_id,
                 schedule_time: this.inputedParams.scheduleId[i].from_time+" - "+this.inputedParams.scheduleId[i].to_time,
+                consultation_type_id: this.inputedParams.scheduleId[i].consultation_type_id,
                 schedule_block: []
               }
             )
@@ -95,6 +96,7 @@ export class ModalScheduleBlockComponent implements OnInit {
                 tt = result[j].to_time.split(':');
                 this.scheduleBlocks[i].schedule_block.push({
                   ...result[j],
+                  consultation_type_id: this.inputedParams.scheduleId[i].consultation_type_id,
                   fh: ft[0],
                   fm: ft[1],
                   th: tt[0],
@@ -161,12 +163,12 @@ export class ModalScheduleBlockComponent implements OnInit {
   }
 
   async addScheduleBlock() {
-    const scheduleId = this.scheduleSel;
+    const scheduleId = this.scheduleSel.schedule_id;
     const date = this.inputedParams.date;
     const fromTime = moment('1990-01-01 ' + this.blockModel.fh + ':' + this.blockModel.fm).format('HH:mm');
     const toTime = moment('1990-01-01 ' + this.blockModel.th + ':' + this.blockModel.tm).format('HH:mm');
-    const checkTime = await this.rangeTimeChecker(fromTime, toTime, this.scheduleSel);
-    const checkScheduleTime = await this.rangeTimeCheckerSchedule(fromTime, toTime, this.scheduleSel);
+    const checkTime = await this.rangeTimeChecker(fromTime, toTime, this.scheduleSel.schedule_id);
+    const checkScheduleTime = await this.rangeTimeCheckerSchedule(fromTime, toTime, this.scheduleSel.schedule_id);
 
     if (checkTime) {
       this.addBlockErrMsg = 'This range time already exist, please select another range time !';
@@ -175,7 +177,7 @@ export class ModalScheduleBlockComponent implements OnInit {
       this.addBlockErrMsg = 'Out of range time schedule, please select another range time !';
     }
     else {
-      const { reason, isIncludeWaitingList, isTeleconsultation } = this.blockModel;
+      const { reason, isIncludeWaitingList, isRescheduleTeleconsultation } = this.blockModel;
       this.addSchBlockPayload = {
         fromDate: date,
         toDate: date,
@@ -183,7 +185,7 @@ export class ModalScheduleBlockComponent implements OnInit {
         toTime: toTime,
         reason: reason,
         isIncludeWaitingList: isIncludeWaitingList,
-        isTeleconsultation: isTeleconsultation,
+        isRescheduleTeleconsultation: isRescheduleTeleconsultation,
         userId: this.userId,
         userName: this.userName,
         source: this.source,
@@ -213,7 +215,7 @@ export class ModalScheduleBlockComponent implements OnInit {
     const toTime = moment('1990-01-01 ' + this.schBlockSelected.th + ':' + this.schBlockSelected.tm).format('HH:mm');
     const reason = this.schBlockSelected.reason;
     const isIncludeWaitingList = this.schBlockSelected.is_include_waiting_list;
-    const isTeleconsultation = this.schBlockSelected.is_teleconsultation;
+    const isRescheduleTeleconsultation = this.schBlockSelected.is_reschedule_teleconsultation;
     this.checkBlockTime2(this.schBlockSelected.fh, this.schBlockSelected.fm, this.schBlockSelected.th, this.schBlockSelected.tm);
 
     if (this.isValidBlock == true) {
@@ -225,7 +227,7 @@ export class ModalScheduleBlockComponent implements OnInit {
         toTime: toTime,
         reason: reason,
         isIncludeWaitingList: isIncludeWaitingList,
-        isTeleconsultation: isTeleconsultation,
+        isRescheduleTeleconsultation: isRescheduleTeleconsultation,
         userId: this.userId,
         userName: this.userName,
         source: this.source,
@@ -246,7 +248,7 @@ export class ModalScheduleBlockComponent implements OnInit {
             this.scheduleBlocks[this.index].is_include_waiting_list = this.scheduleBlocks[this.index].is_include_waiting_list ? false : true;
           } else if(this.undoTeleconsultation === true) {
             this.undoTeleconsultation = false;
-            this.scheduleBlocks[this.index].is_teleconsultation = this.scheduleBlocks[this.index].is_teleconsultation ? false : true;
+            this.scheduleBlocks[this.index].is_reschedule_teleconsultation = this.scheduleBlocks[this.index].is_reschedule_teleconsultation ? false : true;
           }
           this.alertService.error(error.error.message, false, 3000);
         }
@@ -292,7 +294,7 @@ export class ModalScheduleBlockComponent implements OnInit {
   }
 
   blockCheckBoxTwo(e) {
-    this.blockModel.isTeleconsultation = this.blockModel.isTeleconsultation ? true : false;
+    this.blockModel.isRescheduleTeleconsultation = this.blockModel.isRescheduleTeleconsultation ? true : false;
   }
 
   blockCheckBoxEdit() {
@@ -311,7 +313,7 @@ export class ModalScheduleBlockComponent implements OnInit {
           this.scheduleBlocks[i].schedule_block[this.index].is_include_waiting_list = this.scheduleBlocks[i].schedule_block[this.index].is_include_waiting_list ? false : true;
         } else if(this.undoTeleconsultation === true) {
           this.undoTeleconsultation = false;
-          this.scheduleBlocks[i].schedule_block[this.index].is_teleconsultation = this.scheduleBlocks[i].schedule_block[this.index].is_teleconsultation ? false : true;
+          this.scheduleBlocks[i].schedule_block[this.index].is_reschedule_teleconsultation = this.scheduleBlocks[i].schedule_block[this.index].is_reschedule_teleconsultation ? false : true;
         }
       }
     }

@@ -44,9 +44,11 @@ export class WidgetDoctorScheduleComponent implements OnInit {
   public holidaysSpecialty: any = [];
   public holidaysName: any = [];
   public fromBpjs: boolean = false;
+  public fromRegistration: boolean = false;
   public patFromBpjs: any;
   public bodyBpjs: any;
   public hideLoading: boolean = false;
+  public reschBpjs: boolean = false;
 
   public datePickerModel: any = {
     date: {
@@ -81,23 +83,42 @@ export class WidgetDoctorScheduleComponent implements OnInit {
 
   async ngOnInit() {
   if (this.doctorService.searchDoctorSource2) {
-    if(this.doctorService.searchDoctorSource2.fromBpjs === true) { //from BPJS menu
-      localStorage.setItem('fromBPJS', JSON.stringify(this.doctorService.searchDoctorSource2));
-      this.bodyBpjs = this.doctorService.searchDoctorSource2;
-      this.fromBpjs = true;
-      this.patFromBpjs = this.doctorService.searchDoctorSource2.patientBpjs;
-      this.consulType = this.doctorService.searchDoctorSource2.consulType;
-    }
+    if(this.doctorService.searchDoctorSource2.fromBpjs === true &&
+      this.doctorService.searchDoctorSource2.fromRegistration === false) { //from BPJS request list
+        localStorage.setItem('fromBPJS', JSON.stringify(this.doctorService.searchDoctorSource2));
+        this.bodyBpjs = this.doctorService.searchDoctorSource2;
+        this.fromBpjs = true;
+        this.fromRegistration = false;
+        this.patFromBpjs = this.doctorService.searchDoctorSource2.patientBpjs;
+        this.consulType = this.doctorService.searchDoctorSource2.consulType;
+
+    } else if (this.doctorService.searchDoctorSource2.fromBpjs === true &&
+      this.doctorService.searchDoctorSource2.fromRegistration === true) { //from BPJS registration
+        localStorage.setItem('fromBPJS', JSON.stringify(this.doctorService.searchDoctorSource2));
+        this.bodyBpjs = this.doctorService.searchDoctorSource2;
+        this.fromBpjs = true;
+        this.fromRegistration = true;
+        this.consulType = this.doctorService.searchDoctorSource2.consulType;
+      }
     this.keywords = this.doctorService.searchDoctorSource2;
-    } else if(this.activatedRoute.snapshot.queryParamMap.get('fromBpjs')) {
+  } else if(this.activatedRoute.snapshot.queryParamMap.get('fromBpjs') === 'true' &&
+      this.activatedRoute.snapshot.queryParamMap.get('fromRegistration') === 'false') {
       this.bodyBpjs = JSON.parse(localStorage.getItem('fromBPJS'));
       this.fromBpjs = true;
+      this.fromRegistration = false;
       this.patFromBpjs = this.bodyBpjs.patientBpjs;
-      this.keywords = this.bodyBpjs;
       this.consulType = this.bodyBpjs.consulType;
-    }
+      this.keywords = this.bodyBpjs;
+  } else if(this.activatedRoute.snapshot.queryParamMap.get('fromBpjs') === 'true' &&
+      this.activatedRoute.snapshot.queryParamMap.get('fromRegistration') === 'true') {
+      this.bodyBpjs = JSON.parse(localStorage.getItem('fromBPJS'));
+      this.fromBpjs = true;
+      this.fromRegistration = true;
+      this.consulType = this.bodyBpjs.consulType;
+      this.keywords = this.bodyBpjs;
+  }
 
-    if(this.fromBpjs) {
+    if(this.fromBpjs === true && this.fromRegistration === false) {
       var splitDate = this.patFromBpjs.appointment_date.split('-');
       var dateFix = splitDate[2]+'-'+splitDate[1]+'-'+splitDate[0];
       let dateChoosed = moment(dateFix); 
@@ -159,6 +180,8 @@ export class WidgetDoctorScheduleComponent implements OnInit {
   }
 
   getSchedulesLogic(keywords: any) {
+    keywords.isRescheduleBpjs === true ? this.consulType = keywords.consulType : ''; //from reschedule bpjs
+    keywords.isRescheduleBpjs === true ? this.reschBpjs = true : ''; //from reschedule bpjs
     const doctorId = keywords.doctor ? keywords.doctor.doctor_id : null;
     const areaId = keywords.area ? keywords.area.area_id : null;
     const hospitalId = keywords.hospital ? keywords.hospital.hospital_id : null;
@@ -173,8 +196,10 @@ export class WidgetDoctorScheduleComponent implements OnInit {
       else {
         if(this.flagCon !== this.consulTypeFlag) {
           this.flagCon = this.consulTypeFlag;
-          consultationType = null;
-          this.consulType = null;
+          if(this.fromBpjs === false && this.fromRegistration === false) {
+            consultationType = consulTypeAll;
+            this.consulType = null;
+          }
         }
       }
       this.getSchedulesByDoctor(doctorId, this.initDate, consultationType);
@@ -184,8 +209,10 @@ export class WidgetDoctorScheduleComponent implements OnInit {
       else {
         if(this.flagCon !== this.consulTypeFlag) {
           this.flagCon = this.consulTypeFlag;
-          consultationType = null;
-          this.consulType = null;
+          if(this.fromBpjs === false && this.fromRegistration === false) {
+            consultationType = consulTypeAll;
+            this.consulType = null;
+          }
         }
       }
       this.getSchedulesByKeywords(specialityId, this.initDate, consultationType, areaId, hospitalId);
@@ -226,6 +253,8 @@ export class WidgetDoctorScheduleComponent implements OnInit {
           this.showScheduleType1 = true;
           this.message1 = null;
         } else {
+          this.showScheduleType2 = false;
+          this.showScheduleType1 = true;
           this.message1 = {
             title: 'Data tidak ditemukan',
             description: ''
@@ -245,6 +274,8 @@ export class WidgetDoctorScheduleComponent implements OnInit {
           this.showScheduleType2 = true;
           this.message1 = null;
         } else {
+          this.showScheduleType2 = false;
+          this.showScheduleType1 = true;
           this.hideLoading = false;
           this.message1 = {
             title: 'Data tidak ditemukan',
@@ -321,13 +352,24 @@ export class WidgetDoctorScheduleComponent implements OnInit {
   }
 
   gotoCreateApp(item: any, date: string) {
-    if(this.fromBpjs === true) {
+    if(this.fromBpjs === true && this.fromRegistration === false) {
       this.doctorService.searchDoctorSource2 = this.bodyBpjs;
       this.router.navigate(['/create-appointment'], {
         queryParams: {
           doctorId: item.doctor_id,
           date: date,
-          fromBpjs: true
+          fromBpjs: true,
+          fromRegistration: false
+        }
+      });
+    } else if(this.fromBpjs === true && this.fromRegistration === true) {
+      this.doctorService.searchDoctorSource2 = this.bodyBpjs;
+      this.router.navigate(['/create-appointment'], {
+        queryParams: {
+          doctorId: item.doctor_id,
+          date: date,
+          fromBpjs: true,
+          fromRegistration: true
         }
       });
     } else {

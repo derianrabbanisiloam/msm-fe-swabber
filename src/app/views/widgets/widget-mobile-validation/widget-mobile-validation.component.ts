@@ -171,7 +171,6 @@ export class WidgetMobileValidationComponent implements OnInit {
     const formData_1 = new FormData();
     formData_1.append('uploader', 'disclaimer_1');
     formData_1.append('filePdf', this.uploadForm.get('disclaimer').value);
-
     if(this.dataContact.email_address) {
       if(this.uploadForm.get('disclaimer').value) {
         this.assetDisclaimer = await this.patientService.uploadImage(formData_1)

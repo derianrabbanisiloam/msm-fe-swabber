@@ -135,6 +135,11 @@ export class DoctorService {
     return this.http.get<any>(url, httpOptions);
   }
 
+  getDoctorBySpeciality(hospitalId: string, speciality: string): Observable<any> {
+    const url = `${this.doctorUrl}/lite?hospitalId=${hospitalId}&specialtyId=${speciality}`;
+    return this.http.get<any>(url, httpOptions);
+  }
+
   getScheduleByDoctorId(doctorId: string, date: string, hospitalId?: string, consultationType?: string): Observable<any> {
     // return of(SCHEDULES);
     let url = `${this.scheduleUrl}?doctorId=${doctorId}&date=${date}&hospitalId=${hospitalId}`;

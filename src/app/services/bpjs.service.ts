@@ -16,6 +16,7 @@ export class BpjsService {
   ) { }
 
   private appointmentBpjsUrl = environment.BPJS_SERVICE + '/appointments';
+  private lakaLantasUrl = environment.BPJS_SERVICE + '/lookups';
 
   getListAppointmentBpjs(
     hospitalId?: string,
@@ -56,12 +57,14 @@ export class BpjsService {
   checkNoBpjs(
     hospitalId?: string,
     bpjsCardNumber?: string,
+    nationalIdNo?: string,
     name?: string,
     birthDate?: string,
     specialityId?: string
     ): Observable<any> {
     let uri = `${this.appointmentBpjsUrl}/references?hospitalId=${hospitalId}`;
     uri = bpjsCardNumber ? `${uri}&bpjsCardNumber=${bpjsCardNumber}` : uri;
+    uri = nationalIdNo ? `${uri}&nationalIdNo=${nationalIdNo}` : uri;
     uri = name ? `${uri}&name=${name}` : uri;
     uri = birthDate ? `${uri}&birthDate=${birthDate}` : uri;
     uri = specialityId ? `${uri}&specialityId=${specialityId}` : uri;
@@ -80,4 +83,20 @@ export class BpjsService {
     
     return this.http.delete<any>(url, options);
   }
+
+  getProvinceLakaLantas(hospitalId: string): Observable<any> {
+    let url = `${this.lakaLantasUrl}/bpjs/province?hospitalId=${hospitalId}`;
+    return this.http.get<any>(url, httpOptions);
+  }
+
+  getDistrictLakaLantas(hospitalId: string, provinceId: string): Observable<any> {
+    let url = `${this.lakaLantasUrl}/bpjs/district/${provinceId}?hospitalId=${hospitalId}`;
+    return this.http.get<any>(url, httpOptions);
+  }
+
+  getSubDistrictLakaLantas(hospitalId: string, districtId: string): Observable<any> {
+    let url = `${this.lakaLantasUrl}/bpjs/sub-district/${districtId}?hospitalId=${hospitalId}`;
+    return this.http.get<any>(url, httpOptions);
+  }
+  
 }

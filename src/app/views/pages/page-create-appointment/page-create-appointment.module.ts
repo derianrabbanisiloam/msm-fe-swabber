@@ -7,7 +7,7 @@ import { SectionFooterModule } from '../../sections/section-footer/section-foote
 import { PageCreateAppointmentRoutingModule } from './page-create-appointment-routing.module';
 import { PageCreateAppointmentComponent } from './page-create-appointment.component';
 import { WidgetCreateAppointmentModule } from '../../widgets/widget-create-appointment/widget-create-appointment.module';
-import { NgbAlertModule, NgbModalModule, NgbPopoverModule } from '@ng-bootstrap/ng-bootstrap';
+import { NgbAlertModule, NgbModalModule, NgbPopoverModule, NgbTabsetModule } from '@ng-bootstrap/ng-bootstrap';
 import { TextMaskModule } from 'angular2-text-mask';
 import { NguiAutoCompleteModule } from '@ngui/auto-complete';
 
@@ -59,8 +59,8 @@ import { ModalCreateAppBpjsModule } from '../../widgets/modal-create-app-bpjs/mo
     ModalVerificationAidoModule,
     NgbPopoverModule,
     NguiAutoCompleteModule,
-    ModalCreateAppBpjsModule
-    
+    ModalCreateAppBpjsModule,
+    NgbTabsetModule
   ],
   entryComponents: [
     ModalScheduleBlockComponent,

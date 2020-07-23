@@ -49,9 +49,6 @@ export class WidgetRequestListComponent implements OnInit {
     speciality: {}
   };
   public showSchedule: boolean = false;
-  public fromBpjs: boolean = false;
-  public patFromBpjs: any;
-  public bodyBpjs: any;
   public myDatePickerOptions: IMyDpOptions = {
     todayBtnTxt: 'Today',
     dateFormat: 'dd/mm/yyyy',
@@ -91,7 +88,6 @@ export class WidgetRequestListComponent implements OnInit {
     if(this.doctorService.goBack) { //when click prev page
       this.showSchedule = false;
     }
-    this.getAppBpjs();
     this.getSpecialities();
     this.keywordsModel.hospitalId = this.hospital.id;
     this.initializeDateRangePicker();
@@ -113,18 +109,6 @@ export class WidgetRequestListComponent implements OnInit {
         x.speciality_name = isEmpty(x.speciality_name) ? '' : x.speciality_name;
       });
     }
-  }
-
-  async getAppBpjs() {
-    if (this.doctorService.searchDoctorSource2) {
-      if(this.doctorService.searchDoctorSource2.fromBpjs === true) { //from BPJS menu
-        this.bodyBpjs = this.doctorService.searchDoctorSource2;
-        this.fromBpjs = true;
-        this.patFromBpjs = this.doctorService.searchDoctorSource2.patientBpjs;
-        this.showSchedule = true;
-      }
-    }
-    
   }
 
   initializeDateRangePicker() {
@@ -168,7 +152,7 @@ export class WidgetRequestListComponent implements OnInit {
     this.showNotFoundMsg = false;
     let offsetTemp;
     const {
-      hospitalId = '', fromDate = this.todayDateISO, toDate = this.todayDateISO,
+      hospitalId = this.hospital.id, fromDate = this.todayDateISO, toDate = this.todayDateISO,
       patientName = '', birthDate = '', noBpjs = '',  offset = 0, specialtyId = '', limit = 10
     } = await this.keywordsModel;
     offsetTemp = offset;
@@ -224,7 +208,7 @@ export class WidgetRequestListComponent implements OnInit {
             x.checked = false;
             let fixDate;
             fixDate = x.created_date.substr(0, 10);
-            x.created_date = moment(fixDate).format('DD-MM-YYYY');;
+            x.created_date = moment(fixDate).format('DD-MM-YYYY');
           });
           this.isCanNextPage = this.appRequestList.length >= 10 ? true : false;
         }
@@ -258,34 +242,6 @@ export class WidgetRequestListComponent implements OnInit {
       }).catch(err => {
         this.alertService.error(err.error.message, false, 3000);
       })
-  }
-
-  downloadDoc() {
-    let body;
-    let tampung = [];
-    if(this.appRequestList) {
-      this.appRequestList.map(x => {
-        if(x.checked === true) {
-          tampung.push(x)
-        } 
-      });
-    }
-
-    // body = {
-    //   appBpjsId: tampung,
-    //   userId: this.user.id,
-    //   userName: this.user.fullname,
-    //   source: sourceApps
-    // }
-
-    // this.bpjsService.notifyBpjs(body)
-    //   .subscribe(data => {
-    //     this.getAppointmentBpjs();
-    //     this.alertService.success('Success update to BPJS', false, 3000);
-    //   }, err => {
-    //     this.alertService.error(err.error.message);
-    //   }
-    // );
   }
 
   CheckAllOptions() {
@@ -396,6 +352,7 @@ export class WidgetRequestListComponent implements OnInit {
         speciality_name: speciality.speciality_name,
       },
       fromBpjs: true,
+      fromRegistration: false,
       patientBpjs: body,
       consulType: consultationType.BPJS
     };
@@ -409,7 +366,8 @@ export class WidgetRequestListComponent implements OnInit {
     this.doctorService.searchDoctorSource2 = this.searchKeywords;
     this.router.navigate(['/doctor-schedule'], {
       queryParams: {
-        fromBpjs: true
+        fromBpjs: true,
+        fromRegistration: false
       }
     });
     localStorage.setItem('searchKey', JSON.stringify(searchKey));

@@ -1,17 +1,17 @@
-<div class="modal-content" id="tutorial5" >
-  <div class="modal-header create-appointment-modal">
+<div class="modal-content" id="tutorial5">
+  <div class="modal-header" id="modal-bpjs">
     <div class="header-2 modal-padding">Create Appointment</div>
     <button #close_button type="button" class="close" data-dismiss="modal" aria-label="Close" aria-label="Close"
             (click)="close()">
       <span aria-hidden="true">&times;</span>
     </button>
   </div>
-  <div class="modal-body create-appointment-modal" style="padding: 0.5rem;">
+  <div class="modal-body" style="padding: 0.5rem;" id="modal-bpjs-2">
 
     <div class="col-md-12 content-appointment-02-group-col" >
 
       <form name="form" (ngSubmit)="f.form.valid" #f="ngForm" novalidate>
-        <div class="row">
+        <div class="row" *ngIf="fromRegistration == false">
           <label class="col-md-6 col-form-label foot-note"><span style="font-weight: bold; font-size: 14px;">BPJS No.</span></label>
           <div class="col-md-6 col-form-label">
           </div>
@@ -30,108 +30,207 @@
           </div>
           <div class="col-md-2"></div>
         </div>
+        <div class="row" *ngIf="fromRegistration === true">
+          <label class="col-md-4 col-form-label foot-note">
+            <span style="font-weight: bold; font-size: 14px;">BPJS No.</span>
+          </label>
+          <div class="col-md-1">
+          </div>
+          <label class="col-md-4 col-form-label foot-note">
+            <span style="font-weight: bold; font-size: 14px;">NIK</span>
+          </label>
+          <div class="col-md-3 col-form-label">
+          </div>
+
+          <div class="col-md-4 input-group">
+            <input 
+              onkeydown="return event.keyCode == 69 ? false : true"
+              onKeyPress="if(this.value.length==16) return false;"
+              type="number" 
+              class="form-control" 
+              placeholder="input BPJS number..." 
+              name="bpjsNumber" 
+              [(ngModel)]="bpjsCardNumber"
+              min="1" max="5"
+              [disabled]="nationalIdNo">
+          </div>
+          <div class="col-md-1 input-group" style="vertical-align: middle;">
+            or
+          </div>
+          <div class="col-md-4 input-group">
+            <input
+              onkeydown="return event.keyCode == 69 ? false : true"
+              onKeyPress="if(this.value.length==16) return false;"
+              type="number" 
+              class="form-control" 
+              placeholder="input national id no..." 
+              name="nationalIdNo" 
+              [(ngModel)]="nationalIdNo"
+              min="1" max="5"
+              [disabled]="bpjsCardNumber">
+          </div>
+          <div class="col-md-3">
+            <button class="btn fo_btn_blue" (click)="searchDataBPJS()" 
+            [disabled]="(!bpjsCardNumber && !nationalIdNo)">Check</button>
+          </div>
+        </div>
         <div>
           <span *ngIf="messageBpjs" style="color: red; font-size: 9px;">{{messageBpjs}}</span>
         </div>
 
-        <div class="form-ca-phoneno form-group row" style="font-weight: bold; margin-top: 0.5em;">
+        <div class="form-ca-phoneno form-group row" style="font-weight: bold; margin-top: 1em;">
           <div class="col-md-6">
             <div class="row">
-              <div class="col-md-12">
-                Status Peserta: 
+              <div class="col-md-10">
+                Status Peserta
+              </div>
+              <div class="col-md-1" style="padding-right: 0;">
+                :
               </div>
             </div>
             <div class="row">
-              <div class="col-md-12">
-                NIK: 
+              <div class="col-md-10">
+                NIK
+              </div>
+              <div class="col-md-1" style="padding-right: 0;">
+                :
               </div>
             </div>
             <div class="row">
-              <div class="col-md-12">
-                Nama Peserta:
+              <div class="col-md-10">
+                Nama Peserta
+              </div>
+              <div class="col-md-1" style="padding-right: 0;">
+                :
               </div>
             </div>
             <div class="row">
-              <div class="col-md-12">
-                Tanggal Lahir:
+              <div class="col-md-10">
+                Tanggal Lahir
+              </div>
+              <div class="col-md-1" style="padding-right: 0;">
+                :
               </div>
             </div>
             <div class="row">
-              <div class="col-md-12">
-                Diagnosa:
+              <div class="col-md-10">
+                Diagnosa
+              </div>
+              <div class="col-md-1" style="padding-right: 0;">
+                :
               </div>
             </div>
             <div class="row">
-              <div class="col-md-12">
-                No. Rujukan:
+              <div class="col-md-10">
+                No. Rujukan
+              </div>
+              <div class="col-md-1" style="padding-right: 0;">
+                :
               </div>
             </div>
             <div class="row">
-              <div class="col-md-12">
-                Dirujuk ke RS:
+              <div class="col-md-10">
+                Dirujuk ke RS
+              </div>
+              <div class="col-md-1" style="padding-right: 0;">
+                :
               </div>
             </div>
             <div class="row">
-              <div class="col-md-12">
-                Dirujuk ke Spesialisasi:
+              <div class="col-md-10">
+                Dirujuk ke Spesialisasi
+              </div>
+              <div class="col-md-1" style="padding-right: 0;">
+                :
               </div>
             </div>
             <div class="row">
-              <div class="col-md-12">
-                Akhir Masa Berlaku Surat Rujukan:
+              <div class="col-md-10" style="padding-right: 0;">
+                Akhir Masa Berlaku Surat Rujukan
+              </div>
+              <div class="col-md-1" style="padding-right: 0;">
+                :
               </div>
             </div>
           </div>
 
-          <div class="col-md-6" *ngIf="!bpjsData?.length">
+          <div class="col-md-6" *ngIf="!fixBpjsData">
           </div>
 
-          <div class="col-md-6" *ngIf="bpjsData?.length">
+          <div class="col-md-6" *ngIf="fixBpjsData" style="padding-left: 0;">
             <div class="row">
-              <div class="col-md-12">
-                {{bpjsData.statusPeserta.keterangan}}
+              <div class="col-md-12" style="padding-left: 0">
+                {{fixBpjsData.peserta.statusPeserta.keterangan}}
               </div>
             </div>
             <div class="row">
-              <div class="col-md-12">
-                {{bpjsData.nik}}
+              <div class="col-md-12" style="padding-left: 0">
+                {{fixBpjsData.peserta.nik}}
               </div>
             </div>
             <div class="row">
-              <div class="col-md-12">
-                {{bpjsData.nama}}
+              <div class="col-md-12" style="padding-left: 0">
+                {{fixBpjsData.peserta.nama}}
               </div>
             </div>
             <div class="row">
-              <div class="col-md-12">
-                {{bpjsData.tglLahir}}
+              <div class="col-md-12" style="padding-left: 0">
+                {{fixBpjsData.fixTglLahir}}
               </div>
             </div>
             <div class="row">
-              <div class="col-md-12">
-                {{bpjsData.diagnosa.nama}}
+              <div class="col-md-12" style="padding-left: 0">
+                {{fixBpjsData.diagnosa.nama}}
               </div>
             </div>
             <div class="row">
-              <div class="col-md-12">
-                {{bpjsData.noKunjungan}}
+              <div class="col-md-12" style="padding-left: 0">
+                {{fixBpjsData.noKunjungan}}
               </div>
             </div>
             <div class="row">
-              <div class="col-md-12">
-                {{bpjsData.provPerujuk.nama}}
+              <div class="col-md-12" style="padding-left: 0">
+                {{fixBpjsData.provPerujuk.nama}}
               </div>
             </div>
             <div class="row">
-              <div class="col-md-12">
-                {{bpjsData.poliRujukan.nama}}
+              <div class="col-md-12" style="padding-left: 0">
+                {{fixBpjsData.poliRujukan.nama}}
               </div>
             </div>
             <div class="row">
-              <div class="col-md-12">
-                {{bpjsData.expiredDate}}
+              <div class="col-md-12" style="padding-left: 0">
+                {{fixBpjsData.expiredDate}}
               </div>
             </div>
+          </div>
+        </div>
+
+        <div class="row" *ngIf="fromRegistration === true">
+          <div class="col-md-1 form-group">
+            <input class="form-control inter-checkbox" type="checkbox" name="isRujukanInternal" (change)="rujukanInternalVal()" [(ngModel)]="isRujukanInternal">
+          </div>
+          <div class="col-md-3" *ngIf="!isRujukanInternal">
+            <span style="font-weight: bold;">Rujukan Internal</span>
+          </div>
+          <div class="col-md-2" *ngIf="isRujukanInternal">
+            <span style="font-weight: bold;">Rujukan Internal</span>
+          </div>
+          <div class="col-md-2" *ngIf="isRujukanInternal">
+            <span style="font-weight: bold;">Referred by: </span>
+          </div>
+          <div class="col-md-3" *ngIf="isRujukanInternal">
+            <select id="doctor" class="form-control"  [(ngModel)]="doctorId" name="doctor" required>
+              <option *ngFor = "let doctor of doctorList" [ngValue]="doctor.doctor_id">
+                {{doctor.name}}
+              </option>
+            </select>
+          </div>
+          <div class="col-md-1" *ngIf="isRujukanInternal">
+            <span style="font-weight: bold;">Notes: </span>
+          </div>
+          <div class="col-md-3" *ngIf="isRujukanInternal">
+            <textarea class="form-control" rows="1" name="note" [(ngModel)]="note"></textarea>
           </div>
         </div>
 

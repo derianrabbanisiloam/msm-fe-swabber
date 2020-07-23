@@ -4,7 +4,7 @@
 
 <div class="fd-column" id="tutorial4">
   <div>
-    <div class="content-header-container" *ngIf="fromBpjs">
+    <div class="content-header-container" *ngIf="fromBpjs == true && fromRegistration == false">
       <div class="content-doctor-schedule-group-1 custom-app-bpjs">
         <div class="left-text">{{patFromBpjs.patient_name}}, {{patFromBpjs.date_of_birth}}</div>
         <div class="left-text">{{patFromBpjs.speciality_name}}, Preferred Consultation Date: {{patFromBpjs.appointment_date}}</div>
@@ -14,10 +14,10 @@
   <div class="jc-space-between content-appointment-01-group-col">
     <div *ngIf="isOriginal" style="padding: 0.2vw">
       <div class="d-flex justify-content-start cc_container_btn_topleft">
-        <div class="btn" style="background: white; padding: 0.2vw 0.5vw" *ngIf="!fromBpjs" (click)="prevPage()">
+        <div class="btn" style="background: white; padding: 0.2vw 0.5vw" *ngIf="fromBpjs == false" (click)="prevPage()">
           <img style="width: 1vw" src="{{assetPath}}icons/ic_BackGreen@2x.png">
         </div>
-        <div class="btn" style="background: white; padding: 0.2vw 0.5vw" *ngIf="fromBpjs" (click)="prevPageTwo()">
+        <div class="btn" style="background: white; padding: 0.2vw 0.5vw" *ngIf="fromBpjs == true" (click)="prevPageTwo()">
           <img style="width: 1vw" src="{{assetPath}}icons/ic_BackGreen@2x.png">
         </div>
         <div>
@@ -81,14 +81,22 @@
               class="st-kolom-available">
               <span style="color:red;font-weight:bold">Not Yet Opened</span>
             </td>
-            <td *ngIf="app.is_can_create && !isOriginal && app.is_walkin == false" class="st-kolom-available"
+            <td *ngIf="app.is_can_create && !isOriginal && app.is_walkin == false && reschBpjs == false" class="st-kolom-available"
               (click)="openCreateAppModal2(app)"><a>Available</a></td>
-            <td *ngIf="app.is_can_create && !isOriginal && app.is_walkin == true && isOpen == true"
+            <td *ngIf="app.is_can_create && !isOriginal && app.is_walkin == true && isOpen == true && reschBpjs == false"
               class="st-kolom-available" (click)="openCreateAppModal2(app)"><a>Available/Walk In Slot</a></td>
-            <td *ngIf="app.is_can_create && !isOriginal && app.is_walkin == true && isOpen == false"
+            <td *ngIf="app.is_can_create && !isOriginal && app.is_walkin == true && isOpen == false && reschBpjs == false"
               class="st-kolom-available">
               <span style="color:red;font-weight:bold">Not Yet Opened</span>
             </td>
+            <!-- reschedule bpjs -->
+            <td *ngIf="app.is_can_create && !isOriginal && isOpen == true && reschBpjs == true" class="st-kolom-available"
+              (click)="openCreateAppModal2(app)"><a>Available</a></td>
+            <td *ngIf="app.is_can_create && !isOriginal && isOpen == false && reschBpjs == true"
+              class="st-kolom-available">
+              <span style="color:red;font-weight:bold">Not Yet Opened</span>
+            </td>
+            <!-- reschedule bpjs -->
             <td *ngIf="!app.is_can_create">
               {{app.patient_name}}
               <span *ngIf="app.appointment_temp_id" class="newPatientIcon">
@@ -117,7 +125,11 @@
                   class="cell-img-nav d-flex justify-content-center">
                   <div *ngIf="isOpen" (click)="checkInAppointment(app, confirmCheckIn)">
                     <img src="{{assetPath}}icons/ic_Check@2x.png">
-                  </div>
+                  </div> 
+                  <!-- dummy -->
+                  <!-- <div *ngIf="isOpen" (click)="checkInBpjsApp(app, confirmDocument)">
+                    <img src="{{assetPath}}icons/ic_Check@2x.png">
+                  </div> -->
                   <span style="opacity: 0; max-width: 0.5em; overflow: hidden">filler</span>
                   <div (click)="confirmCancelAppointment(app.appointment_id)">
                     <img src="{{assetPath}}icons/ic_Cancel@2x.png">
@@ -147,6 +159,19 @@
             <td>{{app.no}}</td>
             <td *ngIf="app.is_can_create && isOriginal && app.is_walkin == false" class="st-kolom-available"
               (click)="createAppBPJSOnly(app)"><a>Available</a></td>
+            <td *ngIf="app.is_can_create && !isOriginal && app.is_walkin == false" class="st-kolom-available"
+            (click)="openCreateAppModal2(app)"><a>Available</a></td>
+            <td *ngIf="!app.is_can_create">
+              {{app.patient_name}}
+              <span *ngIf="app.appointment_temp_id" class="newPatientIcon">
+                <span>
+                  Tentative
+                  <span>
+                    Please verify this patient first
+                  </span>
+                </span>
+              </span>
+            </td>
             <td>{{app.date_of_birth}}</td>
             <td>{{app.local_mr_no}}</td>
             <td>{{app.phone_no}}</td>
@@ -162,7 +187,10 @@
               <div *ngIf="!app.appointment_temp_id">
                 <div *ngIf="app.is_can_cancel && isOriginal && !app.admission_id"
                   class="cell-img-nav d-flex justify-content-center">
-                  <div *ngIf="isOpen" (click)="checkInAppointment(app, confirmCheckIn)">
+                  <!-- <div *ngIf="isOpen" (click)="checkInAppointment(app, confirmCheckIn)">
+                    <img src="{{assetPath}}icons/ic_Check@2x.png">
+                  </div> -->
+                  <div *ngIf="isOpen" (click)="checkInBpjsApp(app, confirmCheckInTwo)">
                     <img src="{{assetPath}}icons/ic_Check@2x.png">
                   </div>
                   <span style="opacity: 0; max-width: 0.5em; overflow: hidden">filler</span>
@@ -277,7 +305,7 @@
     </div>
 
     <!--                              Waiting List                                -->
-    <div *ngIf="schArray.doctor_type_name !== doctorType.FCFS && fromBpjs === false">
+    <div *ngIf="schArray.doctor_type_name !== doctorType.FCFS && fromBpjs === false && reschBpjs == false">
       <div *ngIf="schArray.consultation_type_id != '4'">
         <div *ngFor="let appWait of appListWaiting">
           <div class="col-md-12" *ngIf="appWait.schedule_id === schArray.schedule_id">
@@ -392,6 +420,32 @@
   </div>
 </ng-template>
 
+<ng-template #confirmCheckInTwo let-c="close" let-d="dismiss">
+  <div class="modal-header">
+    <h4 class="modal-title">Confirmation</h4>
+    <button type="button" class="close" aria-label="Close" (click)="d('Cross click')">
+      <span aria-hidden="true">&times;</span>
+    </button>
+  </div>
+  <div class="modal-body">
+    <div *ngIf="late">
+      <p style="color:red;">
+        <font size="4"><b>Pasien Terlambat {{late}}</b></font>
+      </p>
+    </div>
+    <p>Are you sure to check in this appointment ?</p>
+    <div class="fo_confirmation_button d-flex justify-content-center">
+      <button type="button" class="btn fo_btn_green"
+        (click)="confirmCheckInValue(selectedCheckIn, confirmDocument, confirmLocalMrCreate)"
+        (click)="c('Cross click')">Ok</button>
+      <div *ngIf="late">
+        <button type="button" class="btn fo_btn_blue" (click)="openRescheduleModal(selectedCheckIn)"
+          (click)="c('Cross click')">Reschedule</button>
+      </div>
+      <button type="button" class="btn fo_btn_black" (click)="c('Cross click')">Cancel</button>
+    </div>
+  </div>
+</ng-template>
 
 <ng-template #checkInOldPatient let-c="close" let-d="dismiss">
   <div class="modal-header">
@@ -446,7 +500,7 @@
           </div>
         </div>
         <div class="d-flex justify-content-start">
-          <div class="" style="width: 15%; min-width: 100px">
+          <div class="" style="width: 17%">
             <label class="">Referal Type</label>
             <div class="">
               <input type="text" class="form-control" name="selfReferal" [(ngModel)]="selectedReferral.description"
@@ -459,7 +513,7 @@
               <input type="text" class="form-control" name="phone" [(ngModel)]="selectedCheckIn.phone_number" readonly>
             </div>
           </div>
-          <div class="">
+          <div style="width: 30%">
             <label class="">Admission Type</label>
             <div class="input-group">
               <input type="text" class="form-control" name="admission_type"
@@ -473,6 +527,14 @@
                 readonly>
             </div>
           </div>
+          <!-- dummy -->
+          <div class="form-group" style="width: 50%" *ngIf="fromBpjs">
+            <label class="">No. Surat Keterangan</label>
+            <div class="input-group">
+              <input type="text" class="form-control" name="surat_keterangan" readonly>
+            </div>
+          </div>
+          <!-- dummy -->
         </div>
       </div>
       <div *ngIf="!selectedCheckIn.admission_id" style="border-top: 0.5px solid #C1C1C1">
@@ -528,6 +590,36 @@
             </div>
           </div>
         </div>
+      </div>
+      <div style="width: 100%" *ngIf="fromBpjs">
+        <!-- dummy -->
+        <div class="d-flex justify-content-start">
+          <div style="width: 2%">
+            <div class="form-group">
+              <input class="inter-checkbox" type="checkbox" name="isLakaLantas" (change)="lakaLantasVal(lakaLantas)" [(ngModel)]="isLakaLantas">
+            </div>
+          </div>
+          <div style="width: 15%;">
+            <span style="font-weight: bold;">Laka Lantas</span>
+          </div>
+          <div style="width: 2%">
+            <div class="form-group">
+              <input class="inter-checkbox" type="checkbox">
+            </div>
+          </div>
+          <div style="width: 10%;">
+            <span style="font-weight: bold;">COB</span>
+          </div>
+          <div style="width: 2%">
+            <div class="form-group">
+              <input class="inter-checkbox" type="checkbox">
+            </div>
+          </div>
+          <div style="width: 15%;">
+            <span style="font-weight: bold;">Katarak</span>
+          </div>
+        </div>
+      <!-- dummy -->
       </div>
       <div>
         <div class="d-flex justify-content-end">
@@ -676,5 +768,256 @@
         (click)="c('Cross click')">Ok</button>
       <button type="button" class="btn fo_btn_black" (click)="c('Cross click')">Cancel</button>
     </div>
+  </div>
+</ng-template>
+
+<ng-template #confirmDocument let-modal let-c="close">
+  <div class="modal-header">
+    <div class="header-2 modal-padding" *ngIf="selectedCheckIn?.contact_name">{{selectedCheckIn.contact_name}} {{selectedCheckIn.custome_birth_date}} | Document uploads</div>
+    <button #cls_btn_confirm type="button" class="close" aria-label="Close" (click)="c('Cross click')">
+      <span aria-hidden="true">&times;</span>
+    </button>
+  </div>
+  <div class="modal-body">
+    <div class="form-ca-phoneno form-group row" style="font-weight: bold; margin-top: 1em;">
+      <div class="col-md-7">
+        <div class="row space-text-two">
+          <div class="col-md-12">
+            Kartu BPJS*
+          </div>
+        </div>
+        <div class="row space-text-two">
+          <div class="col-md-12">
+            KTP
+          </div>
+        </div>
+        <div class="row space-text-two">
+          <div class="col-md-12">
+            Kartu Keluarga
+          </div>
+        </div>
+        <div class="row space-text-two">
+          <div class="col-md-12">
+            Surat Rujukan/Surat Keterangan*
+          </div>
+        </div>
+      </div>
+      <div class="col-md-5" style="padding-left: 0;">
+        <div class="row space-text">
+          <div class="col-md-3" style="padding-left: 0" *ngIf="selectedCheckIn?.bpjs_card_file">
+            <span>
+              <a href=":javascript"
+              (click)="getImage(selectedCheckIn.bpjs_card_file)"
+              target="_blank">View<br></a>
+            </span>
+          </div>
+          <div class="col-md-4" style="padding-left: 0">
+            <button type="button" class="btn ms_btn_blue_module" [disabled]="flagFile1" (click)="fileInputOne.click()">
+              <span *ngIf="!selectedCheckIn?.bpjs_card_file">Upload</span>
+              <span *ngIf="selectedCheckIn?.bpjs_card_file">Re-upload</span>
+              <input #fileInputOne type="file" (change)="upload($event, 'bpjsCard')" style="display:none;" accept="application/pdf, .jpg, .jpeg"/>
+            </button>
+          </div>
+          <div class="col-md-3" style="padding-left: 0;">
+            <span *ngIf="flagFile1">
+              <ngb-progressbar type="success" value="500" [striped]="true" height="2.3rem" [animated]="true">Loading...</ngb-progressbar>
+            </span>
+          </div>
+        </div>
+        <div class="row space-text">
+          <div class="col-md-3" style="padding-left: 0" *ngIf="selectedCheckIn?.family_card_file">
+            <span>
+              <a href=":javascript"
+              (click)="getImage(selectedCheckIn.family_card_file)"
+              target="_blank">View<br></a>
+            </span>
+          </div>
+          <div class="col-md-4" style="padding-left: 0">
+            <button type="button" class="btn ms_btn_blue_module" [disabled]="flagFile2" (click)="fileInputTwo.click()">
+              <span *ngIf="!selectedCheckIn?.family_card_file">Upload</span>
+              <span *ngIf="selectedCheckIn?.family_card_file">Re-upload</span>
+              <input #fileInputTwo type="file" (change)="upload($event, 'familyCard')" style="display:none;" accept="application/pdf, .jpg, .jpeg"/>
+            </button>
+          </div>
+          <div class="col-md-3" style="padding-left: 0;">
+            <span *ngIf="flagFile2">
+              <ngb-progressbar type="success" value="1000" [striped]="true" height="2.3rem" [animated]="true">Loading...</ngb-progressbar>
+            </span>
+          </div>
+        </div>
+        <div class="row space-text">
+          <div class="col-md-3" style="padding-left: 0" *ngIf="selectedCheckIn?.identity_card_file">
+            <span>
+              <a href=":javascript"
+              (click)="getImage(selectedCheckIn.identity_card_file)"
+              target="_blank">View<br></a>
+            </span>
+          </div>
+          <div class="col-md-4" style="padding-left: 0">
+            <button type="button" class="btn ms_btn_blue_module" [disabled]="flagFile3" (click)="fileInputThree.click()">
+              <span *ngIf="!selectedCheckIn?.identity_card_file">Upload</span>
+              <span *ngIf="selectedCheckIn?.identity_card_file">Re-upload</span>
+              <input #fileInputThree type="file" (change)="upload($event, 'identityCard')" style="display:none;" accept="application/pdf, .jpg, .jpeg"/>
+            </button>
+          </div>
+          <div class="col-md-3" style="padding-left: 0;">
+            <span *ngIf="flagFile3">
+              <ngb-progressbar type="success" value="1000" [striped]="true" height="2.3rem" [animated]="true">Loading...</ngb-progressbar>
+            </span>
+          </div>
+        </div>
+        <div class="row space-text">
+          <div class="col-md-3" style="padding-left: 0" *ngIf="selectedCheckIn?.surat_rujukan">
+            <span>
+              <a href=":javascript"
+              (click)="getImage(selectedCheckIn.surat_rujukan)"
+              target="_blank">View<br></a>
+            </span>
+          </div>
+          <div class="col-md-4" style="padding-left: 0">
+            <button type="button" class="btn ms_btn_blue_module" [disabled]="flagFile4" (click)="fileInputFour.click()">
+              <span *ngIf="!selectedCheckIn?.surat_rujukan">Upload</span>
+              <span *ngIf="selectedCheckIn?.surat_rujukan">Re-upload</span>
+              <input #fileInputFour type="file" (change)="upload($event, 'referenceLetter')" style="display:none;" accept="application/pdf, .jpg, .jpeg"/>
+            </button>
+          </div>
+          <div class="col-md-3" style="padding-left: 0;">
+            <span *ngIf="flagFile4">
+              <ngb-progressbar type="success" value="1000" [striped]="true" height="2.3rem" [animated]="true">Loading...</ngb-progressbar>
+            </span>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+  <div class="modal-footer">
+    <button class="btn ms_btn_green" [disabled]="!selectedCheckIn.bpjs_card_file" (click)="open50(checkInOldPatient)">Continue</button>
+    <button type="button" class="btn ms_btn_red" (click)="c('Cross click')">Cancel</button>
+  </div>
+</ng-template>
+
+<ng-template #lakaLantas let-modal let-c="close">
+  <div class="modal-header">
+    <div class="header-2 modal-padding">Jaminan</div>
+    <button #cls_btn_confirm type="button" class="close" aria-label="Close" (click)="c('Cross click')" (click)="cancelLakaLantas()">
+      <span aria-hidden="true">&times;</span>
+    </button>
+  </div>
+  <div class="modal-body">
+    <div class="fo_create_admission_body_two">
+      <div class="row">
+        <div class="col-md-1" style="padding-right: 0;">
+          <input class="form-control inter-checkbox" type="checkbox" name="isLakaLantas" [(ngModel)]="isLakaLantas" disabled>
+        </div>
+        <div class="col-md-11" style="padding-left: 0; margin-left: -1.5em;">
+          Laka Lantas
+        </div>
+      </div>
+      <div style="width: 100%">
+        <ngb-tabset>
+          <ngb-tab title="Penjamin">
+            <ng-template ngbTabContent>
+              <div class="form-group">
+                <div class="row" style="margin-top: 1em;">
+                  <div class="col-md-2">
+                    Penjamin
+                  </div>
+                  <div class="col-md-9">
+                    <input class="form-control" [(ngModel)]="lakaLantasAssurance.penjamin">
+                  </div>
+                </div>
+                <div class="row" style="margin-top: 0.5em;">
+                  <div class="col-md-2">
+                    Tgl Kejadian
+                  </div>
+                  <div class="col-md-9">
+                    <input class="form-control" [textMask]="{mask: mask_birth}" name="birth" [(ngModel)]="lakaLantasAssurance.tglKejadian" placeholder="dd-mm-yyyy">
+                  </div>
+                </div>
+                <div class="row" style="margin-top: 0.5em;">
+                  <div class="col-md-2">
+                    Keterangan
+                  </div>
+                  <div class="col-md-9">
+                    <input class="form-control" [(ngModel)]="lakaLantasAssurance.keterangan">
+                  </div>
+                </div>
+              </div>
+            </ng-template>
+          </ngb-tab>
+    
+          <ngb-tab title="Suplesi">
+            <ng-template ngbTabContent>
+              <div class="form-group">
+                <div class="row" style="margin-top: 1em; margin-bottom: 0.5em;">
+                  <div class="col-md-3">
+                  </div>
+                  <div class="col-md-1" style="padding-right: 0;">
+                    <input class="form-control inter-checkbox" type="checkbox" name="sepSuplesi" (change)="suplesiCheckBox()" [(ngModel)]="suplesi.suplesi">
+                  </div>
+                  <div class="col-md-8" style="padding-left: 0; margin-left: -1.5em;">
+                    Is Suplesi
+                  </div>
+                </div>
+                <div class="row">
+                  <div class="col-md-3">
+                    No SEP Suplesi
+                  </div>
+                  <div class="col-md-7">
+                    <input class="form-control" [(ngModel)]="suplesi.noSepSuplesi">
+                  </div>
+                  <div class="col-md-2">
+                    <button class="btn ms_btn_green">Search</button>
+                  </div>
+                </div>
+              </div>
+            </ng-template>
+          </ngb-tab>
+
+          <ngb-tab title="Lokasi Laka">
+            <ng-template ngbTabContent>
+              <div class="form-group">
+                <div class="row" style="margin-top: 1em;">
+                  <div class="col-md-2">
+                    Provinsi
+                  </div>
+                  <div class="col-md-10">
+                    <select class="form-control" [(ngModel)]="lokasiLakaBody.kdPropinsi" name="province" (change)="districtLakaLantas()">
+                      <option *ngFor="let prov of listProvince" [ngValue]="prov.kode">{{prov.nama}}</option>
+                    </select>
+                  </div>
+                </div>
+                <div class="row" style="margin-top: 0.5em;">
+                  <div class="col-md-2">
+                    Kabupaten
+                  </div>
+                  <div class="col-md-10">
+                    <select class="form-control" [(ngModel)]="lokasiLakaBody.kdKabupaten" name="district" (change)="subDistrictLakaLantas()">
+                      <option *ngFor="let dist of listDistrict" [ngValue]="dist.kode">{{dist.nama}}</option>
+                    </select>
+                  </div>
+                </div>
+                <div class="row" style="margin-top: 0.5em;">
+                  <div class="col-md-2">
+                    Kecamatan
+                  </div>
+                  <div class="col-md-10">
+                    <select class="form-control" [(ngModel)]="lokasiLakaBody.kdKecamatan" name="subDistrict">
+                      <option *ngFor="let subDist of listSubDistrict" [ngValue]="subDist.kode">{{subDist.nama}}</option>
+                    </select>
+                  </div>
+                </div>
+              </div>
+            </ng-template>
+          </ngb-tab>
+      </ngb-tabset>
+      </div>
+        
+    </div>
+  </div>
+
+  <div class="modal-footer">
+    <button class="btn ms_btn_green" [disabled]="!selectedCheckIn.bpjs_card_file" (click)="c('Cross click')">Continue</button>
+    <button type="button" class="btn ms_btn_red" (click)="c('Cross click')" (click)="cancelLakaLantas()">Cancel</button>
   </div>
 </ng-template>

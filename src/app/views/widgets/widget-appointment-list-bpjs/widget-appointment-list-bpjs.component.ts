@@ -1,42 +1,26 @@
-import * as moment from 'moment';
-import { Component, OnInit, Input, Output, OnChanges, EventEmitter } from '@angular/core';
-import { Router, ActivatedRoute } from '@angular/router';
-import { AppointmentService } from '../../../services/appointment.service';
-import { PatientService } from '../../../services/patient.service';
-import { ScheduleService } from '../../../services/schedule.service';
-import { GeneralService } from '../../../services/general.service';
+import { Component, OnInit } from '@angular/core';
+import { IMyDpOptions } from 'mydatepicker';
+import { NgbModal, ModalDismissReasons } from '@ng-bootstrap/ng-bootstrap';
 import { DoctorService } from '../../../services/doctor.service';
+import { AppointmentService } from '../../../services/appointment.service';
 import { AdmissionService } from '../../../services/admission.service';
-import { AppointmentMini } from '../../../models/appointments/appointment-mini';
+import { Doctor } from '../../../models/doctors/doctor';
 import { General } from '../../../models/generals/general';
-import { Schedule } from '../../../models/schedules/schedule';
-import { DoctorNote } from '../../../models/doctors/doctor-note';
-import { DoctorProfile } from '../../../models/doctors/doctor-profile';
-import { ScheduleBlock } from '../../../models/schedules/schedule-block';
-import { doctorType, typeFile, formatFile } from '../../../variables/common.variable';
-import { NgbModalConfig, NgbModal, ModalDismissReasons } from '@ng-bootstrap/ng-bootstrap';
-import {
-  ModalCancelAppointmentComponent
-} from '../modal-cancel-appointment/modal-cancel-appointment.component'
-import {
-  ModalCreateAppointmentComponent
-} from '../modal-create-appointment/modal-create-appointment.component';
-import {
-  ModalScheduleBlockComponent
-} from '../../widgets/modal-schedule-block/modal-schedule-block.component';
-import {
-  ModalPatientVerificationComponent
-} from '../../widgets/modal-patient-verification/modal-patient-verification.component';
-import { appointmentPayload as appPayload } from '../../../payloads/appointment.payload';
-import { reserveSlotAppPayload as reserveSlotPayload } from '../../../payloads/reserve-slot.payload';
+import { Appointment } from '../../../models/appointments/appointment';
+import { dateFormatter } from '../../../utils/helpers.util';
 import { AlertService } from '../../../services/alert.service';
-import { Alert, AlertType } from '../../../models/alerts/alert';
-import { sourceApps, queueType, consultationType } from '../../../variables/common.variable';
+import { GeneralService } from '../../../services/general.service';
 import { QueueService } from '../../../services/queue.service';
-import { dateFormatter, regionTime } from '../../../utils/helpers.util';
+import { ScheduleService } from '../../../services/schedule.service';
+import { PatientService } from '../../../services/patient.service';
+import { Alert, AlertType } from '../../../models/alerts/alert';
+import { sourceApps, queueType, appointmentStatusId } from '../../../variables/common.variable';
+import { Router, ActivatedRoute } from '@angular/router';
+import { BoundElementProperty } from '@angular/compiler';
 import {
-  ModalRescheduleAppointmentComponent
-} from '../modal-reschedule-appointment/modal-reschedule-appointment.component';
+  ModalRescheduleBpjsComponent
+} from '../modal-reschedule-bpjs/modal-reschedule-bpjs.component';
+import { RescheduleAppointment } from '../../../models/appointments/reschedule-appointment';
 import * as pdfMake from 'pdfmake/build/pdfmake';
 import * as pdfFonts from 'pdfmake/build/vfs_fonts';
 import socket from 'socket.io-client';
@@ -44,65 +28,82 @@ import {
   SecretKey, Jwt,
   CHECK_IN, CREATE_APP,
   CANCEL_APP, RESCHEDULE_APP,
-  QUEUE_NUMBER, keySocket, SCHEDULE_BLOCK, channelId, appointmentStatusId,
-  pathImage
+  QUEUE_NUMBER, keySocket, pathImage,
+  channelId
 } from '../../../variables/common.variable';
 import Security from 'msm-kadapat';
 import { environment } from '../../../../environments/environment';
-import { 
-  ModalVerificationAidoComponent 
-} from '../../widgets/modal-verification-aido/modal-verification-aido.component';
-import {
-  ModalCreateAppBpjsComponent
-} from '../modal-create-app-bpjs/modal-create-app-bpjs.component';
-import { BpjsService } from '../../../services/bpjs.service';
-import Swal from 'sweetalert2';
-import { FormBuilder, FormGroup, FormControl } from '@angular/forms';
+import { HttpClient } from '@angular/common/http';
+import { HttpHeaders } from '@angular/common/http';
 
 @Component({
-  selector: 'app-widget-create-appointment',
-  templateUrl: './widget-create-appointment.component.html',
-  styleUrls: ['./widget-create-appointment.component.css'],
+  selector: 'app-widget-appointment-list-bpjs',
+  templateUrl: './widget-appointment-list-bpjs.component.html',
+  styleUrls: ['./widget-appointment-list-bpjs.component.css']
 })
-export class WidgetCreateAppointmentComponent implements OnInit {
-  @Input() appointmentPayloadInput: any;
-  @Output() opSlotSelected = new EventEmitter<any>();
+export class WidgetAppointmentListBpjsComponent implements OnInit {
+  public assetPath = environment.ASSET_PATH;
   public key: any = JSON.parse(localStorage.getItem('key'));
   public hospital = this.key.hospital;
   public user = this.key.user;
-  public assetPath = environment.ASSET_PATH;
-  private socket;
-  private socketTwo;
-  private socketThree;
-  public appointments: any;
+  public now = new Date();
+  public appStatusId = appointmentStatusId;
+  public qType = queueType;
+
+  public dateAppointment: any = {
+    date: {
+      year: this.now.getFullYear(),
+      month: this.now.getMonth() + 1,
+      day: this.now.getDate(),
+    }
+  };
+
+  public myDatePickerOptions: IMyDpOptions = {
+    todayBtnTxt: 'Today',
+    dateFormat: 'dd/mm/yyyy',
+    firstDayOfWeek: 'mo',
+    sunHighlight: true,
+    height: '27px',
+    width: '150px',
+    showInputField: true,
+  };
+
+  // Input mask
+  public mask_birth = [/\d/, /\d/, '-', /\d/, /\d/, '-', /\d/, /\d/, /\d/, /\d/];
+
+  public doctorList: Doctor[];
+  public patientTypeList: General[];
+  public patientType: General;
+  public admissionTypeList: General[];
+  public selectedAdmissionType: General;
+
+  public model: any = { hospital_id: '', name: '', mr: '', doctor: '', modifiedName: '',
+   iswaitingList: '' };
+
   public appList: any = [];
-  public schLength: number = 0;
-  public appListWaiting: any = [];
-  public appointmentPayload: appPayload = new appPayload;
-  public schedule: any;
-  public appDateDisplay: any;
-  public table1Header: any = [];
-  public table2Header: any = [];
-  public doctorType: any = doctorType;
-  public doctorProfile: DoctorProfile = new DoctorProfile;
-  public doctorNotes: DoctorNote[];
-  public scheduleBlocks: ScheduleBlock[];
-  public modalConfig: any = {};
-  public alerts: Alert[] = [];
-  private userId: string = this.key.user.id;
-  private source: string = sourceApps;
-  public isOriginal: boolean = true;
-
-  public closeResult: string;
-  public late: any;
   public selectedCheckIn: any;
-  public listPayer: any;
+  public selectedCancel: any;
 
-  public listActiveAdmission: any = [];
+  public limit = 10;
+  public offset = 0;
+  private page: number = 0;
+  public isCanPrevPage: boolean = false;
+  public isCanNextPage: boolean = false;
+
+  public alerts: Alert[] = [];
+  public showWaitMsg: boolean = false;
+  public showNotFoundMsg: boolean = false;
+  public closeResult: string;
+
+  public listPayer: any;
+  public listReferral: General[];
+  public selectedReferral: General;
+  public dateAdmission: any = dateFormatter(new Date, true);
+
+  public late: any;
 
   public nationalIdTypeId: any;
 
-  public isLoadingCreateAdmission: boolean = false;
   public buttonCreateAdmission: boolean = false;
   public buttonPrintQueue: boolean = true;
   public buttonPatientLabel: boolean = true;
@@ -117,14 +118,9 @@ export class WidgetCreateAppointmentComponent implements OnInit {
   public txtPayerNo: boolean = true;
   public txtPayerEligibility: boolean = true;
 
-  public patientTypeList: General[];
-  public patientType: General;
-  public admissionTypeList: General[];
-  public selectedAdmissionType: General;
+  public isLoadingCreateAdmission: boolean = false;
 
-  public listReferral: General[];
-  public selectedReferral: General;
-  public dateAdmission: any = dateFormatter(new Date, true);
+  public listActiveAdmission: any = [];
 
   public closeAdm: any;
   public closeQue: any;
@@ -132,72 +128,32 @@ export class WidgetCreateAppointmentComponent implements OnInit {
   public resQueue: any;
   public resMrLocal: any;
   public roomDetail: any;
-  public detailTemp: any;
 
-  public isOpen: boolean = true;
-
-  public slotList: any = [];
-
+  public history: any;
+  public flagHistory: boolean = false;
+  public nameHistory: string;
+  public socket;
+  public socketTwo;
+  public dateApp;
   public listRoomHope: any = [];
   public roomHope: any;
-  public scheduleTemp: string;
-  public doctorName: string;
-  public hospitalName: string;
-  public aidoChannel: any = channelId.AIDO;
-  public appStatusId = appointmentStatusId;
-  public selectedApp: any;
-  public selectedAdm: any;
-  public fromBpjs: boolean = false;
-  public fromRegistration: boolean = false;
-  public patFromBpjs: any;
-  public bodyBpjs: any;
-  public consulType: string = null;
-  public urlBpjsCard = environment.GET_IMAGE+pathImage.BPJS_CARD; //dummy
-  public maxSize10MB: number = 10485760;
-  public listProvince: any = null;
-  public listDistrict: any = null;
-  public listSubDistrict: any = null;
-  public isLakaLantas: boolean = false;
-  public lakaLantasAssurance = {
-  penjamin: null,
-  tglKejadian: null,
-  keterangan: null
-  }
-  public suplesi = {
-    suplesi: null,
-    noSepSuplesi: null,
-    lokasiLaka: null
-  }
-  public lokasiLakaBody = {
-    kdPropinsi: null, 
-    kdKabupaten: null,
-    kdKecamatan: null
-  }
-  public flagFile1: boolean = false;
-  public flagFile2: boolean = false;
-  public flagFile3: boolean = false;
-  public flagFile4: boolean = false;
-  uploadForm: FormGroup;
-  public assetUpload: any = null;
-  public bodyUpload: any = {};
-  public mask_birth = [/\d/, /\d/, '-', /\d/, /\d/, '-', /\d/, /\d/, /\d/, /\d/];
-  public reschBpjs: boolean = false;
+  public urlBpjsCard = environment.GET_IMAGE;
+  //public urlBpjsCard = 'https://cdn.pixabay.com';
+  public checkAll: boolean = false;
 
   constructor(
-    private router: Router,
-    private activatedRoute: ActivatedRoute,
-    private appointmentService: AppointmentService,
-    private scheduleService: ScheduleService,
     private doctorService: DoctorService,
-    private generalService: GeneralService,
-    private modalService: NgbModal,
     private alertService: AlertService,
-    private patientService: PatientService,
+    private generalService: GeneralService,
+    private appointmentService: AppointmentService,
     private admissionService: AdmissionService,
+    private modalService: NgbModal,
     private queueService: QueueService,
-    private bpjsService: BpjsService,
-    private formBuilder: FormBuilder,
-    modalSetting: NgbModalConfig,
+    private scheduleService: ScheduleService,
+    private patientService: PatientService,
+    private route: ActivatedRoute,
+    private router: Router,
+    private http: HttpClient
   ) {
     this.socket = socket(`${environment.WEB_SOCKET_SERVICE + keySocket.APPOINTMENT}`, {
       transports: ['websocket'],
@@ -212,448 +168,151 @@ export class WidgetCreateAppointmentComponent implements OnInit {
         Security.encrypt({ secretKey: SecretKey }, Jwt)
         }&url=${environment.FRONT_OFFICE_SERVICE}`,
     });
-
-    this.socketThree = socket(environment.WEB_SOCKET_SERVICE + keySocket.SCHEDULE, {
-      transports: ['websocket'],  
-      query: `data=${
-        Security.encrypt({ secretKey: SecretKey }, Jwt)
-        }&url=${environment.FRONT_OFFICE_SERVICE}`,
-    });
-
-    modalSetting.backdrop = 'static';
-    modalSetting.keyboard = false;
   }
 
-  async ngOnInit() {
-    this.uploadForm = this.formBuilder.group({
-      bpjsCard: [''],
-      identityCard: [''],
-      referenceLetter: [''],
-      familyCard: ['']
-    });
-
-    await this.getAppBpjs();
-    await this.provinceLakaLantas();
-    await this.getQueryParams();
-    await this.enableWalkInChecker(); 
-    await this.getSchedule();
-    await this.getDoctorProfile();
-    await this.getDoctorNotes();
-    await this.getScheduleBlock();
-    await this.getAppointmentList();
-    await this.getSlotTime();
-    await this.dataProcessing();
-    await this.getPayer();
-    await this.getPatientType();
-    await this.admissionType();
-    await this.getListRoomHope();
-    await this.getReferral();
-    this.setTableHeader();
-    this.emitCreateApp();
-    this.emitCancelApp();
-    this.emitVerifyApp();
-    this.emitScheduleBlock();
+  ngOnInit() {
+    this.admissionType();
+    this.getPayer();
+    this.getReferral();
+    this.getListDoctor();
+    this.getListRoomHope();
+    this.getPatientType();
+    this.listAppointment();
     this.emitRescheduleApp();
+    this.emitUpdateNotes();
+    this.emitUpdateContact();
     this.getCollectionAlert();
 
-    //scoket create appointment
-    this.socket.on(CREATE_APP+'/'+this.hospital.id, (call) => {
-      for(let k = 0, { length } = this.schedule; k < length; k += 1) {
-        if (call.data.schedule_id == this.schedule[k].schedule_id
-          && call.data.appointment_date == this.appointmentPayload.appointmentDate) {
-          this.appointments = this.appointments.filter((value) => {
-            if(call.data.appointment_temporary_id) {
-              return value.appointment_temporary_id !== call.data.appointment_temporary_id;
-            }
-            else { 
-              return value.appointment_id !== call.data.appointment_id; 
-            }
-          });
-          this.appointments.push(call.data);
-          this.dataProcessing();
-        }
-      }
-    });
-
-    //socket cancel appointment
     this.socket.on(CANCEL_APP+'/'+this.hospital.id, (call) => {
-      for(let k = 0, { length } = this.schedule; k < length; k += 1) {
-        if (call.data.schedule_id == this.schedule[k].schedule_id
-          && call.data.appointment_date == this.appointmentPayload.appointmentDate) {
-          this.appointments = this.appointments.filter((value) => {
-            if(call.data.appointment_temporary_id) {
-              return value.appointment_temporary_id !== call.data.appointment_temporary_id;
-            }
-            else { 
-              return value.appointment_id !== call.data.appointment_id; 
-            }
-          });
-          this.dataProcessing();
-        }
-      }
-    });
-
-    //socket checkin appointment
-    this.socket.on(CHECK_IN+'/'+this.hospital.id, (call) => {
-      for(let k = 0, { length } = this.schedule; k < length; k += 1) {
-        if (call.data.schedule_id == this.schedule[k].schedule_id
-          && call.data.appointment_date == this.appointmentPayload.appointmentDate) {
-          this.appointments = this.appointments.map((value) => {
-            if (value.appointment_id === call.data.appointment_id) {
-              value.admission_id = call.data.admission_id;
-            }
-            return value;
-          });
-          this.dataProcessing();
-        }
-      }
-    });
-
-    //socket reschedule appointment
-    this.socket.on(RESCHEDULE_APP+'/'+this.hospital.id, (call) => {
-      if (this.appointments.length) {
-        let flag: any = '';
-        this.appointments.map((value) => {
-          if ((value.appointment_id === call.data.after.appointment_id
-            || value.appointment_temporary_id === call.data.after.appointment_temporary_id)
-            && value.schedule_id !== call.data.after.schedule_id) { //for appointment move to other schedule
-            this.appointments = this.appointments.filter((value) => {
-              if(call.data.after.appointment_temporary_id) {
-                return value.appointment_temporary_id !== call.data.after.appointment_temporary_id;
-              }
-              else {
-                return value.appointment_id !== call.data.after.appointment_id; 
-              }
-            });
-            this.dataProcessing();
-          } else if (value.schedule_id === call.data.after.schedule_id
-            && value.schedule_id === call.data.before.schedule_id 
-            && ((value.appointment_id !== flag
-            && value.appointment_id === call.data.after.appointment_id)
-            || (value.appointment_temporary_id !== flag
-            && value.appointment_temporary_id === call.data.after.appointment_temporary_id))) { //for appointment move to the slot time with same schedule
-              if(call.data.after.appointment_temporary_id) {
-                flag = call.data.after.appointment_temporary_id;
-                this.appointments = this.appointments.filter((value) => {
-                  return value.appointment_temporary_id !== call.data.after.appointment_temporary_id;
-                });
-              }
-              else {
-                flag = call.data.after.appointment_id;
-                this.appointments = this.appointments.filter((value) => {
-                  return value.appointment_id !== call.data.after.appointment_id;
-                });
-              }
-            this.appointments.push(call.data.after);
-            this.dataProcessing();
-          } else if (value.schedule_id === call.data.after.schedule_id
-            && value.schedule_id !== call.data.before.schedule_id 
-            && ((value.appointment_id !== flag
-            && value.appointment_id !== call.data.after.appointment_id)
-            || (value.appointment_temporary_id !== flag
-            && value.appointment_temporary_id !== call.data.after.appointment_temporary_id))) { //for appointment move to this schedule
-              if(call.data.after.appointment_temporary_id) {
-                flag = call.data.after.appointment_temporary_id;
-              }
-              else {
-                flag = call.data.after.appointment_id; 
-              }
-            this.appointments.push(call.data.after);
-            this.dataProcessing();
+      if (call.data.hospital_id == this.hospital.id
+        && call.data.appointment_date == this.dateApp) {
+        this.appList = this.appList.map((value) => {
+          if (value.appointment_id === call.data.appointment_id) {
+            value.appointment_status_id = appointmentStatusId.INACTIVE;
           }
+          return value;
         });
-      } else {
-        this.appointments.push(call.data.after);
-        this.dataProcessing();
       }
     });
-
-    //scoket queue number
+    this.socket.on(CHECK_IN+'/'+this.hospital.id, (call) => {
+      if (call.data.hospital_id == this.hospital.id
+        && call.data.appointment_date == this.dateApp) {
+        this.appList = this.appList.map((value) => {
+          if (value.appointment_id === call.data.appointment_id) {
+            value.admission_id = call.data.admission_id;
+            value.admission_hope_id = call.data.admission_hope_id;
+            value.admission_no = call.data.admission_no;
+            value.payer_name = call.data.payer_name;
+          }
+          return value;
+        });
+      }
+    });
     this.socketTwo.on(QUEUE_NUMBER+'/'+this.hospital.id, (call) => {
-      for(let k = 0, { length } = this.schedule; k < length; k += 1) {
-        if (call.data.schedule_id == this.schedule[k].schedule_id
-          && call.data.appointment_date == this.appointmentPayload.appointmentDate) {
-          this.appointments = this.appointments.map((value) => {
-            if (value.appointment_id === call.data.appointment_id) {
-              value.queue_number = call.data.queue_number;
-            }
-            return value;
-          });
-          this.dataProcessing();
-        }
-      }
-    });
-
-    //socket block slot
-    this.socketThree.on(SCHEDULE_BLOCK+'/'+this.schedule[0].hospital_id, (call) => {
-      for(let k = 0, { length } = this.schedule; k < length; k += 1) {
-        if(call.data.schedule_id === this.schedule[k].schedule_id
-          && call.data.from_date === this.appointmentPayload.appointmentDate) {
-            this.emitBlockSchedule();
+      if (call.data.hospital_id == this.hospital.id
+        && call.data.appointment_date == this.dateApp) {
+        this.appList = this.appList.map((value) => {
+          if (value.appointment_id === call.data.appointment_id) {
+            value.queue_number = call.data.queue_number;
+            value.queue_id = call.data.queue_id;
+            value.queue_type = call.data.queue_type;
           }
+          return value;
+        });
       }
     });
   }
 
-  async emitBlockSchedule() {
-    await this.getScheduleBlock();
-    await this.getAppointmentList();
-    await this.getSlotTime(); 
-    await this.dataProcessing();
-  }
-
-  async ngOnChanges() {
-    await this.getAppBpjs();
-    await this.provinceLakaLantas();
-    await this.getQueryParams();
-    await this.enableWalkInChecker();
-    await this.getSchedule();
-    await this.getDoctorProfile();
-    await this.getDoctorNotes();
-    await this.getScheduleBlock();
-    await this.getAppointmentList();
-    await this.getSlotTime();
-    await this.dataProcessing();
-    await this.getPayer();
-    await this.getPatientType();
-    await this.admissionType();
-    await this.getListRoomHope();
-    await this.getReferral();
-    this.setTableHeader();
-    this.emitCreateApp();
-    this.emitCancelApp();
-    this.emitVerifyApp();
-    this.emitScheduleBlock();
-    this.emitRescheduleApp();
-    this.getCollectionAlert();
-  }
-
-  lakaLantasVal(modal?) {
-    this.isLakaLantas = this.isLakaLantas ? true : false;
-    if(this.isLakaLantas === true) this.modalService.open(modal, { windowClass: 'fo_modal_admission_2', size: 'lg' });
-    else {
-      this.cancelLakaLantas();
+  async downloadDoc() {
+    let tampung = [];
+    if(this.appList) {
+      this.appList.map(x => {
+        if(x.checked === true) {
+          tampung.push(x);
+        } 
+      });
+    }
+    for(let i = 0, { length } = tampung; i < length; i += 1) {
+      this.doDownload(tampung[i]);
     }
   }
 
-  cancelLakaLantas() {
-    this.isLakaLantas = false;
-    this.lakaLantasAssurance = {
-      penjamin: null,
-      tglKejadian: null,
-      keterangan: null
-      }
-    this.suplesi = {
-        suplesi: null,
-        noSepSuplesi: null,
-        lokasiLaka: null
-      }
-    this.lokasiLakaBody = {
-        kdPropinsi: null, 
-        kdKabupaten: null,
-        kdKecamatan: null
-      }
-  }
-
-  async getAppBpjs() {
-    if (this.doctorService.searchDoctorSource2) {
-      if(this.doctorService.searchDoctorSource2.fromBpjs === true &&
-        this.doctorService.searchDoctorSource2.fromRegistration === false) { //from BPJS request list
-          localStorage.setItem('fromBPJS', JSON.stringify(this.doctorService.searchDoctorSource2));
-          this.bodyBpjs = this.doctorService.searchDoctorSource2;
-          this.fromBpjs = true;
-          this.fromRegistration = false;
-          this.patFromBpjs = this.doctorService.searchDoctorSource2.patientBpjs;
-          this.consulType = this.doctorService.searchDoctorSource2.consulType;
-  
-      } else if (this.doctorService.searchDoctorSource2.fromBpjs === true &&
-        this.doctorService.searchDoctorSource2.fromRegistration === true) { //from BPJS registration
-          localStorage.setItem('fromBPJS', JSON.stringify(this.doctorService.searchDoctorSource2));
-          this.bodyBpjs = this.doctorService.searchDoctorSource2;
-          this.fromBpjs = true;
-          this.fromRegistration = true;
-          this.consulType = this.doctorService.searchDoctorSource2.consulType;
-          
-        }
-    } else if(this.activatedRoute.snapshot.queryParamMap.get('fromBpjs') === 'true' &&
-        this.activatedRoute.snapshot.queryParamMap.get('fromRegistration') === 'false') {
-        this.bodyBpjs = JSON.parse(localStorage.getItem('fromBPJS'));
-        this.fromBpjs = true;
-        this.fromRegistration = false;
-        this.patFromBpjs = this.bodyBpjs.patientBpjs;
-        this.consulType = this.bodyBpjs.consulType;
-    } else if(this.activatedRoute.snapshot.queryParamMap.get('fromBpjs') === 'true' &&
-        this.activatedRoute.snapshot.queryParamMap.get('fromRegistration') === 'true') {
-        this.bodyBpjs = JSON.parse(localStorage.getItem('fromBPJS'));
-        this.fromBpjs = true;
-        this.fromRegistration = true;
-        this.consulType = this.bodyBpjs.consulType;
-    }
-  }
-
-  async upload(event, nameFile){
-    if (event.target.files.length > 0) {
-      if(event.target.files[0].type === typeFile.image || event.target.files[0].type === typeFile.pdf) {
-        if(event.target.files[0].size > this.maxSize10MB) {
-          Swal.fire({
-            position: 'center',
-            type: 'error',
-            title: 'Max size 10MB',
-            showConfirmButton: false,
-            timer: 2000
-          })
-        } else {
-          let file;
-          const formData_1 = new FormData();
-          if(nameFile === 'bpjsCard') {
-            this.flagFile1 = true;
-            file = event.target.files[0];
-            this.uploadForm.get('bpjsCard').setValue(file);
-            formData_1.append('bpjs_bpjs_card', this.uploadForm.get('bpjsCard').value);
-          } 
-          else if(nameFile === 'identityCard') {
-            this.flagFile2 = true;
-            file = event.target.files[0];
-            this.uploadForm.get('identityCard').setValue(file);
-            formData_1.append('bpjs_identity_card', this.uploadForm.get('identityCard').value);
-          } 
-          else if(nameFile === 'referenceLetter') {
-            this.flagFile3 = true;
-            file = event.target.files[0];
-            this.uploadForm.get('referenceLetter').setValue(file);
-            formData_1.append('bpjs_reference_later', this.uploadForm.get('referenceLetter').value);
-          } 
-          else if(nameFile === 'familyCard') {
-            this.flagFile4 = true;
-            file = event.target.files[0];
-            this.uploadForm.get('familyCard').setValue(file);
-            formData_1.append('bpjs_family_card', this.uploadForm.get('familyCard').value);
-          }
-            this.assetUpload = await this.patientService.uploadDocBpjs(formData_1)
-            .toPromise().then(res => {
-              this.flagFile1 = false;
-              this.flagFile2 = false;
-              this.flagFile3 = false;
-              this.flagFile4 = false;
-              Swal.fire({
-                position: 'center',
-                type: 'success',
-                title: 'Upload Successful',
-                showConfirmButton: false,
-                timer: 3000
-              })
-              return res.data;
-            }).catch(err => {
-              this.flagFile1 = false;
-              this.flagFile2 = false;
-              this.flagFile3 = false;
-              this.flagFile4 = false;
-              Swal.fire({
-                type: 'error',
-                title: 'Oops...',
-                text: err.error.message,
-                timer: 4000
-              })
-              return null
-            });
-            // if(this.assetUpload) {
-            //   this.editAppointmentData(this.assetUpload.name, nameFile)
-            // } //dummy
-        }
-      } else {
-        Swal.fire({
-          position: 'center',
-          type: 'error',
-          title: 'Format file JPG and PDF only',
-          showConfirmButton: false,
-          timer: 2000
-        })
-      }
-    }
-  }
-
-  async editAppointmentData(pathFile, nameFile) {
-    this.bodyUpload = {
-      appointmentId: "",
-      userId: this.user.id,
-      userName: this.user.username,
-      source: sourceApps,
-    }
-    if(nameFile === 'bpjsCard') this.bodyUpload.bpjsCard = pathFile;
-    else if(nameFile === 'identityCard') this.bodyUpload.identityCard = pathFile;
-    else if(nameFile === 'referenceLetter') this.bodyUpload.referenceLetter = pathFile;
-    else if(nameFile === 'familyCard') this.bodyUpload.familyCard = pathFile;
+  doDownload(value) {
+    let objDoc = value;
+    let docLoop = [];
     
-    this.patientService.updateContact(this.bodyUpload.appointmentId, this.bodyUpload).subscribe(
-      data => {
-        this.bodyUpload = {};
-        this.getRefreshAfterUpload();
-        if(nameFile === 'bpjsCard') this.uploadForm.get('bpjsCard').setValue(null);
-        else if(nameFile === 'identityCard') this.uploadForm.get('identityCard').setValue(null);
-        else if(nameFile === 'referenceLetter') this.uploadForm.get('referenceLetter').setValue(null);
-        else if(nameFile === 'familyCard') this.uploadForm.get('familyCard').setValue(null);
+    if(objDoc.bpjs_card_file) {
+      docLoop.push({
+        file: objDoc.bpjs_card_file,
+        name: objDoc.contact_name
+      });
+    }
+    if(objDoc.family_card_file) {
+      docLoop.push({
+        file: objDoc.family_card_file,
+        name: objDoc.contact_name
+      });
+    }
+    if(objDoc.identity_card_file) {
+      docLoop.push({
+        file: objDoc.identity_card_file,
+        name: objDoc.contact_name
+      });
+    }
+    if(objDoc.refference_letter_file) {
+      docLoop.push({
+        file: objDoc.refference_letter_file,
+        name: objDoc.contact_name
+      });
+    }
+    if(objDoc.selfie_with_identity_file){
+      docLoop.push({
+        file: objDoc.selfie_with_identity_file,
+        name: objDoc.contact_name
+      });
+    }
+
+    for(let i = 0, { length } = docLoop; i < length; i += 1) {
+      let split = docLoop[i].file.split('-');
+      let path = split[0];
+      let nameFile = docLoop[i].name+'-'+docLoop[i].file;
+      let url = this.urlBpjsCard +'/'+ path +'/'+ docLoop[i].file;
+      let requestOptions = { responseType: 'blob' as 'blob' };
+      this.http.get(url, requestOptions).subscribe(val => {
+        let url = URL.createObjectURL(val);
+        this.downloadUrl(url, nameFile);
+        URL.revokeObjectURL(url);
       }, error => {
-        Swal.fire({
-          type: 'error',
-          title: 'Oops...',
-          text: error.error.message,
-          timer: 4000
-        })
+        this.alertService.error(error.error.message, false, 3000);
+      });
+    }
+  }
+
+  downloadUrl(url, fileName) {
+    let a: any = document.createElement('a');
+    a.href = url;
+    a.download = fileName;
+    document.body.appendChild(a);
+    a.style = 'display: none';
+    a.click();
+    a.remove();
+    this.appList = this.appList.map((value) => {
+      value.checked = false;
+      return value;
+    });
+  };
+
+  emitUpdateNotes() {
+    this.appointmentService.updateNotesSource$.subscribe(
+      result => {
+        if (result) {
+          this.alertService.success('Appointment successfully updated', false, 3000);
+          this.searchAppointment(false);
+        } else {
+          this.alertService.error('Appointment fail updated', false, 3000);
+        }
       }
-    )
-  }
-
-  async getRefreshAfterUpload() {
-    await this.getAppointmentList();
-    await this.dataProcessing();
-  }
-
-  suplesiCheckBox() {
-    this.suplesi.suplesi = this.suplesi.suplesi ? 1 : 0;
-  }
-
-  async provinceLakaLantas() {
-    const hospitalId = this.hospital.id;
-    this.listProvince = await this.bpjsService.getProvinceLakaLantas(hospitalId)
-      .toPromise().then(res => {
-        return res.data;
-      }).catch(err => {
-        return null;
-      })
-  }
-
-  async districtLakaLantas() {
-    const hospitalId = this.hospital.id;
-    const provinceId = this.lokasiLakaBody.kdPropinsi ? this.lokasiLakaBody.kdPropinsi : null;
-    if(provinceId) {
-      this.listDistrict = await this.bpjsService.getDistrictLakaLantas(hospitalId, provinceId)
-      .toPromise().then(res => {
-        return res.data;
-      }).catch(err => {
-        return null;
-      })
-    }
-  }
-
-  async subDistrictLakaLantas() {
-    const hospitalId = this.hospital.id;
-    const districtId = this.lokasiLakaBody.kdKabupaten ? this.lokasiLakaBody.kdKabupaten : null;
-    if(districtId) {
-      this.listSubDistrict = await this.bpjsService.getSubDistrictLakaLantas(hospitalId, districtId)
-      .toPromise().then(res => {
-        return res.data;
-      }).catch(err => {
-        return null;
-      })
-    }
-  }
-
-  async enableWalkInChecker() {
-    //to enable or disable button checkin and slot walkin 
-    const appointmentDate = this.appointmentPayload.appointmentDate;
-    const zone = this.hospital.zone;
-    const dateNow = await regionTime(zone);
-    this.isOpen = new Date(dateNow) < new Date(appointmentDate) ? false : true;
+    );
   }
 
   emitRescheduleApp() {
@@ -661,6 +320,7 @@ export class WidgetCreateAppointmentComponent implements OnInit {
       result => {
         if (result === true) {
           this.alertService.success('Reschedule appointment berhasil', false, 3000);
+          this.searchAppointment(false);
         } else {
           this.alertService.error(result, false, 3000);
         }
@@ -668,42 +328,39 @@ export class WidgetCreateAppointmentComponent implements OnInit {
     );
   }
 
-  emitVerifyApp() {
-    this.appointmentService.verifyAppSource$.subscribe(
-      async () => {
-        await this.getAppointmentList();
-        await this.dataProcessing();
+  emitUpdateContact() {
+    this.patientService.updateContactSource$.subscribe(
+      async (result) => {
+        if (result) {
+          this.alertService.success('Ubah nomor HP berhasil', false, 3000);
+          await this.searchAppointment(false);;
+        } else {
+          this.alertService.error('Gagal ubah nomor HP', false, 3000);
+        }
       }
     );
   }
 
-  async refreshPage() {
-    this.buttonCreateAdmission = false;
-    this.buttonPrintQueue = true;
-    this.buttonPatientLabel = true;
-    this.buttonCloseAdm = false;
-
-    this.resQueue = null;
-
-    this.txtPayer = true;
-    this.txtPayerNo = true;
-    this.txtPayerEligibility = true;
-
-    this.patientType = null;
-    this.payer = null;
-    this.payerNo = null;
-    this.payerEligibility = null;
-    this.roomHope = null;
+  nextPage() {
+    this.checkAll = false;
+    this.page += 1;
+    this.offset = this.page * 10;
+    this.isCanPrevPage = this.offset === 0 ? false : true;
+    this.searchAppointment(false);
   }
 
-  async getListRoomHope() {
-    const organizationId = this.hospital.orgId;
-    this.listRoomHope = await this.generalService.getRoomHope(organizationId)
-      .toPromise().then(res => {
-        return res.data;
-      }).catch(err => {
-        return [];
-      })
+  prevPage() {
+    this.checkAll = false;
+    this.page -= 1;
+    this.offset = this.page * 10;
+    this.isCanPrevPage = this.offset === 0 ? false : true;
+    this.searchAppointment(false);
+  }
+
+  getImage(fileName) {
+    let split = fileName.split('-');
+    let path = split[0];
+    window.open(this.urlBpjsCard +'/'+ path +'/'+ fileName, '_blank', "status=1");
   }
 
   async admissionType() {
@@ -737,6 +394,15 @@ export class WidgetCreateAppointmentComponent implements OnInit {
 
   }
 
+  async getPayer() {
+    this.listPayer = await this.generalService.getPayer(this.hospital.orgId)
+      .toPromise().then(res => {
+        return res.data;
+      }).catch(err => {
+        return [];
+      })
+  }
+
   async getPatientType() {
     this.patientTypeList = await this.generalService.getPatientType()
       .toPromise().then(res => {
@@ -750,8 +416,9 @@ export class WidgetCreateAppointmentComponent implements OnInit {
       })
   }
 
-  async getPayer() {
-    this.listPayer = await this.generalService.getPayer(this.hospital.orgId)
+  async getListRoomHope() {
+    const organizationId = this.hospital.orgId;
+    this.listRoomHope = await this.generalService.getRoomHope(organizationId)
       .toPromise().then(res => {
         return res.data;
       }).catch(err => {
@@ -759,652 +426,155 @@ export class WidgetCreateAppointmentComponent implements OnInit {
       })
   }
 
-  getQueryParams() {
-    if (this.appointmentPayloadInput) { //from modal reschedule appointment
-      this.appointmentPayload.doctorId = this.appointmentPayloadInput.doctorId;
-      this.appointmentPayload.appointmentDate = this.appointmentPayloadInput.appointmentDate;
-      this.isOriginal = false;
-      this.consulType = this.appointmentPayloadInput.consulType ? this.appointmentPayloadInput.consulType : null; //reschedule bpjs
-      this.reschBpjs = this.appointmentPayloadInput.isRescheduleBpjs === true ? true : false; //reschedule bpjs
-    } else { //from menu doctor schedule
-      this.appointmentPayload.doctorId = this.activatedRoute.snapshot.queryParamMap.get('doctorId');
-      this.appointmentPayload.appointmentDate = this.activatedRoute.snapshot.queryParamMap.get('date');
-    }
-    if (!this.appointmentPayload.doctorId && !this.appointmentPayload.appointmentDate) {
-      this.router.navigate(['/doctor-schedule']);
-    }
-    this.appDateDisplay = moment(this.appointmentPayload.appointmentDate).format('dddd, DD MMMM YYYY');
+  refreshPage() {
+    this.buttonCreateAdmission = false;
+    this.buttonPrintQueue = true;
+    this.buttonPatientLabel = true;
+    this.buttonCloseAdm = false;
+    this.resQueue = null;
+    this.txtPayer = true;
+    this.txtPayerNo = true;
+    this.txtPayerEligibility = true;
+    this.patientType = null;
+    this.payer = null;
+    this.payerNo = null;
+    this.payerEligibility = null;
+    this.roomHope = null;
   }
 
-  setTableHeader() {
-    this.table1Header = ['Time', 'No.', 'Patient Name', 'Date of Birth', 'Local MR No', 'Phone No', 'Queue No',
-      'Note', 'Modified By', 'Action'];
-    this.table2Header = ['Time', 'No.', 'Patient Name', 'Date of Birth', 'Local MR No', 'Phone No', 'Queue No', 'Note',
-      'Modified By', 'Action'];
+  clearSearch() {
+    this.model.name = '';
+    this.model.mr = '';
+    this.model.doctor = '';
+    this.model.birth = '';
+    this.model.modifiedName = '';
+    this.model.isWaitingList = '';
   }
 
-  async dataProcessing() {
-    //this function use to make list appointment base on slot time
-    this.appList = [];
-    this.appListWaiting = [];
+  async getListDoctor() {
 
-    const hospitalId = this.schedule[0].hospital_id;
-    const doctorId = this.schedule[0].doctor_id;
-    const doctorName = this.schedule[0].doctor_name;
+    this.alerts = [];
 
-    //this param using in waiting list and FCFS
-    let no;
-    this.schLength = this.schedule.length;
-    for(let k = 0, { length } = this.schedule; k < length; k += 1) {
-      const docType = this.schedule[k].doctor_type_name;
-      no = 0;
-      const fromTime = this.schedule[k].from_time;
-      const toTime = this.schedule[k].to_time;
-      let appTime = `${fromTime} - ${toTime}`;
-      this.appList.push(
-        {
-          schedule_id: this.schedule[k].schedule_id,
-          doctor_type_name: this.schedule[k].doctor_type_name,
-          consultation_type_id: this.schedule[k].consultation_type_id,
-          appointment: []
+    this.doctorList = await this.doctorService.getListDoctor(this.hospital.id)
+      .toPromise().then(res => {
+        if (res.status === 'OK' && res.data.length === 0) {
+          this.alertService.success('No List Doctor in This Hospital', false, 3000);
         }
-      )
-      this.appListWaiting.push(
-        {
-          schedule_id: this.schedule[k].schedule_id,
-          consultation_type_id: this.schedule[k].consultation_type_id,
-          appointment: []
-        }
-      )
-     //using slot time only for doctor type FIX and HOURLY
-     if (docType === this.doctorType.FIX_APPOINTMENT
-      || docType === this.doctorType.HOURLY_APPOINTMENT) {
-      for (let i = 0, { length } = this.slotList; i < length; i += 1) {
-        if(this.appList[k].schedule_id === this.slotList[i].schedule_id) {
-          let found = false;
-          let idx = 0;
-          for (let j = 0, { length: totalApp } = this.appointments; j < totalApp; j += 1) {
-            if((this.slotList[i].schedule_id === this.appointments[j].schedule_id) ||
-                (this.appointments[j].channel_id === channelId.AIDO)){
-              if ((Number(this.appointments[j].appointment_no) === this.slotList[i].appointment_no
-                    && this.appointments[j].is_waiting_list === false) ||
-                  ((this.appointments[j].from_time.substr(0,5) === this.slotList[i].schedule_from_time) &&
-                  (this.appointments[j].to_time.substr(0,5) === this.slotList[i].schedule_to_time) &&
-                  (this.appointments[j].channel_id === channelId.AIDO))) {
-                found = true; //appointment slot already taken
-                idx = j;
-              }
-            } 
-          }
 
-          if (found && idx >= 0) {
-            this.appList[k].appointment.push({
-              no: this.slotList[i].no,
-              hospital_id: hospitalId,
-              doctor_id: doctorId,
-              doctor_name: doctorName, 
-              appointment_range_time: this.slotList[i].appointment_range_time,
-              appointment_from_time: this.slotList[i].schedule_from_time,
-              appointment_to_time: this.slotList[i].schedule_to_time,
-              schedule_from_time: fromTime,
-              schedule_to_time: toTime,
-              appointment_id: this.appointments[idx].appointment_id,
-              appointment_date: this.appointments[idx].appointment_date,
-              appointment_temp_id: this.appointments[idx].appointment_temporary_id,
-              admission_id: this.appointments[idx].admission_id,
-              appointment_no: this.appointments[idx].appointment_no,
-              patient_name: this.appointments[idx].contact_name,
-              contact_id: this.appointments[idx].contact_id,
-              date_of_birth: moment(this.appointments[idx].birth_date).format('DD-MM-YYYY'),
-              local_mr_no: this.appointments[idx].medical_record_number,
-              phone_no: this.appointments[idx].phone_number,
-              queue_no: this.appointments[idx].queue_number,
-              note: this.appointments[idx].appointment_note ? this.appointments[idx].appointment_note : '',
-              note_long: this.appointments[idx].appointment_note ? this.appointments[idx].appointment_note : '',
-              note_short: this.appointments[idx].appointment_note && this.appointments[idx].appointment_note.length > 30 ? this.appointments[idx].appointment_note.substr(0, 30) + '...' : this.appointments[idx].appointment_note,
-              modified_name: this.appointments[idx].modified_name,
-              modified_by: this.appointments[idx].modified_by,
-              is_waiting_list: this.appointments[idx].is_waiting_list,
-              is_can_create: false,
-              is_can_cancel: this.slotList[i].is_blocked ? false : true,
-              is_blocked: this.slotList[i].is_blocked,
-              is_walkin: this.slotList[i].is_walkin,
-              schedule_id: this.schedule[k].schedule_id,
-              doctor_type_id: this.schedule[k].doctor_type_id,
-              channel_id: this.appointments[idx].channel_id ? this.appointments[idx].channel_id : null,
-              admission_status_id: this.appointments[idx].admission_status_id ? this.appointments[idx].admission_status_id : null,
-              appointment_status_id: this.appointments[idx].appointment_status_id ? this.appointments[idx].appointment_status_id : null,
-              patient_hope_id: this.appointments[idx].patient_hope_id ? this.appointments[idx].patient_hope_id : null,
-              patient_organization_id: this.appointments[idx].patient_organization_id ? this.appointments[idx].patient_organization_id : null,
-              is_double_mr: this.appointments[idx].is_double_mr ? this.appointments[idx].is_double_mr : false
-            });
-          } else {
-            this.appList[k].appointment.push({
-              no: this.slotList[i].no,
-              hospital_id: hospitalId,
-              doctor_id: doctorId,
-              doctor_name: doctorName,
-              appointment_range_time: this.slotList[i].appointment_range_time,
-              appointment_from_time: this.slotList[i].schedule_from_time,
-              appointment_to_time: this.slotList[i].schedule_to_time,
-              schedule_from_time: fromTime,
-              schedule_to_time: toTime,
-              appointment_id: null,
-              appointment_date: null,
-              appointment_temp_id: null,
-              admission_id: null,
-              appointment_no: this.slotList[i].appointment_no,
-              patient_name: null,
-              contact_id: null,
-              date_of_birth: null,
-              local_mr_no: null,
-              phone_no: null,
-              queue_no: null,
-              note: '',
-              note_long: '',
-              note_short: '',
-              modified_name: '',
-              modified_by: null,
-              is_waiting_list: false,
-              is_can_create: this.slotList[i].is_blocked ? false : true,
-              is_can_cancel: false,
-              is_blocked: this.slotList[i].is_blocked,
-              is_walkin: this.slotList[i].is_walkin,
-              schedule_id: this.schedule[k].schedule_id,
-              doctor_type_id: this.schedule[k].doctor_type_id,
-              channel_id: null,
-              admission_status_id: null,
-              appointment_status_id: null,
-              patient_hope_id: null,
-              patient_organization_id: null,
-              is_double_mr: false
-            });
-          }
-        }
-      }
-
-
-
-      /** Appointment waiting list */
-      let isBlockWaitingList = false;
-      this.scheduleBlocks.map(x => {
-        if (x.schedule_id === this.appListWaiting[k].schedule_id) {
-          if (x.is_include_waiting_list === true) isBlockWaitingList = true;
-        }
-        
+        return res.data;
+      }).catch(err => {
+        this.alertService.error(err.error.message, false, 3000);
+        return [];
       });
+  }
 
-      this.appointments.map((x, index) => {
-        if (x.is_waiting_list === true && this.appListWaiting[k].schedule_id === x.schedule_id) {
-          no += 1;
-          appTime = no === 1 ? appTime : '';
-          this.appListWaiting[k].appointment.push({
-            no: no,
-            hospital_id: hospitalId,
-            doctor_id: doctorId,
-            doctor_name: doctorName,
-            appointment_range_time: appTime,
-            appointment_from_time: fromTime,
-            appointment_to_time: toTime,
-            appointment_no: x.appointment_no,
-            appointment_id: x.appointment_id,
-            appointment_date: x.appointment_date,
-            appointment_temp_id: x.appointment_temporary_id,
-            admission_id: x.admission_id,
-            patient_name: x.contact_name,
-            contact_id: x.contact_id,
-            date_of_birth: moment(x.birth_date).format('DD-MM-YYYY'),
-            local_mr_no: x.medical_record_number,
-            phone_no: x.phone_number,
-            queue_no: x.queue_number,
-            note: x.appointment_note,
-            note_long: x.appointment_note ? x.appointment_note : '',
-            note_short: x.appointment_note && x.appointment_note.length > 30 ? x.appointment_note.substr(0, 30) + '...' : x.appointment_note,
-            modified_name: x.modified_name,
-            modified_by: x.modified_by,
-            is_waiting_list: x.is_waiting_list,
-            is_can_create: false,
-            is_can_cancel: isBlockWaitingList === false ? true : false,
-            is_blocked: isBlockWaitingList,
-            schedule_id: this.schedule[k].schedule_id,
-            doctor_type_id: this.schedule[k].doctor_type_id,
-            channel_id: x.channel_id ? x.channel_id : null,
-            admission_status_id: x.admission_status_id ? x.admission_status_id : null,
-            appointment_status_id: x.appointment_status_id ? x.appointment_status_id : null,
-            patient_hope_id: x.patient_hope_id ? x.patient_hope_id : null,
-            patient_organization_id: x.patient_organization_id ? x.patient_organization_id : null,
-            is_double_mr: x.is_double_mr ? x.is_double_mr : false,
-          });
-        }
-      });
+  CheckAllOptions() {
+    this.checkAll = this.checkAll ? false : true;
+    this.appList = this.appList.map((value) => {
+      if(this.checkAll === true) {
+        value.checked = true;
+      } else if(this.checkAll == false) {
+        value.checked = false;
+      }
+        return value;
+    });
+  }
 
-        let nextWlNo = 0;
-        nextWlNo = this.appListWaiting[k].appointment.length === 0 ? 
-          nextWlNo : Math.max.apply(Math, this.appListWaiting[k].appointment.map(function (o) { return o.appointment_no }));
-        this.appListWaiting[k].appointment.push({
-          no: no + 1,
-          hospital_id: hospitalId,
-          doctor_id: doctorId,
-          doctor_name: doctorName,
-          appointment_range_time: this.appListWaiting[k].appointment.length > 0 ? '' : appTime,
-          appointment_from_time: fromTime,
-          appointment_to_time: toTime,
-          appointment_no: this.appListWaiting[k].appointment.length === 0 ? this.appList[k].appointment.length : nextWlNo + 1,
-          appointment_id: null,
-          appointment_date: null,
-          appointment_temp_id: null,
-          admission_id: null,
-          patient_name: null,
-          contact_id: null,
-          date_of_birth: null,
-          local_mr_no: null,
-          phone_no: null,
-          queue_no: null,
-          note: '',
-          note_long: '',
-          note_short: '',
-          modified_name: '',
-          modified_by: null,
-          is_waiting_list: true,
-          is_can_create: isBlockWaitingList === false ? true : false,
-          is_can_cancel: false,
-          is_blocked: isBlockWaitingList,
-          schedule_id: this.schedule[k].schedule_id,
-          doctor_type_id: this.schedule[k].doctor_type_id,
-          channel_id: null,
-          admission_status_id: null,
-          appointment_status_id: null,
-          patient_hope_id: null,
-          patient_organization_id: null,
-          is_double_mr: false
-        }); 
-      } else {
-        for (let i = 0, { length } = this.appointments; i < length; i++) {
-          no += 1;
-          if(this.appList[k].schedule_id === this.appointments[i].schedule_id) {
-            this.appList[k].appointment.push({
-              no: no,
-              hospital_id: hospitalId,
-              doctor_id: doctorId,
-              doctor_name: doctorName,
-              appointment_range_time: appTime,
-              appointment_from_time: fromTime,
-              appointment_to_time: toTime,
-              appointment_id: this.appointments[i].appointment_id,
-              appointment_temp_id: this.appointments[i].appointment_temporary_id,
-              admission_id: this.appointments[i].admission_id,
-              appointment_no: this.appointments[i].appointment_no,
-              patient_name: this.appointments[i].contact_name,
-              contact_id: this.appointments[i].contact_id,
-              date_of_birth: moment(this.appointments[i].birth_date).format('DD-MM-YYYY'),
-              local_mr_no: this.appointments[i].medical_record_number,
-              phone_no: this.appointments[i].phone_number,
-              queue_no: this.appointments[i].queue_number,
-              note: this.appointments[i].appointment_note ? this.appointments[i].appointment_note : '',
-              note_long: this.appointments[i].appointment_note ? this.appointments[i].appointment_note : '',
-              note_short: this.appointments[i].appointment_note && this.appointments[i].appointment_note.length > 30 ? this.appointments[i].appointment_note.substr(0, 30) + '...' : this.appointments[i].appointment_note,
-              modified_name: this.appointments[i].modified_name,
-              modified_by: this.appointments[i].modified_by,
-              is_waiting_list: false,
-              is_can_create: false,
-              is_can_cancel: true,
-              is_blocked: false,
-              is_walkin: false,
-              schedule_id: this.schedule[k].schedule_id,
-              doctor_type_id: this.schedule[k].doctor_type_id,
-              channel_id: this.appointments[i].channel_id ? this.appointments[i].channel_id : null,
-              admission_status_id: this.appointments[i].admission_status_id ? this.appointments[i].admission_status_id : null,
-              appointment_status_id: this.appointments[i].appointment_status_id ? this.appointments[i].appointment_status_id : null,
-              patient_hope_id: this.appointments[i].patient_hope_id ? this.appointments[i].patient_hope_id : null,
-              patient_organization_id: this.appointments[i].patient_organization_id ? this.appointments[i].patient_organization_id : null,
-              is_double_mr: this.appointments[i].is_double_mr ? this.appointments[i].is_double_mr : false
-            });
+  async listAppointment(name = '', birth = '', mr = '', doctor = '', modifiedName = '',
+  isWaitingList = null) {
+    const channel = channelId.BPJS; //appointment BPJS //dummy
+    //const channel = null;
+    this.showWaitMsg = true;
+    this.showNotFoundMsg = false;
+
+    const { year, month, day } = this.dateAppointment.date;
+    const strDate = year + '-' + month + '-' + day;
+    const date = dateFormatter(strDate, false);
+    this.dateApp = date;
+    const hospital = this.hospital.id;
+    const limit = this.limit;
+    const offset = this.offset;
+
+    //dummy
+    this.appList = await this.appointmentService.getListAppointment(date, hospital, name, birth, mr, doctor, modifiedName, isWaitingList, limit, offset, channel)
+      .toPromise().then(res => {
+        if (res.data.length > 0) {
+          this.isCanNextPage = res.data.length >= 10 ? true : false;
+
+          for (let i = 0, { length } = res.data; i < length; i += 1) {
+            res.data[i].custome_birth_date = dateFormatter(res.data[i].birth_date, true);
+            res.data[i].custome_appointment_date = dateFormatter(res.data[i].appointment_date, true);
+            res.data[i].custome_from_time = res.data[i].from_time.substring(0, 5);
+            res.data[i].custome_to_time = res.data[i].to_time.substring(0, 5);
+            res.data[i].checked = false;
+            // res.data[i].bpjs_card_file = 'disclaimer_1-1594719597879.pdf'; //dummy
+            // res.data[i].family_card_file = 'disclaimer_1-1594805030136.pdf';
+            // res.data[i].identity_card_file = 'disclaimer_1-1595232503271.pdf';
+            // res.data[i].refference_letter_file = 'disclaimer_1-1595232538199.pdf';
+            // res.data[i].selfie_with_identity_file = 'disclaimer_1-1595232563389.pdf';
           }
-        }
 
-        let numberL;
-        numberL = this.appList[k].appointment.length > 0 ? 
-        Math.max.apply(Math, this.appList[k].appointment.map(i => i.appointment_no)) : 0;
-        const appListLength = numberL;
-        no += 1;
-
-        this.appList[k].appointment.push({
-          no: no,
-          hospital_id: hospitalId,
-          doctor_id: doctorId,
-          doctor_name: doctorName,
-          appointment_range_time: appListLength > 0 ? '' : appTime,
-          appointment_from_time: fromTime,
-          appointment_to_time: toTime,
-          appointment_id: null,
-          appointment_temp_id: null,
-          admission_id: null,
-          appointment_no: this.appointments.length > 0 ? numberL + 1 : 0,
-          patient_name: null,
-          contact_id: null,
-          date_of_birth: null,
-          local_mr_no: null,
-          phone_no: null,
-          queue_no: null,
-          note: '',
-          note_long: '',
-          note_short: '',
-          modified_name: '',
-          modified_by: null,
-          is_waiting_list: false,
-          is_can_create: true,
-          is_can_cancel: false,
-          is_blocked: false,
-          is_walkin: false,
-          schedule_id: this.schedule[k].schedule_id,
-          doctor_type_id: this.schedule[k].doctor_type_id,
-          channel_id: null,
-          admission_status_id: null,
-          appointment_status_id: null,
-          patient_hope_id: null,
-          patient_organization_id: null,
-          is_double_mr: false
-        });
-      } 
-    }
-
-  }
-
-  async getAppointmentList() {
-    const doctorId = this.appointmentPayload.doctorId;
-    const hospitalId = this.hospital.id;
-    const date = this.appointmentPayload.appointmentDate;
-    const sortBy = 'appointment_no';
-    const orderBy = 'ASC';
-    let exclude = this.fromBpjs === true ? false : true; //dummy
-    //const exclude = this.fromBpjs === true ? true : false;
-    if(this.reschBpjs === true) exclude = false; // dummy reschedule bpjs
-    const isBpjs = channelId.BPJS;
-    await this.appointmentService.getAppointmentByDay(hospitalId, doctorId, date, sortBy, orderBy, isBpjs, exclude).toPromise().then(
-      data => {
-        this.appointments = data.data;
-      }
-    );
-  }
-
-  async getSlotTime() {
-    //get time slot
-    const doctorId = this.appointmentPayload.doctorId;
-    const date = this.appointmentPayload.appointmentDate;
-    const hospitalId = this.hospital.id;
-    const consulTypeAll = consultationType.REGULAR+':'+consultationType.EXECUTIVE+':'
-      +consultationType.TELECONSULTATION+':'+consultationType.BPJS_REGULER;
-    let consulTypeList = this.fromBpjs === true ? this.consulType : consulTypeAll; //dummy
-    //const consulTypeList = this.fromBpjs === true ? consulTypeAll : this.consulType;
-    if(this.reschBpjs === true) consulTypeList = this.consulType; // dummy reschedule bpjs
-    await this.scheduleService.getTimeSlot(hospitalId, doctorId, date, consulTypeList).toPromise().then(
-      data => {
-        this.slotList = data.data;
-        if(this.fromBpjs === true) {
-          this.slotList.map(x => {
-            x.is_walkin = false;
-          });
-        }
-      }
-    );
-  }
-
-  async getDoctorProfile() {
-    const hospitalId = this.hospital.id;
-    const doctorId = this.appointmentPayload.doctorId;
-    const date = this.appointmentPayload.appointmentDate;
-    await this.doctorService.getDoctorProfile(hospitalId, doctorId, date).toPromise().then(
-      data => {
-        this.doctorProfile = data.data;
-      }
-    );
-  }
-
-  async getDoctorNotes() {
-    const hospitalId = this.hospital.id;
-    const doctorId = this.appointmentPayload.doctorId;
-    const fromDate = this.appointmentPayload.appointmentDate;
-    const toDate = fromDate;
-    await this.doctorService.getDoctorNotes(hospitalId, fromDate, toDate, doctorId).toPromise().then(
-      data => {
-        if(data.data.length === 0) {
-          this.doctorNotes = null;
+          this.showWaitMsg = false;
+          this.showNotFoundMsg = false;
         } else {
-          this.doctorNotes = data.data;
+          this.showWaitMsg = false;
+          this.showNotFoundMsg = true;
         }
-      }
-    );
+        return res.data;
+      }).catch(err => {
+        this.showWaitMsg = false;
+        this.showNotFoundMsg = true;
+        this.alertService.error(err.error.message, false, 3000);
+        return [];
+      });
   }
 
-  openRescheduleModal(appointmentSelected: any) {
-    const modalRef = this.modalService.open(ModalRescheduleAppointmentComponent,
-      { windowClass: 'cc_modal_confirmation', size: 'lg' });
-    modalRef.componentInstance.appointmentSelected = appointmentSelected;
-  }
+  async searchAppointment(search?: boolean) {
+    this.offset = search ? 0 : this.offset;
+    let { name, mr, doctor, birth, modifiedName, isWaitingList } = await this.model;
 
-  async getSchedule() {
-    const doctorId = this.appointmentPayload.doctorId;
-    const date = this.appointmentPayload.appointmentDate;
-    const consulTypeAll = consultationType.REGULAR+':'+consultationType.EXECUTIVE+':'
-      +consultationType.TELECONSULTATION+':'+consultationType.BPJS_REGULER;
-    let consulTypeList = this.fromBpjs === true ? this.consulType : consulTypeAll;
-    if(this.reschBpjs === true) consulTypeList = this.consulType; // dummy reschedule bpjs
-    await this.scheduleService.getScheduleDoctor(this.hospital.id, doctorId, date, consulTypeList).toPromise().then(
-      data => {
-        this.schedule = data.data;
-        this.schedule.map(x => {
-          x.from_time = x.from_time.substr(0, 5);
-          x.to_time = x.to_time.substr(0, 5);
-        });
-        this.doctorName = this.schedule[0].doctor_name;
-        this.hospitalName = this.schedule[0].hospital_name;
-      }
-    );
-  }
+    const doctorId = doctor ? doctor.doctor_id : '';
+    const arrBirth = birth ? birth.split('-') : '';
 
-  async verifyAppointment(appointmentId: string, temp = false) {
-    await this.appointmentService.getTempAppointment(appointmentId).toPromise().then(
-      data => {
-        this.detailTemp = data.data;
-        const modalRef = this.modalService.open(ModalPatientVerificationComponent, { windowClass: 'modal_verification', size: 'lg' });
-        modalRef.componentInstance.tempAppointmentSelected = this.detailTemp;
-      }
-    );
-  }
+    name = name ? name.toLowerCase() : '';
+    mr = mr ? mr.toLowerCase() : '';
+    modifiedName = modifiedName ? modifiedName.toLowerCase() : '';
+    birth = arrBirth ? arrBirth[2] + '-' + arrBirth[1] + '-' + arrBirth[0] : '';
 
-  confirmCancelAppointment(appointmentId: string, temp = false) {
-    const modalRef = this.modalService.open(ModalCancelAppointmentComponent);
-    const payload = { appointmentId: appointmentId, temp: temp };
-    modalRef.componentInstance.payload = payload;
-  }
-
-  async createAppBPJSOnly(item: any) {
-    const canReserved = await this.getReservedSlot(item);
-    if(canReserved.key === null) {
-      await this.reserveSlotApp(item);
+    if (name || mr || doctorId || birth || modifiedName || isWaitingList) {
+      this.listAppointment(name, birth, mr, doctorId, modifiedName, isWaitingList);
+    } else {
+      this.listAppointment();
     }
-    const fromTime = item.appointment_from_time ? item.appointment_from_time : item.schedule_from_time; 
-    const toTime = item.appointment_to_time ? item.appointment_to_time : item.schedule_to_time;
-    const data = {
-      schedule_id: item.schedule_id,
-      appointment_date: this.appointmentPayload.appointmentDate,
-      appointment_from_time: fromTime,
-      appointment_to_time: toTime,
-      hospital_id: item.hospital_id,
-      doctor_id: item.doctor_id,
-      appointment_no: item.appointment_no,
-      is_waiting_list: item.is_waiting_list,
-      can_reserved: canReserved,
-      doctor_type_id: item.doctor_type_id,
-      ...this.bodyBpjs
-    };
-    const modalRef = this.modalService.open(ModalCreateAppBpjsComponent);
-    modalRef.componentInstance.bpjsInfo = data;
   }
 
-  async openCreateAppModal(item: any) {
-    const canReserved = await this.getReservedSlot(item);
-    if(canReserved.key === null) {
-      await this.reserveSlotApp(item);
-    }
-    const fromTime = item.appointment_from_time ? item.appointment_from_time : item.schedule_from_time; 
-    const toTime = item.appointment_to_time ? item.appointment_to_time : item.schedule_to_time;
-    const data = {
-      schedule_id: item.schedule_id,
-      appointment_date: this.appointmentPayload.appointmentDate,
-      appointment_from_time: fromTime,
-      appointment_to_time: toTime,
-      hospital_id: item.hospital_id,
-      doctor_id: item.doctor_id,
-      appointment_no: item.appointment_no,
-      is_waiting_list: item.is_waiting_list,
-      can_reserved: canReserved,
-      doctor_type_id: item.doctor_type_id
-    };
-    const modalRef = this.modalService.open(ModalCreateAppointmentComponent);
-    modalRef.componentInstance.appointmentInfo = data;
-  }
+  onDateChange(val) {
+    const { year, month, day } = val.date;
 
-  public reschCurrentIdx: any;
-  async openCreateAppModal2(item: any) {
-    const canReserved = await this.getReservedSlot(item);
-    if(canReserved.key === null) {
-      await this.reserveSlotApp(item);
-    }
-    const fromTime = item.appointment_from_time ? item.appointment_from_time : item.schedule_from_time;
-    const toTime = item.appointment_to_time ? item.appointment_to_time : item.schedule_to_time;
-    const data = {
-      schedule_id: item.schedule_id,
-      appointment_date: this.appointmentPayload.appointmentDate,
-      appointment_from_time: fromTime,
-      appointment_to_time: toTime,
-      hospital_id: item.hospital_id,
-      doctor_id: item.doctor_id,
-      appointment_no: item.appointment_no,
-      is_waiting_list: item.is_waiting_list,
-      can_reserved: canReserved,
-      doctor_type_id: item.doctor_type_id
-    };
-
-    let idx;
-    idx = this.reschCurrentIdx;
-    for(let k = 0, { length } = this.schedule; k < length; k += 1) {
-      if(this.schedule[k].schedule_id === this.scheduleTemp) {
-        if (idx) { //delete slot name when do move slot
-          if (idx.is_waiting_list) {
-            this.appListWaiting[k].appointment.map(x => {
-              if (x.appointment_no === idx.appointment_no) {
-                x.patient_name = null;
-                x.is_can_create = true;
-              }
-            });
-          } else {
-            if (this.schedule[k].doctor_type_id === '1') { //first come first serve
-              this.appList[k].appointment.map(x => {
-                if (x.appointment_no === idx.appointment_no) {
-                  x.patient_name = null;
-                  x.is_can_create = true;
-                }
-              });
-            } else {
-              this.appList[k].appointment[idx.appointment_no].patient_name = null;
-              this.appList[k].appointment[idx.appointment_no].is_can_create = true;
-            }
-          }
+    if (year === 0 && month === 0 && day === 0) {
+      this.clearSearch();
+      this.refreshPage();
+      this.appList = [];
+      this.alertService.error('Please Input Date', false, 3000);
+    } else {
+      this.dateAppointment = {
+        date: {
+          year: year,
+          month: month,
+          day: day,
         }
-      }
+      };
+      this.offset = 0;
+      this.clearSearch();
+      this.refreshPage();
+      this.searchAppointment(false);
     }
-
-    idx = item;
-    this.reschCurrentIdx = idx;
-    for(let k = 0, { length } = this.schedule; k < length; k += 1) {
-      if(this.schedule[k].schedule_id === idx.schedule_id) {
-        if (idx.is_waiting_list) { //take slot with name in waiting list
-          this.scheduleTemp = idx.schedule_id;
-          this.appListWaiting[k].appointment.map(x => {
-            if (x.appointment_no === idx.appointment_no) {
-              x.patient_name = this.appointmentPayloadInput.name;
-              x.is_can_create = false;
-            }
-          });
-        } else { //take slot with name
-          this.scheduleTemp = idx.schedule_id;
-          if (this.schedule[k].doctor_type_id === '1') {  //first come first serve
-            this.appList[k].appointment.map(x => {
-              if (x.appointment_no === idx.appointment_no) {
-                x.patient_name = this.appointmentPayloadInput.name;
-                x.is_can_create = false;
-              }
-            });
-          } else {
-            this.appList[k].appointment[idx.appointment_no].patient_name = this.appointmentPayloadInput.name;
-            this.appList[k].appointment[idx.appointment_no].is_can_create = false;
-          }
-        }
-      }
-    }
-
-    this.opSlotSelected.emit(data);
   }
 
-  async reserveSlotApp(app: any) {
-    const payload: reserveSlotPayload = {
-      scheduleId: app.schedule_id,
-      appointmentDate: this.appointmentPayload.appointmentDate,
-      appointmentNo: app.appointment_no,
-      userId: this.userId,
-      source: this.source,
-    };
-
-    await this.appointmentService.reserveSlotApp(payload).toPromise().then(
-      data => {
-        return data.data;
-      }
-    );
-  }
-
-  async checkInAppointment(app, content) {
-    await this.appointmentService.getAppointmentById(app.appointment_id).subscribe(
-      data => {
-        this.selectedCheckIn = data.data[0];
-        this.selectedCheckIn.custome_birth_date = dateFormatter(this.selectedCheckIn.birth_date, true);
-      }
-    );
-
-    //if doctor type is not firstcome, check patient is late or not
-    if(app.doctor_type_id !== '1'){
-      this.late = await this.checkIsLate(app.appointment_id);
-    }else{
-      this.late = '';
-    }
+  async checkInAppointment(val, content) {
+    this.selectedCheckIn = val;
+    this.late = await this.checkIsLate(val.appointment_id);
     this.open(content);
-  }
-
-  async checkInBpjsApp(app, content) {
-    await this.appointmentService.getAppointmentById(app.appointment_id).subscribe(
-      data => {
-        this.selectedCheckIn = data.data[0];
-        this.selectedCheckIn.custome_birth_date = dateFormatter(this.selectedCheckIn.birth_date, true);
-        this.selectedCheckIn.bpjs_card_file = "community/media/visual/2019/10/29/02335a2e-1a99-45ec-9ff3-055d7333b511_43.jpeg";
-        this.selectedCheckIn.family_card_file = "community/media/visual/2019/10/29/02335a2e-1a99-45ec-9ff3-055d7333b511_43.jpeg";
-        this.selectedCheckIn.identity_card_file = "community/media/visual/2019/10/29/02335a2e-1a99-45ec-9ff3-055d7333b511_43.jpeg";
-        this.selectedCheckIn.surat_rujukan = "";
-        
-      }
-    );
-
-    //if doctor type is not firstcome, check patient is late or not
-    if(app.doctor_type_id !== '1'){
-      this.late = await this.checkIsLate(app.appointment_id);
-    }else{
-      this.late = '';
-    }
-    //this.open50(content);
-    this.modalService.open(content, { windowClass: 'fo_modal_admission_2', size: 'lg' });
-  }
-
-  getImage(fileName) {
-    window.open(this.urlBpjsCard + fileName, '_blank', "status=1");
   }
 
   checkIsLate(appointmentId: string) {
@@ -1472,41 +642,13 @@ export class WidgetCreateAppointmentComponent implements OnInit {
         if (detail.patient_hope_id) {
           this.open(mrLocalModal);
         } else {
-          const params = {
-            appointmentId: detail.appointment_id,
-          };
-
+          const params = { appointmentId: detail.appointment_id, };
           this.router.navigate(['./patient-data'], { queryParams: params });
         }
       } else {
         await this.defaultPatientType(detail.patient_hope_id);
-        if(this.fromBpjs === true) {
-          this.modalService.open(checkInModal, { windowClass: 'fo_modal_admission_2', size: 'lg' });
-        } else {
-          this.open50(checkInModal);
-        }
+        this.open50(checkInModal);
       }
-    }
-  }
-
-  getActiveAdmission(patientHopeId: any) {
-    const active = this.admissionService.getActiveAdmission(patientHopeId)
-      .toPromise().then(res => {
-        return res.data;
-      }).catch(err => {
-        return [];
-      });
-    return active;
-  }
-
-  async createAdmission(val, activeModal) {
-    this.buttonCreateAdmission = true;
-
-    this.listActiveAdmission = await this.getActiveAdmission(val.patient_hope_id);
-    if (this.listActiveAdmission.length !== 0) {
-      this.openconfirmation(activeModal);
-    } else {
-      this.processCreateAdmission(val);
     }
   }
 
@@ -1521,6 +663,12 @@ export class WidgetCreateAppointmentComponent implements OnInit {
       })
 
     return patient;
+  }
+
+  openRescheduleModal(appointmentSelected: any) {
+    const modalRef = this.modalService.open( ModalRescheduleBpjsComponent,
+      { windowClass: 'cc_modal_confirmation', size: 'lg' });
+    modalRef.componentInstance.appointmentSelected = appointmentSelected;
   }
 
   async buildMrLocal(detail, close, modal) {
@@ -1538,76 +686,82 @@ export class WidgetCreateAppointmentComponent implements OnInit {
       this.selectedCheckIn.medical_record_number = this.resMrLocal.medical_record_number;
       this.selectedCheckIn.patient_organization_id = this.resMrLocal.patient_organization_id;
       await this.defaultPatientType(detail.patient_hope_id);
-      await this.getAppointmentList();
-      await this.dataProcessing();
       close.click();
       this.open50(modal);
     }
   }
 
-  async createMrModal(val: any, content: any){
-    this.selectedApp = val;
-    this.open(content);
+  cancelAppointment(val, content) {
+    this.selectedCancel = val;
+    this.openconfirmation(content);
   }
 
-  async processCreateMrLocal(){
-    const body = {
-      patientHopeId: this.selectedApp.patient_hope_id,
-      organizationId: Number(this.hospital.orgId),
-      channelId: channelId.AIDO, 
-      userId: this.user.id,
-      source: sourceApps,
-      userName: this.user.fullname,
-    };
-    
-    const resMrLocal = await this.mrLocalProcess(body);
+  cancelProcess(val) {
+    const appointmentId = val.appointment_id;
+    const body = { userId: this.user.id, source: sourceApps };
 
-    if(resMrLocal){
-      await this.getAppointmentList();
-      await this.dataProcessing();
-    }
-  }
-
-  processAdmissionTeleconsultation(payload: any) {
-    const admissionTele = this.admissionService.createAdmissionAido(payload)
+    this.appointmentService.deleteAppointment(appointmentId, body)
       .toPromise().then(res => {
         this.alertService.success(res.message, false, 3000);
-        return res.data;
       }).catch(err => {
         this.alertService.error(err.error.message, false, 3000);
-        return null;
       })
 
-    return admissionTele;
+    setTimeout(() => {
+      this.refreshPage();
+      this.searchAppointment(false);
+    }, 1000)
+
   }
 
-  async createAdmModal(val, content) {
-    this.selectedAdm = {
-      appointmentId: val.appointment_id,
-      userId: this.user.id,
-      source: sourceApps,
-      userName: this.user.fullname
+  changeCondition(event: any) {
+    const val = event.target.value;
+    let idx = null
+
+    if (val == 'PRIVATE' || val == 'PASSPORT' || val == 'KITAS') {
+      this.txtPayer = true;
+      this.txtPayerNo = true;
+      this.txtPayerEligibility = true;
+
+      this.payer = null;
+      this.payerNo = null;
+      this.payerEligibility = null;
+
+      if (val == 'PRIVATE') {
+        idx = this.patientTypeList.findIndex((a) => {
+          return a.description == "PRIVATE";
+        })
+      } else if (val == 'KITAS') {
+        idx = this.patientTypeList.findIndex((a) => {
+          return a.description == "KITAS";
+        })
+      } else if (val == 'PASSPORT') {
+        idx = this.patientTypeList.findIndex((a) => {
+          return a.description == "PASSPORT";
+        })
+      }
+    } else {
+      this.txtPayer = false;
+      this.txtPayerNo = false;
+      this.txtPayerEligibility = false;
+
+      idx = this.patientTypeList.findIndex((a) => {
+        return a.description == "PAYER";
+      })
     }
-    this.open(content);
+
+    this.patientType = this.patientTypeList[idx];
   }
 
-  async createAdmTeleconsultation() {
-    const resAdmissionTele = await this.processAdmissionTeleconsultation(this.selectedAdm);
+  async createAdmission(val, activeModal) {
+    this.buttonCreateAdmission = true;
+    this.listActiveAdmission = await this.getActiveAdmission(val.patient_hope_id);
 
-    if(resAdmissionTele){
-      await this.getAppointmentList();
-      await this.dataProcessing();
+    if (this.listActiveAdmission.length !== 0) {
+      this.openconfirmation(activeModal);
+    } else {
+      this.processCreateAdmission(val);
     }
-  }
-
-  async verifyAppointmentTele(data) {
-    const parameter = {
-      from_worklist: false,
-      ...data,
-    };
-
-    const modalRef = this.modalService.open(ModalVerificationAidoComponent, { windowClass: 'modal_verification', size: 'lg' });
-        modalRef.componentInstance.appointmentAidoSelected = parameter;
   }
 
   checkInValidate(){
@@ -1650,10 +804,10 @@ export class WidgetCreateAppointmentComponent implements OnInit {
         if (this.payer && this.payer.payer_id) {
           payer = this.payer.payer_id;
           payerNo = this.payerNo;
-          payerEligibility = this.payerEligibility
+          payerEligibility = this.payerEligibility;
         }
       }
-  
+
       const body = {
         appointmentId: val.appointment_id,
         organizationId: Number(this.hospital.orgId),
@@ -1703,58 +857,33 @@ export class WidgetCreateAppointmentComponent implements OnInit {
     }
   }
 
-  async printPatientLabel(val) {
-    const contentPdf = await this.admissionService.getPatientLabel(val.appointment_id).toPromise()
-      .then(res => {
-        return res.data;
-      }).catch(err => {
-        return null;
-      })
-
-    if (contentPdf) {
-      await this.filePdfCreated(contentPdf);
-    } else {
-      this.alertService.error('Cannot print patient label', false, 3000);
-    }
+  newPatient() {
+    const params = { appointmentId: this.selectedCheckIn.appointment_id, };
+    this.router.navigate(['./patient-data'], { queryParams: params });
   }
 
-  changeCondition(event: any) {
-    const val = event.target.value;
-    let idx = null
-
-    if (val == 'PRIVATE' || val == 'PASSPORT' || val == 'KITAS') {
-      this.txtPayer = true;
-      this.txtPayerNo = true;
-      this.txtPayerEligibility = true;
-
-      this.payer = null;
-      this.payerNo = null;
-      this.payerEligibility = null;
-
-      if (val == 'PRIVATE') {
-        idx = this.patientTypeList.findIndex((a) => {
-          return a.description == "PRIVATE";
-        })
-      } else if (val == 'KITAS') {
-        idx = this.patientTypeList.findIndex((a) => {
-          return a.description == "KITAS";
-        })
-      } else if (val == 'PASSPORT') {
-        idx = this.patientTypeList.findIndex((a) => {
-          return a.description == "PASSPORT";
-        })
+  openLogHistory(val, content) {
+    let history = val;
+    this.nameHistory = history.contact_name;
+    this.appointmentService.appointmentHistory(history.appointment_id).toPromise()
+      .then(data => {
+        let newData = data.data;
+        if (newData.length) {
+          this.history = newData;
+          this.flagHistory = true;
+          this.opened(content);
+        }
+        else {
+          this.history = null;
+          this.flagHistory = false;
+          this.openedTwo(content);
+        }
+      }, err => {
+        this.history = null;
+        this.flagHistory = false;
+        this.openedTwo(content);
       }
-    } else {
-      this.txtPayer = false;
-      this.txtPayerNo = false;
-      this.txtPayerEligibility = false;
-
-      idx = this.patientTypeList.findIndex((a) => {
-        return a.description == "PAYER";
-      })
-    }
-
-    this.patientType = this.patientTypeList[idx];
+      );
   }
 
   filePdfCreated(val) {
@@ -1799,6 +928,20 @@ export class WidgetCreateAppointmentComponent implements OnInit {
     pdfMake.createPdf(docDefinition).print();
   }
 
+  async printPatientLabel(val) {
+    const contentPdf = await this.admissionService.getPatientLabel(val.appointment_id).toPromise()
+      .then(res => {
+        return res.data;
+      }).catch(err => {
+        return null;
+      })
+
+    if (contentPdf) {
+      await this.filePdfCreated(contentPdf);
+    } else {
+      this.alertService.error('Cannot print patient label', false, 3000);
+    }
+  }
 
   printQueue(content, close) {
     this.modalService.open(content, { windowClass: 'modal_queue', size: 'lg' });
@@ -1864,11 +1007,6 @@ export class WidgetCreateAppointmentComponent implements OnInit {
     }).catch(err => {
       return null;
     });
-  }
-
-  newPatient() {
-    const params = { appointmentId: this.selectedCheckIn.appointment_id, };
-    this.router.navigate(['./patient-data'], { queryParams: params });
   }
 
   printQueueTicket(val) {
@@ -1956,133 +1094,19 @@ export class WidgetCreateAppointmentComponent implements OnInit {
       this.closeQue.click();
       this.closeAdm.click();
       this.refreshPage();
+      this.searchAppointment(false);
     }, 1000);
 
   }
 
-
-  open(content) {
-    this.modalService.open(content).result.then((result) => {
-      this.closeResult = `Closed with: ${result}`;
-    }, (reason) => {
-      this.closeResult = `Dismissed ${this.getDismissReason(reason)}`;
-    });
-  }
-
-  openconfirmation(content) {
-    this.modalService.open(content, { windowClass: 'fo_modal_confirmation' }).result.then((result) => {
-      this.closeResult = `Closed with: ${result}`;
-    }, (reason) => {
-      this.closeResult = `Dismissed ${this.getDismissReason(reason)}`;
-    });
-  }
-
-  open50(content) {
-    this.modalService.open(content, { windowClass: 'fo_modal_admission' }).result.then((result) => {
-      this.closeResult = `Closed with: ${result}`;
-    }, (reason) => {
-      this.closeResult = `Dismissed ${this.getDismissReason(reason)}`;
-    });
-  }
-
-  private getDismissReason(reason: any): string {
-    this.refreshPage();
-    if (reason === ModalDismissReasons.ESC) {
-      return 'by pressing ESC';
-    } else if (reason === ModalDismissReasons.BACKDROP_CLICK) {
-      return 'by clicking on a backdrop';
-    } else {
-      return `with: ${reason}`;
-    }
-  }
-
-  async getReservedSlot(app: any) {
-    const scheduleId = app.schedule_id;
-    const appointmentDate = this.appointmentPayload.appointmentDate;
-    const appointmentNo = app.appointment_no;
-    const userId = this.userId;
-    const result = await this.appointmentService.getReservedSlotApp(
-      scheduleId,
-      appointmentDate,
-      appointmentNo,
-      userId
-    ).toPromise().then(
-      data => {
-        return data.data;
-      }
-    );
-    return result;
-  }
-
-  prevPage() {
-    const searchKey = JSON.parse(localStorage.getItem('searchKey'));
-    this.router.navigate(['./base-appointment'], { queryParams: searchKey });
-  }
-
-  prevPageTwo() {
-    if(this.fromBpjs === true && this.fromRegistration === false) {
-      this.doctorService.searchDoctorSource2 = this.bodyBpjs;
-      const query = {
-        fromBpjs: true,
-        fromRegistration: false
-      }
-      this.router.navigate(['./doctor-schedule'], {queryParams: query});
-    } else if(this.fromBpjs === true && this.fromRegistration === true) {
-      const searchKey = JSON.parse(localStorage.getItem('searchKey'));
-      this.router.navigate(['./bpjs-registration'], { queryParams: searchKey });
-    }
-  }
-
-  openScheduleBlockModal() {
-    const params = {
-      scheduleId: this.schedule,
-      doctorId: this.appointmentPayload.doctorId,
-      date: this.appointmentPayload.appointmentDate
-    };
-    const modalRef = this.modalService.open(ModalScheduleBlockComponent, { windowClass: 'cc_modal_block' });
-    modalRef.componentInstance.inputedParams = params;
-  }
-
-  async getScheduleBlock() {
-    const { appointmentDate, doctorId } = this.appointmentPayload;
-    await this.scheduleService.getScheduleBlockByDay(this.hospital.id, doctorId, appointmentDate).toPromise().then(
-      data => {
-        this.scheduleBlocks = data.data;
-        this.scheduleBlocks.map(x => {
-          x.from_time = x.from_time.substr(0, 5);
-          x.to_time = x.to_time.substr(0, 5);
-        });
-      }
-    );
-  }
-
-  emitCreateApp() {
-    this.appointmentService.createAppSource$.subscribe(
-      async () => {
-        await this.getAppointmentList();
-        await this.dataProcessing();
-      }
-    );
-  }
-
-  emitCancelApp() {
-    this.appointmentService.cancelAppSource$.subscribe(
-      async () => {
-        await this.getAppointmentList();
-        await this.dataProcessing();
-      }
-    );
-  }
-
-  emitScheduleBlock() {
-    this.scheduleService.scheduleBlockSource$.subscribe(
-      async () => {
-        await this.getScheduleBlock();
-        await this.getAppointmentList();
-        await this.getSlotTime();
-        await this.dataProcessing();
-      }
-    );
+  getActiveAdmission(patientHopeId: any) {
+    const active = this.admissionService.getActiveAdmission(patientHopeId)
+      .toPromise().then(res => {
+        return res.data;
+      }).catch(err => {
+        return [];
+      });
+    return active;
   }
 
   async getCollectionAlert() {
@@ -2117,4 +1141,64 @@ export class WidgetCreateAppointmentComponent implements OnInit {
   removeAlert(alert: Alert) {
     this.alerts = this.alerts.filter(x => x !== alert);
   }
+
+  open(content) {
+    this.modalService.open(content).result.then((result) => {
+      this.closeResult = `Closed with: ${result}`;
+    }, (reason) => {
+      this.closeResult = `Dismissed ${this.getDismissReason(reason)}`;
+    });
+  }
+
+  open50(content) {
+    this.modalService.open(content, { windowClass: 'fo_modal_admission' }).result.then((result) => {
+      this.closeResult = `Closed with: ${result}`;
+    }, (reason) => {
+      this.closeResult = `Dismissed ${this.getDismissReason(reason)}`;
+    });
+  }
+
+  openconfirmation(content) {
+    this.modalService.open(content, { windowClass: 'fo_modal_confirmation' }).result.then((result) => {
+      this.closeResult = `Closed with: ${result}`;
+    }, (reason) => {
+      this.closeResult = `Dismissed ${this.getDismissReason(reason)}`;
+    });
+  }
+
+  opened(content) {
+    this.modalService.open(content, { windowClass: 'log-history', size: 'lg' }).result.then((result) => {
+
+      this.closeResult = `Closed with: ${result}`;
+    }, (reason) => {
+      this.closeResult = `Dismissed ${this.getDismissReason(reason)}`;
+    });
+  }
+
+  openedTwo(content) {
+    this.modalService.open(content, { windowClass: 'log-history-2', size: 'lg' }).result.then((result) => {
+
+      this.closeResult = `Closed with: ${result}`;
+    }, (reason) => {
+      this.closeResult = `Dismissed ${this.getDismissReason(reason)}`;
+    });
+  }
+
+  private getDismissReason(reason: any): string {
+    this.buttonCreateAdmission = false;
+    this.buttonPrintQueue = true;
+    this.buttonPatientLabel = true;
+
+    this.refreshPage();
+    this.searchAppointment(false);
+
+    if (reason === ModalDismissReasons.ESC) {
+      return 'by pressing ESC';
+    } else if (reason === ModalDismissReasons.BACKDROP_CLICK) {
+      return 'by clicking on a backdrop';
+    } else {
+      return `with: ${reason}`;
+    }
+  }
+
 }

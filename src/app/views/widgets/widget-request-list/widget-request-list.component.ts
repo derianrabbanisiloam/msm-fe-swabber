@@ -244,34 +244,6 @@ export class WidgetRequestListComponent implements OnInit {
       })
   }
 
-  downloadDoc() {
-    let body;
-    let tampung = [];
-    if(this.appRequestList) {
-      this.appRequestList.map(x => {
-        if(x.checked === true) {
-          tampung.push(x)
-        } 
-      });
-    }
-
-    // body = {
-    //   appBpjsId: tampung,
-    //   userId: this.user.id,
-    //   userName: this.user.fullname,
-    //   source: sourceApps
-    // }
-
-    // this.bpjsService.notifyBpjs(body)
-    //   .subscribe(data => {
-    //     this.getAppointmentBpjs();
-    //     this.alertService.success('Success update to BPJS', false, 3000);
-    //   }, err => {
-    //     this.alertService.error(err.error.message);
-    //   }
-    // );
-  }
-
   CheckAllOptions() {
     if (this.appRequestList.every(val => val.checked == false)) {
         this.appRequestList.forEach(val => { val.checked = true });

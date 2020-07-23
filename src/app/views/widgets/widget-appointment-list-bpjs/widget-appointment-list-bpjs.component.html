@@ -98,6 +98,7 @@
             (change)="model.modifiedName.length >= 3 || model.modifiedName.length === 0? searchAppointment(true): ''" />
           </div>
         </td>
+        <td></td>
       </tr>
 
       <tr *ngFor="let itr of appList" [ngClass]="{
@@ -205,14 +206,9 @@
           target="_blank">{{itr.selfie_with_identity_file}}<br></a>
           </span>
         </td>
-        <!-- <td>
-          <a href=":javascript"
-          (click)="getImage(itr.gambar)"
-          target="_blank">{{itr.gambar}}<br></a>
-        </td> -->
       </tr>
       <tr>
-        <td *ngIf="showNotFoundMsg" colspan="15">Displaying no data</td>
+        <td *ngIf="showNotFoundMsg" colspan="15" style="text-align: center;">Displaying no data</td>
         <td *ngIf="showWaitMsg" colspan="15">
           <ngb-progressbar value="1000">Loading...</ngb-progressbar>
         </td>

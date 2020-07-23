@@ -4,7 +4,7 @@
     <p>{{message1.message}}</p>
   </div>
   <div id="tutorial_week_button" class="btn-box header_right" *ngIf="showScheduleType1">
-    <div style="padding-right: 0.5em" *ngIf="fromRegistration == false">
+    <div style="padding-right: 0.5em" *ngIf="fromRegistration == false && reschBpjs == false">
       <select class="form-control" (change)="getScheduleByConsType()" [(ngModel)]="consulType">
         <option [ngValue]=null [selected]="consulType === null">All Schedule</option>
         <option value=4 selected="consulType == 4">Teleconsultation</option>
@@ -156,7 +156,7 @@
         </button>
       </div>
     </div>
-    <div class="content-header-container" *ngIf="fromBpjs === true && fromRegistration == true">
+    <div class="content-header-container" *ngIf="fromBpjs === true && fromRegistration == true && keywords?.speciality?.speciality_name">
       <div class="content-doctor-schedule-group-1">
         <span class="showing_result foot-note" *ngIf="keywords.area"><span class="bold">Area:</span>
           {{keywords.area.name}}</span>

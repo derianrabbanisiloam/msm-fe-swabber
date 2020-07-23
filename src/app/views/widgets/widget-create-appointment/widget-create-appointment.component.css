@@ -1,3 +1,8 @@
+.inter-checkbox {
+  height: 19px;
+  width: 19px;
+}
+
 .image-upload>input {
   display: none;
 }

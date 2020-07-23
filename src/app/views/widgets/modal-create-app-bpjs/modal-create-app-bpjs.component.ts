@@ -123,13 +123,14 @@ export class ModalCreateAppBpjsComponent implements OnInit {
       });
   }
 
-  rujukanInternalVal(e) {
+  rujukanInternalVal() {
     this.isRujukanInternal = this.isRujukanInternal ? true : false;
     if(this.isRujukanInternal === true) {
       document.getElementById('modal-bpjs').setAttribute('add-width-att', '');
       document.getElementById('modal-bpjs-2').setAttribute('add-width-att', '');
       document.getElementById('tutorial5').setAttribute('add-width-percent', '');
     } else {
+      this.doctorId = null;
       document.getElementById('modal-bpjs').removeAttribute('add-width-att');
       document.getElementById('modal-bpjs-2').removeAttribute('add-width-att');
       document.getElementById('tutorial5').removeAttribute('add-width-percent');
@@ -186,87 +187,166 @@ export class ModalCreateAppBpjsComponent implements OnInit {
           this.fixBpjsData = this.bpjsData[0];
         } else {
           this.messageBpjs = 'Tidak ada rujukan';
+
+          // this.bpjsData = [{ //dummy
+          //   "diagnosa": {
+          //      "kode": "N40",
+          //      "nama": "Hyperplasia of prostate"
+          //   },
+          //   "keluhan": "kencing tidak puas",
+          //   "noKunjungan": "030107010217Y001465",
+          //   "pelayanan": {
+          //      "kode": "2",
+          //      "nama": "Rawat Jalan"
+          //   },
+          //   "peserta": {
+          //      "cob": {
+          //         "nmAsuransi": null,
+          //         "noAsuransi": null,
+          //         "tglTAT": null,
+          //         "tglTMT": null
+          //      },
+          //      "hakKelas": {
+          //         "keterangan": "KELAS I",
+          //         "kode": "1"
+          //      },
+          //      "informasi": {
+          //         "dinsos": null,
+          //         "noSKTM": null,
+          //         "prolanisPRB": null
+          //      },
+          //      "jenisPeserta": {
+          //         "keterangan": "PENERIMA PENSIUN PNS",
+          //         "kode": "15"
+          //      },
+          //      "mr": {
+          //         "noMR": "298036",
+          //         "noTelepon": null
+          //      },
+          //      "nama": "MUSDIWAR,BA",
+          //      "nik": 36030807079400002,
+          //      "noKartu": "0000416382632",
+          //      "pisa": "2",
+          //      "provUmum": {
+          //         "kdProvider": "03010701",
+          //         "nmProvider": "SITEBA"
+          //      },
+          //      "sex": "L",
+          //      "statusPeserta": {
+          //         "keterangan": "AKTIF",
+          //         "kode": "0"
+          //      },
+          //      "tglCetakKartu": "2017-11-13",
+          //      "tglLahir": "1938-08-31",
+          //      "tglTAT": "2038-08-31",
+          //      "tglTMT": "1996-08-20",
+          //      "umur": {
+          //         "umurSaatPelayanan": "78 tahun ,6 bulan ,6 hari",
+          //         "umurSekarang": "79 tahun ,3 bulan ,18 hari"
+          //      }
+          //   },
+          //   "poliRujukan": {
+          //      "kode": "URO",
+          //      "nama": "UROLOGI"
+          //   },
+          //   "provPerujuk": {
+          //      "kode": "03010701",
+          //      "nama": "SITEBA"
+          //   },
+          //   "tglKunjungan": "2017-02-25"
+          // }];
+          // this.bpjsData.map(x => {
+          //   birthSplit = x.peserta.tglLahir.split('-');
+          //   fixBirthDate = birthSplit[2]+'-'+birthSplit[1]+'-'+birthSplit[0];
+          //   dateChoosed = moment(x.tglKunjungan); 
+          //   dateFix = dateChoosed.add(90, 'days').format('YYYY-MM-DD');
+          //   visitDate = dateFix.split('-');
+          //   bpjsDate = visitDate[2]+'-'+visitDate[1]+'-'+visitDate[0];
+          //   x.expiredDate = bpjsDate;
+          //   x.fixTglLahir = fixBirthDate;
+          // });
+          // this.fixBpjsData = this.bpjsData[0];
         }
       }, err => {
-      //   this.bpjsData = [{ //dummy
-      //     "diagnosa": {
-      //        "kode": "N40",
-      //        "nama": "Hyperplasia of prostate"
-      //     },
-      //     "keluhan": "kencing tidak puas",
-      //     "noKunjungan": "030107010217Y001465",
-      //     "pelayanan": {
-      //        "kode": "2",
-      //        "nama": "Rawat Jalan"
-      //     },
-      //     "peserta": {
-      //        "cob": {
-      //           "nmAsuransi": null,
-      //           "noAsuransi": null,
-      //           "tglTAT": null,
-      //           "tglTMT": null
-      //        },
-      //        "hakKelas": {
-      //           "keterangan": "KELAS I",
-      //           "kode": "1"
-      //        },
-      //        "informasi": {
-      //           "dinsos": null,
-      //           "noSKTM": null,
-      //           "prolanisPRB": null
-      //        },
-      //        "jenisPeserta": {
-      //           "keterangan": "PENERIMA PENSIUN PNS",
-      //           "kode": "15"
-      //        },
-      //        "mr": {
-      //           "noMR": "298036",
-      //           "noTelepon": null
-      //        },
-      //        "nama": "MUSDIWAR,BA",
-      //        "nik": 36030807079400002,
-      //        "noKartu": "0000416382632",
-      //        "pisa": "2",
-      //        "provUmum": {
-      //           "kdProvider": "03010701",
-      //           "nmProvider": "SITEBA"
-      //        },
-      //        "sex": "L",
-      //        "statusPeserta": {
-      //           "keterangan": "AKTIF",
-      //           "kode": "0"
-      //        },
-      //        "tglCetakKartu": "2017-11-13",
-      //        "tglLahir": "1938-08-31",
-      //        "tglTAT": "2038-08-31",
-      //        "tglTMT": "1996-08-20",
-      //        "umur": {
-      //           "umurSaatPelayanan": "78 tahun ,6 bulan ,6 hari",
-      //           "umurSekarang": "79 tahun ,3 bulan ,18 hari"
-      //        }
-      //     },
-      //     "poliRujukan": {
-      //        "kode": "URO",
-      //        "nama": "UROLOGI"
-      //     },
-      //     "provPerujuk": {
-      //        "kode": "03010701",
-      //        "nama": "SITEBA"
-      //     },
-      //     "tglKunjungan": "2017-02-25"
-      //  }];
-      //  this.bpjsData.map(x => {
-      //   birthSplit = x.peserta.tglLahir.split('-');
-      //   fixBirthDate = birthSplit[2]+'-'+birthSplit[1]+'-'+birthSplit[0];
-      //   dateChoosed = moment(x.tglKunjungan); 
-      //   dateFix = dateChoosed.add(90, 'days').format('YYYY-MM-DD');
-      //   visitDate = dateFix.split('-');
-      //   bpjsDate = visitDate[2]+'-'+visitDate[1]+'-'+visitDate[0];
-      //   x.expiredDate = bpjsDate;
-      //   x.fixTglLahir = fixBirthDate;
-      // });
-        //this.fixBpjsData = this.bpjsData[0];
-        this.fixBpjsData = null;
+        // this.bpjsData = [{ //dummy
+        //   "diagnosa": {
+        //      "kode": "N40",
+        //      "nama": "Hyperplasia of prostate"
+        //   },
+        //   "keluhan": "kencing tidak puas",
+        //   "noKunjungan": "030107010217Y001465",
+        //   "pelayanan": {
+        //      "kode": "2",
+        //      "nama": "Rawat Jalan"
+        //   },
+        //   "peserta": {
+        //      "cob": {
+        //         "nmAsuransi": null,
+        //         "noAsuransi": null,
+        //         "tglTAT": null,
+        //         "tglTMT": null
+        //      },
+        //      "hakKelas": {
+        //         "keterangan": "KELAS I",
+        //         "kode": "1"
+        //      },
+        //      "informasi": {
+        //         "dinsos": null,
+        //         "noSKTM": null,
+        //         "prolanisPRB": null
+        //      },
+        //      "jenisPeserta": {
+        //         "keterangan": "PENERIMA PENSIUN PNS",
+        //         "kode": "15"
+        //      },
+        //      "mr": {
+        //         "noMR": "298036",
+        //         "noTelepon": null
+        //      },
+        //      "nama": "MUSDIWAR,BA",
+        //      "nik": 36030807079400002,
+        //      "noKartu": "0000416382632",
+        //      "pisa": "2",
+        //      "provUmum": {
+        //         "kdProvider": "03010701",
+        //         "nmProvider": "SITEBA"
+        //      },
+        //      "sex": "L",
+        //      "statusPeserta": {
+        //         "keterangan": "AKTIF",
+        //         "kode": "0"
+        //      },
+        //      "tglCetakKartu": "2017-11-13",
+        //      "tglLahir": "1938-08-31",
+        //      "tglTAT": "2038-08-31",
+        //      "tglTMT": "1996-08-20",
+        //      "umur": {
+        //         "umurSaatPelayanan": "78 tahun ,6 bulan ,6 hari",
+        //         "umurSekarang": "79 tahun ,3 bulan ,18 hari"
+        //      }
+        //   },
+        //   "poliRujukan": {
+        //      "kode": "URO",
+        //      "nama": "UROLOGI"
+        //   },
+        //   "provPerujuk": {
+        //      "kode": "03010701",
+        //      "nama": "SITEBA"
+        //   },
+        //   "tglKunjungan": "2017-02-25"
+        // }];
+        // this.bpjsData.map(x => {
+        //   birthSplit = x.peserta.tglLahir.split('-');
+        //   fixBirthDate = birthSplit[2]+'-'+birthSplit[1]+'-'+birthSplit[0];
+        //   dateChoosed = moment(x.tglKunjungan); 
+        //   dateFix = dateChoosed.add(90, 'days').format('YYYY-MM-DD');
+        //   visitDate = dateFix.split('-');
+        //   bpjsDate = visitDate[2]+'-'+visitDate[1]+'-'+visitDate[0];
+        //   x.expiredDate = bpjsDate;
+        //   x.fixTglLahir = fixBirthDate;
+        // });
+        // this.fixBpjsData = this.bpjsData[0];
+        //this.fixBpjsData = null;
         this.messageBpjs = null;
         this.alertService.error(err.error.message, false, 3000);
       }

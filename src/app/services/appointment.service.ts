@@ -112,14 +112,14 @@ export class AppointmentService {
      modifiedName?: string, isWaitingList?: boolean, limit?: number, offset?: number, channel?: string): Observable<any> {
 
     let uri = `/hospital/${hospital}?date=${date}`;
-
+    
     uri = name ? `${uri}&name=${name}` : uri;
     uri = birth ? `${uri}&birth=${birth}` : uri;
     uri = mr ? `${uri}&mr=${mr}` : uri;
     uri = doctor ? `${uri}&doctor=${doctor}` : uri;
     uri = modifiedName ? `${uri}&modifiedName=${modifiedName}` : uri;
     uri = isWaitingList ? `${uri}&isWaitingList=${isWaitingList}` : uri;
-    uri = channel ? `${channel}&channelId=${channel}` : uri;
+    uri = channel ? `${uri}&channelId=${channel}` : uri;
 
     const url = `${uri}&limit=${limit}&offset=${offset}`;
 
@@ -217,7 +217,7 @@ export class AppointmentService {
   getAppointmentByDay(hospitalId: string, doctorId: string, date: string, sortBy?: string, orderBy?: string, isBpjs?: string, exclude?: boolean): Observable<any> {
     let url = `${this.ccAppointmentUrl}?hospitalId=${hospitalId}&doctorId=${doctorId}&date=${date}&sortBy=${sortBy}&orderBy=${orderBy}`;
     url = isBpjs ? `${url}&channelId=${isBpjs}` : url;
-    url = exclude ? `${url}&exclude=${exclude}` : url;
+    url =`${url}&exclude=${exclude}`;
     return this.http.get<any>(url, httpOptions);
   }
 

@@ -65,7 +65,7 @@ import { FormBuilder, FormGroup, FormControl } from '@angular/forms';
   styleUrls: ['./widget-create-appointment.component.css'],
 })
 export class WidgetCreateAppointmentComponent implements OnInit {
-  @Input() appointmentPayloadInput: appPayload;
+  @Input() appointmentPayloadInput: any;
   @Output() opSlotSelected = new EventEmitter<any>();
   public key: any = JSON.parse(localStorage.getItem('key'));
   public hospital = this.key.hospital;
@@ -152,8 +152,7 @@ export class WidgetCreateAppointmentComponent implements OnInit {
   public patFromBpjs: any;
   public bodyBpjs: any;
   public consulType: string = null;
-  //public urlBpjsCard = environment.GET_IMAGE+pathImage.BPJS_CARD; //dummy
-  public urlBpjsCard = 'https://akcdn.detik.net.id/';
+  public urlBpjsCard = environment.GET_IMAGE+pathImage.BPJS_CARD; //dummy
   public maxSize10MB: number = 10485760;
   public listProvince: any = null;
   public listDistrict: any = null;
@@ -182,6 +181,7 @@ export class WidgetCreateAppointmentComponent implements OnInit {
   public assetUpload: any = null;
   public bodyUpload: any = {};
   public mask_birth = [/\d/, /\d/, '-', /\d/, /\d/, '-', /\d/, /\d/, /\d/, /\d/];
+  public reschBpjs: boolean = false;
 
   constructor(
     private router: Router,
@@ -426,6 +426,33 @@ export class WidgetCreateAppointmentComponent implements OnInit {
     this.emitScheduleBlock();
     this.emitRescheduleApp();
     this.getCollectionAlert();
+  }
+
+  lakaLantasVal(modal?) {
+    this.isLakaLantas = this.isLakaLantas ? true : false;
+    if(this.isLakaLantas === true) this.modalService.open(modal, { windowClass: 'fo_modal_admission_2', size: 'lg' });
+    else {
+      this.cancelLakaLantas();
+    }
+  }
+
+  cancelLakaLantas() {
+    this.isLakaLantas = false;
+    this.lakaLantasAssurance = {
+      penjamin: null,
+      tglKejadian: null,
+      keterangan: null
+      }
+    this.suplesi = {
+        suplesi: null,
+        noSepSuplesi: null,
+        lokasiLaka: null
+      }
+    this.lokasiLakaBody = {
+        kdPropinsi: null, 
+        kdKabupaten: null,
+        kdKecamatan: null
+      }
   }
 
   async getAppBpjs() {
@@ -737,6 +764,8 @@ export class WidgetCreateAppointmentComponent implements OnInit {
       this.appointmentPayload.doctorId = this.appointmentPayloadInput.doctorId;
       this.appointmentPayload.appointmentDate = this.appointmentPayloadInput.appointmentDate;
       this.isOriginal = false;
+      this.consulType = this.appointmentPayloadInput.consulType ? this.appointmentPayloadInput.consulType : null; //reschedule bpjs
+      this.reschBpjs = this.appointmentPayloadInput.isRescheduleBpjs === true ? true : false; //reschedule bpjs
     } else { //from menu doctor schedule
       this.appointmentPayload.doctorId = this.activatedRoute.snapshot.queryParamMap.get('doctorId');
       this.appointmentPayload.appointmentDate = this.activatedRoute.snapshot.queryParamMap.get('date');
@@ -988,7 +1017,7 @@ export class WidgetCreateAppointmentComponent implements OnInit {
           patient_hope_id: null,
           patient_organization_id: null,
           is_double_mr: false
-        });  
+        }); 
       } else {
         for (let i = 0, { length } = this.appointments; i < length; i++) {
           no += 1;
@@ -1087,7 +1116,9 @@ export class WidgetCreateAppointmentComponent implements OnInit {
     const date = this.appointmentPayload.appointmentDate;
     const sortBy = 'appointment_no';
     const orderBy = 'ASC';
-    const exclude = this.fromBpjs === true ? false : true;
+    let exclude = this.fromBpjs === true ? false : true; //dummy
+    //const exclude = this.fromBpjs === true ? true : false;
+    if(this.reschBpjs === true) exclude = false; // dummy reschedule bpjs
     const isBpjs = channelId.BPJS;
     await this.appointmentService.getAppointmentByDay(hospitalId, doctorId, date, sortBy, orderBy, isBpjs, exclude).toPromise().then(
       data => {
@@ -1103,7 +1134,9 @@ export class WidgetCreateAppointmentComponent implements OnInit {
     const hospitalId = this.hospital.id;
     const consulTypeAll = consultationType.REGULAR+':'+consultationType.EXECUTIVE+':'
       +consultationType.TELECONSULTATION+':'+consultationType.BPJS_REGULER;
-    const consulTypeList = this.fromBpjs === true ? this.consulType : consulTypeAll;
+    let consulTypeList = this.fromBpjs === true ? this.consulType : consulTypeAll; //dummy
+    //const consulTypeList = this.fromBpjs === true ? consulTypeAll : this.consulType;
+    if(this.reschBpjs === true) consulTypeList = this.consulType; // dummy reschedule bpjs
     await this.scheduleService.getTimeSlot(hospitalId, doctorId, date, consulTypeList).toPromise().then(
       data => {
         this.slotList = data.data;
@@ -1154,7 +1187,8 @@ export class WidgetCreateAppointmentComponent implements OnInit {
     const date = this.appointmentPayload.appointmentDate;
     const consulTypeAll = consultationType.REGULAR+':'+consultationType.EXECUTIVE+':'
       +consultationType.TELECONSULTATION+':'+consultationType.BPJS_REGULER;
-    const consulTypeList = this.fromBpjs === true ? this.consulType : consulTypeAll;
+    let consulTypeList = this.fromBpjs === true ? this.consulType : consulTypeAll;
+    if(this.reschBpjs === true) consulTypeList = this.consulType; // dummy reschedule bpjs
     await this.scheduleService.getScheduleDoctor(this.hospital.id, doctorId, date, consulTypeList).toPromise().then(
       data => {
         this.schedule = data.data;
@@ -1330,7 +1364,6 @@ export class WidgetCreateAppointmentComponent implements OnInit {
   }
 
   async checkInAppointment(app, content) {
-    console.log('!!!!!!!!!!!!', app)
     await this.appointmentService.getAppointmentById(app.appointment_id).subscribe(
       data => {
         this.selectedCheckIn = data.data[0];
@@ -1447,7 +1480,11 @@ export class WidgetCreateAppointmentComponent implements OnInit {
         }
       } else {
         await this.defaultPatientType(detail.patient_hope_id);
-        this.open50(checkInModal);
+        if(this.fromBpjs === true) {
+          this.modalService.open(checkInModal, { windowClass: 'fo_modal_admission_2', size: 'lg' });
+        } else {
+          this.open50(checkInModal);
+        }
       }
     }
   }

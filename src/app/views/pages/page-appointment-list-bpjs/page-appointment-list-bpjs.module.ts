@@ -13,8 +13,8 @@ import { NgbAlertModule, NgbPopoverModule, NgbProgressbarModule, NgbModalModule 
 import { AutocompleteLibModule } from 'angular-ng-autocomplete';
 import { NguiAutoCompleteModule } from '@ngui/auto-complete';
 
-import { ModalRescheduleAppointmentModule } from '../../widgets/modal-reschedule-appointment/modal-reschedule-appointment.module';
-import { ModalRescheduleAppointmentComponent } from '../../widgets/modal-reschedule-appointment/modal-reschedule-appointment.component';
+import { ModalRescheduleBpjsModule } from '../../widgets/modal-reschedule-bpjs/modal-reschedule-bpjs.module';
+import { ModalRescheduleBpjsComponent } from '../../widgets/modal-reschedule-bpjs/modal-reschedule-bpjs.component';
 
 @NgModule({
   declarations: [
@@ -38,12 +38,12 @@ import { ModalRescheduleAppointmentComponent } from '../../widgets/modal-resched
     NgbModalModule,
     AutocompleteLibModule,
     NguiAutoCompleteModule,
-    ModalRescheduleAppointmentModule,
+    ModalRescheduleBpjsModule,
   ],exports: [
     PageAppointmentListBpjsComponent,
   ],
   entryComponents: [
-    ModalRescheduleAppointmentComponent
+    ModalRescheduleBpjsComponent
   ]
 })
 export class PageAppointmentListBpjsModule { }

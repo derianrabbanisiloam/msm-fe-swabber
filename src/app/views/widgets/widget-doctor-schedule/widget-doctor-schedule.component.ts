@@ -48,6 +48,7 @@ export class WidgetDoctorScheduleComponent implements OnInit {
   public patFromBpjs: any;
   public bodyBpjs: any;
   public hideLoading: boolean = false;
+  public reschBpjs: boolean = false;
 
   public datePickerModel: any = {
     date: {
@@ -98,7 +99,6 @@ export class WidgetDoctorScheduleComponent implements OnInit {
         this.fromBpjs = true;
         this.fromRegistration = true;
         this.consulType = this.doctorService.searchDoctorSource2.consulType;
-        
       }
     this.keywords = this.doctorService.searchDoctorSource2;
   } else if(this.activatedRoute.snapshot.queryParamMap.get('fromBpjs') === 'true' &&
@@ -180,6 +180,8 @@ export class WidgetDoctorScheduleComponent implements OnInit {
   }
 
   getSchedulesLogic(keywords: any) {
+    keywords.isRescheduleBpjs === true ? this.consulType = keywords.consulType : ''; //from reschedule bpjs
+    keywords.isRescheduleBpjs === true ? this.reschBpjs = true : ''; //from reschedule bpjs
     const doctorId = keywords.doctor ? keywords.doctor.doctor_id : null;
     const areaId = keywords.area ? keywords.area.area_id : null;
     const hospitalId = keywords.hospital ? keywords.hospital.hospital_id : null;
@@ -194,8 +196,10 @@ export class WidgetDoctorScheduleComponent implements OnInit {
       else {
         if(this.flagCon !== this.consulTypeFlag) {
           this.flagCon = this.consulTypeFlag;
-          consultationType = null;
-          this.consulType = null;
+          if(this.fromBpjs === false && this.fromRegistration === false) {
+            consultationType = consulTypeAll;
+            this.consulType = null;
+          }
         }
       }
       this.getSchedulesByDoctor(doctorId, this.initDate, consultationType);
@@ -205,8 +209,10 @@ export class WidgetDoctorScheduleComponent implements OnInit {
       else {
         if(this.flagCon !== this.consulTypeFlag) {
           this.flagCon = this.consulTypeFlag;
-          consultationType = null;
-          this.consulType = null;
+          if(this.fromBpjs === false && this.fromRegistration === false) {
+            consultationType = consulTypeAll;
+            this.consulType = null;
+          }
         }
       }
       this.getSchedulesByKeywords(specialityId, this.initDate, consultationType, areaId, hospitalId);
@@ -247,6 +253,8 @@ export class WidgetDoctorScheduleComponent implements OnInit {
           this.showScheduleType1 = true;
           this.message1 = null;
         } else {
+          this.showScheduleType2 = false;
+          this.showScheduleType1 = true;
           this.message1 = {
             title: 'Data tidak ditemukan',
             description: ''
@@ -266,6 +274,8 @@ export class WidgetDoctorScheduleComponent implements OnInit {
           this.showScheduleType2 = true;
           this.message1 = null;
         } else {
+          this.showScheduleType2 = false;
+          this.showScheduleType1 = true;
           this.hideLoading = false;
           this.message1 = {
             title: 'Data tidak ditemukan',
@@ -362,8 +372,7 @@ export class WidgetDoctorScheduleComponent implements OnInit {
           fromRegistration: true
         }
       });
-    }
-    else {
+    } else {
       this.router.navigate(['/create-appointment'], {
         queryParams: {
           doctorId: item.doctor_id,

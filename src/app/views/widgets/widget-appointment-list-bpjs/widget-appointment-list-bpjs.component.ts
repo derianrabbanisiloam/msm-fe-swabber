@@ -18,8 +18,8 @@ import { sourceApps, queueType, appointmentStatusId } from '../../../variables/c
 import { Router, ActivatedRoute } from '@angular/router';
 import { BoundElementProperty } from '@angular/compiler';
 import {
-  ModalRescheduleAppointmentComponent
-} from '../modal-reschedule-appointment/modal-reschedule-appointment.component';
+  ModalRescheduleBpjsComponent
+} from '../modal-reschedule-bpjs/modal-reschedule-bpjs.component';
 import { RescheduleAppointment } from '../../../models/appointments/reschedule-appointment';
 import * as pdfMake from 'pdfmake/build/pdfmake';
 import * as pdfFonts from 'pdfmake/build/vfs_fonts';
@@ -140,7 +140,6 @@ export class WidgetAppointmentListBpjsComponent implements OnInit {
   public urlBpjsCard = environment.GET_IMAGE;
   //public urlBpjsCard = 'https://cdn.pixabay.com';
   public checkAll: boolean = false;
-  public items: any;
 
   constructor(
     private doctorService: DoctorService,
@@ -222,13 +221,6 @@ export class WidgetAppointmentListBpjsComponent implements OnInit {
         });
       }
     });
-
-
-    this.items = [
-      { label: '1.txt', value: 'https://ilhamcc.files.wordpress.com/2017/01/angularjs-untuk-pemula.pdf' },
-      { label: 'hallo', value: 'disclaimer_1/disclaimer_1-1594719597879.pdf' },
-      { label: '3.txt', value: 'https://s3.amazonaws.com/uifaces/faces/twitter/olegpogodaev/128.jpg' }
-    ];
   }
 
   async downloadDoc() {
@@ -490,8 +482,8 @@ export class WidgetAppointmentListBpjsComponent implements OnInit {
 
   async listAppointment(name = '', birth = '', mr = '', doctor = '', modifiedName = '',
   isWaitingList = null) {
-    //const channel = channelId.BPJS; //appointment BPJS
-    const channel = null
+    const channel = channelId.BPJS; //appointment BPJS //dummy
+    //const channel = null;
     this.showWaitMsg = true;
     this.showNotFoundMsg = false;
 
@@ -500,14 +492,13 @@ export class WidgetAppointmentListBpjsComponent implements OnInit {
     const date = dateFormatter(strDate, false);
     this.dateApp = date;
     const hospital = this.hospital.id;
-
     const limit = this.limit;
     const offset = this.offset;
 
+    //dummy
     this.appList = await this.appointmentService.getListAppointment(date, hospital, name, birth, mr, doctor, modifiedName, isWaitingList, limit, offset, channel)
       .toPromise().then(res => {
-        if (res.status === 'OK') {
-
+        if (res.data.length > 0) {
           this.isCanNextPage = res.data.length >= 10 ? true : false;
 
           for (let i = 0, { length } = res.data; i < length; i += 1) {
@@ -516,11 +507,11 @@ export class WidgetAppointmentListBpjsComponent implements OnInit {
             res.data[i].custome_from_time = res.data[i].from_time.substring(0, 5);
             res.data[i].custome_to_time = res.data[i].to_time.substring(0, 5);
             res.data[i].checked = false;
-            res.data[i].bpjs_card_file = 'disclaimer_1-1594719597879.pdf';
-            res.data[i].family_card_file = 'disclaimer_1-1594805030136.pdf';
-            res.data[i].identity_card_file = 'disclaimer_1-1595232503271.pdf';
-            res.data[i].refference_letter_file = 'disclaimer_1-1595232538199.pdf';
-            res.data[i].selfie_with_identity_file = 'disclaimer_1-1595232563389.pdf';
+            // res.data[i].bpjs_card_file = 'disclaimer_1-1594719597879.pdf'; //dummy
+            // res.data[i].family_card_file = 'disclaimer_1-1594805030136.pdf';
+            // res.data[i].identity_card_file = 'disclaimer_1-1595232503271.pdf';
+            // res.data[i].refference_letter_file = 'disclaimer_1-1595232538199.pdf';
+            // res.data[i].selfie_with_identity_file = 'disclaimer_1-1595232563389.pdf';
           }
 
           this.showWaitMsg = false;
@@ -675,7 +666,7 @@ export class WidgetAppointmentListBpjsComponent implements OnInit {
   }
 
   openRescheduleModal(appointmentSelected: any) {
-    const modalRef = this.modalService.open(ModalRescheduleAppointmentComponent,
+    const modalRef = this.modalService.open( ModalRescheduleBpjsComponent,
       { windowClass: 'cc_modal_confirmation', size: 'lg' });
     modalRef.componentInstance.appointmentSelected = appointmentSelected;
   }

@@ -51,38 +51,6 @@ export class AppointmentService {
     this.updateNotesSource.next(params);
   }
 
-  downloadImage(urlBpjsCard, img) {
-    const imgUrl = img;
-    const imgName = imgUrl.substr(imgUrl.lastIndexOf('/') + 1);
-    this.http.get<any>(urlBpjsCard+imgUrl, {responseType: 'blob' as 'json'})
-      .subscribe((res: any) => {
-        const file = new Blob([res], {type: res.type});
- 
-        // IE
-        if (window.navigator && window.navigator.msSaveOrOpenBlob) {
-          window.navigator.msSaveOrOpenBlob(file);
-          return;
-        }
-
-        const blob = window.URL.createObjectURL(file);
-        const link = urlBpjsCard.createElement('a');
-        link.href = blob;
-        link.download = imgName;
- 
-        // Version link.click() to work at firefox
-        link.dispatchEvent(new MouseEvent('click', {
-          bubbles: true,
-          cancelable: true,
-          view: window
-        }));
- 
-        setTimeout(() => { // firefox
-          window.URL.revokeObjectURL(blob);
-          link.remove();
-        }, 100);
-      });
-  }
-
   updateDetailTemporaryApp(tempAppId: any, payload: any): Observable<any> {
     const url = `${this.ccAppointmentUrl}/temporary/${tempAppId}`;
     const body = JSON.stringify(payload);

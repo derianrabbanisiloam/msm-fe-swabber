@@ -51,16 +51,18 @@ export class WidgetReservationBpjsComponent implements OnInit {
 
     if (type) {
       if (type === 'doctor') {
-        const searchKey = {
-          doctor_id: this.route.snapshot.queryParams['doctor_id'],
-          name: this.route.snapshot.queryParams['name'],
-        };
-
+        let doctorId = this.route.snapshot.queryParams['doctor_id'];
         const idx = this.doctorList.findIndex((a) => {
-          return a.doctor_id === searchKey.doctor_id;
+          return a.doctor_id === doctorId;
         });
 
         this.searchAutoComplete = this.doctorList[idx];
+        const searchKey = {
+          doctor_id: doctorId,
+          name: this.route.snapshot.queryParams['name'],
+          specialty_id: this.searchAutoComplete.specialty_id
+        };
+        
         this.searchSchedule1(searchKey);
       } else {
         const searchKey = {

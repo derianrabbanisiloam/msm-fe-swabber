@@ -556,9 +556,9 @@ export class WidgetCreateAppointmentComponent implements OnInit {
               })
               return null
             });
-            // if(this.assetUpload) {
-            //   this.editAppointmentData(this.assetUpload.name, nameFile)
-            // } //dummy
+            if(this.assetUpload) {
+              this.editAppointmentData(this.assetUpload[0].name, nameFile)
+            } //dummy
         }
       } else {
         Swal.fire({
@@ -574,20 +574,19 @@ export class WidgetCreateAppointmentComponent implements OnInit {
 
   async editAppointmentData(pathFile, nameFile) {
     this.bodyUpload = {
-      appointmentId: "",
       userId: this.user.id,
       userName: this.user.username,
       source: sourceApps,
     }
-    if(nameFile === 'bpjsCard') this.bodyUpload.bpjsCard = pathFile;
-    else if(nameFile === 'identityCard') this.bodyUpload.identityCard = pathFile;
-    else if(nameFile === 'referenceLetter') this.bodyUpload.referenceLetter = pathFile;
-    else if(nameFile === 'familyCard') this.bodyUpload.familyCard = pathFile;
+    if(nameFile === 'bpjsCard') this.bodyUpload.bpjsCardFile = pathFile;
+    else if(nameFile === 'identityCard') this.bodyUpload.identityCardFile = pathFile;
+    else if(nameFile === 'referenceLetter') this.bodyUpload.refferenceLetterFile = pathFile;
+    else if(nameFile === 'familyCard') this.bodyUpload.familyCardFile = pathFile;
     
-    this.patientService.updateContact(this.bodyUpload.appointmentId, this.bodyUpload).subscribe(
+    this.appointmentService.updateAppBpjs(this.selectedCheckIn.appointment_id, this.bodyUpload).subscribe(
       data => {
         this.bodyUpload = {};
-        this.getRefreshAfterUpload();
+        this.refreshDataApp(this.selectedCheckIn.appointment_id);
         if(nameFile === 'bpjsCard') this.uploadForm.get('bpjsCard').setValue(null);
         else if(nameFile === 'identityCard') this.uploadForm.get('identityCard').setValue(null);
         else if(nameFile === 'referenceLetter') this.uploadForm.get('referenceLetter').setValue(null);
@@ -601,11 +600,6 @@ export class WidgetCreateAppointmentComponent implements OnInit {
         })
       }
     )
-  }
-
-  async getRefreshAfterUpload() {
-    await this.getAppointmentList();
-    await this.dataProcessing();
   }
 
   suplesiCheckBox() {
@@ -1381,18 +1375,7 @@ export class WidgetCreateAppointmentComponent implements OnInit {
   }
 
   async checkInBpjsApp(app, content) {
-    await this.appointmentService.getAppointmentById(app.appointment_id).subscribe(
-      data => {
-        this.selectedCheckIn = data.data[0];
-        this.selectedCheckIn.custome_birth_date = dateFormatter(this.selectedCheckIn.birth_date, true);
-        this.selectedCheckIn.bpjs_card_file = "community/media/visual/2019/10/29/02335a2e-1a99-45ec-9ff3-055d7333b511_43.jpeg";
-        this.selectedCheckIn.family_card_file = "community/media/visual/2019/10/29/02335a2e-1a99-45ec-9ff3-055d7333b511_43.jpeg";
-        this.selectedCheckIn.identity_card_file = "community/media/visual/2019/10/29/02335a2e-1a99-45ec-9ff3-055d7333b511_43.jpeg";
-        this.selectedCheckIn.surat_rujukan = "";
-        
-      }
-    );
-
+    await this.refreshDataApp(app.appointment_id);
     //if doctor type is not firstcome, check patient is late or not
     if(app.doctor_type_id !== '1'){
       this.late = await this.checkIsLate(app.appointment_id);
@@ -1401,6 +1384,20 @@ export class WidgetCreateAppointmentComponent implements OnInit {
     }
     //this.open50(content);
     this.modalService.open(content, { windowClass: 'fo_modal_admission_2', size: 'lg' });
+  }
+
+  async refreshDataApp(appointment){
+    await this.appointmentService.getAppointmentById(appointment).subscribe(
+      data => {
+        this.selectedCheckIn = data.data[0];
+        this.selectedCheckIn.custome_birth_date = dateFormatter(this.selectedCheckIn.birth_date, true);
+        // this.selectedCheckIn.bpjs_card_file = "community/media/visual/2019/10/29/02335a2e-1a99-45ec-9ff3-055d7333b511_43.jpeg";
+        // this.selectedCheckIn.family_card_file = "community/media/visual/2019/10/29/02335a2e-1a99-45ec-9ff3-055d7333b511_43.jpeg";
+        // this.selectedCheckIn.identity_card_file = "community/media/visual/2019/10/29/02335a2e-1a99-45ec-9ff3-055d7333b511_43.jpeg";
+        // this.selectedCheckIn.surat_rujukan = "";
+        
+      }
+    );
   }
 
   getImage(fileName) {

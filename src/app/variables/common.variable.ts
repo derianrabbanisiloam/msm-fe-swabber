@@ -97,7 +97,8 @@ export const consultationType = {
   BPJS: '2',
   EXECUTIVE: '3',
   TELECONSULTATION: '4',
-  BPJS_REGULER: '5'
+  BPJS_REGULER: '5',
+  NON_BPJS_TELE: '6'
 }
 
 export const activityType = {

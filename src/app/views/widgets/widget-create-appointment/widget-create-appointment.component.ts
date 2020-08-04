@@ -31,7 +31,7 @@ import { appointmentPayload as appPayload } from '../../../payloads/appointment.
 import { reserveSlotAppPayload as reserveSlotPayload } from '../../../payloads/reserve-slot.payload';
 import { AlertService } from '../../../services/alert.service';
 import { Alert, AlertType } from '../../../models/alerts/alert';
-import { sourceApps, queueType } from '../../../variables/common.variable';
+import { sourceApps, queueType, consultationType } from '../../../variables/common.variable';
 import { QueueService } from '../../../services/queue.service';
 import { dateFormatter, regionTime } from '../../../utils/helpers.util';
 import {
@@ -845,7 +845,9 @@ export class WidgetCreateAppointmentComponent implements OnInit {
     const date = this.appointmentPayload.appointmentDate;
     const sortBy = 'appointment_no';
     const orderBy = 'ASC';
-    await this.appointmentService.getAppointmentByDay(hospitalId, doctorId, date, sortBy, orderBy).toPromise().then(
+    let exclude = true;
+    const isBpjs = channelId.BPJS;
+    await this.appointmentService.getAppointmentByDay(hospitalId, doctorId, date, sortBy, orderBy, isBpjs, exclude).toPromise().then(
       data => {
         this.appointments = data.data;
       }
@@ -857,7 +859,10 @@ export class WidgetCreateAppointmentComponent implements OnInit {
     const doctorId = this.appointmentPayload.doctorId;
     const date = this.appointmentPayload.appointmentDate;
     const hospitalId = this.hospital.id;
-    await this.scheduleService.getTimeSlot(hospitalId, doctorId, date).toPromise().then(
+    const consulTypeAll = consultationType.REGULAR+':'+consultationType.EXECUTIVE+':'
+      +consultationType.TELECONSULTATION+':'+consultationType.BPJS_REGULER+':'+consultationType.NON_BPJS_TELE;
+      let consulTypeList = consulTypeAll;
+    await this.scheduleService.getTimeSlot(hospitalId, doctorId, date, consulTypeList).toPromise().then(
       data => {
         this.slotList = data.data;
       }
@@ -900,7 +905,10 @@ export class WidgetCreateAppointmentComponent implements OnInit {
   async getSchedule() {
     const doctorId = this.appointmentPayload.doctorId;
     const date = this.appointmentPayload.appointmentDate;
-    await this.scheduleService.getScheduleDoctor(this.hospital.id, doctorId, date).toPromise().then(
+    const consulTypeAll = consultationType.REGULAR+':'+consultationType.EXECUTIVE+':'
+      +consultationType.TELECONSULTATION+':'+consultationType.BPJS_REGULER+':'+consultationType.NON_BPJS_TELE;
+    let consulTypeList = consulTypeAll;
+    await this.scheduleService.getScheduleDoctor(this.hospital.id, doctorId, date, consulTypeList).toPromise().then(
       data => {
         this.schedule = data.data;
         this.schedule.map(x => {

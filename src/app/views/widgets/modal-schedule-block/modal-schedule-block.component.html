@@ -17,7 +17,7 @@
           [(ngModel)]="scheduleSel" required>
             <option [disabled]="schedule.doctor_type_id == 1" 
             [ngStyle]="{'background-color': schedule.doctor_type_id == 1 ? '#E5E7E9 ' : '' }"
-            *ngFor="let schedule of inputedParams.scheduleId" [ngValue]="schedule">
+            *ngFor="let schedule of inputedParams.scheduleId" value="{{schedule.schedule_id}}">
               {{schedule.from_time}} - {{schedule.to_time}}</option>
           </select>
           <br>
@@ -45,23 +45,18 @@
             <option *ngFor="let m of minuteOptions" value="{{m}}">{{m}}</option>
           </select>
         </div>
-        <div class="form-group col-md-4">
+        <div class="form-group col-md-2">
           <label>Reason</label>
           <input [disabled]="!scheduleSel" class="form-control" type="text" maxlength="100" name="reason" [(ngModel)]="blockModel.reason" required>
         </div>
-        <div class="form-group col-md-2" *ngIf="!scheduleSel">
+        <div class="form-group col-md-2">
           <label style="display: block; text-align: center;">Include Waiting List</label>
           <input [disabled]="!scheduleSel" class="form-control" type="checkbox" name="isIncludeWaitingList" (change)="blockCheckBox($event)" [(ngModel)]="blockModel.isIncludeWaitingList">
         </div>
-        <div class="form-group col-md-2" *ngIf="scheduleSel && scheduleSel?.consultation_type_id != 4">
-          <label style="display: block; text-align: center;">Include Waiting List</label>
-          <input [disabled]="!scheduleSel" class="form-control" type="checkbox" name="isIncludeWaitingList" (change)="blockCheckBox($event)" [(ngModel)]="blockModel.isIncludeWaitingList">
+        <div class="form-group col-md-2">
+          <label style="display: block; text-align: center;">Teleconsultation</label>
+          <input [disabled]="!scheduleSel" class="form-control" type="checkbox" name="isTeleconsultation" (change)="blockCheckBoxTwo($event)" [(ngModel)]="blockModel.isTeleconsultation">
         </div>
-        <div class="form-group col-md-2" *ngIf="scheduleSel && scheduleSel?.consultation_type_id == 4">
-          <label style="display: block; text-align: center;">Include Teleconsult</label>
-          <input [disabled]="!scheduleSel" class="form-control" type="checkbox" name="isRescheduleTeleconsultation" (change)="blockCheckBoxTwo($event)" [(ngModel)]="blockModel.isRescheduleTeleconsultation">
-        </div>
-          
         <div class="form-group col-md-2">
           <button [disabled]="!isValidBlock || !b.form.valid" (click)="addScheduleBlock()" class="btn btn-green">Add Block</button>
         </div>

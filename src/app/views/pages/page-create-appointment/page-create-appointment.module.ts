@@ -7,7 +7,7 @@ import { SectionFooterModule } from '../../sections/section-footer/section-foote
 import { PageCreateAppointmentRoutingModule } from './page-create-appointment-routing.module';
 import { PageCreateAppointmentComponent } from './page-create-appointment.component';
 import { WidgetCreateAppointmentModule } from '../../widgets/widget-create-appointment/widget-create-appointment.module';
-import { NgbAlertModule, NgbModalModule, NgbPopoverModule } from '@ng-bootstrap/ng-bootstrap';
+import { NgbAlertModule, NgbModalModule, NgbPopoverModule, NgbTabsetModule } from '@ng-bootstrap/ng-bootstrap';
 import { TextMaskModule } from 'angular2-text-mask';
 import { NguiAutoCompleteModule } from '@ngui/auto-complete';
 
@@ -31,6 +31,8 @@ import { ModalPatientVerificationComponent } from '../../widgets/modal-patient-v
 
 import { ModalVerificationAidoModule } from '../../widgets/modal-verification-aido/modal-verification-aido.module';
 import { ModalVerificationAidoComponent } from '../../widgets/modal-verification-aido/modal-verification-aido.component';
+import { ModalCreateAppBpjsComponent } from '../../widgets/modal-create-app-bpjs/modal-create-app-bpjs.component';
+import { ModalCreateAppBpjsModule } from '../../widgets/modal-create-app-bpjs/modal-create-app-bpjs.module';
 
 @NgModule({
   declarations: [
@@ -57,7 +59,8 @@ import { ModalVerificationAidoComponent } from '../../widgets/modal-verification
     ModalVerificationAidoModule,
     NgbPopoverModule,
     NguiAutoCompleteModule,
-    
+    ModalCreateAppBpjsModule,
+    NgbTabsetModule
   ],
   entryComponents: [
     ModalScheduleBlockComponent,
@@ -67,6 +70,7 @@ import { ModalVerificationAidoComponent } from '../../widgets/modal-verification
     ModalPatientVerificationComponent,
     ModalRescheduleAppointmentComponent,
     ModalVerificationAidoComponent,
+    ModalCreateAppBpjsComponent
   ],
   exports: [
     PageCreateAppointmentComponent,

@@ -19,3 +19,16 @@
     font-weight: bold;
     padding: 0;
   }
+
+  .flag-tele {
+    background-color: #6767ff; 
+    color: white; 
+    border-radius: 5px; 
+    padding: 0.2em; 
+    font-weight: bold; 
+    font-size: 9px; 
+    padding-left: 1em; 
+    padding-right: 1em;
+    margin-left: 2em;
+    margin-right: 2em;
+  }

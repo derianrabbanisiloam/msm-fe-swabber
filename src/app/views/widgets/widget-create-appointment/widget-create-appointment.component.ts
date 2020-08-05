@@ -44,8 +44,8 @@ import {
   SecretKey, Jwt,
   CHECK_IN, CREATE_APP,
   CANCEL_APP, RESCHEDULE_APP,
-  QUEUE_NUMBER, keySocket, SCHEDULE_BLOCK, channelId, appointmentStatusId,
-  pathImage
+  QUEUE_NUMBER, keySocket, SCHEDULE_BLOCK, channelId, appointmentStatusId, 
+  paymentStatus, pathImage
 } from '../../../variables/common.variable';
 import Security from 'msm-kadapat';
 import { environment } from '../../../../environments/environment';
@@ -145,6 +145,7 @@ export class WidgetCreateAppointmentComponent implements OnInit {
   public hospitalName: string;
   public aidoChannel: any = channelId.AIDO;
   public appStatusId = appointmentStatusId;
+  public payStatusId = paymentStatus;
   public selectedApp: any;
   public selectedAdm: any;
   public fromBpjs: boolean = false;
@@ -870,7 +871,8 @@ export class WidgetCreateAppointmentComponent implements OnInit {
               appointment_status_id: this.appointments[idx].appointment_status_id ? this.appointments[idx].appointment_status_id : null,
               patient_hope_id: this.appointments[idx].patient_hope_id ? this.appointments[idx].patient_hope_id : null,
               patient_organization_id: this.appointments[idx].patient_organization_id ? this.appointments[idx].patient_organization_id : null,
-              is_double_mr: this.appointments[idx].is_double_mr ? this.appointments[idx].is_double_mr : false
+              is_double_mr: this.appointments[idx].is_double_mr ? this.appointments[idx].is_double_mr : false,
+              payment_status_id: this.appointments[idx].payment_status_id ? this.appointments[idx].payment_status_id : '' 
             });
           } else {
             this.appList[k].appointment.push({
@@ -911,7 +913,8 @@ export class WidgetCreateAppointmentComponent implements OnInit {
               appointment_status_id: null,
               patient_hope_id: null,
               patient_organization_id: null,
-              is_double_mr: false
+              is_double_mr: false,
+              payment_status_id: ''
             });
           }
         }
@@ -968,6 +971,7 @@ export class WidgetCreateAppointmentComponent implements OnInit {
             patient_hope_id: x.patient_hope_id ? x.patient_hope_id : null,
             patient_organization_id: x.patient_organization_id ? x.patient_organization_id : null,
             is_double_mr: x.is_double_mr ? x.is_double_mr : false,
+            payment_status_id: x.payment_status_id ? x.payment_status_id : ''
           });
         }
       });
@@ -1010,8 +1014,9 @@ export class WidgetCreateAppointmentComponent implements OnInit {
           appointment_status_id: null,
           patient_hope_id: null,
           patient_organization_id: null,
-          is_double_mr: false
-        }); 
+          is_double_mr: false,
+          payment_status_id: ''
+        });  
       } else {
         for (let i = 0, { length } = this.appointments; i < length; i++) {
           no += 1;
@@ -1051,7 +1056,8 @@ export class WidgetCreateAppointmentComponent implements OnInit {
               appointment_status_id: this.appointments[i].appointment_status_id ? this.appointments[i].appointment_status_id : null,
               patient_hope_id: this.appointments[i].patient_hope_id ? this.appointments[i].patient_hope_id : null,
               patient_organization_id: this.appointments[i].patient_organization_id ? this.appointments[i].patient_organization_id : null,
-              is_double_mr: this.appointments[i].is_double_mr ? this.appointments[i].is_double_mr : false
+              is_double_mr: this.appointments[i].is_double_mr ? this.appointments[i].is_double_mr : false,
+              payment_status_id: this.appointments[i].payment_status_id ? this.appointments[i].payment_status_id : ''
             });
           }
         }
@@ -1097,7 +1103,8 @@ export class WidgetCreateAppointmentComponent implements OnInit {
           appointment_status_id: null,
           patient_hope_id: null,
           patient_organization_id: null,
-          is_double_mr: false
+          is_double_mr: false,
+          payment_status_id: ''
         });
       } 
     }
@@ -1127,7 +1134,7 @@ export class WidgetCreateAppointmentComponent implements OnInit {
     const date = this.appointmentPayload.appointmentDate;
     const hospitalId = this.hospital.id;
     const consulTypeAll = consultationType.REGULAR+':'+consultationType.EXECUTIVE+':'
-      +consultationType.TELECONSULTATION+':'+consultationType.BPJS_REGULER;
+      +consultationType.TELECONSULTATION+':'+consultationType.BPJS_REGULER+':'+consultationType.NON_BPJS_TELE;
     let consulTypeList = this.fromBpjs === true ? this.consulType : consulTypeAll; //dummy
     //const consulTypeList = this.fromBpjs === true ? consulTypeAll : this.consulType;
     if(this.reschBpjs === true) consulTypeList = this.consulType; // dummy reschedule bpjs
@@ -1180,7 +1187,7 @@ export class WidgetCreateAppointmentComponent implements OnInit {
     const doctorId = this.appointmentPayload.doctorId;
     const date = this.appointmentPayload.appointmentDate;
     const consulTypeAll = consultationType.REGULAR+':'+consultationType.EXECUTIVE+':'
-      +consultationType.TELECONSULTATION+':'+consultationType.BPJS_REGULER;
+      +consultationType.TELECONSULTATION+':'+consultationType.BPJS_REGULER+':'+consultationType.NON_BPJS_TELE;
     let consulTypeList = this.fromBpjs === true ? this.consulType : consulTypeAll;
     if(this.reschBpjs === true) consulTypeList = this.consulType; // dummy reschedule bpjs
     await this.scheduleService.getScheduleDoctor(this.hospital.id, doctorId, date, consulTypeList).toPromise().then(

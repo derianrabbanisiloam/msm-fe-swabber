@@ -1,3 +1,14 @@
+.flag-payment {
+  background-color: darkblue; 
+  color: white; 
+  border-radius: 5px; 
+  padding: 0.2em; 
+  font-weight: bold; 
+  font-size: 12px; 
+  margin-left: 0.5em;
+  margin-right: 0.5em;
+}
+
 .inter-checkbox {
   height: 19px;
   width: 19px;

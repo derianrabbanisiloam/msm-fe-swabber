@@ -15,6 +15,8 @@ import { NguiAutoCompleteModule } from '@ngui/auto-complete';
 
 import { ModalRescheduleBpjsModule } from '../../widgets/modal-reschedule-bpjs/modal-reschedule-bpjs.module';
 import { ModalRescheduleBpjsComponent } from '../../widgets/modal-reschedule-bpjs/modal-reschedule-bpjs.component';
+import { ModalAppointmentBpjsModule } from '../../widgets/modal-appointment-bpjs/modal-appointment-bpjs.module';
+import { ModalAppointmentBpjsComponent } from '../../widgets/modal-appointment-bpjs/modal-appointment-bpjs.component';
 
 @NgModule({
   declarations: [
@@ -39,11 +41,13 @@ import { ModalRescheduleBpjsComponent } from '../../widgets/modal-reschedule-bpj
     AutocompleteLibModule,
     NguiAutoCompleteModule,
     ModalRescheduleBpjsModule,
+    ModalAppointmentBpjsModule
   ],exports: [
     PageAppointmentListBpjsComponent,
   ],
   entryComponents: [
-    ModalRescheduleBpjsComponent
+    ModalRescheduleBpjsComponent,
+    ModalAppointmentBpjsComponent
   ]
 })
 export class PageAppointmentListBpjsModule { }

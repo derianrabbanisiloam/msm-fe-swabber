@@ -154,8 +154,11 @@ export class ModalAppointmentBpjsComponent implements OnInit {
   }
 
   async getAppointmentById() {
+    console.log('!!!!!!!@@@@@@@#######', this.appointmentSelected)
     this.dateConvert = dateFormatter(this.appointmentSelected.birthDate, true);
     this.appointment = this.appointmentSelected;
+    this.rescheduleSelected.note = this.appointment.appointment_note;
+    this.editModel.phoneNo = this.appointment.phone_number;
   }
 
   close() {

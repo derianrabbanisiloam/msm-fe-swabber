@@ -20,6 +20,9 @@ import { BoundElementProperty } from '@angular/compiler';
 import {
   ModalRescheduleBpjsComponent
 } from '../modal-reschedule-bpjs/modal-reschedule-bpjs.component';
+import {
+  ModalAppointmentBpjsComponent
+} from '../modal-appointment-bpjs/modal-appointment-bpjs.component';
 import { RescheduleAppointment } from '../../../models/appointments/reschedule-appointment';
 import * as pdfMake from 'pdfmake/build/pdfmake';
 import * as pdfFonts from 'pdfmake/build/vfs_fonts';
@@ -666,7 +669,7 @@ export class WidgetAppointmentListBpjsComponent implements OnInit {
   }
 
   openRescheduleModal(appointmentSelected: any) {
-    const modalRef = this.modalService.open( ModalRescheduleBpjsComponent,
+    const modalRef = this.modalService.open( ModalAppointmentBpjsComponent,
       { windowClass: 'cc_modal_confirmation', size: 'lg' });
     modalRef.componentInstance.appointmentSelected = appointmentSelected;
   }

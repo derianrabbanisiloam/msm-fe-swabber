@@ -134,9 +134,6 @@ export class ModalRescheduleBpjsComponent implements OnInit {
         doctor_id: this.appointmentSelected.doctor_id,
         name: this.appointmentSelected.doctor_name,
       },
-      consulType: consultationType.BPJS,
-      original: false,
-      isRescheduleBpjs: true
     };
     this.doctorService.changeSearchDoctor(searchKeywords);
   }

@@ -144,7 +144,6 @@ export class WidgetDoctorScheduleComponent implements OnInit {
 
     this.doctorService.searchDoctorSource$.subscribe(
       async (params) => {
-        console.log('!!!!!!!!', params)
         this.keywords = params;
         await this.getLeaveHeader(this.keywords);
         await this.generateDates(this.initDate);

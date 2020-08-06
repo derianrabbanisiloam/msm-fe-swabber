@@ -182,6 +182,7 @@ export class WidgetCreateAppointmentComponent implements OnInit {
   public bodyUpload: any = {};
   public mask_birth = [/\d/, /\d/, '-', /\d/, /\d/, '-', /\d/, /\d/, /\d/, /\d/];
   public reschBpjs: boolean = false;
+  public flagCreateApp: boolean = false;
 
   constructor(
     private router: Router,
@@ -1213,27 +1214,37 @@ export class WidgetCreateAppointmentComponent implements OnInit {
   }
 
   async createAppBPJSOnly(item: any) {
-    const canReserved = await this.getReservedSlot(item);
-    if(canReserved.key === null) {
-      await this.reserveSlotApp(item);
+    if(this.flagCreateApp === true) {
+      Swal.fire({
+        position: 'center',
+        type: 'error',
+        title: 'Appointment was created',
+        showConfirmButton: false,
+        timer: 5000
+      })
+    } else {
+      const canReserved = await this.getReservedSlot(item);
+      if(canReserved.key === null) {
+        await this.reserveSlotApp(item);
+      }
+      const fromTime = item.appointment_from_time ? item.appointment_from_time : item.schedule_from_time; 
+      const toTime = item.appointment_to_time ? item.appointment_to_time : item.schedule_to_time;
+      const data = {
+        schedule_id: item.schedule_id,
+        appointment_date: this.appointmentPayload.appointmentDate,
+        appointment_from_time: fromTime,
+        appointment_to_time: toTime,
+        hospital_id: item.hospital_id,
+        doctor_id: item.doctor_id,
+        appointment_no: item.appointment_no,
+        is_waiting_list: item.is_waiting_list,
+        can_reserved: canReserved,
+        doctor_type_id: item.doctor_type_id,
+        ...this.bodyBpjs
+      };
+      const modalRef = this.modalService.open(ModalCreateAppBpjsComponent);
+      modalRef.componentInstance.bpjsInfo = data;
     }
-    const fromTime = item.appointment_from_time ? item.appointment_from_time : item.schedule_from_time; 
-    const toTime = item.appointment_to_time ? item.appointment_to_time : item.schedule_to_time;
-    const data = {
-      schedule_id: item.schedule_id,
-      appointment_date: this.appointmentPayload.appointmentDate,
-      appointment_from_time: fromTime,
-      appointment_to_time: toTime,
-      hospital_id: item.hospital_id,
-      doctor_id: item.doctor_id,
-      appointment_no: item.appointment_no,
-      is_waiting_list: item.is_waiting_list,
-      can_reserved: canReserved,
-      doctor_type_id: item.doctor_type_id,
-      ...this.bodyBpjs
-    };
-    const modalRef = this.modalService.open(ModalCreateAppBpjsComponent);
-    modalRef.componentInstance.bpjsInfo = data;
   }
 
   async openCreateAppModal(item: any) {
@@ -2056,6 +2067,9 @@ export class WidgetCreateAppointmentComponent implements OnInit {
   emitCreateApp() {
     this.appointmentService.createAppSource$.subscribe(
       async () => {
+        if(this.fromBpjs === true && this.fromRegistration === false) {
+          this.flagCreateApp = true;
+        }
         await this.getAppointmentList();
         await this.dataProcessing();
       }

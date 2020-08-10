@@ -374,11 +374,15 @@
                 <div class="">
                   <select id="title" class="form-control" required (change)="changeCondition($event)"
                 name="dropDownPatientType">
-                    <option *ngFor="let itr of patientTypeList" [ngValue]="itr" [disabled]="itr.description == 'EMPLOYEE'"
-                  [selected]="(itr.description == 'KITAS' && nationalIdTypeId == 4) || (itr.description == 'PASSPORT' && nationalIdTypeId == 3)
-                || itr.description == 'PRIVATE' && nationalIdTypeId == 1 || (itr.description == 'PRIVATE' && nationalIdTypeId == 2) || (itr.description == 'PRIVATE' && nationalIdTypeId == 5) || (itr.description == 'PRIVATE' && nationalIdTypeId == '')">
-                  {{itr.description}}
-                    </option>
+                  <option *ngFor="let itr of patientTypeList" [ngValue]="itr" [disabled]="itr.description == 'EMPLOYEE'"
+                  [selected]="(itr.description == patientType.description && nationalIdTypeId == 4) 
+                  || (itr.description == patientType.description && nationalIdTypeId == 3)
+                  || (itr.description == patientType.description && nationalIdTypeId == 1)
+                  || (itr.description == patientType.description && nationalIdTypeId == 2)
+                  || (itr.description == patientType.description && nationalIdTypeId == 5)
+                  || (itr.description == patientType.description && nationalIdTypeId == '')
+                  || (itr.description == patientType.description && nationalIdTypeId == '')">
+                  {{itr.description}}</option>
                   </select>
                   <input type="hidden" name="patientType" [(ngModel)]="patientType">
                 </div>

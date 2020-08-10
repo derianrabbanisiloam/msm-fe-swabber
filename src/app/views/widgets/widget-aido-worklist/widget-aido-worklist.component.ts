@@ -279,7 +279,6 @@ export class WidgetAidoWorklistComponent implements OnInit {
   nextPage() {
     this.page += 1;
     this.keywordsModel.offset = this.page * 10;
-    console.log('!!!!!!!@@@@@@@@@', this.keywordsModel)
     this.isCanPrevPage = this.keywordsModel.offset === 0 ? false : true;
     this.getAidoWorklist();
   }

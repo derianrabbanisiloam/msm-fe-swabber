@@ -159,7 +159,7 @@
           <div *ngIf="!itr.expired && itr.appointment_status_id !== appStatusId.INACTIVE && !itr.admission_id">
 
             <div class="cell-img-nav d-flex justify-content-center">
-              <div (click)="checkInAppointment(itr, confirmCheckIn)">
+              <div (click)="checkInAppointment(itr, confirmCheckInTwo)">
                 <img src="{{assetPath}}icons/ic_Check@2x.png">
               </div>
               <span style="opacity: 0; max-width: 0.5em; overflow: hidden">filler</span>
@@ -271,7 +271,157 @@
     </div>
   </ng-template>
 
+  <ng-template #confirmCheckInTwo let-c="close" let-d="dismiss">
+    <div class="modal-header">
+      <h4 class="modal-title">Confirmation</h4>
+      <button type="button" class="close" aria-label="Close" (click)="d('Cross click')">
+        <span aria-hidden="true">&times;</span>
+      </button>
+    </div>
+    <div class="modal-body">
+      <div *ngIf="late">
+        <p style="color:red;">
+          <font size="4"><b>Pasien Terlambat {{late}}</b></font>
+        </p>
+      </div>
+      <p>Are you sure to check in this appointment?</p>
+      <div class="fo_confirmation_button d-flex justify-content-center">
+        <button type="button" class="btn fo_btn_green"
+          (click)="confirmCheckInValue(selectedCheckIn, confirmDocument, confirmLocalMrCreate)"
+          (click)="c('Cross click')">Ok</button>
+        <div *ngIf="late">
+          <button type="button" class="btn fo_btn_blue" (click)="openRescheduleModal(selectedCheckIn)"
+            (click)="c('Cross click')">Reschedule</button>
+        </div>
+        <button type="button" class="btn fo_btn_black" (click)="c('Cross click')">Cancel</button>
+      </div>
+    </div>
+  </ng-template>
 
+  <ng-template #confirmDocument let-modal let-c="close">
+    <div class="modal-header">
+      <div class="header-2 modal-padding" *ngIf="selectedCheckIn?.contact_name">{{selectedCheckIn.contact_name}} {{selectedCheckIn.custome_birth_date}} | Document uploads</div>
+      <button #cls_btn_confirm type="button" class="close" aria-label="Close" (click)="c('Cross click')">
+        <span aria-hidden="true">&times;</span>
+      </button>
+    </div>
+    <div class="modal-body">
+      <div class="form-ca-phoneno form-group row" style="font-weight: bold; margin-top: 1em;">
+        <div class="col-md-5">
+          <div class="row space-text-two">
+            <div class="col-md-12">
+              Kartu BPJS*
+            </div>
+          </div>
+          <div class="row space-text-two">
+            <div class="col-md-12">
+              KTP
+            </div>
+          </div>
+          <div class="row space-text-two">
+            <div class="col-md-12">
+              Kartu Keluarga
+            </div>
+          </div>
+          <div class="row space-text-two">
+            <div class="col-md-12">
+              Surat Rujukan/Surat Keterangan*
+            </div>
+          </div>
+        </div>
+        <div class="col-md-5" style="padding-left: 0;">
+          <div class="row space-text">
+            <div class="col-md-5" style="padding-left: 0" *ngIf="selectedCheckIn?.bpjs_card_file">
+              <span style="margin-left: 2.5em;">
+                <a href=":javascript"
+                (click)="getImage(selectedCheckIn.bpjs_card_file)"
+                target="_blank">View<br></a>
+              </span>
+            </div>
+            <div class="col-md-4" style="padding-left: 0">
+              <button type="button" class="btn ms_btn_blue_module" [disabled]="flagFile1" (click)="fileInputOne.click()">
+                <span *ngIf="!selectedCheckIn?.bpjs_card_file">Upload</span>
+                <span *ngIf="selectedCheckIn?.bpjs_card_file">Re-upload</span>
+                <input #fileInputOne type="file" (change)="upload($event, 'bpjsCard')" style="display:none;" accept="application/pdf, .jpg, .jpeg"/>
+              </button>
+            </div>
+            <div class="col-md-3">
+              <span *ngIf="flagFile1">
+                <ngb-progressbar type="success" value="500" [striped]="true" height="2.3rem" [animated]="true">Loading...</ngb-progressbar>
+              </span>
+            </div>
+          </div>
+          <div class="row space-text">
+            <div class="col-md-5" style="padding-left: 0" *ngIf="selectedCheckIn?.identity_card_file">
+              <span style="margin-left: 2.5em;">
+                <a href=":javascript"
+                (click)="getImage(selectedCheckIn.identity_card_file)"
+                target="_blank">View<br></a>
+              </span>
+            </div>
+            <div class="col-md-4" style="padding-left: 0">
+              <button type="button" class="btn ms_btn_blue_module" [disabled]="flagFile2" (click)="fileInputTwo.click()">
+                <span *ngIf="!selectedCheckIn?.identity_card_file">Upload</span>
+                <span *ngIf="selectedCheckIn?.identity_card_file">Re-upload</span>
+                <input #fileInputTwo type="file" (change)="upload($event, 'identityCard')" style="display:none;" accept="application/pdf, .jpg, .jpeg"/>
+              </button>
+            </div>
+            <div class="col-md-3">
+              <span *ngIf="flagFile2">
+                <ngb-progressbar type="success" value="1000" [striped]="true" height="2.3rem" [animated]="true">Loading...</ngb-progressbar>
+              </span>
+            </div>
+          </div>
+          <div class="row space-text">
+            <div class="col-md-5" style="padding-left: 0" *ngIf="selectedCheckIn?.family_card_file">
+              <span style="margin-left: 2.5em;">
+                <a href=":javascript"
+                (click)="getImage(selectedCheckIn.family_card_file)"
+                target="_blank">View<br></a>
+              </span>
+            </div>
+            <div class="col-md-4" style="padding-left: 0">
+              <button type="button" class="btn ms_btn_blue_module" [disabled]="flagFile3" (click)="fileInputThree.click()">
+                <span *ngIf="!selectedCheckIn?.family_card_file">Upload</span>
+                <span *ngIf="selectedCheckIn?.family_card_file">Re-upload</span>
+                <input #fileInputThree type="file" (change)="upload($event, 'familyCard')" style="display:none;" accept="application/pdf, .jpg, .jpeg"/>
+              </button>
+            </div>
+            <div class="col-md-3">
+              <span *ngIf="flagFile3">
+                <ngb-progressbar type="success" value="1000" [striped]="true" height="2.3rem" [animated]="true">Loading...</ngb-progressbar>
+              </span>
+            </div>
+          </div>
+          <div class="row space-text">
+            <div class="col-md-5" style="padding-left: 0" *ngIf="selectedCheckIn?.surat_rujukan">
+              <span style="margin-left: 2.5em;">
+                <a href=":javascript"
+                (click)="getImage(selectedCheckIn.surat_rujukan)"
+                target="_blank">View<br></a>
+              </span>
+            </div>
+            <div class="col-md-4" style="padding-left: 0">
+              <button type="button" class="btn ms_btn_blue_module" [disabled]="flagFile4" (click)="fileInputFour.click()">
+                <span *ngIf="!selectedCheckIn?.surat_rujukan">Upload</span>
+                <span *ngIf="selectedCheckIn?.surat_rujukan">Re-upload</span>
+                <input #fileInputFour type="file" (change)="upload($event, 'referenceLetter')" style="display:none;" accept="application/pdf, .jpg, .jpeg"/>
+              </button>
+            </div>
+            <div class="col-md-3">
+              <span *ngIf="flagFile4">
+                <ngb-progressbar type="success" value="1000" [striped]="true" height="2.3rem" [animated]="true">Loading...</ngb-progressbar>
+              </span>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="modal-footer">
+      <button class="btn ms_btn_green" [disabled]="!selectedCheckIn.bpjs_card_file && !selectedCheckIn.surat_rujukan" (click)="open50(checkInOldPatient)">Continue</button>
+      <button type="button" class="btn ms_btn_red" (click)="c('Cross click')">Cancel</button>
+    </div>
+  </ng-template>
 
   <ng-template #confirmLocalMrCreate let-c="close" let-d="dismiss">
     <div class="modal-header">
@@ -392,11 +542,15 @@
                 <div class="">
                   <select id="title" class="form-control" required (change)="changeCondition($event)"
                 name="dropDownPatientType">
-                    <option *ngFor="let itr of patientTypeList" [ngValue]="itr" [disabled]="itr.description == 'EMPLOYEE'"
-                  [selected]="(itr.description == 'KITAS' && nationalIdTypeId == 4) || (itr.description == 'PASSPORT' && nationalIdTypeId == 3)
-                || itr.description == 'PRIVATE' && nationalIdTypeId == 1 || (itr.description == 'PRIVATE' && nationalIdTypeId == 2) || (itr.description == 'PRIVATE' && nationalIdTypeId == 5) || (itr.description == 'PRIVATE' && nationalIdTypeId == '')">
-                  {{itr.description}}
-                    </option>
+                <option *ngFor="let itr of patientTypeList" [ngValue]="itr" [disabled]="itr.description == 'EMPLOYEE'"
+                  [selected]="(itr.description == patientType.description && nationalIdTypeId == 4) 
+                  || (itr.description == patientType.description && nationalIdTypeId == 3)
+                  || (itr.description == patientType.description && nationalIdTypeId == 1)
+                  || (itr.description == patientType.description && nationalIdTypeId == 2)
+                  || (itr.description == patientType.description && nationalIdTypeId == 5)
+                  || (itr.description == patientType.description && nationalIdTypeId == '')
+                  || (itr.description == patientType.description && nationalIdTypeId == '')">
+                  {{itr.description}}</option>
                   </select>
                   <input type="hidden" name="patientType" [(ngModel)]="patientType">
                 </div>

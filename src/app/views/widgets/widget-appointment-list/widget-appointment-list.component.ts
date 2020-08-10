@@ -484,7 +484,11 @@ export class WidgetAppointmentListComponent implements OnInit {
     this.nationalIdTypeId = await this.patientService.getDefaultPatientType(patientHopeId).toPromise()
       .then(res => {
         if (res.data) {
-          return res.data.nationalIdTypeId;
+          if(res.data.nationalIdTypeId === null) {
+            return '';
+          } else {
+            return res.data.nationalIdTypeId;
+          }
         } else {
           return '';
         }

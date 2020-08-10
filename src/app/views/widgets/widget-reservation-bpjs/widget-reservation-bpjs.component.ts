@@ -126,7 +126,7 @@ export class WidgetReservationBpjsComponent implements OnInit {
       },
       fromBpjs: true,
       fromRegistration: true,
-      consulType: consultationType.BPJS //dummy
+      consulType: consultationType.BPJS
     };
 
     this.searchKeywords.doctor = {

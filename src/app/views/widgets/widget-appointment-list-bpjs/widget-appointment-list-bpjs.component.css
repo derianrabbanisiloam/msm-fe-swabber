@@ -9,6 +9,25 @@ thead th a{ color: #1A2269; text-decoration: none}
 .row-pink{background: #FFD4D1;}
 .row-orange{background: #FFE17C;}
 
+.ms_btn_blue_module{ 
+  background: dodgerblue; 
+  color: white;
+  border-radius: 5px;
+  width: 7em;
+}
+
+.space-text {
+  margin-bottom: 1.5em;
+}
+
+.space-text-two {
+  margin-bottom: 2.4em;
+}
+
+::ng-deep .fo_modal_admission_3 .modal-dialog {
+  width: 45em;
+}
+
 .fo_row_patient_list span{ border-radius: 8px; border: none}
 ::ng-deep ngb-progressbar .progress .progress-bar{ background-color: #4D9B35 !important; color: white!important;}
 

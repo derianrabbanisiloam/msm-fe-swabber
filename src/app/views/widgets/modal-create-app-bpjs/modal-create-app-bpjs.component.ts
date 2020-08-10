@@ -550,7 +550,6 @@ export class ModalCreateAppBpjsComponent implements OnInit {
     }
     const data = this.bpjsInfo;
     const appTempId = this.bpjsBody ? this.bpjsBody.appointment_bpjs_id : null;
-    console.log('this.bpjs', data)
     const { patientName, phoneNumber, address, note } = this.model;
     const dob = this.model.birthDate.split('-');
     const birthDate = dob[2] + '-' + dob[1] + '-' + dob[0];

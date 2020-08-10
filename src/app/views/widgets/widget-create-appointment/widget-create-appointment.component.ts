@@ -152,7 +152,7 @@ export class WidgetCreateAppointmentComponent implements OnInit {
   public patFromBpjs: any;
   public bodyBpjs: any;
   public consulType: string = null;
-  public urlBpjsCard = environment.GET_IMAGE+pathImage.BPJS_CARD; //dummy
+  public urlBpjsCard = environment.GET_IMAGE+pathImage.BPJS_CARD;
   public maxSize10MB: number = 10485760;
   public listProvince: any = null;
   public listDistrict: any = null;
@@ -532,17 +532,17 @@ export class WidgetCreateAppointmentComponent implements OnInit {
           }
             this.assetUpload = await this.patientService.uploadDocBpjs(formData_1)
             .toPromise().then(res => {
+              this.uploadForm = this.formBuilder.group({
+                bpjsCard: [''],
+                identityCard: [''],
+                referenceLetter: [''],
+                familyCard: ['']
+              });
               this.flagFile1 = false;
               this.flagFile2 = false;
               this.flagFile3 = false;
               this.flagFile4 = false;
-              Swal.fire({
-                position: 'center',
-                type: 'success',
-                title: 'Upload Successful',
-                showConfirmButton: false,
-                timer: 3000
-              })
+              
               return res.data;
             }).catch(err => {
               this.flagFile1 = false;
@@ -559,7 +559,7 @@ export class WidgetCreateAppointmentComponent implements OnInit {
             });
             if(this.assetUpload) {
               this.editAppointmentData(this.assetUpload[0].name, nameFile)
-            } //dummy
+            }
         }
       } else {
         Swal.fire({
@@ -592,6 +592,13 @@ export class WidgetCreateAppointmentComponent implements OnInit {
         else if(nameFile === 'identityCard') this.uploadForm.get('identityCard').setValue(null);
         else if(nameFile === 'referenceLetter') this.uploadForm.get('referenceLetter').setValue(null);
         else if(nameFile === 'familyCard') this.uploadForm.get('familyCard').setValue(null);
+        Swal.fire({
+          position: 'center',
+          type: 'success',
+          title: 'Upload Successful',
+          showConfirmButton: false,
+          timer: 3000
+        })
       }, error => {
         Swal.fire({
           type: 'error',
@@ -1111,9 +1118,8 @@ export class WidgetCreateAppointmentComponent implements OnInit {
     const date = this.appointmentPayload.appointmentDate;
     const sortBy = 'appointment_no';
     const orderBy = 'ASC';
-    let exclude = this.fromBpjs === true ? false : true; //dummy
-    //const exclude = this.fromBpjs === true ? true : false;
-    if(this.reschBpjs === true) exclude = false; // dummy reschedule bpjs
+    let exclude = this.fromBpjs === true ? false : true;
+    if(this.reschBpjs === true) exclude = false; // reschedule bpjs
     const isBpjs = channelId.BPJS;
     await this.appointmentService.getAppointmentByDay(hospitalId, doctorId, date, sortBy, orderBy, isBpjs, exclude).toPromise().then(
       data => {
@@ -1129,9 +1135,8 @@ export class WidgetCreateAppointmentComponent implements OnInit {
     const hospitalId = this.hospital.id;
     const consulTypeAll = consultationType.REGULAR+':'+consultationType.EXECUTIVE+':'
       +consultationType.TELECONSULTATION+':'+consultationType.BPJS_REGULER;
-    let consulTypeList = this.fromBpjs === true ? this.consulType : consulTypeAll; //dummy
-    //const consulTypeList = this.fromBpjs === true ? consulTypeAll : this.consulType;
-    if(this.reschBpjs === true) consulTypeList = this.consulType; // dummy reschedule bpjs
+    let consulTypeList = this.fromBpjs === true ? this.consulType : consulTypeAll;
+    if(this.reschBpjs === true) consulTypeList = this.consulType; // reschedule bpjs
     await this.scheduleService.getTimeSlot(hospitalId, doctorId, date, consulTypeList).toPromise().then(
       data => {
         this.slotList = data.data;
@@ -1183,7 +1188,7 @@ export class WidgetCreateAppointmentComponent implements OnInit {
     const consulTypeAll = consultationType.REGULAR+':'+consultationType.EXECUTIVE+':'
       +consultationType.TELECONSULTATION+':'+consultationType.BPJS_REGULER;
     let consulTypeList = this.fromBpjs === true ? this.consulType : consulTypeAll;
-    if(this.reschBpjs === true) consulTypeList = this.consulType; // dummy reschedule bpjs
+    if(this.reschBpjs === true) consulTypeList = this.consulType; // reschedule bpjs
     await this.scheduleService.getScheduleDoctor(this.hospital.id, doctorId, date, consulTypeList).toPromise().then(
       data => {
         this.schedule = data.data;
@@ -1402,11 +1407,6 @@ export class WidgetCreateAppointmentComponent implements OnInit {
       data => {
         this.selectedCheckIn = data.data[0];
         this.selectedCheckIn.custome_birth_date = dateFormatter(this.selectedCheckIn.birth_date, true);
-        // this.selectedCheckIn.bpjs_card_file = "community/media/visual/2019/10/29/02335a2e-1a99-45ec-9ff3-055d7333b511_43.jpeg";
-        // this.selectedCheckIn.family_card_file = "community/media/visual/2019/10/29/02335a2e-1a99-45ec-9ff3-055d7333b511_43.jpeg";
-        // this.selectedCheckIn.identity_card_file = "community/media/visual/2019/10/29/02335a2e-1a99-45ec-9ff3-055d7333b511_43.jpeg";
-        // this.selectedCheckIn.surat_rujukan = "";
-        
       }
     );
   }
@@ -1433,7 +1433,11 @@ export class WidgetCreateAppointmentComponent implements OnInit {
     this.nationalIdTypeId = await this.patientService.getDefaultPatientType(patientHopeId).toPromise()
       .then(res => {
         if (res.data) {
-          return res.data.nationalIdTypeId;
+          if(res.data.nationalIdTypeId === null) {
+            return '';
+          } else {
+            return res.data.nationalIdTypeId;
+          }
         } else {
           return '';
         }
@@ -1442,7 +1446,6 @@ export class WidgetCreateAppointmentComponent implements OnInit {
       })
 
     let idx = null;
-
     if (this.nationalIdTypeId) {
       if (this.nationalIdTypeId == 3) {
         //Passport
@@ -1461,9 +1464,19 @@ export class WidgetCreateAppointmentComponent implements OnInit {
         })
       }
     } else {
-      idx = this.patientTypeList.findIndex((a) => {
-        return a.description == "PRIVATE";
-      })
+      if(this.fromBpjs === true) {
+        this.txtPayer = false;
+        this.txtPayerNo = false;
+        this.txtPayerEligibility = false;
+        this.payerNo = this.selectedCheckIn.bpjs_card_number;
+        idx = this.patientTypeList.findIndex((a) => {
+          return a.description == "PAYER";
+        })
+      } else {
+        idx = this.patientTypeList.findIndex((a) => {
+          return a.description == "PRIVATE";
+        })
+      }
     }
     this.patientType = this.patientTypeList[idx];
   }
@@ -1480,16 +1493,24 @@ export class WidgetCreateAppointmentComponent implements OnInit {
         if (detail.patient_hope_id) {
           this.open(mrLocalModal);
         } else {
-          const params = {
-            appointmentId: detail.appointment_id,
-          };
+          let params;
+          if(this.fromBpjs === true) {
+            params = {
+              appointmentId: detail.appointment_id,
+              fromBpjs: true
+            };
+          } else {
+            params = {
+              appointmentId: detail.appointment_id,
+            };
+          }
 
           this.router.navigate(['./patient-data'], { queryParams: params });
         }
       } else {
         await this.defaultPatientType(detail.patient_hope_id);
         if(this.fromBpjs === true) {
-          this.modalService.open(checkInModal, { windowClass: 'fo_modal_admission_2', size: 'lg' });
+          this.modalService.open(checkInModal, { windowClass: 'fo_modal_admission_3', size: 'lg' });
         } else {
           this.open50(checkInModal);
         }

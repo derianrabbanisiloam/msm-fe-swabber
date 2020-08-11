@@ -70,7 +70,6 @@ export class WidgetRequestListComponent implements OnInit {
   public selectedPat: any;
   public specialities: Speciality[];
   public butdownload: boolean = false;
-  public checkAll: boolean = false;
 
   constructor(
     private doctorService: DoctorService,
@@ -156,27 +155,33 @@ export class WidgetRequestListComponent implements OnInit {
       patientName = '', birthDate = '', noBpjs = '',  offset = 0, specialtyId = '', limit = 10
     } = await this.keywordsModel;
     offsetTemp = offset;
+    let fixBirthDate = null;
+    if(birthDate) {
+      let split = birthDate.split('-');
+      fixBirthDate = split[2]+'-'+split[1]+'-'+split[0];
+    }
+    const specialty = specialtyId ? specialtyId.speciality_id : '';
     
     if(this.count === 0) {
       this.bodyKeyword.valueOne = hospitalId, this.bodyKeyword.valueTwo = fromDate, this.bodyKeyword.valueThree = toDate;
-      this.bodyKeyword.valueFour = patientName, this.bodyKeyword.valueFive = birthDate;
-      this.bodyKeyword.valueSix = noBpjs, this.bodyKeyword.valueSeven = specialtyId;
+      this.bodyKeyword.valueFour = patientName, this.bodyKeyword.valueFive = fixBirthDate;
+      this.bodyKeyword.valueSix = noBpjs, this.bodyKeyword.valueSeven = specialty;
 
       this.bodyKeywordTwo.valueOne = hospitalId, this.bodyKeywordTwo.valueTwo = fromDate, this.bodyKeywordTwo.valueThree = toDate;
-      this.bodyKeywordTwo.valueFour = patientName, this.bodyKeyword.valueFive = birthDate;
-      this.bodyKeyword.valueSix = noBpjs, this.bodyKeyword.valueSeven = specialtyId;
+      this.bodyKeywordTwo.valueFour = patientName, this.bodyKeywordTwo.valueFive = fixBirthDate;
+      this.bodyKeywordTwo.valueSix = noBpjs, this.bodyKeywordTwo.valueSeven = specialty;
     } else if(this.count > 0) {
       this.bodyKeyword.valueOne = hospitalId, this.bodyKeyword.valueTwo = fromDate, this.bodyKeyword.valueThree = toDate;
-      this.bodyKeyword.valueFour = patientName, this.bodyKeyword.valueFive = birthDate;
-      this.bodyKeyword.valueSix = noBpjs, this.bodyKeyword.valueSeven = specialtyId;
+      this.bodyKeyword.valueFour = patientName, this.bodyKeyword.valueFive = fixBirthDate;
+      this.bodyKeyword.valueSix = noBpjs, this.bodyKeyword.valueSeven = specialty;
 
       if(this.bodyKeyword.valueOne !== this.bodyKeywordTwo.valueOne || this.bodyKeyword.valueTwo !== this.bodyKeywordTwo.valueTwo ||
         this.bodyKeyword.valueThree !== this.bodyKeywordTwo.valueThree || this.bodyKeyword.valueFour !== this.bodyKeywordTwo.valueFour ||
         this.bodyKeyword.valueFive !== this.bodyKeywordTwo.valueFive || this.bodyKeyword.valueSix !== this.bodyKeywordTwo.valueSix ||
-        this.bodyKeyword.valueSeven !== this.bodyKeywordTwo.valueSeven) {    
+        this.bodyKeyword.valueSeven !== this.bodyKeywordTwo.valueSeven) {
           this.bodyKeywordTwo.valueOne = hospitalId, this.bodyKeywordTwo.valueTwo = fromDate, this.bodyKeywordTwo.valueThree = toDate;
-          this.bodyKeywordTwo.valueFour = patientName, this.bodyKeyword.valueFive = birthDate;
-          this.bodyKeyword.valueSix = noBpjs, this.bodyKeywordTwo.valueSeven = specialtyId;
+          this.bodyKeywordTwo.valueFour = patientName, this.bodyKeywordTwo.valueFive = fixBirthDate;
+          this.bodyKeywordTwo.valueSix = noBpjs, this.bodyKeywordTwo.valueSeven = specialty;
         
           this.page = 0;
           offsetTemp = 0;
@@ -190,9 +195,9 @@ export class WidgetRequestListComponent implements OnInit {
       fromDate,
       toDate,
       patientName,
-      birthDate,
+      fixBirthDate,
       noBpjs,
-      specialtyId,
+      specialty,
       offsetTemp,
       limit
     ).subscribe(
@@ -201,11 +206,9 @@ export class WidgetRequestListComponent implements OnInit {
           this.showWaitMsg = false;
           this.showNotFoundMsg = false;
           this.appRequestList = data.data;
-
           this.appRequestList.map(x => {
             x.patient_birth_date = moment(x.patient_birth_date).format('DD-MM-YYYY');
             x.appointment_date = moment(x.appointment_date).format('DD-MM-YYYY');
-            x.checked = false;
             let fixDate;
             fixDate = x.created_date.substr(0, 10);
             x.created_date = moment(fixDate).format('DD-MM-YYYY');
@@ -244,15 +247,6 @@ export class WidgetRequestListComponent implements OnInit {
       })
   }
 
-  CheckAllOptions() {
-    if (this.appRequestList.every(val => val.checked == false)) {
-        this.appRequestList.forEach(val => { val.checked = true });
-      }
-    else {
-      this.appRequestList.forEach(val => { val.checked = false });
-    }
-  }
-
   openModalCancel(content, body) {
     this.selectedPat = body;
     this.open(content);
@@ -278,20 +272,12 @@ export class WidgetRequestListComponent implements OnInit {
 
   private page: number = 0;
   nextPage() {
-    this.checkAll = false;
-    this.appRequestList.map(x => {
-      x.checked = false;
-    });
     this.page += 1;
     this.keywordsModel.offset = this.page * 10;
     this.isCanPrevPage = this.keywordsModel.offset === 0 ? false : true;
     this.getAppointmentBpjs();
   }
   prevPage() {
-    this.checkAll = false;
-    this.appRequestList.map(x => {
-      x.checked = false;
-    });
     this.page -= 1;
     this.keywordsModel.offset = this.page * 10;
     this.isCanPrevPage = this.keywordsModel.offset === 0 ? false : true;
@@ -385,7 +371,7 @@ class KeywordsModel {
   isDoubleMr: boolean;
   admStatus: string;
   noBpjs: string;
-  specialtyId: string;
+  specialtyId: any;
   offset: number;
   limit: number;
 }

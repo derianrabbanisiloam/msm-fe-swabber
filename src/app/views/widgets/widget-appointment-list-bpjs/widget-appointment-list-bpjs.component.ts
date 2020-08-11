@@ -32,12 +32,14 @@ import {
   CHECK_IN, CREATE_APP,
   CANCEL_APP, RESCHEDULE_APP,
   QUEUE_NUMBER, keySocket, pathImage,
-  channelId
+  channelId, typeFile
 } from '../../../variables/common.variable';
 import Security from 'msm-kadapat';
 import { environment } from '../../../../environments/environment';
 import { HttpClient } from '@angular/common/http';
 import { HttpHeaders } from '@angular/common/http';
+import { FormBuilder, FormGroup, FormControl } from '@angular/forms';
+import Swal from 'sweetalert2';
 
 @Component({
   selector: 'app-widget-appointment-list-bpjs',
@@ -140,9 +142,18 @@ export class WidgetAppointmentListBpjsComponent implements OnInit {
   public dateApp;
   public listRoomHope: any = [];
   public roomHope: any;
-  public urlBpjsCard = environment.GET_IMAGE;
   //public urlBpjsCard = 'https://cdn.pixabay.com';
   public checkAll: boolean = false;
+  public fromBpjs: boolean = true;
+  public maxSize10MB: number = 10485760;
+  public flagFile1: boolean = false;
+  public flagFile2: boolean = false;
+  public flagFile3: boolean = false;
+  public flagFile4: boolean = false;
+  uploadForm: FormGroup;
+  public assetUpload: any = null;
+  public bodyUpload: any = {};
+  public urlBpjsCard = environment.GET_IMAGE+pathImage.BPJS_CARD;
 
   constructor(
     private doctorService: DoctorService,
@@ -156,7 +167,8 @@ export class WidgetAppointmentListBpjsComponent implements OnInit {
     private patientService: PatientService,
     private route: ActivatedRoute,
     private router: Router,
-    private http: HttpClient
+    private http: HttpClient,
+    private formBuilder: FormBuilder,
   ) {
     this.socket = socket(`${environment.WEB_SOCKET_SERVICE + keySocket.APPOINTMENT}`, {
       transports: ['websocket'],
@@ -174,6 +186,12 @@ export class WidgetAppointmentListBpjsComponent implements OnInit {
   }
 
   ngOnInit() {
+    this.uploadForm = this.formBuilder.group({
+      bpjsCard: [''],
+      identityCard: [''],
+      referenceLetter: [''],
+      familyCard: ['']
+    });
     this.admissionType();
     this.getPayer();
     this.getReferral();
@@ -361,9 +379,134 @@ export class WidgetAppointmentListBpjsComponent implements OnInit {
   }
 
   getImage(fileName) {
-    let split = fileName.split('-');
-    let path = split[0];
-    window.open(this.urlBpjsCard +'/'+ path +'/'+ fileName, '_blank', "status=1");
+    window.open(this.urlBpjsCard + fileName, '_blank', "status=1");
+  }
+
+  async upload(event, nameFile){
+    if (event.target.files.length > 0) {
+      if(event.target.files[0].type === typeFile.image || event.target.files[0].type === typeFile.pdf) {
+        if(event.target.files[0].size > this.maxSize10MB) {
+          Swal.fire({
+            position: 'center',
+            type: 'error',
+            title: 'Max size 10MB',
+            showConfirmButton: false,
+            timer: 2000
+          })
+        } else {
+          let file;
+          const formData_1 = new FormData();
+          if(nameFile === 'bpjsCard') {
+            this.flagFile1 = true;
+            file = event.target.files[0];
+            this.uploadForm.get('bpjsCard').setValue(file);
+            formData_1.append('bpjs_bpjs_card', this.uploadForm.get('bpjsCard').value);
+          } 
+          else if(nameFile === 'identityCard') {
+            this.flagFile2 = true;
+            file = event.target.files[0];
+            this.uploadForm.get('identityCard').setValue(file);
+            formData_1.append('bpjs_identity_card', this.uploadForm.get('identityCard').value);
+          } 
+          else if(nameFile === 'referenceLetter') {
+            this.flagFile3 = true;
+            file = event.target.files[0];
+            this.uploadForm.get('referenceLetter').setValue(file);
+            formData_1.append('bpjs_reference_later', this.uploadForm.get('referenceLetter').value);
+          } 
+          else if(nameFile === 'familyCard') {
+            this.flagFile4 = true;
+            file = event.target.files[0];
+            this.uploadForm.get('familyCard').setValue(file);
+            formData_1.append('bpjs_family_card', this.uploadForm.get('familyCard').value);
+          }
+            this.assetUpload = await this.patientService.uploadDocBpjs(formData_1)
+            .toPromise().then(res => {
+              this.uploadForm = this.formBuilder.group({
+                bpjsCard: [''],
+                identityCard: [''],
+                referenceLetter: [''],
+                familyCard: ['']
+              });
+              this.flagFile1 = false;
+              this.flagFile2 = false;
+              this.flagFile3 = false;
+              this.flagFile4 = false;
+              
+              return res.data;
+            }).catch(err => {
+              this.flagFile1 = false;
+              this.flagFile2 = false;
+              this.flagFile3 = false;
+              this.flagFile4 = false;
+              Swal.fire({
+                type: 'error',
+                title: 'Oops...',
+                text: err.error.message,
+                timer: 4000
+              })
+              return null
+            });
+            if(this.assetUpload) {
+              this.editAppointmentData(this.assetUpload[0].name, nameFile)
+            }
+        }
+      } else {
+        Swal.fire({
+          position: 'center',
+          type: 'error',
+          title: 'Format file JPG and PDF only',
+          showConfirmButton: false,
+          timer: 2000
+        })
+      }
+    }
+  }
+
+  async editAppointmentData(pathFile, nameFile) {
+    this.bodyUpload = {
+      userId: this.user.id,
+      userName: this.user.username,
+      source: sourceApps,
+    }
+    if(nameFile === 'bpjsCard') this.bodyUpload.bpjsCardFile = pathFile;
+    else if(nameFile === 'identityCard') this.bodyUpload.identityCardFile = pathFile;
+    else if(nameFile === 'referenceLetter') this.bodyUpload.refferenceLetterFile = pathFile;
+    else if(nameFile === 'familyCard') this.bodyUpload.familyCardFile = pathFile;
+    
+    this.appointmentService.updateAppBpjs(this.selectedCheckIn.appointment_id, this.bodyUpload).subscribe(
+      data => {
+        this.bodyUpload = {};
+        this.refreshDataApp(this.selectedCheckIn.appointment_id);
+        if(nameFile === 'bpjsCard') this.uploadForm.get('bpjsCard').setValue(null);
+        else if(nameFile === 'identityCard') this.uploadForm.get('identityCard').setValue(null);
+        else if(nameFile === 'referenceLetter') this.uploadForm.get('referenceLetter').setValue(null);
+        else if(nameFile === 'familyCard') this.uploadForm.get('familyCard').setValue(null);
+        Swal.fire({
+          position: 'center',
+          type: 'success',
+          title: 'Upload Successful',
+          showConfirmButton: false,
+          timer: 3000
+        })
+      }, error => {
+        Swal.fire({
+          type: 'error',
+          title: 'Oops...',
+          text: error.error.message,
+          timer: 4000
+        })
+      }
+    )
+  }
+
+  async refreshDataApp(appointment){
+    await this.appointmentService.getAppointmentById(appointment).subscribe(
+      data => {
+        this.selectedCheckIn = data.data[0];
+        this.selectedCheckIn.custome_birth_date = dateFormatter(this.selectedCheckIn.birth_date, true);
+      }
+    );
   }
 
   async admissionType() {
@@ -485,8 +628,7 @@ export class WidgetAppointmentListBpjsComponent implements OnInit {
 
   async listAppointment(name = '', birth = '', mr = '', doctor = '', modifiedName = '',
   isWaitingList = null) {
-    const channel = channelId.BPJS; //appointment BPJS //dummy
-    //const channel = null;
+    const channel = channelId.BPJS;
     this.showWaitMsg = true;
     this.showNotFoundMsg = false;
 
@@ -498,7 +640,6 @@ export class WidgetAppointmentListBpjsComponent implements OnInit {
     const limit = this.limit;
     const offset = this.offset;
 
-    //dummy
     this.appList = await this.appointmentService.getListAppointment(date, hospital, name, birth, mr, doctor, modifiedName, isWaitingList, limit, offset, channel)
       .toPromise().then(res => {
         if (res.data.length > 0) {
@@ -510,11 +651,6 @@ export class WidgetAppointmentListBpjsComponent implements OnInit {
             res.data[i].custome_from_time = res.data[i].from_time.substring(0, 5);
             res.data[i].custome_to_time = res.data[i].to_time.substring(0, 5);
             res.data[i].checked = false;
-            // res.data[i].bpjs_card_file = 'disclaimer_1-1594719597879.pdf'; //dummy
-            // res.data[i].family_card_file = 'disclaimer_1-1594805030136.pdf';
-            // res.data[i].identity_card_file = 'disclaimer_1-1595232503271.pdf';
-            // res.data[i].refference_letter_file = 'disclaimer_1-1595232538199.pdf';
-            // res.data[i].selfie_with_identity_file = 'disclaimer_1-1595232563389.pdf';
           }
 
           this.showWaitMsg = false;
@@ -598,7 +734,11 @@ export class WidgetAppointmentListBpjsComponent implements OnInit {
     this.nationalIdTypeId = await this.patientService.getDefaultPatientType(patientHopeId).toPromise()
       .then(res => {
         if (res.data) {
-          return res.data.nationalIdTypeId;
+          if(res.data.nationalIdTypeId === null) {
+            return '';
+          } else {
+            return res.data.nationalIdTypeId;
+          }
         } else {
           return '';
         }
@@ -608,7 +748,7 @@ export class WidgetAppointmentListBpjsComponent implements OnInit {
 
     let idx = null;
 
-    if (this.nationalIdTypeId) {
+    if (this.nationalIdTypeId && this.fromBpjs === false) {
       if (this.nationalIdTypeId == 3) {
         //Passport
         idx = this.patientTypeList.findIndex((a) => {
@@ -625,10 +765,28 @@ export class WidgetAppointmentListBpjsComponent implements OnInit {
           return a.description == "PRIVATE";
         })
       }
-    } else {
+    } else if(this.nationalIdTypeId && this.fromBpjs === true) {
+      this.txtPayer = false;
+      this.txtPayerNo = false;
+      this.txtPayerEligibility = false;
+      this.payerNo = this.selectedCheckIn.bpjs_card_number;
       idx = this.patientTypeList.findIndex((a) => {
-        return a.description == "PRIVATE";
+        return a.description == "PAYER";
       })
+    } else {
+      if(this.fromBpjs === true) {
+        this.txtPayer = false;
+        this.txtPayerNo = false;
+        this.txtPayerEligibility = false;
+        this.payerNo = this.selectedCheckIn.bpjs_card_number;
+        idx = this.patientTypeList.findIndex((a) => {
+          return a.description == "PAYER";
+        })
+      } else {
+        idx = this.patientTypeList.findIndex((a) => {
+          return a.description == "PRIVATE";
+        })
+      }
     }
     this.patientType = this.patientTypeList[idx];
   }
@@ -645,12 +803,27 @@ export class WidgetAppointmentListBpjsComponent implements OnInit {
         if (detail.patient_hope_id) {
           this.open(mrLocalModal);
         } else {
-          const params = { appointmentId: detail.appointment_id, };
+          let params;
+          if(this.fromBpjs === true) {
+            params = {
+              appointmentId: detail.appointment_id,
+              fromBpjs: true
+            };
+          } else {
+            params = {
+              appointmentId: detail.appointment_id,
+            };
+          }
+
           this.router.navigate(['./patient-data'], { queryParams: params });
         }
       } else {
         await this.defaultPatientType(detail.patient_hope_id);
-        this.open50(checkInModal);
+        if(this.fromBpjs === true) {
+          this.modalService.open(checkInModal, { windowClass: 'fo_modal_admission_3', size: 'lg' });
+        } else {
+          this.open50(checkInModal);
+        }
       }
     }
   }

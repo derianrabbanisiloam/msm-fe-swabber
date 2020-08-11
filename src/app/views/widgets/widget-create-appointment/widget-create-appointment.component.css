@@ -32,10 +32,15 @@
   width: 55em;
 }
 
+::ng-deep .fo_modal_admission_3 .modal-dialog {
+  width: 45em;
+}
+
 .ms_btn_blue_module{ 
   background: dodgerblue; 
   color: white;
   border-radius: 5px;
+  width: 7em;
 }
 
 .space-text {

@@ -180,8 +180,10 @@ export class WidgetDoctorScheduleComponent implements OnInit {
   }
 
   getSchedulesLogic(keywords: any) {
-    keywords.isRescheduleBpjs === true ? this.consulType = keywords.consulType : ''; //from reschedule bpjs
-    keywords.isRescheduleBpjs === true ? this.reschBpjs = true : ''; //from reschedule bpjs
+    if(keywords.isRescheduleBpjs === true) {
+      this.consulType = keywords.consulType;
+      this.reschBpjs = true;
+    }
     const doctorId = keywords.doctor ? keywords.doctor.doctor_id : null;
     const areaId = keywords.area ? keywords.area.area_id : null;
     const hospitalId = keywords.hospital ? keywords.hospital.hospital_id : null;
@@ -291,16 +293,18 @@ export class WidgetDoctorScheduleComponent implements OnInit {
     const areaId = keywords.area ? keywords.area.area_id : null;
     const hospitalId = !isEmpty(keywords.hospital) ? keywords.hospital.hospital_id : null;
     const specialityId = keywords.speciality ? keywords.speciality.speciality_id : null;
-    this.leaves = await this.scheduleService.getLeaveHeader(
-      year,
-      hospitalId,
-      doctorId,
-      areaId,
-      specialityId).toPromise().then(
-        data => {
-          return data.data;
-        }
-      );
+    if(year && (doctorId || areaId || hospitalId || specialityId)) {
+      this.leaves = await this.scheduleService.getLeaveHeader(
+        year,
+        hospitalId,
+        doctorId,
+        areaId,
+        specialityId).toPromise().then(
+          data => {
+            return data.data;
+          }
+        );
+    }
   }
 
   gotoDate(dateSelected: any) {

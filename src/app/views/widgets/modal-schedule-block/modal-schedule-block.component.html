@@ -45,23 +45,42 @@
             <option *ngFor="let m of minuteOptions" value="{{m}}">{{m}}</option>
           </select>
         </div>
-        <div class="form-group col-md-4">
+
+        <div class="form-group col-md-4" *ngIf="!scheduleSel">
           <label>Reason</label>
           <input [disabled]="!scheduleSel" class="form-control" type="text" maxlength="100" name="reason" [(ngModel)]="blockModel.reason" required>
         </div>
+        <div class="form-group col-md-4" *ngIf="scheduleSel && scheduleSel?.consultation_type_id != 6">
+          <label>Reason</label>
+          <input [disabled]="!scheduleSel" class="form-control" type="text" maxlength="100" name="reason" [(ngModel)]="blockModel.reason" required>
+        </div>
+        <div class="form-group col-md-2" *ngIf="scheduleSel && scheduleSel?.consultation_type_id == 6">
+          <label>Reason</label>
+          <input [disabled]="!scheduleSel" class="form-control" type="text" maxlength="100" name="reason" [(ngModel)]="blockModel.reason" required>
+        </div>
+
         <div class="form-group col-md-2" *ngIf="!scheduleSel">
           <label style="display: block; text-align: center;">Include Waiting List</label>
-          <input [disabled]="!scheduleSel" class="form-control" type="checkbox" name="isIncludeWaitingList" (change)="blockCheckBox($event)" [(ngModel)]="blockModel.isIncludeWaitingList">
+          <input [disabled]="!scheduleSel" class="form-control custom-checkbox" type="checkbox" name="isIncludeWaitingList" (change)="blockCheckBox($event)" [(ngModel)]="blockModel.isIncludeWaitingList">
         </div>
-        <div class="form-group col-md-2" *ngIf="scheduleSel && scheduleSel?.consultation_type_id != 4">
+        <div class="form-group col-md-2" *ngIf="scheduleSel && scheduleSel?.consultation_type_id != 4 && scheduleSel?.consultation_type_id != 6">
           <label style="display: block; text-align: center;">Include Waiting List</label>
-          <input [disabled]="!scheduleSel" class="form-control" type="checkbox" name="isIncludeWaitingList" (change)="blockCheckBox($event)" [(ngModel)]="blockModel.isIncludeWaitingList">
+          <input [disabled]="!scheduleSel" class="form-control custom-checkbox" type="checkbox" name="isIncludeWaitingList" (change)="blockCheckBox($event)" [(ngModel)]="blockModel.isIncludeWaitingList">
         </div>
         <div class="form-group col-md-2" *ngIf="scheduleSel && scheduleSel?.consultation_type_id == 4">
           <label style="display: block; text-align: center;">Include Teleconsult</label>
-          <input [disabled]="!scheduleSel" class="form-control" type="checkbox" name="isRescheduleTeleconsultation" (change)="blockCheckBoxTwo($event)" [(ngModel)]="blockModel.isRescheduleTeleconsultation">
+          <input [disabled]="!scheduleSel" class="form-control custom-checkbox" type="checkbox" name="isRescheduleTeleconsultation" (change)="blockCheckBoxTwo($event)" [(ngModel)]="blockModel.isRescheduleTeleconsultation">
         </div>
-          
+
+        <div class="form-group col-md-2" *ngIf="scheduleSel && scheduleSel?.consultation_type_id == 6">
+          <label style="display: block; text-align: center;">Include Waiting List</label>
+          <input [disabled]="!scheduleSel" class="form-control custom-checkbox" type="checkbox" name="isIncludeWaitingList" (change)="blockCheckBox($event)" [(ngModel)]="blockModel.isIncludeWaitingList">
+        </div>
+        <div class="form-group col-md-2" *ngIf="scheduleSel && scheduleSel?.consultation_type_id == 6">
+          <label style="display: block; text-align: center;">Include Teleconsult</label>
+          <input [disabled]="!scheduleSel" class="form-control custom-checkbox" type="checkbox" name="isRescheduleTeleconsultation" (change)="blockCheckBoxTwo($event)" [(ngModel)]="blockModel.isRescheduleTeleconsultation">
+        </div>
+        
         <div class="form-group col-md-2">
           <button [disabled]="!isValidBlock || !b.form.valid" (click)="addScheduleBlock()" class="btn btn-green">Add Block</button>
         </div>
@@ -106,18 +125,33 @@
             <option *ngFor="let m of minuteOptions" value="{{m}}">{{m}}</option>
           </select>
         </div>
-        <div class="form-group col-md-4">
+
+        <div class="form-group col-md-4" *ngIf="bl?.consultation_type_id != 6">
           <label>Reason</label>
           <input class="form-control" type="text" maxlength="100" name="block_model_reason" [(ngModel)]="bl.reason" disabled>
         </div>
-        <div class="form-group col-md-2" *ngIf="bl?.consultation_type_id != 4">
+        <div class="form-group col-md-2" *ngIf="bl?.consultation_type_id == 6">
+          <label>Reason</label>
+          <input class="form-control" type="text" maxlength="100" name="block_model_reason" [(ngModel)]="bl.reason" disabled>
+        </div>
+
+        <div class="form-group col-md-2" *ngIf="bl?.consultation_type_id != 4 && bl?.consultation_type_id != 6">
           <label style="display: block; text-align: center;">Include Waiting List</label>
-          <input class="form-control" type="checkbox" name="block_model_is_waiting_list" (change)="blockCheckBoxEdit()" (change)="openModalBlockConfirmation(content6, bl, i)" [(ngModel)]="bl.is_include_waiting_list">
+          <input class="form-control custom-checkbox" type="checkbox" name="block_model_is_waiting_list" (change)="blockCheckBoxEdit()" (change)="openModalBlockConfirmation(content6, bl, i)" [(ngModel)]="bl.is_include_waiting_list">
         </div>
         <div class="form-group col-md-2" *ngIf="bl?.consultation_type_id == 4">
           <label style="display: block; text-align: center;">Include Teleconsult</label>
-          <input class="form-control" type="checkbox" name="block_model_is_teleconsultation" (change)="blockCheckBoxEditTwo()" (change)="openModalBlockConfirmation(content6, bl, i)" [(ngModel)]="bl.is_reschedule_teleconsultation">
+          <input class="form-control custom-checkbox" type="checkbox" name="block_model_is_teleconsultation" (change)="blockCheckBoxEditTwo()" (change)="openModalBlockConfirmation(content6, bl, i)" [(ngModel)]="bl.is_reschedule_teleconsultation">
         </div>
+        <div class="form-group col-md-2" *ngIf="bl?.consultation_type_id == 6">
+          <label style="display: block; text-align: center;">Include Waiting List</label>
+          <input class="form-control custom-checkbox" type="checkbox" name="block_model_is_waiting_list" (change)="blockCheckBoxEdit()" (change)="openModalBlockConfirmation(content6, bl, i)" [(ngModel)]="bl.is_include_waiting_list">
+        </div>
+        <div class="form-group col-md-2" *ngIf="bl?.consultation_type_id == 6">
+          <label style="display: block; text-align: center;">Include Teleconsult</label>
+          <input class="form-control custom-checkbox" type="checkbox" name="block_model_is_teleconsultation" (change)="blockCheckBoxEditTwo()" (change)="openModalBlockConfirmation(content6, bl, i)" [(ngModel)]="bl.is_reschedule_teleconsultation">
+        </div>
+
         <div class="form-group col-md-2">
           <button (click)="openModalBlockConfirmation(content7, bl)" class="btn btn-danger">Delete</button>
         </div>

@@ -1,3 +1,8 @@
+.custom-checkbox {
+  height: 17px; 
+  margin-top: 12px;
+}
+
 .select-time {
     width: 55px;
     display: inline;

@@ -92,7 +92,8 @@ export class AppointmentService {
   }
 
   getListAppointment(date: any, hospital: string, name?: string, birth?: any, mr?: any, doctor?: string,
-     modifiedName?: string, isWaitingList?: boolean, limit?: number, offset?: number, channel?: string): Observable<any> {
+     modifiedName?: string, isWaitingList?: boolean, limit?: number, offset?: number, channel?: string,
+     exclude?: boolean): Observable<any> {
 
     let uri = `/hospital/${hospital}?date=${date}`;
     
@@ -103,6 +104,7 @@ export class AppointmentService {
     uri = modifiedName ? `${uri}&modifiedName=${modifiedName}` : uri;
     uri = isWaitingList ? `${uri}&isWaitingList=${isWaitingList}` : uri;
     uri = channel ? `${uri}&channelId=${channel}` : uri;
+    uri =`${uri}&exclude=${exclude}`;
 
     const url = `${uri}&limit=${limit}&offset=${offset}`;
 

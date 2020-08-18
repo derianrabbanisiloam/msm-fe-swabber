@@ -533,17 +533,17 @@
           </div>
         </div>
         <div class="row space-text">
-          <div class="col-md-5" style="padding-left: 0" *ngIf="selectedCheckIn?.surat_rujukan">
+          <div class="col-md-5" style="padding-left: 0" *ngIf="selectedCheckIn?.refference_letter_file">
             <span style="margin-left: 2.5em;">
               <a href=":javascript"
-              (click)="getImage(selectedCheckIn.surat_rujukan)"
+              (click)="getImage(selectedCheckIn.refference_letter_file)"
               target="_blank">View<br></a>
             </span>
           </div>
           <div class="col-md-4" style="padding-left: 0">
             <button type="button" class="btn ms_btn_blue_module" [disabled]="flagFile4" (click)="fileInputFour.click()">
-              <span *ngIf="!selectedCheckIn?.surat_rujukan">Upload</span>
-              <span *ngIf="selectedCheckIn?.surat_rujukan">Re-upload</span>
+              <span *ngIf="!selectedCheckIn?.refference_letter_file">Upload</span>
+              <span *ngIf="selectedCheckIn?.refference_letter_file">Re-upload</span>
               <input #fileInputFour type="file" (change)="upload($event, 'referenceLetter')" style="display:none;" accept="application/pdf, .jpg, .jpeg"/>
             </button>
           </div>
@@ -557,7 +557,7 @@
     </div>
   </div>
   <div class="modal-footer">
-    <button class="btn ms_btn_green" [disabled]="!selectedCheckIn.bpjs_card_file && !selectedCheckIn.surat_rujukan" (click)="createAdmissionBpjs(checkInOldPatient)">Continue</button>
+    <button class="btn ms_btn_green" [disabled]="!selectedCheckIn.bpjs_card_file && !selectedCheckIn.refference_letter_file" (click)="createAdmissionBpjs(checkInOldPatient)">Continue</button>
     <button type="button" class="btn ms_btn_red" (click)="c('Cross click')">Cancel</button>
   </div>
 </ng-template>

@@ -880,7 +880,12 @@ export class WidgetCreateAppointmentComponent implements OnInit {
               patient_hope_id: this.appointments[idx].patient_hope_id ? this.appointments[idx].patient_hope_id : null,
               patient_organization_id: this.appointments[idx].patient_organization_id ? this.appointments[idx].patient_organization_id : null,
               is_double_mr: this.appointments[idx].is_double_mr ? this.appointments[idx].is_double_mr : false,
-              payment_status_id: this.appointments[idx].payment_status_id ? this.appointments[idx].payment_status_id : '' 
+              payment_status_id: this.appointments[idx].payment_status_id ? this.appointments[idx].payment_status_id : '',
+              bpjs_card_file: this.appointments[idx].bpjs_card_file ? this.appointments[idx].bpjs_card_file : '',
+              identity_card_file: this.appointments[idx].identity_card_file ? this.appointments[idx].identity_card_file : '',
+              family_card_file: this.appointments[idx].family_card_file ? this.appointments[idx].family_card_file : '',
+              refference_letter_file: this.appointments[idx].refference_letter_file ? this.appointments[idx].refference_letter_file : '',
+              selfie_with_identity_file: this.appointments[idx].selfie_with_identity_file ? this.appointments[idx].selfie_with_identity_file : ''
             });
           } else {
             this.appList[k].appointment.push({
@@ -922,7 +927,12 @@ export class WidgetCreateAppointmentComponent implements OnInit {
               patient_hope_id: null,
               patient_organization_id: null,
               is_double_mr: false,
-              payment_status_id: ''
+              payment_status_id: '',
+              bpjs_card_file: '',
+              identity_card_file: '',
+              family_card_file: '',
+              refference_letter_file: '',
+              selfie_with_identity_file: ''
             });
           }
         }
@@ -979,7 +989,12 @@ export class WidgetCreateAppointmentComponent implements OnInit {
             patient_hope_id: x.patient_hope_id ? x.patient_hope_id : null,
             patient_organization_id: x.patient_organization_id ? x.patient_organization_id : null,
             is_double_mr: x.is_double_mr ? x.is_double_mr : false,
-            payment_status_id: x.payment_status_id ? x.payment_status_id : ''
+            payment_status_id: x.payment_status_id ? x.payment_status_id : '',
+            bpjs_card_file: x.bpjs_card_file? x.bpjs_card_file : '',
+            identity_card_file: x.identity_card_file? x.identity_card_file : '',
+            family_card_file: x.family_card_file? x.family_card_file : '',
+            refference_letter_file: x.refference_letter_file? x.refference_letter_file : '',
+            selfie_with_identity_file: x.selfie_with_identity_file? x.selfie_with_identity_file : ''
           });
         }
       });
@@ -1023,7 +1038,12 @@ export class WidgetCreateAppointmentComponent implements OnInit {
           patient_hope_id: null,
           patient_organization_id: null,
           is_double_mr: false,
-          payment_status_id: ''
+          payment_status_id: '',
+          bpjs_card_file: '',
+          identity_card_file: '',
+          family_card_file: '',
+          refference_letter_file: '',
+          selfie_with_identity_file: ''
         });  
       } else {
         for (let i = 0, { length } = this.appointments; i < length; i++) {
@@ -1065,7 +1085,12 @@ export class WidgetCreateAppointmentComponent implements OnInit {
               patient_hope_id: this.appointments[i].patient_hope_id ? this.appointments[i].patient_hope_id : null,
               patient_organization_id: this.appointments[i].patient_organization_id ? this.appointments[i].patient_organization_id : null,
               is_double_mr: this.appointments[i].is_double_mr ? this.appointments[i].is_double_mr : false,
-              payment_status_id: this.appointments[i].payment_status_id ? this.appointments[i].payment_status_id : ''
+              payment_status_id: this.appointments[i].payment_status_id ? this.appointments[i].payment_status_id : '',
+              bpjs_card_file: this.appointments[i].bpjs_card_file ? this.appointments[i].bpjs_card_file : '',
+              identity_card_file: this.appointments[i].identity_card_file ? this.appointments[i].identity_card_file : '',
+              family_card_file: this.appointments[i].family_card_file ? this.appointments[i].family_card_file : '',
+              refference_letter_file: this.appointments[i].refference_letter_file ? this.appointments[i].refference_letter_file : '',
+              selfie_with_identity_file: this.appointments[i].selfie_with_identity_file ? this.appointments[i].selfie_with_identity_file : '',
             });
           }
         }
@@ -1112,7 +1137,12 @@ export class WidgetCreateAppointmentComponent implements OnInit {
           patient_hope_id: null,
           patient_organization_id: null,
           is_double_mr: false,
-          payment_status_id: ''
+          payment_status_id: '',
+          bpjs_card_file: '',
+          identity_card_file: '',
+          family_card_file: '',
+          refference_letter_file: '',
+          selfie_with_identity_file: ''
         });
       } 
     }
@@ -1405,8 +1435,7 @@ export class WidgetCreateAppointmentComponent implements OnInit {
     }else{
       this.late = '';
     }
-    //this.open50(content);
-    this.modalService.open(content, { windowClass: 'fo_modal_admission_2', size: 'lg' });
+    this.open(content);
   }
 
   async refreshDataApp(appointment){

@@ -31,18 +31,9 @@ export class SectionSidebarComponent implements OnInit {
   }
 
   ngOnInit() {
-    this.countRechedule();
     this.socket.on(APP_RESCHEDULE+'/'+this.hospital.id, (call) => {
       this.countAppRes = call.data;
     });
-  }
-
-  countRechedule() {
-    this.appointmentService.getCountAppReschedule(this.hospital.id).subscribe(
-      data => {
-        this.countAppRes = data.data;
-      }
-    );
   }
 
 }

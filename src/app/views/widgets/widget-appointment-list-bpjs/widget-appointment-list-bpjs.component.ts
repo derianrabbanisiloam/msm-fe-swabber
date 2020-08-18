@@ -640,7 +640,7 @@ export class WidgetAppointmentListBpjsComponent implements OnInit {
     const limit = this.limit;
     const offset = this.offset;
 
-    this.appList = await this.appointmentService.getListAppointment(date, hospital, name, birth, mr, doctor, modifiedName, isWaitingList, limit, offset, channel)
+    this.appList = await this.appointmentService.getListAppointment(date, hospital, name, birth, mr, doctor, modifiedName, isWaitingList, limit, offset, channel, false)
       .toPromise().then(res => {
         if (res.data.length > 0) {
           this.isCanNextPage = res.data.length >= 10 ? true : false;

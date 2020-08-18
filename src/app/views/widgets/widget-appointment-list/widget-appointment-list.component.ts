@@ -14,7 +14,7 @@ import { QueueService } from '../../../services/queue.service';
 import { ScheduleService } from '../../../services/schedule.service';
 import { PatientService } from '../../../services/patient.service';
 import { Alert, AlertType } from '../../../models/alerts/alert';
-import { sourceApps, queueType, appointmentStatusId } from '../../../variables/common.variable';
+import { sourceApps, queueType, appointmentStatusId, channelId } from '../../../variables/common.variable';
 import { Router, ActivatedRoute } from '@angular/router';
 import { BoundElementProperty } from '@angular/compiler';
 import {
@@ -390,7 +390,7 @@ export class WidgetAppointmentListComponent implements OnInit {
     const limit = this.limit;
     const offset = this.offset;
 
-    this.appList = await this.appointmentService.getListAppointment(date, hospital, name, birth, mr, doctor, modifiedName, isWaitingList, limit, offset)
+    this.appList = await this.appointmentService.getListAppointment(date, hospital, name, birth, mr, doctor, modifiedName, isWaitingList, limit, offset, channelId.BPJS, true)
       .toPromise().then(res => {
         if (res.status === 'OK') {
 

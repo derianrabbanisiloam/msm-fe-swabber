@@ -189,6 +189,7 @@ export class ModalAppointmentBpjsComponent implements OnInit {
     const app = this.appointmentSelected;
     const sch = this.opScheduleSelected;
     this.rescheduleAppPayload = {
+      appointmentId: app.appointment_id,
       scheduleId: data.schedule_id,
       appointmentDate: sch.date,
       appointmentFromTime: data.appointment_from_time,

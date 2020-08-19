@@ -929,7 +929,7 @@
 <ng-template #confirmDocument let-modal let-c="close">
   <div class="modal-header">
     <div class="header-2 modal-padding" *ngIf="selectedCheckIn?.contact_name">{{selectedCheckIn.contact_name}} {{selectedCheckIn.custome_birth_date}} | Document uploads</div>
-    <button #cls_btn_confirm type="button" class="close" aria-label="Close" (click)="c('Cross click')">
+    <button #cls_confirm_document type="button" class="close" aria-label="Close" (click)="c('Cross click')">
       <span aria-hidden="true">&times;</span>
     </button>
   </div>
@@ -1047,7 +1047,7 @@
   </div>
   <div class="modal-footer">
     
-    <button class="btn ms_btn_green" [disabled]="!selectedCheckIn.bpjs_card_file && !selectedCheckIn.refference_letter_file" (click)="open50(checkInOldPatient)">Continue</button>
+    <button class="btn ms_btn_green" [disabled]="!(selectedCheckIn.bpjs_card_file && selectedCheckIn.refference_letter_file)" (click)="afterUploadCheckIn(checkInOldPatient, cls_confirm_document)">Continue</button>
     <button type="button" class="btn ms_btn_red" (click)="c('Cross click')">Cancel</button>
   </div>
 </ng-template>

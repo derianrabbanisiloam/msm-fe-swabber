@@ -45,7 +45,7 @@ import {
   CHECK_IN, CREATE_APP,
   CANCEL_APP, RESCHEDULE_APP,
   QUEUE_NUMBER, keySocket, SCHEDULE_BLOCK, channelId, appointmentStatusId, 
-  paymentStatus, pathImage
+  paymentStatus
 } from '../../../variables/common.variable';
 import Security from 'msm-kadapat';
 import { environment } from '../../../../environments/environment';
@@ -128,6 +128,7 @@ export class WidgetCreateAppointmentComponent implements OnInit {
 
   public closeAdm: any;
   public closeQue: any;
+  public closeDocument: any;
 
   public resQueue: any;
   public resMrLocal: any;
@@ -153,7 +154,7 @@ export class WidgetCreateAppointmentComponent implements OnInit {
   public patFromBpjs: any;
   public bodyBpjs: any;
   public consulType: string = null;
-  public urlBpjsCard = environment.GET_IMAGE+pathImage.BPJS_CARD;
+  public urlBpjsCard = environment.GET_IMAGE;
   public maxSize10MB: number = 10485760;
   public listProvince: any = null;
   public listDistrict: any = null;
@@ -519,17 +520,17 @@ export class WidgetCreateAppointmentComponent implements OnInit {
             this.uploadForm.get('identityCard').setValue(file);
             formData_1.append('bpjs_identity_card', this.uploadForm.get('identityCard').value);
           } 
-          else if(nameFile === 'referenceLetter') {
-            this.flagFile3 = true;
-            file = event.target.files[0];
-            this.uploadForm.get('referenceLetter').setValue(file);
-            formData_1.append('bpjs_reference_later', this.uploadForm.get('referenceLetter').value);
-          } 
           else if(nameFile === 'familyCard') {
-            this.flagFile4 = true;
+            this.flagFile3 = true;
             file = event.target.files[0];
             this.uploadForm.get('familyCard').setValue(file);
             formData_1.append('bpjs_family_card', this.uploadForm.get('familyCard').value);
+          }
+          else if(nameFile === 'referenceLetter') {
+            this.flagFile4 = true;
+            file = event.target.files[0];
+            this.uploadForm.get('referenceLetter').setValue(file);
+            formData_1.append('bpjs_reference_later', this.uploadForm.get('referenceLetter').value);
           }
             this.assetUpload = await this.patientService.uploadDocBpjs(formData_1)
             .toPromise().then(res => {
@@ -598,7 +599,7 @@ export class WidgetCreateAppointmentComponent implements OnInit {
           type: 'success',
           title: 'Upload Successful',
           showConfirmButton: false,
-          timer: 3000
+          timer: 2000
         })
       }, error => {
         Swal.fire({
@@ -1448,7 +1449,9 @@ export class WidgetCreateAppointmentComponent implements OnInit {
   }
 
   getImage(fileName) {
-    window.open(this.urlBpjsCard + fileName, '_blank', "status=1");
+    let split = fileName.split('-');
+    let pathFile = split[0];
+    window.open(this.urlBpjsCard +'/'+ pathFile +'/'+ fileName, '_blank', "status=1");
   }
 
   checkIsLate(appointmentId: string) {
@@ -1482,7 +1485,7 @@ export class WidgetCreateAppointmentComponent implements OnInit {
       })
 
     let idx = null;
-    if (this.nationalIdTypeId) {
+    if (this.nationalIdTypeId && this.fromBpjs === false) {
       if (this.nationalIdTypeId == 3) {
         //Passport
         idx = this.patientTypeList.findIndex((a) => {
@@ -1499,6 +1502,14 @@ export class WidgetCreateAppointmentComponent implements OnInit {
           return a.description == "PRIVATE";
         })
       }
+    } else if(this.nationalIdTypeId && this.fromBpjs === true) {
+      this.txtPayer = false;
+      this.txtPayerNo = false;
+      this.txtPayerEligibility = false;
+      this.payerNo = this.selectedCheckIn.bpjs_card_number;
+      idx = this.patientTypeList.findIndex((a) => {
+        return a.description == "PAYER";
+      })
     } else {
       if(this.fromBpjs === true) {
         this.txtPayer = false;
@@ -1870,6 +1881,11 @@ export class WidgetCreateAppointmentComponent implements OnInit {
     this.closeAdm = close;
   }
 
+  afterUploadCheckIn(content, close) {
+    this.open50(content);
+    this.closeDocument = close;
+  }
+
   async printQueueAction(val, isReguler, content) {
     this.buttonReguler = true;
     this.buttonVIP = true;
@@ -2020,6 +2036,9 @@ export class WidgetCreateAppointmentComponent implements OnInit {
     setTimeout(() => {
       this.closeQue.click();
       this.closeAdm.click();
+      if(this.fromBpjs === true) {
+        this.closeDocument.click();
+      }
       this.refreshPage();
     }, 1000);
 

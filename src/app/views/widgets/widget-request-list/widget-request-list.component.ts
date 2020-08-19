@@ -23,7 +23,7 @@ export class WidgetRequestListComponent implements OnInit {
   public user = this.key.user;
   public hospital: any = this.key.hospital;
   public assetPath = environment.ASSET_PATH;
-  public urlBpjsCard = environment.GET_IMAGE+pathImage.BPJS_CARD;
+  public urlBpjsCard = environment.GET_IMAGE;
   public todayDateISO: any = moment().format('YYYY-MM-DD');
   public myDateRangePickerOptions: IMyDrpOptions = {
     dateFormat: 'dd/mm/yyyy',
@@ -124,7 +124,9 @@ export class WidgetRequestListComponent implements OnInit {
   }
 
   getImage(fileName) {
-    window.open(this.urlBpjsCard + fileName, '_blank', "status=1");
+    let split = fileName.split('-');
+    let pathFile = split[0];
+    window.open(this.urlBpjsCard +'/'+ pathFile +'/'+ fileName, '_blank', "status=1");
   }
 
   changeDateRange(dateRange: any) {

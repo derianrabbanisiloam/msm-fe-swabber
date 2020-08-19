@@ -117,6 +117,7 @@ export class WidgetPatientDataComponent implements OnInit {
 
   public closeAdm: any;
   public closeQue: any;
+  public closeDocument: any;
 
   public resQueue: any;
   public roomDetail: any;
@@ -144,7 +145,7 @@ export class WidgetPatientDataComponent implements OnInit {
   uploadForm: FormGroup;
   public assetUpload: any = null;
   public bodyUpload: any = {};
-  public urlBpjsCard = environment.GET_IMAGE+pathImage.BPJS_CARD;
+  public urlBpjsCard = environment.GET_IMAGE;
 
   public flagErrorMobile1: boolean = false;
   public flagErrorMobile2: boolean = false;
@@ -1201,17 +1202,17 @@ export class WidgetPatientDataComponent implements OnInit {
             this.uploadForm.get('identityCard').setValue(file);
             formData_1.append('bpjs_identity_card', this.uploadForm.get('identityCard').value);
           } 
-          else if(nameFile === 'referenceLetter') {
-            this.flagFile3 = true;
-            file = event.target.files[0];
-            this.uploadForm.get('referenceLetter').setValue(file);
-            formData_1.append('bpjs_reference_later', this.uploadForm.get('referenceLetter').value);
-          } 
           else if(nameFile === 'familyCard') {
-            this.flagFile4 = true;
+            this.flagFile3 = true;
             file = event.target.files[0];
             this.uploadForm.get('familyCard').setValue(file);
             formData_1.append('bpjs_family_card', this.uploadForm.get('familyCard').value);
+          }
+          else if(nameFile === 'referenceLetter') {
+            this.flagFile4 = true;
+            file = event.target.files[0];
+            this.uploadForm.get('referenceLetter').setValue(file);
+            formData_1.append('bpjs_reference_later', this.uploadForm.get('referenceLetter').value);
           }
             this.assetUpload = await this.patientService.uploadDocBpjs(formData_1)
             .toPromise().then(res => {
@@ -1257,7 +1258,9 @@ export class WidgetPatientDataComponent implements OnInit {
   }
 
   getImage(fileName) {
-    window.open(this.urlBpjsCard + fileName, '_blank', "status=1");
+    let split = fileName.split('-');
+    let pathFile = split[0];
+    window.open(this.urlBpjsCard +'/'+ pathFile +'/'+ fileName, '_blank', "status=1");
   }
 
   async editAppointmentData(pathFile, nameFile) {
@@ -1689,10 +1692,6 @@ export class WidgetPatientDataComponent implements OnInit {
     this.modalService.open(content, { windowClass: 'fo_modal_admission_3', size: 'lg' });
   }
 
-  async createAdmissionBpjs(content) {
-    this.modalService.open(content, { windowClass: 'fo_modal_admission_4', size: 'lg' });
-  }
-
   async actionAdmission(activeModal) {
     this.buttonCreateAdmission = true;
     this.listActiveAdmission = await this.getActiveAdmission(this.selectedCheckIn.patient_hope_id);
@@ -1766,6 +1765,11 @@ export class WidgetPatientDataComponent implements OnInit {
     this.closeAdm = close;
   }
 
+  afterUploadCheckIn(content, close) {
+    this.modalService.open(content, { windowClass: 'fo_modal_admission_4', size: 'lg' });
+    this.closeDocument = close;
+  }
+
   async printQueueAction(val, isReguler, content) {
     this.buttonReguler = true;
     this.buttonVIP = true;
@@ -1831,6 +1835,9 @@ export class WidgetPatientDataComponent implements OnInit {
   printQueueTicket(val) {
     this.closeQue.click();
     this.closeAdm.click();
+    if(this.fromBpjs === true) {
+      this.closeDocument.click();
+    }
 
     const queueNo = this.resQueue.name;
     const isWalkin = this.selectedCheckIn.is_walkin ? 'WALK IN' : 'APPOINTMENT';

@@ -129,6 +129,7 @@ export class WidgetAppointmentListBpjsComponent implements OnInit {
 
   public closeAdm: any;
   public closeQue: any;
+  public closeDocument: any;
 
   public resQueue: any;
   public resMrLocal: any;
@@ -153,7 +154,7 @@ export class WidgetAppointmentListBpjsComponent implements OnInit {
   uploadForm: FormGroup;
   public assetUpload: any = null;
   public bodyUpload: any = {};
-  public urlBpjsCard = environment.GET_IMAGE+pathImage.BPJS_CARD;
+  public urlBpjsCard = environment.GET_IMAGE;
 
   constructor(
     private doctorService: DoctorService,
@@ -379,7 +380,9 @@ export class WidgetAppointmentListBpjsComponent implements OnInit {
   }
 
   getImage(fileName) {
-    window.open(this.urlBpjsCard + fileName, '_blank', "status=1");
+    let split = fileName.split('-');
+    let pathFile = split[0];
+    window.open(this.urlBpjsCard +'/'+ pathFile +'/'+ fileName, '_blank', "status=1");
   }
 
   async upload(event, nameFile){
@@ -407,18 +410,18 @@ export class WidgetAppointmentListBpjsComponent implements OnInit {
             file = event.target.files[0];
             this.uploadForm.get('identityCard').setValue(file);
             formData_1.append('bpjs_identity_card', this.uploadForm.get('identityCard').value);
-          } 
-          else if(nameFile === 'referenceLetter') {
-            this.flagFile3 = true;
-            file = event.target.files[0];
-            this.uploadForm.get('referenceLetter').setValue(file);
-            formData_1.append('bpjs_reference_later', this.uploadForm.get('referenceLetter').value);
-          } 
+          }
           else if(nameFile === 'familyCard') {
-            this.flagFile4 = true;
+            this.flagFile3 = true;
             file = event.target.files[0];
             this.uploadForm.get('familyCard').setValue(file);
             formData_1.append('bpjs_family_card', this.uploadForm.get('familyCard').value);
+          }
+          else if(nameFile === 'referenceLetter') {
+            this.flagFile4 = true;
+            file = event.target.files[0];
+            this.uploadForm.get('referenceLetter').setValue(file);
+            formData_1.append('bpjs_reference_later', this.uploadForm.get('referenceLetter').value);
           }
             this.assetUpload = await this.patientService.uploadDocBpjs(formData_1)
             .toPromise().then(res => {
@@ -1124,6 +1127,11 @@ export class WidgetAppointmentListBpjsComponent implements OnInit {
     this.closeAdm = close;
   }
 
+  afterUploadCheckIn(content, close) {
+    this.open50(content);
+    this.closeDocument = close;
+  }
+
   async printQueueAction(val, isReguler, content) {
     this.buttonReguler = true;
     this.buttonVIP = true;
@@ -1269,6 +1277,9 @@ export class WidgetAppointmentListBpjsComponent implements OnInit {
     setTimeout(() => {
       this.closeQue.click();
       this.closeAdm.click();
+      if(this.fromBpjs === true) {
+        this.closeDocument.click();
+      }
       this.refreshPage();
       this.searchAppointment(false);
     }, 1000);

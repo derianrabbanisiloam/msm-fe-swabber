@@ -490,7 +490,7 @@ export class WidgetAppointmentListBpjsComponent implements OnInit {
           type: 'success',
           title: 'Upload Successful',
           showConfirmButton: false,
-          timer: 3000
+          timer: 2000
         })
       }, error => {
         Swal.fire({

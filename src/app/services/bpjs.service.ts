@@ -17,6 +17,12 @@ export class BpjsService {
 
   private appointmentBpjsUrl = environment.BPJS_SERVICE + '/appointments';
   private lakaLantasUrl = environment.BPJS_SERVICE + '/lookups';
+  private sendSmsUrl = environment.FRONT_OFFICE_SERVICE + '/notifications/bpjs';
+
+  notifySmsBpjs(payload: any): Observable<any> {
+    const url = `${this.sendSmsUrl}`;
+    return this.http.post<any>(url, payload, httpOptions);
+  }
 
   getListAppointmentBpjs(
     hospitalId?: string,

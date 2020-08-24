@@ -589,6 +589,14 @@ export class ModalCreateAppBpjsComponent implements OnInit {
 
     await this.appointmentService.addAppointment(this.addAppPayload).toPromise().then(
       data => {
+        if(this.bpjsInfo.fromBpjs === true && this.bpjsInfo.fromRegistration === false) {
+          let body = {
+            appointmentBpjsId: appTempId,
+            source: this.source,
+            userId: this.userId,
+          }
+          this.sendSms(body);
+        }
         this.alertService.success('Success to create appointment', false, 3000);
         this.appointmentService.emitCreateApp(true);
         setTimeout(() => { this.close(); }, 2000);
@@ -597,6 +605,10 @@ export class ModalCreateAppBpjsComponent implements OnInit {
       }
     );
     this.isSubmitting = false;
+  }
+
+  async sendSms(payload){
+    await this.bpjsService.notifySmsBpjs(payload).toPromise();
   }
 
   async editPatientHopeId(val, content) {

@@ -1,3 +1,28 @@
+.center-text{
+    text-align: left;
+    align-items: center;
+    font-size: 16px;
+    font-weight: bold;
+  }  
+
+.content-header-container{
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    width: 100%;
+    margin: 10px 0;
+  }
+
+.content-doctor-schedule-group-1 h3 {
+    color:#717171;
+}
+
+.custom-app-bpjs{
+    background-color: white;
+    border-radius: 10px;
+    padding: 1em;
+}
+
 .hugeModal > .modal-dialog {
     max-width: 90% !important;
    width: 90% !important;

@@ -94,9 +94,9 @@ export class ModalRescheduleAppointmentComponent implements OnInit {
     let name = this.appointmentSelected.contact_name;
     name = name ? name : this.appointmentSelected.patient_name;
     this.createAppInputData = {
-      scheduleId: data.schedule_id,
       appointmentDate: data.date,
       name: name,
+      doctorId: data.doctor_id
     };
   }
 
@@ -104,7 +104,7 @@ export class ModalRescheduleAppointmentComponent implements OnInit {
     const app = this.appointmentSelected;
     const sch = this.opScheduleSelected;
     this.rescheduleAppPayload = {
-      scheduleId: sch.schedule_id,
+      scheduleId: data.schedule_id,
       appointmentDate: sch.date,
       appointmentFromTime: data.appointment_from_time,
       appointmentToTime: data.appointment_to_time,

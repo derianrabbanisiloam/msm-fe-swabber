@@ -30,13 +30,37 @@ export class ScheduleService {
     return this.http.get<any>(uri, httpOptions);
   }
 
+  getTimeSlot(hospitalId: string, doctorId: string, date: string, consulType?: string){
+    let uri = `${this.timeSlotUrl}/${hospitalId}/doctor/${doctorId}/appointment-date/${date}`;
+    if (consulType) {
+      uri = `${uri}?consultationTypeId=${consulType}`;
+    }
+    return this.http.get<any>(uri, httpOptions);
+  }
+
   scheduleDetail(scheduleId: string): Observable<any> {
     const uri = `${this.opAdminScheduleUrl}/${scheduleId}`;
     return this.http.get<any>(uri, httpOptions);
   }
 
+  getScheduleByDate(hospitalId: string, doctorId: string, date: string): Observable<any> {
+    const uri = `${this.opAdminScheduleUrl}/hospital/${hospitalId}?doctorId=${doctorId}&date=${date}`;
+    return this.http.get<any>(uri, httpOptions);
+  }
+
+  getScheduleDoctor(hospitalId: string, doctorId: string, date: string, consulType?: string): Observable<any> {
+    let uri = `${this.opAdminScheduleUrl}/doctor-hospital-consultation?doctorId=${doctorId}&hospitalId=${hospitalId}&date=${date}`;
+    uri = consulType ? `${uri}&consultationTypeId=${consulType}` : uri;
+    return this.http.get<any>(uri, httpOptions);
+  }
+
   getScheduleBlock(scheduleId: string, date: string): Observable<any> {
     const url = `${this.scheduleBlockUrl}/${scheduleId}?date=${date}`;
+    return this.http.get<any>(url, httpOptions);
+  }
+
+  getScheduleBlockByDay(hospitalId: string, doctorId: string, date: string): Observable<any> {
+    const url = `${this.scheduleBlockUrl}?hospitalId=${hospitalId}&doctorId=${doctorId}&date=${date}`;
     return this.http.get<any>(url, httpOptions);
   }
 

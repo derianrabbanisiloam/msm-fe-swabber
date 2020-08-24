@@ -163,6 +163,12 @@ export class ModalCreateAppBpjsComponent implements OnInit {
     }
   }
 
+  resetField() {
+    this.isSubmitting = false;
+    this.model = {};
+    this.isLock = false;
+  }
+
   close() {
     this.activeModal.close();
   }

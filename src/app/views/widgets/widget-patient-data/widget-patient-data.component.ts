@@ -1724,7 +1724,7 @@ export class WidgetPatientDataComponent implements OnInit {
     pdfMake.createPdf(docDefinition).print();
 
     //redirect to create appointment
-    const params = { id: this.selectedCheckIn.schedule_id, date: this.selectedCheckIn.appointment_date };
+    const params = { doctorId: this.selectedCheckIn.doctor_id, date: this.selectedCheckIn.appointment_date };
     this.router.navigate(['./create-appointment'], { queryParams: params });
 
   }

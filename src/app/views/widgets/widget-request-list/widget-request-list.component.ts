@@ -352,7 +352,7 @@ export class WidgetRequestListComponent implements OnInit {
     };
 
     this.doctorService.searchDoctorSource2 = this.searchKeywords;
-    this.router.navigate(['/doctor-schedule'], {
+    this.router.navigate(['/bpjs-registration'], {
       queryParams: {
         fromBpjs: true,
         fromRegistration: false

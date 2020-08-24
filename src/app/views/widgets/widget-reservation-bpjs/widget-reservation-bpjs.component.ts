@@ -23,6 +23,12 @@ export class WidgetReservationBpjsComponent implements OnInit {
   public alerts: Alert[] = [];
   public model: any = { speciality: '', doctor: '' };
   public specialities: Speciality[];
+  public fromBpjs: boolean = false;
+  public fromRegistration: boolean = false;
+  public patFromBpjs: any;
+  public bodyBpjs: any;
+  public consulType: string = null;
+  public keywords: any = {};
   public searchKeywords: any = {
     doctor: {},
     area: {},
@@ -41,6 +47,28 @@ export class WidgetReservationBpjsComponent implements OnInit {
   ) { }
 
   async ngOnInit() {
+    if (this.doctorService.searchDoctorSource2) {
+      if(this.doctorService.searchDoctorSource2.fromBpjs === true &&
+        this.doctorService.searchDoctorSource2.fromRegistration === false) { //from BPJS request list
+          localStorage.setItem('fromBPJS', JSON.stringify(this.doctorService.searchDoctorSource2));
+          this.bodyBpjs = this.doctorService.searchDoctorSource2;
+          this.fromBpjs = true;
+          this.fromRegistration = false;
+          this.patFromBpjs = this.doctorService.searchDoctorSource2.patientBpjs;
+          this.consulType = this.doctorService.searchDoctorSource2.consulType;
+  
+      } 
+      this.keywords = this.doctorService.searchDoctorSource2;
+    } else if(this.route.snapshot.queryParamMap.get('fromBpjs') === 'true' &&
+        this.route.snapshot.queryParamMap.get('fromRegistration') === 'false') {
+        this.bodyBpjs = JSON.parse(localStorage.getItem('fromBPJS'));
+        this.fromBpjs = true;
+        this.fromRegistration = false;
+        this.patFromBpjs = this.bodyBpjs.patientBpjs;
+        this.consulType = this.bodyBpjs.consulType;
+        this.keywords = this.bodyBpjs;
+    }
+
     await this.getListDoctor();
     await this.getSpecialities();
     await this.fromBack();
@@ -171,7 +199,90 @@ export class WidgetReservationBpjsComponent implements OnInit {
         speciality_name: speciality.speciality_name,
       },
       fromBpjs: true,
-      fromRegistration: true,
+      fromRegistration: false,
+      patientBpjs: this.bodyBpjs.patientBpjs,
+      consulType: consultationType.BPJS
+    };
+
+    const searchKey = {
+      type: 'spesialist',
+      speciality_id: speciality.speciality_id,
+      speciality_name: speciality.speciality_name,
+    };
+
+    localStorage.setItem('searchKey', JSON.stringify(searchKey));
+
+    this.doctorService.changeSearchDoctor(this.searchKeywords);
+    this.doctorService.searchDoctorSource2 = this.searchKeywords;
+
+    this.showSchedule = true;
+  }
+
+  searchScheduleBpjs1(item) {
+    this.model.speciality = '';
+
+    this.searchKeywords = {
+      doctor: {
+        doctor_id: item.doctor_id,
+        name: item.name
+      },
+      hospital: {
+        hospital_id: this.hospital.id,
+        name: this.hospital.name,
+      },
+      speciality: {
+        speciality_id: item.specialty_id,
+      },
+      fromBpjs: true,
+      fromRegistration: false,
+      patientBpjs: this.bodyBpjs.patientBpjs,
+      consulType: consultationType.BPJS
+    };
+
+    this.searchKeywords.doctor = {
+      doctor_id: item.doctor_id,
+      name: item.name
+    };
+
+    const searchKey = {
+      type: 'doctor',
+      doctor_id: item.doctor_id,
+      name: item.name
+    };
+
+    localStorage.setItem('searchKey', JSON.stringify(searchKey));
+
+    this.doctorService.changeSearchDoctor(this.searchKeywords);
+    this.doctorService.searchDoctorSource2 = this.searchKeywords;
+
+    this.showSchedule = true;
+  }
+
+  searchScheduleBpjs2() {
+    this.model.doctor = '';
+
+    const speciality = this.model.speciality;
+
+    this.searchKeywords = {
+      doctor: {
+        doctor_id: null,
+        name: null,
+      },
+      area: {
+        area_id: null,
+        name: null,
+      },
+      hospital: {
+        hospital_id: this.hospital.id,
+        name: this.hospital.name,
+      },
+      speciality: {
+        speciality_id: speciality.speciality_id,
+        speciality_name: speciality.speciality_name,
+      },
+      fromBpjs: true,
+      fromRegistration: false,
+      patientBpjs: this.bodyBpjs.patientBpjs,
       consulType: consultationType.BPJS
     };
 

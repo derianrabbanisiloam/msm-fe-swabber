@@ -1,29 +1,14 @@
-// export const environment = {
-//   production: false,
-//   ENVIRONMENT_NAME: 'Development',
-//   CALL_CENTER_SERVICE: 'http://10.85.139.13/msm-be-call-center-master/api/v2',
-//   OPADMIN_SERVICE: 'http://10.85.139.13/msm-be-opadmin-master/api/v2',
-//   FRONT_OFFICE_SERVICE: 'http://10.85.139.13/msm-be-front-office-master/api/v2',
-//   BPJS_SERVICE: 'http://10.85.139.13/msm-be-bpjs-master/api/v2',
-//   SSO_SERVICE: 'http://10.85.129.55:7500',
-//   WEB_SOCKET_SERVICE: 'http://10.85.139.12:8860',
-//   HIS_SERVICE: 'http://10.85.139.13/his-service-master',
-//   ASSET_PATH: 'https://gtn-dev-mysiloam-02.siloamhospitals.com/fo-assets/',
-//   UPLOAD_IMAGE: 'http://10.85.136.23:3333',
-//   GET_IMAGE_DISCLAIMER: 'http://10.85.136.23/dev/disclaimer_1/'
-// };
-
 export const environment = {
-  production: true,
-  ENVIRONMENT_NAME: '',
-  CALL_CENTER_SERVICE: 'http://gtn-mysiloam-api-02/callcenter/api/v2',
-  OPADMIN_SERVICE: 'http://gtn-mysiloam-api-01/opadmin/api/v2',
-  FRONT_OFFICE_SERVICE: 'http://gtn-mysiloam-api-02/frontoffice/api/v2',
-  BPJS_SERVICE: 'http://10.85.136.18/bpjs/api/v2',
-  SSO_SERVICE: 'http://10.85.129.91:8500',
-  WEB_SOCKET_SERVICE: 'http://gtn-mysiloam-websocket-01:7779',
-  HIS_SERVICE: 'http://10.85.136.17/his-get',
-  ASSET_PATH: 'https://gtn-mysiloam-01.siloamhospitals.com/fo-assets/',
-  UPLOAD_IMAGE: 'http://10.85.136.23:9999',
-  GET_IMAGE_DISCLAIMER: 'http://10.85.136.23/prod/disclaimer_1/'
+  production: false,
+  ENVIRONMENT_NAME: 'Development',
+  CALL_CENTER_SERVICE: 'http://10.85.139.13/msm-be-call-center-master/api/v2',
+  OPADMIN_SERVICE: 'http://10.85.139.13/msm-be-opadmin-master/api/v2',
+  FRONT_OFFICE_SERVICE: 'http://10.85.139.13/msm-be-front-office-master/api/v2',
+  BPJS_SERVICE: 'http://10.85.139.13/msm-be-bpjs-master/api/v2',
+  SSO_SERVICE: 'http://10.85.129.55:7500',
+  WEB_SOCKET_SERVICE: 'http://10.85.139.12:8860',
+  HIS_SERVICE: 'http://10.85.139.13/his-service-master',
+  ASSET_PATH: 'https://gtn-dev-mysiloam-02.siloamhospitals.com/fo-assets/',
+  UPLOAD_IMAGE: 'http://10.85.136.23:3333',
+  GET_IMAGE_DISCLAIMER: 'http://10.85.136.23/dev/disclaimer_1/'
 };

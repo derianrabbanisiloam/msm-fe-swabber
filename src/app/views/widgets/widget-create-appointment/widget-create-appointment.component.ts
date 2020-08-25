@@ -529,6 +529,7 @@ export class WidgetCreateAppointmentComponent implements OnInit {
         {
           schedule_id: this.schedule[k].schedule_id,
           doctor_type_name: this.schedule[k].doctor_type_name,
+          is_allow_waiting_list: this.schedule[k].is_allow_waiting_list,
           consultation_type_id: this.schedule[k].consultation_type_id,
           appointment: []
         }

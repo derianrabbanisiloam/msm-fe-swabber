@@ -320,7 +320,7 @@
 
     <!--                              Waiting List                                -->
     <div *ngIf="schArray.doctor_type_name !== doctorType.FCFS">
-      <div *ngIf="schArray.consultation_type_id != '4'">
+      <div *ngIf="schArray.consultation_type_id != '4' && schArray.is_allow_waiting_list == true">
         <div *ngFor="let appWait of appListWaiting">
           <div class="col-md-12" *ngIf="appWait.schedule_id === schArray.schedule_id">
             <p>Total Waiting List : <strong>{{appWait.appointment.length - 1}}</strong></p>

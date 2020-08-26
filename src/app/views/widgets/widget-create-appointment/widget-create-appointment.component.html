@@ -68,7 +68,7 @@
             <th *ngFor="let header of table1Header">{{header}}</th>
           </tr>
         </thead>
-        <tbody *ngIf="schArray.consultation_type_id != 4 && !fromBpjs">
+        <tbody *ngIf="schArray.consultation_type_id != 4 && schArray.consultation_type_id != 6 && !fromBpjs">
           <tr *ngFor="let app of schArray.appointment; let i=index"
             [ngClass]="{'cc_row_rescheduled': app.is_blocked == true || isOpen == false && app.is_walkin == true }">
             <td class="st-kolom-time">{{app.appointment_range_time}}</td>
@@ -119,35 +119,61 @@
               <a ngbPopover="{{app.modified_name}}" popoverTitle=""
                 triggers="mouseenter:mouseleave">{{app.modified_name && app.modified_name.length > 10 ? app.modified_name.substr(0,10)+"..." : app.modified_name}}</a>
             </td>
-            <td class="st-kolom-button">
-              <div *ngIf="!app.appointment_temp_id">
-                <div *ngIf="app.is_can_cancel && isOriginal && !app.admission_id"
-                  class="cell-img-nav d-flex justify-content-center">
-                  <div *ngIf="isOpen" (click)="checkInAppointment(app, confirmCheckIn)">
-                    <img src="{{assetPath}}icons/ic_Check@2x.png">
+            <td>
+              <div *ngIf="app.channel_id != aidoChannel">
+                <div *ngIf="!app.appointment_temp_id">
+                  <div *ngIf="app.is_can_cancel && isOriginal && !app.admission_id"
+                    class="cell-img-nav d-flex justify-content-center">
+                    <div *ngIf="isOpen" (click)="checkInAppointment(app, confirmCheckIn)">
+                      <img src="{{assetPath}}icons/ic_Check@2x.png">
+                    </div>
+                    <span style="opacity: 0; max-width: 0.5em; overflow: hidden">filler</span>
+                    <div (click)="confirmCancelAppointment(app.appointment_id)">
+                      <img src="{{assetPath}}icons/ic_Cancel@2x.png">
+                    </div>
                   </div>
-                  <span style="opacity: 0; max-width: 0.5em; overflow: hidden">filler</span>
-                  <div (click)="confirmCancelAppointment(app.appointment_id)">
-                    <img src="{{assetPath}}icons/ic_Cancel@2x.png">
+  
+                  <div *ngIf="app.is_can_cancel && isOriginal && app.admission_id"
+                    class="cell-img-nav d-flex justify-content-center">
+                    <span class="badge badge-success">Checked in</span>
                   </div>
                 </div>
-
-                <div *ngIf="app.is_can_cancel && isOriginal && app.admission_id"
-                  class="cell-img-nav d-flex justify-content-center">
-                  <span class="badge badge-success">Checked in</span>
+  
+                <div *ngIf="app.appointment_temp_id">
+                  <button (click)="verifyAppointment(app.appointment_temp_id)" class="btn ms_btn_green">Verify</button>
+                  <span class="filler-05"></span>
+                  <button (click)="confirmCancelAppointment(app.appointment_temp_id, true)"
+                    class="btn ms_btn_red">Cancel</button>
                 </div>
               </div>
 
-              <div *ngIf="app.appointment_temp_id">
-                <button (click)="verifyAppointment(app.appointment_temp_id)" class="btn ms_btn_green">Verify</button>
-                <span class="filler-05"></span>
-                <button (click)="confirmCancelAppointment(app.appointment_temp_id, true)"
-                  class="btn ms_btn_red">Cancel</button>
+              <!-- button action for teleconsultation -->
+              <div *ngIf="app.channel_id == aidoChannel" style="width: 4em;">
+                <div *ngIf="app.payment_status_id === payStatusId.UNPAID">
+                  <span class="flag-payment">Waiting Payment</span>
+                </div>
+                <div *ngIf="app.admission_status_id != 2 && app.appointment_status_id !== appStatusId.INACTIVE && app.payment_status_id === payStatusId.PAID">
+                  <div *ngIf="app.patient_hope_id && app.patient_organization_id && app.is_double_mr === false">
+                    <button (click)="createAdmModal(app, confirmAdmission)" class="btn ms_btn_green" style="font-size: 11px;">Check In</button>
+                  </div>
+                  <div *ngIf="app.patient_hope_id && !app.patient_organization_id && app.is_double_mr === false">
+                    <button (click)="createMrModal(app, confirmCreateMr)" class="btn ms_btn_black" style="font-size: 11px;">Create MR</button>
+                  </div>
+                  <div *ngIf="(!app.patient_hope_id && !app.patient_organization_id && app.is_double_mr === true)
+                  || (app.patient_hope_id && !app.patient_organization_id && app.is_double_mr === true)
+                  || (!app.patient_hope_id && !app.patient_organization_id && app.is_double_mr === false)">
+                    <button (click)="verifyAppointmentTele(app)" class="btn ms_btn_blue" style="font-size: 10px;">Verify MR</button>
+                  </div>
+                </div>
+
+                <div *ngIf="app.admission_status_id == 2" class="cell-img-nav d-flex justify-content-center">
+                  <span class="badge badge-success set-position">Checked in</span>
+                </div>
               </div>
+              <!-- button action for teleconsultation -->
             </td>
           </tr>
         </tbody>
-
         <tbody *ngIf="schArray.consultation_type_id != 4 && fromBpjs">
           <tr *ngFor="let app of schArray.appointment; let i=index"
             [ngClass]="{'cc_row_rescheduled': app.is_blocked == true || isOpen == false && app.is_walkin == true }">
@@ -216,7 +242,6 @@
             <td *ngIf="app.is_can_create && isOriginal && isOpen == true" class="st-kolom-available"
               (click)="openCreateAppModal(app)"><a>Available</a></td>
             <td *ngIf="app.is_can_create && isOriginal && isOpen == false" class="st-kolom-available">Available</td>
-
             <td *ngIf="app.is_can_create && !isOriginal && isOpen == true" class="st-kolom-available"
               (click)="openCreateAppModal2(app)"><a>Available</a></td>
             <td *ngIf="app.is_can_create && !isOriginal && isOpen == false" class="st-kolom-available">Available</td>
@@ -290,6 +315,104 @@
                 </div>
 
                 <div *ngIf="app.admission_status_id == 2" class="cell-img-nav d-flex justify-content-center">
+                  <span class="badge badge-success set-position">Checked in</span>
+                </div>
+              </div>
+              <!-- button action for teleconsultation -->
+            </td>
+          </tr>
+        </tbody>
+        <tbody *ngIf="schArray.consultation_type_id == 6">
+          <tr *ngFor="let app of schArray.appointment; let i=index"
+            [ngClass]="{'cc_row_rescheduled': app.is_blocked == true || isOpen == false && app.is_walkin == true }">
+            <td class="st-kolom-time">{{app.appointment_range_time}}</td>
+            <td>{{app.no}}</td>
+            <td *ngIf="app.is_can_create && isOriginal && app.is_walkin == false" class="st-kolom-available"
+              (click)="openCreateAppModal(app)"><a>Available</a></td>
+            <td *ngIf="app.is_can_create && isOriginal && app.is_walkin == true && isOpen == true"
+              class="st-kolom-available" (click)="openCreateAppModal(app)"><a>Available/Walk In Slot</a></td>
+            <td *ngIf="app.is_can_create && isOriginal && app.is_walkin == true && isOpen == false"
+              class="st-kolom-available">
+              <span style="color:red;font-weight:bold">Not Yet Opened</span>
+            </td>
+            <td *ngIf="app.is_can_create && !isOriginal && app.is_walkin == false" class="st-kolom-available"
+              (click)="openCreateAppModal2(app)"><a>Available</a></td>
+            <td *ngIf="app.is_can_create && !isOriginal && app.is_walkin == true && isOpen == true"
+              class="st-kolom-available" (click)="openCreateAppModal2(app)"><a>Available/Walk In Slot</a></td>
+            <td *ngIf="app.is_can_create && !isOriginal && app.is_walkin == true && isOpen == false"
+              class="st-kolom-available">
+              <span style="color:red;font-weight:bold">Not Yet Opened</span>
+            </td>
+            <td *ngIf="!app.is_can_create">
+              {{app.patient_name}}
+              <span *ngIf="app.appointment_temp_id" class="newPatientIcon">
+                <span>
+                  Tentative
+                  <span>
+                    Please verify this patient first
+                  </span>
+                </span>
+              </span>
+            </td>
+            <td>{{app.date_of_birth}}</td>
+            <td>{{app.local_mr_no}}</td>
+            <td>{{app.phone_no}}</td>
+            <td>{{app.queue_no}}</td>
+            <td>
+              <a ngbPopover="{{app.note_long}}" popoverTitle="" triggers="mouseenter:mouseleave">{{app.note_short}}</a>
+            </td>
+            <td>
+              <a ngbPopover="{{app.modified_name}}" popoverTitle=""
+                triggers="mouseenter:mouseleave">{{app.modified_name && app.modified_name.length > 10 ? app.modified_name.substr(0,10)+"..." : app.modified_name}}</a>
+            </td>
+            <td>
+              <div *ngIf="app.channel_id != aidoChannel">
+                <div *ngIf="!app.appointment_temp_id">
+                  <div *ngIf="app.is_can_cancel && isOriginal && !app.admission_id"
+                    class="cell-img-nav d-flex justify-content-center">
+                    <div *ngIf="isOpen" (click)="checkInAppointment(app, confirmCheckIn)">
+                      <img src="{{assetPath}}icons/ic_Check@2x.png">
+                    </div>
+                    <span style="opacity: 0; max-width: 0.5em; overflow: hidden">filler</span>
+                    <div (click)="confirmCancelAppointment(app.appointment_id)">
+                      <img src="{{assetPath}}icons/ic_Cancel@2x.png">
+                    </div>
+                  </div>
+  
+                  <div *ngIf="app.is_can_cancel && isOriginal && app.admission_id"
+                    class="cell-img-nav d-flex justify-content-center">
+                    <span class="badge badge-success">Checked in</span>
+                  </div>
+                </div>
+  
+                <div *ngIf="app.appointment_temp_id">
+                  <button (click)="verifyAppointment(app.appointment_temp_id)" class="btn ms_btn_green">Verify</button>
+                  <span class="filler-05"></span>
+                  <button (click)="confirmCancelAppointment(app.appointment_temp_id, true)"
+                    class="btn ms_btn_red">Cancel</button>
+                </div>
+              </div>
+
+              <!-- button action for teleconsultation -->
+              <div *ngIf="app.channel_id == aidoChannel" style="width: 4em;">
+                <div *ngIf="app.payment_status_id === payStatusId.UNPAID">
+                  <span class="flag-payment">Waiting Payment</span>
+                </div>
+                <div *ngIf="app.admission_status_id != 2 && app.appointment_status_id !== appStatusId.INACTIVE && app.payment_status_id === payStatusId.PAID">
+                  <div *ngIf="app.patient_hope_id && app.patient_organization_id && app.is_double_mr === false">
+                    <button (click)="createAdmModal(app, confirmAdmission)" class="btn ms_btn_green" style="font-size: 11px;">Check In</button>
+                  </div>
+                  <div *ngIf="app.patient_hope_id && !app.patient_organization_id && app.is_double_mr === false">
+                    <button (click)="createMrModal(app, confirmCreateMr)" class="btn ms_btn_black" style="font-size: 11px;">Create MR</button>
+                  </div>
+                  <div *ngIf="(!app.patient_hope_id && !app.patient_organization_id && app.is_double_mr === true)
+                  || (app.patient_hope_id && !app.patient_organization_id && app.is_double_mr === true)
+                  || (!app.patient_hope_id && !app.patient_organization_id && app.is_double_mr === false)">
+                    <button (click)="verifyAppointmentTele(app)" class="btn ms_btn_blue" style="font-size: 10px;">Verify MR</button>
+                  </div>
+                </div>
+
+                <div *ngIf="app.admission_status_id == 2" class="cell-img-nav d-flex justify-content-center">
                   <span class="badge badge-success">Checked in</span>
                 </div>
               </div>
@@ -302,7 +425,7 @@
 
     <!--                              Waiting List                                -->
     <div *ngIf="schArray.doctor_type_name !== doctorType.FCFS && fromBpjs === false && reschBpjs == false">
-      <div *ngIf="schArray.consultation_type_id != '4'">
+      <div *ngIf="schArray.consultation_type_id != '4' && schArray.is_allow_waiting_list == true">
         <div *ngFor="let appWait of appListWaiting">
           <div class="col-md-12" *ngIf="appWait.schedule_id === schArray.schedule_id">
             <p>Total Waiting List : <strong>{{appWait.appointment.length - 1}}</strong></p>

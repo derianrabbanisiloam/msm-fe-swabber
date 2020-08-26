@@ -130,6 +130,24 @@ export class AppointmentService {
     return this.http.get<any>(url, httpOptions);
   }
 
+  getRescheduleWorklistAido(
+    hospitalId: string,
+    fromDate: string,
+    toDate: string,
+    name?: string,
+    doctor?: string,
+    offset?: number,
+    limit?: number
+  ): Observable<any> {
+    let url = `${this.rescheduleUrl}/aido?hospitalId=${hospitalId}&from=${fromDate}&to=${toDate}`;
+    url = name ? `${url}&patientName=${name}` : url;
+    url = doctor ? `${url}&doctorId=${doctor}` : url;
+    url = `${url}&limit=${limit}&offset=${offset}`;
+    
+    // return of(APPOINTMENT)
+    return this.http.get<any>(url, httpOptions);
+  }
+
   getAidoWorklist(
     hospitalId: string,
     fromDate: string,
@@ -138,6 +156,7 @@ export class AppointmentService {
     doctor?: string,
     isDoubleMr?: boolean,
     admStatus?: string,
+    payStatus?: string,
     offset?: number,
     limit?: number
   ): Observable<any> {
@@ -146,6 +165,7 @@ export class AppointmentService {
     url = doctor ? `${url}&doctorId=${doctor}` : url;
     url = isDoubleMr ? `${url}&isDoubleMr=${isDoubleMr}` : url;
     url = admStatus ? `${url}&admStatus=${admStatus}` : url;
+    url = payStatus ? `${url}&paymentStatus=${payStatus}` : url;
     url = `${url}&limit=${limit}&offset=${offset}`;
     
     // return of(APPOINTMENT)
@@ -156,15 +176,21 @@ export class AppointmentService {
     return this.http.post<any>(this.rescheduleUrl, addReschedulePayload, httpOptions);
   }
 
-  deleteAppointment(appointmentId: string, payload: any, temp = false) {
+  deleteAppointment(appointmentId: string, payload: any, temp = false, isAido = false) {
     let url = `${this.ccAppointmentUrl}`;
+
+    if(isAido){
+      url = `${url}/aido/${appointmentId}`;
+    }
 
     if(temp){
       url = `${url}/temporary/${appointmentId}`;
-    }else{
-      url = `${url}/${appointmentId}`
     }
 
+    if(!temp && !isAido){
+      url = `${url}/${appointmentId}`
+    }
+    
     const body = JSON.stringify(payload);
     
     const options = {
@@ -178,6 +204,13 @@ export class AppointmentService {
   getAppointmentByScheduleId(scheduleId: string, date: string, sortBy?: string, orderBy?: string): Observable<any> {
     const url = `${this.ccAppointmentUrl}?scheduleId=${scheduleId}&date=${date}&sortBy=${sortBy}&orderBy=${orderBy}`;
     // return of(APPOINTMENT);
+    return this.http.get<any>(url, httpOptions);
+  }
+
+  getAppointmentByDay(hospitalId: string, doctorId: string, date: string, sortBy?: string, orderBy?: string, isBpjs?: string, exclude?: boolean): Observable<any> {
+    let url = `${this.ccAppointmentUrl}?hospitalId=${hospitalId}&doctorId=${doctorId}&date=${date}&sortBy=${sortBy}&orderBy=${orderBy}`;
+    url = isBpjs ? `${url}&channelId=${isBpjs}` : url;
+    url =`${url}&exclude=${exclude}`;
     return this.http.get<any>(url, httpOptions);
   }
 

@@ -92,7 +92,22 @@ export const formatFile = {
   pdf: 'pdf'
 }
 
+export const consultationType = {
+  REGULAR: '1',
+  BPJS: '2',
+  EXECUTIVE: '3',
+  TELECONSULTATION: '4',
+  BPJS_REGULER: '5',
+  NON_BPJS_TELE: '6'
+}
+
 export const activityType = {
   LINKED_TO_MR: '1',
   OPEN_ACCESS_MR: '2',
+};
+
+export const paymentStatus = {
+  PAID: '1',
+  UNPAID: '2',
+  NOTPAID: '3',
 };

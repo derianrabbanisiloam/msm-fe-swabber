@@ -1,8 +1,10 @@
-<div class="shadow-4 fo_container" style="width: 100%; padding-bottom: 12px">
+<div class="shadow-4 fo_container" style="width: 150%; padding-bottom: 12px">
   <table class="" style="width: 100%">
     <thead>
       <tr>
         <th width="300px">Doctor</th>
+        <th>Speciality</th>
+        <th>Consultation Type</th>
         <th>Quota / Hour</th>
         <th>Reservation</th>
         <th>Walk In</th>
@@ -18,12 +20,17 @@
         </td>
         <td></td>
         <td></td>
+        <td></td>
+        <td></td>
       </tr>
     </tbody>
 
     <tbody id="quota-list-1" class="quota-list">
       <tr *ngFor="let item of pagedItems">
         <td>{{item.name}}</td>
+        <td>{{item.specialization_name}}</td>
+        <td *ngIf="item.quota_type_id === '1'">Regular</td>
+        <td *ngIf="item.quota_type_id === '2'">Teleconsultation</td>
         <td>{{item.quota}}</td>
         <td>{{item.reservation}}</td>
         <td>{{item.walkin}}</td>

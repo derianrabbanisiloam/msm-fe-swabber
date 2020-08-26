@@ -8,6 +8,7 @@ import * as moment from 'moment';
 import { IMyDpOptions } from 'mydatepicker';
 import { isEmpty } from 'lodash';
 import { environment } from '../../../../environments/environment';
+import { consultationType as conType } from '../../../variables/common.variable';
 
 @Component({
   selector: 'app-widget-doctor-schedule',
@@ -58,6 +59,9 @@ export class WidgetDoctorScheduleComponent implements OnInit {
     width: '150px',
     showInputField: true,
   };
+  public consulType: string = null;
+  public consulTypeFlag: number;
+  public flagCon: number;
 
   constructor(
     private doctorService: DoctorService,
@@ -89,6 +93,12 @@ export class WidgetDoctorScheduleComponent implements OnInit {
     this.initForeignSource();
   }
 
+  async getScheduleByConsType() {
+    await this.getLeaveHeader(this.keywords);
+    await this.generateDates(this.initDate);
+    await this.getSchedulesLogic(this.keywords);
+  }
+
   initForeignSource() {
     const id = this.activatedRoute.snapshot.queryParamMap.get('doctor_id');
     const name = this.activatedRoute.snapshot.queryParamMap.get('doctor_name');
@@ -113,11 +123,33 @@ export class WidgetDoctorScheduleComponent implements OnInit {
     const areaId = keywords.area ? keywords.area.area_id : null;
     const hospitalId = keywords.hospital ? keywords.hospital.hospital_id : null;
     const specialityId = keywords.speciality ? keywords.speciality.speciality_id : null;
+    const consulTypeAll = conType.REGULAR+':'+conType.EXECUTIVE+':'
+      +conType.TELECONSULTATION+':'+conType.BPJS_REGULER+':'+conType.NON_BPJS_TELE;
+    let consultationType = this.consulType ? this.consulType : consulTypeAll;
+
     this.isOriginal = keywords.original != undefined ? keywords.original : true;
     if (doctorId) {
-      this.getSchedulesByDoctor(doctorId, this.initDate);
+      this.consulTypeFlag = 1; //reset <select> function
+      if(!this.flagCon) this.flagCon = this.consulTypeFlag;
+      else {
+        if(this.flagCon !== this.consulTypeFlag) {
+          this.flagCon = this.consulTypeFlag;
+          consultationType = null;
+          this.consulType = null;
+        }
+      }
+      this.getSchedulesByDoctor(doctorId, this.initDate, consultationType);
     } else if ((areaId || hospitalId) && specialityId) {
-      this.getSchedulesByKeywords(specialityId, this.initDate, areaId, hospitalId);
+      this.consulTypeFlag = 2; //reset <select> function
+      if(!this.flagCon) this.flagCon = this.consulTypeFlag;
+      else {
+        if(this.flagCon !== this.consulTypeFlag) {
+          this.flagCon = this.consulTypeFlag;
+          consultationType = null;
+          this.consulType = null;
+        }
+      }
+      this.getSchedulesByKeywords(specialityId, this.initDate, consultationType, areaId, hospitalId);
     }
   }
 
@@ -146,8 +178,8 @@ export class WidgetDoctorScheduleComponent implements OnInit {
     }
   }
 
-  getSchedulesByDoctor(doctorId: string, date: string) {
-    this.doctorService.getScheduleByDoctorId(doctorId, date, this.hospital.id)
+  getSchedulesByDoctor(doctorId: string, date: string, consultationType: string) {
+    this.doctorService.getScheduleByDoctorId(doctorId, date, this.hospital.id, consultationType)
       .subscribe(data => {
         this.doctorSchedules1 = data.data;
         if (this.doctorSchedules1.length > 0) {
@@ -163,8 +195,8 @@ export class WidgetDoctorScheduleComponent implements OnInit {
       });
   }
 
-  getSchedulesByKeywords(specialityId: string, date: string, areaId?: string, hospitalId?: string) {
-    this.doctorService.getScheduleByKeywords(specialityId, date, areaId, hospitalId)
+  getSchedulesByKeywords(specialityId: string, date: string, consultationType: string, areaId?: string, hospitalId?: string) {
+    this.doctorService.getScheduleByKeywords(specialityId, date, areaId, hospitalId, consultationType)
       .subscribe(data => {
         this.doctorSchedules2 = data.data;
         if (this.doctorSchedules2.length > 0) {
@@ -249,7 +281,7 @@ export class WidgetDoctorScheduleComponent implements OnInit {
   gotoCreateApp(item: any, date: string) {
     this.router.navigate(['/create-appointment'], {
       queryParams: {
-        id: item.schedule_id,
+        doctorId: item.doctor_id,
         date: date
       }
     });
@@ -263,7 +295,7 @@ export class WidgetDoctorScheduleComponent implements OnInit {
   gotoCreateApp3(item: any, date: string) {
     this.router.navigate(['/create-appointment-271095'], {
       queryParams: {
-        id: item.schedule_id,
+        doctorId: item.doctor_id,
         date: date
       }
     });

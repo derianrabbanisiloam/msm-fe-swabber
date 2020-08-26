@@ -1,3 +1,36 @@
+.set-position {
+  margin-left: 3em;
+}
+
+.flag-payment {
+  background-color: darkblue; 
+  color: white; 
+  border-radius: 5px; 
+  padding: 0.2em; 
+  font-weight: bold; 
+  font-size: 11px; 
+  margin-left: 0.5em;
+  margin-right: 0.5em;
+}
+
+.flag-tele {
+  background-color: #6767ff; 
+  color: white; 
+  border-radius: 5px; 
+  padding: 0.2em; 
+  font-weight: bold; 
+  font-size: 14px; 
+  padding-left: 1em; 
+  padding-right: 1em;
+  margin-left: 2em;
+  margin-right: 2em;
+}
+
+hr.line-border {
+  border-top: 10px solid silver;
+  border-radius: 3px;
+}
+
 .content-appointment-01-group-row {
   padding: 0 15px;
   /*width: 800px;*/

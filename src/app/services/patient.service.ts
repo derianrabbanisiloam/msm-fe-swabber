@@ -26,6 +26,7 @@ export class PatientService {
   private patientHopeDetailUrl = environment.HIS_SERVICE + '/patient';
 
   private uploadImageUrl = environment.UPLOAD_IMAGE + '/pdf-upload';
+  private uploadDocBpjsUrl = environment.UPLOAD_IMAGE + '/bpjs/';
 
   private searchPatientHopeSource = new Subject<any>();
   public searchPatientHopeSource$ = this.searchPatientHopeSource.asObservable();
@@ -59,6 +60,11 @@ export class PatientService {
 
   uploadImage(formData: any) {
     const url = `${this.uploadImageUrl}`;
+    return this.http.post<any>(url, formData);
+  }
+
+  uploadDocBpjs(formData: any) {
+    const url = `${this.uploadDocBpjsUrl}`;
     return this.http.post<any>(url, formData);
   }
 

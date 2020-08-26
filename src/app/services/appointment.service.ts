@@ -21,6 +21,7 @@ export class AppointmentService {
   private rescheduleUrl = environment.CALL_CENTER_SERVICE + '/appointments/reschedules';
   private reserveSlotAppUrl = environment.CALL_CENTER_SERVICE + '/appointments/reserved-slot';
   private appointmentRescheduleCount = environment.CALL_CENTER_SERVICE + '/appointments/reschedules/count';
+  private appointmentRescheduleAidoCount = environment.CALL_CENTER_SERVICE + '/appointments/reschedules/count/aido';
   private aidoWorklistUrl = environment.CALL_CENTER_SERVICE + '/appointments/aido';
 
   private rescheduleAppSource = new Subject<any>();
@@ -58,6 +59,13 @@ export class AppointmentService {
     return this.http.put<any>(url, body, httpOptions);
   }
 
+  updateAppBpjs(appointmentId: any, payload: any): Observable<any> {
+    const url = `${this.ccAppointmentUrl}/${appointmentId}`;
+    const body = JSON.stringify(payload);
+    
+    return this.http.put<any>(url, body, httpOptions);
+  }
+
   getConfirmRescheduleTemp(appTemp: string) {
     const url = `${this.rescheduleUrl}/confirm?appointmentTemporaryId=${appTemp}`;
     return this.http.get<any>(url, httpOptions);
@@ -71,22 +79,32 @@ export class AppointmentService {
     const url = `${this.ccAppointmentUrl}/history/${appointment}`;
     return this.http.get<any>(url, httpOptions);
   }
-  getCountAppReschedule(hospital: string) {
-    const url = `${this.appointmentRescheduleCount}?hospitalId=${hospital}`;
+  getCountAppReschedule(hospital: string, channel?: string, exclude?: boolean) {
+    let url = `${this.appointmentRescheduleCount}?hospitalId=${hospital}`;
+    url = channel ? `${url}&channelId=${channel}` : url;
+    url =`${url}&exclude=${exclude}`;
+    return this.http.get<any>(url, httpOptions);
+  }
+
+  getCountAppRescheduleAido(hospital: string) {
+    let url = `${this.appointmentRescheduleAidoCount}?hospitalId=${hospital}`;
     return this.http.get<any>(url, httpOptions);
   }
 
   getListAppointment(date: any, hospital: string, name?: string, birth?: any, mr?: any, doctor?: string,
-     modifiedName?: string, isWaitingList?: boolean, limit?: number, offset?: number): Observable<any> {
+     modifiedName?: string, isWaitingList?: boolean, limit?: number, offset?: number, channel?: string,
+     exclude?: boolean): Observable<any> {
 
     let uri = `/hospital/${hospital}?date=${date}`;
-
+    
     uri = name ? `${uri}&name=${name}` : uri;
     uri = birth ? `${uri}&birth=${birth}` : uri;
     uri = mr ? `${uri}&mr=${mr}` : uri;
     uri = doctor ? `${uri}&doctor=${doctor}` : uri;
     uri = modifiedName ? `${uri}&modifiedName=${modifiedName}` : uri;
     uri = isWaitingList ? `${uri}&isWaitingList=${isWaitingList}` : uri;
+    uri = channel ? `${uri}&channelId=${channel}` : uri;
+    uri =`${uri}&exclude=${exclude}`;
 
     const url = `${uri}&limit=${limit}&offset=${offset}`;
 
@@ -119,9 +137,30 @@ export class AppointmentService {
     name?: string,
     doctor?: string,
     offset?: number,
-    limit?: number
+    limit?: number,
+    channel?: string,
+    exclude?: boolean
   ): Observable<any> {
     let url = `${this.rescheduleUrl}?hospitalId=${hospitalId}&from=${fromDate}&to=${toDate}`;
+    url = name ? `${url}&patientName=${name}` : url;
+    url = doctor ? `${url}&doctorId=${doctor}` : url;
+    url = `${url}&limit=${limit}&offset=${offset}`;
+    url = channel ? `${url}&channelId=${channel}` : url;
+    url =`${url}&exclude=${exclude}`;
+    // return of(APPOINTMENT)
+    return this.http.get<any>(url, httpOptions);
+  }
+
+  getRescheduleWorklistAido(
+    hospitalId: string,
+    fromDate: string,
+    toDate: string,
+    name?: string,
+    doctor?: string,
+    offset?: number,
+    limit?: number
+  ): Observable<any> {
+    let url = `${this.rescheduleUrl}/aido?hospitalId=${hospitalId}&from=${fromDate}&to=${toDate}`;
     url = name ? `${url}&patientName=${name}` : url;
     url = doctor ? `${url}&doctorId=${doctor}` : url;
     url = `${url}&limit=${limit}&offset=${offset}`;

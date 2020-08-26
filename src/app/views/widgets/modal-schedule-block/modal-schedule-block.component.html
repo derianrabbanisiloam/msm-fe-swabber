@@ -80,7 +80,7 @@
           <label style="display: block; text-align: center;">Include Teleconsult</label>
           <input [disabled]="!scheduleSel" class="form-control custom-checkbox" type="checkbox" name="isRescheduleTeleconsultation" (change)="blockCheckBoxTwo($event)" [(ngModel)]="blockModel.isRescheduleTeleconsultation">
         </div>
-        
+      
         <div class="form-group col-md-2">
           <button [disabled]="!isValidBlock || !b.form.valid" (click)="addScheduleBlock()" class="btn btn-green">Add Block</button>
         </div>

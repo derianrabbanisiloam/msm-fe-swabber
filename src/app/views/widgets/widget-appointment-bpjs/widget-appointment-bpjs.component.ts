@@ -188,7 +188,9 @@ export class WidgetAppointmentBpjsComponent implements OnInit {
       fromDate,
       toDate,
       patientName,
-      doctorId,
+      null,
+      null,
+      null,
       offset,
       limit
     ).subscribe(

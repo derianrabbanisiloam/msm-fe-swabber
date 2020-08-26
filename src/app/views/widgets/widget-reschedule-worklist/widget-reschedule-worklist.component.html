@@ -13,9 +13,11 @@
   <div style="margin-bottom: 1em;">
     <div class="container-appointment-input">
       <button class="btn fo_btn_white" [ngClass]="{'fo_btn_active': isWorklist}" 
-      (click)="rescheduleWorklistButton('worklist')" style="margin-right: 2em;">Reschedule Worklist</button>
+      (click)="rescheduleWorklistButton('worklist')" style="margin-right: 2em;">Reschedule Worklist <span class="roundNumber">{{countAppRes}}</span></button>
       <button class="btn fo_btn_white" [ngClass]="{'fo_btn_active': isAido}"
-      (click)="rescheduleWorklistButton('aido')">Reschedule Worklist - Teleconsultation</button>
+      (click)="rescheduleWorklistButton('aido')" style="margin-right: 2em;">Reschedule Worklist - Tele <span class="roundNumber">{{countAppResAido}}</span></button>
+      <button class="btn fo_btn_white" [ngClass]="{'fo_btn_active': isBpjs}"
+      (click)="rescheduleWorklistButton('bpjs')">Reschedule Worklist - BPJS <span class="roundNumber">{{countAppResBpjs}}</span></button>
     </div>
   </div>
 
@@ -280,6 +282,94 @@
         Next <img src="{{assetPath}}icons/ic_ArrowLeft_White.png">
       </button>
     </section>
+  </div>
+  <div class="reschedule-worklist" *ngIf="isBpjs">
+    <div class="ms_container ms_shadow_4" id="tutorial_reschedule_table">
+      <table class="table">
+        <thead>
+          <tr>
+            <th class="header-2" colspan="9" style="padding: 0.5vw 1.5vw">Reschedule Worklist</th>
+          </tr>
+          <tr>
+            <th>Patient Name</th>
+            <th width="100px">MR No.</th>
+            <th>Date of Birth</th>
+            <th width="100px" style="white-space: nowrap">App Date</th>
+            <th>Time Slot</th>
+            <th>Doctor</th>
+            <th>Hospital</th>
+            <th>Phone Number</th>
+            <th>Note</th>
+          </tr>
+        </thead>
+
+        <tbody>
+
+          <tr>
+            <td>
+              <div class="inner-addon right-addon">
+                <input type="text" class="form-control filter-input filter" placeholder="Filter by name"
+                  [(ngModel)]="keywordsModel.patientName" (change)="getRescheduleWorklistBpjs()" />
+              </div>
+            </td>
+            <td></td>
+            <td></td>
+            <td></td>
+            <td></td>
+            <td style="white-space: nowrap">
+              <div class="tab-pane fade show active" id="doctor-pane" role="tabpanel" aria-labelledby="home-tab">
+                <div class="form-group">
+                  <div class="ng-autocomplete" class="angular-autocomplete">
+                    <ng-autocomplete placeHolder="Search Doctor..." [data]="doctors" searchKeyword="name"
+                      (selected)='getRescheduleWorklistBpjs($event)' [itemTemplate]="itemTemplateDoctor"
+                      [notFoundTemplate]="notFoundTemplate">
+                    </ng-autocomplete>
+
+                    <ng-template #itemTemplateDoctor let-item>
+                      <a [innerHTML]="item.name"></a>
+                    </ng-template>
+
+                    <ng-template #notFoundTemplate let-notFound>
+                      <div [innerHTML]="notFound"></div>
+                    </ng-template>
+                  </div>
+                </div>
+              </div>
+            </td>
+            <td></td>
+            <td></td>
+            <td></td>
+          </tr>
+
+          <tr *ngFor="let r of rescheduledAppointmentsBpjs; let i = index">
+            <td>
+              <a href="javascript:void(0)" (click)="openRescheduleBpjsModal(r)">
+                {{r.patient_name != null ? r.patient_name.substr(0,30) : ''}}</a>
+            </td>
+            <td>{{ r.medical_record_number }}</td>
+            <td>{{ r.birth_date }}</td>
+            <td style="white-space: nowrap">{{ r.appointment_date }}</td>
+            <td>{{ r.appointment_from_time }} - {{ r.appointment_to_time }}</td>
+            <td>{{ r.doctor_name }}</td>
+            <td>{{ r.hospital_alias }}</td>
+            <td>{{ r.phone_number_1 }}</td>
+            <td><a ngbPopover="{{r.note}}" popoverTitle=""
+                triggers="mouseenter:mouseleave">{{r.note && r.note.length > 30 ? r.note.substr(0,30)+"..." : r.note}}</a>
+            </td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+
+    <div class="pagination-bottom">
+      <button *ngIf="isCanPrevPageBpjs" (click)="prevPageBpjs()" class="btn ms_btn_blue">
+        <img src="{{assetPath}}icons/ic_ArrowRight_White.png"> Prev
+      </button>
+      <span style="width:10px">&nbsp;</span>
+      <button *ngIf="isCanNextPageBpjs" (click)="nextPageBpjs()" class="btn ms_btn_blue">
+        Next <img src="{{assetPath}}icons/ic_ArrowLeft_White.png">
+      </button>
+    </div>
   </div>
   
 </div>

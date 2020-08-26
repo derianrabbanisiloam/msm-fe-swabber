@@ -1,0 +1,129 @@
+:host(app-widget-appointment-list-bpjs) { width:100% }
+.fo_appointment_date{ width: 15%;}
+.fo_container_input_date{ margin-bottom: 2rem}
+.fo_container_input_date input { width: 200px}
+.fo_container_list{ background: white; border: none; border-radius: 4px;}
+.fo_header_grey{ background: #F4F4F4}
+.fo_color_blue{ color: #1A2269;}
+thead th a{ color: #1A2269; text-decoration: none}
+.row-pink{background: #FFD4D1;}
+.row-orange{background: #FFE17C;}
+
+.ms_btn_blue_module{ 
+  background: dodgerblue; 
+  color: white;
+  border-radius: 5px;
+  width: 7em;
+}
+
+.space-text {
+  margin-bottom: 1.5em;
+}
+
+.space-text-two {
+  margin-bottom: 2.4em;
+}
+
+::ng-deep .fo_modal_admission_3 .modal-dialog {
+  width: 45em;
+}
+
+.fo_row_patient_list span{ border-radius: 8px; border: none}
+::ng-deep ngb-progressbar .progress .progress-bar{ background-color: #4D9B35 !important; color: white!important;}
+
+.fo_confirmation_button.justify-content-center button{
+  margin: 2rem 1rem;
+  width: 9rem; height: 2.7rem;
+}
+.modal-body p { text-align: center}
+::ng-deep .fo_modal_confirmation .modal-dialog{
+  max-width: 30%;
+  margin: 10rem auto;
+}
+::ng-deep .fo_modal_confirmation .modal-body div {
+  text-align: center;
+}
+::ng-deep .modal-header{
+  padding: 16px;
+}
+::ng-deep .modal-body{
+ padding: 16px;
+}
+.fo_create_admission_body > div > div > div:not(:last-child) {
+  margin-right: 14px;
+}
+.fo_create_admission_body > div { padding: 9px 0px}
+.fo_create_admission_body > div:last-child{
+  padding-top: 30px;
+}
+.fo_create_admission_body .justify-content-between > div:not(:last-child){
+  margin-right: 14px;
+}
+
+::ng-deep .modal_queue .modal-dialog { 
+  max-width: 40%;
+  width: 40%;
+  margin-top: 7vw;
+}
+
+.fo_btn_admission{ height: 2.7rem; width: 12rem;
+  border: none; border-radius: 2px;
+  font-size: 14px;
+  margin-left: 1rem;
+}
+.fo_create_admission_body label{ font-size: 10px}
+::ng-deep .fo_modal_admission .modal-dialog {
+  margin: 10% auto;
+  max-width: 50%;
+}
+
+.modal-message {
+  padding: 15px 0;
+  text-align: right;
+}
+
+::ng-deep .cc_modal_confirmation .modal-dialog{
+  max-width: min-content !important;
+}
+::ng-deep .cc_modal_confirmation .thead > th {
+  padding: 0;
+}
+
+::ng-deep .log-history .modal-dialog { 
+  max-width: 93%;
+  width: 93%;
+  margin-top: 7vw;
+}
+::ng-deep .log-history-2 .modal-dialog { 
+  max-width: 30%;
+  width: 30%;
+  margin-top: 7vw;
+}
+
+.cell-img-nav, .cell-img-nav-single {
+ text-align: center;
+}
+.cell-img-nav > div, .cell-img-nav > div > img {
+  width: 2em;
+}
+.cell-img-nav-single > div, .cell-img-nav-single > div > img {
+  width: 2em;
+}
+::ng-deep .fo_container_input_date .alert {
+  position: fixed;
+  top: 180px;
+  right: 40px;
+  width: 35vw;
+}
+
+.kolom-type {
+  text-align: center;
+  color: white;
+}
+.kolom-type span {
+  border-radius: 0.2em;
+  padding: 0.1em 1em;
+}
+.filter-row td {
+  padding: 0.2EM;
+}

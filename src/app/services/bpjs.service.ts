@@ -18,9 +18,14 @@ export class BpjsService {
   private appointmentBpjsUrl = environment.BPJS_SERVICE + '/appointments';
   private lakaLantasUrl = environment.BPJS_SERVICE + '/lookups';
   private sendSmsUrl = environment.FRONT_OFFICE_SERVICE + '/notifications/bpjs';
+  private sendEmailUrl = environment.MOBILE_SERVICE + '/mobile/bpjs/mailer';
 
   notifySmsBpjs(payload: any): Observable<any> {
     const url = `${this.sendSmsUrl}`;
+    return this.http.post<any>(url, payload, httpOptions);
+  }
+  notifyEmailBpjs(payload: any): Observable<any> {
+    const url = `${this.sendEmailUrl}`;
     return this.http.post<any>(url, payload, httpOptions);
   }
 

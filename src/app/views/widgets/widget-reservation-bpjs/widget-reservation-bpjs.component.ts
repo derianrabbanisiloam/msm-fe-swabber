@@ -24,7 +24,7 @@ export class WidgetReservationBpjsComponent implements OnInit {
   public model: any = { speciality: '', doctor: '' };
   public specialities: Speciality[];
   public fromBpjs: boolean = false;
-  public fromRegistration: boolean = false;
+  public fromRegistration: boolean = true;
   public patFromBpjs: any;
   public bodyBpjs: any;
   public consulType: string = null;

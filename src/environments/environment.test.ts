@@ -10,5 +10,6 @@ export const environment = {
   HIS_SERVICE: 'http://10.85.139.13/his-get',
   ASSET_PATH: 'https://gtn-dev-mysiloam-02.siloamhospitals.com/fo-assets/',
   UPLOAD_IMAGE: 'http://10.85.136.23:5555',
-  GET_IMAGE: 'http://10.85.136.23/staging'
+  GET_IMAGE: 'http://10.85.136.23/staging',
+  MOBILE_SERVICE: 'http://10.85.139.13/mobileinternal/api/v2'
 };

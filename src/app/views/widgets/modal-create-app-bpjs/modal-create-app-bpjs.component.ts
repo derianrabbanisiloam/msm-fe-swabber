@@ -595,7 +595,7 @@ export class ModalCreateAppBpjsComponent implements OnInit {
             source: this.source,
             userId: this.userId,
           }
-          this.sendSms(body);
+          this.sendSmsAndEmail(body);
         }
         this.alertService.success('Success to create appointment', false, 3000);
         this.appointmentService.emitCreateApp(true);
@@ -607,8 +607,12 @@ export class ModalCreateAppBpjsComponent implements OnInit {
     this.isSubmitting = false;
   }
 
-  async sendSms(payload){
+  async sendSmsAndEmail(payload){
+    let payloadCustom = {
+      appointmentBpjsId: payload.appointmentBpjsId
+    }
     await this.bpjsService.notifySmsBpjs(payload).toPromise();
+    await this.bpjsService.notifyEmailBpjs(payloadCustom).toPromise();
   }
 
   async editPatientHopeId(val, content) {

@@ -1160,7 +1160,12 @@ export class WidgetCreateAppointmentComponent implements OnInit {
     let exclude = this.fromBpjs === true ? false : true;
     if(this.reschBpjs === true) exclude = false; // reschedule bpjs
     const isBpjs = channelId.BPJS;
-    await this.appointmentService.getAppointmentByDay(hospitalId, doctorId, date, sortBy, orderBy, isBpjs, exclude).toPromise().then(
+    // await this.appointmentService.getAppointmentByDay(hospitalId, doctorId, date, sortBy, orderBy, isBpjs, exclude).toPromise().then(
+    //   data => {
+    //     this.appointments = data.data;
+    //   }
+    // ); //dummy
+    await this.appointmentService.getAppointmentByDay(hospitalId, doctorId, date, sortBy, orderBy).toPromise().then(
       data => {
         this.appointments = data.data;
       }
@@ -2111,7 +2116,9 @@ export class WidgetCreateAppointmentComponent implements OnInit {
         fromBpjs: true,
         fromRegistration: false
       }
-      this.router.navigate(['./doctor-schedule'], {queryParams: query});
+      //this.router.navigate(['./doctor-schedule'], {queryParams: query}); dummy
+      const searchKey = JSON.parse(localStorage.getItem('searchKey'));
+      this.router.navigate(['./bpjs-registration'], { queryParams: searchKey });
     } else if(this.fromBpjs === true && this.fromRegistration === true) {
       const searchKey = JSON.parse(localStorage.getItem('searchKey'));
       this.router.navigate(['./bpjs-registration'], { queryParams: searchKey });
@@ -2146,6 +2153,7 @@ export class WidgetCreateAppointmentComponent implements OnInit {
       async () => {
         if(this.fromBpjs === true && this.fromRegistration === false) {
           this.flagCreateApp = true;
+          this.doctorService.searchDoctorSource2 = null
         }
         await this.getAppointmentList();
         await this.dataProcessing();

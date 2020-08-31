@@ -72,7 +72,12 @@
           <tr *ngFor="let app of schArray.appointment; let i=index"
             [ngClass]="{'cc_row_rescheduled': app.is_blocked == true || isOpen == false && app.is_walkin == true }">
             <td class="st-kolom-time">{{app.appointment_range_time}}</td>
-            <td>{{app.no}}</td>
+            <td>
+              {{app.no}}
+              <span *ngIf="app.channel_id == 15" style="padding-right: 0; margin-right: -2em;">
+                <img class="icon_bpjs" src="../../../../assets/icons/bpjs_logo.png">
+              </span>
+            </td>
             <td *ngIf="app.is_can_create && isOriginal && app.is_walkin == false" class="st-kolom-available"
               (click)="openCreateAppModal(app)"><a>Available</a></td>
             <td *ngIf="app.is_can_create && isOriginal && app.is_walkin == true && isOpen == true"
@@ -178,7 +183,12 @@
           <tr *ngFor="let app of schArray.appointment; let i=index"
             [ngClass]="{'cc_row_rescheduled': app.is_blocked == true || isOpen == false && app.is_walkin == true }">
             <td class="st-kolom-time">{{app.appointment_range_time}}</td>
-            <td>{{app.no}}</td>
+            <td>
+              {{app.no}}
+              <span *ngIf="app.channel_id == 15" style="padding-right: 0; margin-right: -2em;">
+                <img class="icon_bpjs" src="../../../../assets/icons/bpjs_logo.png">
+              </span>
+            </td>
             <td *ngIf="app.is_can_create && isOriginal && app.is_walkin == false" class="st-kolom-available"
               (click)="createAppBPJSOnly(app)"><a>Available</a></td>
             <td *ngIf="app.is_can_create && !isOriginal && app.is_walkin == false" class="st-kolom-available"
@@ -238,7 +248,12 @@
           <tr *ngFor="let app of schArray.appointment; let i=index"
             [ngClass]="{'cc_row_rescheduled': app.is_blocked == true || isOpen == false}">
             <td class="st-kolom-time">{{app.appointment_range_time}}</td>
-            <td>{{app.no}}</td>
+            <td>
+              {{app.no}}
+              <span *ngIf="app.channel_id == 15" style="padding-right: 0; margin-right: -2em;">
+                <img class="icon_bpjs" src="../../../../assets/icons/bpjs_logo.png">
+              </span>
+            </td>
             <td *ngIf="app.is_can_create && isOriginal && isOpen == true" class="st-kolom-available"
               (click)="openCreateAppModal(app)"><a>Available</a></td>
             <td *ngIf="app.is_can_create && isOriginal && isOpen == false" class="st-kolom-available">Available</td>
@@ -326,7 +341,12 @@
           <tr *ngFor="let app of schArray.appointment; let i=index"
             [ngClass]="{'cc_row_rescheduled': app.is_blocked == true || isOpen == false && app.is_walkin == true }">
             <td class="st-kolom-time">{{app.appointment_range_time}}</td>
-            <td>{{app.no}}</td>
+            <td>
+              {{app.no}}
+              <span *ngIf="app.channel_id == 15" style="padding-right: 0; margin-right: -2em;">
+                <img class="icon_bpjs" src="../../../../assets/icons/bpjs_logo.png">
+              </span>
+            </td>
             <td *ngIf="app.is_can_create && isOriginal && app.is_walkin == false" class="st-kolom-available"
               (click)="openCreateAppModal(app)"><a>Available</a></td>
             <td *ngIf="app.is_can_create && isOriginal && app.is_walkin == true && isOpen == true"
@@ -424,7 +444,7 @@
     </div>
 
     <!--                              Waiting List                                -->
-    <div *ngIf="schArray.doctor_type_name !== doctorType.FCFS && fromBpjs === false && reschBpjs == false">
+    <div *ngIf="schArray.doctor_type_name !== doctorType.FCFS">
       <div *ngIf="schArray.consultation_type_id != '4' && schArray.is_allow_waiting_list == true">
         <div *ngFor="let appWait of appListWaiting">
           <div class="col-md-12" *ngIf="appWait.schedule_id === schArray.schedule_id">
@@ -442,9 +462,16 @@
             <tbody>
               <tr *ngFor="let app of appWait.appointment" [ngClass]="{'cc_row_rescheduled': app.is_blocked == true}">
                 <td class="st-kolom-time">{{app.appointment_range_time}}</td>
-                <td>{{app.no}}</td>
-                <td *ngIf="app.is_can_create && isOriginal" class="st-kolom-available" (click)="openCreateAppModal(app)">
+                <td>
+                  {{app.no}}
+                  <span *ngIf="app.channel_id == 15" style="padding-right: 0; margin-right: -2em;">
+                    <img class="icon_bpjs" src="../../../../assets/icons/bpjs_logo.png">
+                  </span>
+                </td>
+                <td *ngIf="app.is_can_create && isOriginal && fromBpjs == false" class="st-kolom-available" (click)="openCreateAppModal(app)">
                   <a>Available</a></td>
+                  <td *ngIf="app.is_can_create && isOriginal && fromBpjs == true" class="st-kolom-available" (click)="createAppBPJSOnly(app)">
+                    <a>Available</a></td>
                 <td *ngIf="app.is_can_create && !isOriginal" class="st-kolom-available" (click)="openCreateAppModal2(app)">
                   <a>Available</a></td>
                 <td *ngIf="!app.is_can_create">
@@ -474,7 +501,10 @@
                   <div *ngIf="!app.appointment_temp_id">
                     <div *ngIf="app.is_can_cancel && isOriginal && !app.admission_id"
                       class="cell-img-nav d-flex justify-content-center">
-                      <div *ngIf="isOpen" (click)="checkInAppointment(app, confirmCheckIn)">
+                      <div *ngIf="isOpen && app.channel_id != 15" (click)="checkInAppointment(app, confirmCheckIn)">
+                        <img src="{{assetPath}}icons/ic_Check@2x.png">
+                      </div>
+                      <div *ngIf="isOpen && app.channel_id == 15" (click)="checkInBpjsApp(app, confirmCheckInTwo)">
                         <img src="{{assetPath}}icons/ic_Check@2x.png">
                       </div>
                       <span style="opacity: 0; max-width: 0.5em; overflow: hidden">filler</span>

@@ -231,7 +231,7 @@ export class AppointmentService {
   getAppointmentByDay(hospitalId: string, doctorId: string, date: string, sortBy?: string, orderBy?: string, isBpjs?: string, exclude?: boolean): Observable<any> {
     let url = `${this.ccAppointmentUrl}?hospitalId=${hospitalId}&doctorId=${doctorId}&date=${date}&sortBy=${sortBy}&orderBy=${orderBy}`;
     url = isBpjs ? `${url}&channelId=${isBpjs}` : url;
-    url =`${url}&exclude=${exclude}`;
+    //url =`${url}&exclude=${exclude}`; dummy
     return this.http.get<any>(url, httpOptions);
   }
 

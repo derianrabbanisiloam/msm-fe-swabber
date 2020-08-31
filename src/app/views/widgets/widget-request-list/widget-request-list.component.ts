@@ -342,7 +342,7 @@ export class WidgetRequestListComponent implements OnInit {
       fromBpjs: true,
       fromRegistration: false,
       patientBpjs: body,
-      consulType: consultationType.BPJS
+      consulType: consultationType.BPJS+':'+consultationType.BPJS_REGULER
     };
 
     const searchKey = {

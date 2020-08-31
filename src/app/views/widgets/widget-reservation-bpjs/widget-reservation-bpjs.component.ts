@@ -48,6 +48,7 @@ export class WidgetReservationBpjsComponent implements OnInit {
 
   async ngOnInit() {
     if (this.doctorService.searchDoctorSource2) {
+      console.log('masuk sini')
       if(this.doctorService.searchDoctorSource2.fromBpjs === true &&
         this.doctorService.searchDoctorSource2.fromRegistration === false) { //from BPJS request list
           localStorage.setItem('fromBPJS', JSON.stringify(this.doctorService.searchDoctorSource2));
@@ -61,6 +62,7 @@ export class WidgetReservationBpjsComponent implements OnInit {
       this.keywords = this.doctorService.searchDoctorSource2;
     } else if(this.route.snapshot.queryParamMap.get('fromBpjs') === 'true' &&
         this.route.snapshot.queryParamMap.get('fromRegistration') === 'false') {
+          console.log('masuk sana')
         this.bodyBpjs = JSON.parse(localStorage.getItem('fromBPJS'));
         this.fromBpjs = true;
         this.fromRegistration = false;
@@ -154,7 +156,7 @@ export class WidgetReservationBpjsComponent implements OnInit {
       },
       fromBpjs: true,
       fromRegistration: true,
-      consulType: consultationType.BPJS
+      consulType: consultationType.BPJS+':'+consultationType.BPJS_REGULER
     };
 
     this.searchKeywords.doctor = {
@@ -201,7 +203,7 @@ export class WidgetReservationBpjsComponent implements OnInit {
       fromBpjs: true,
       fromRegistration: false,
       patientBpjs: this.bodyBpjs.patientBpjs,
-      consulType: consultationType.BPJS
+      consulType: consultationType.BPJS+':'+consultationType.BPJS_REGULER
     };
 
     const searchKey = {
@@ -236,7 +238,7 @@ export class WidgetReservationBpjsComponent implements OnInit {
       fromBpjs: true,
       fromRegistration: false,
       patientBpjs: this.bodyBpjs.patientBpjs,
-      consulType: consultationType.BPJS
+      consulType: consultationType.BPJS+':'+consultationType.BPJS_REGULER
     };
 
     this.searchKeywords.doctor = {
@@ -283,7 +285,7 @@ export class WidgetReservationBpjsComponent implements OnInit {
       fromBpjs: true,
       fromRegistration: false,
       patientBpjs: this.bodyBpjs.patientBpjs,
-      consulType: consultationType.BPJS
+      consulType: consultationType.BPJS+':'+consultationType.BPJS_REGULER
     };
 
     const searchKey = {

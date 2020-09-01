@@ -13,7 +13,7 @@
         <div class="form-group col-md-12" style="padding: 0" *ngIf="
         !scheduleSel || 
         (scheduleSel && scheduleSel?.consultation_type_id == 4) ||
-        (scheduleSel && scheduleSel?.consultation_type_id == 5)">
+        (scheduleSel && scheduleSel.is_allow_waiting_list == false)">
           <label>Select schedule</label>
           <br>
           <select class="form-control select-schedule" name="selectSchedule"
@@ -27,7 +27,7 @@
           <span class="custom-text" *ngIf="!scheduleSel">Select schedule first</span>
         </div>
 
-        <div class="form-group col-md-2" style="padding: 0" *ngIf="scheduleSel && scheduleSel?.consultation_type_id != 4 && scheduleSel?.consultation_type_id != 5">
+        <div class="form-group col-md-2" style="padding: 0" *ngIf="scheduleSel && scheduleSel?.consultation_type_id != 4 && scheduleSel.is_allow_waiting_list == true">
           <label>Select schedule</label>
           <br>
           <select class="form-control select-schedule" name="selectSchedule"
@@ -40,11 +40,11 @@
           <br>
           <span class="custom-text" *ngIf="!scheduleSel">Select schedule first</span>
         </div>
-        <div class="form-group col-md-2" *ngIf="scheduleSel && scheduleSel?.consultation_type_id != 4 && scheduleSel?.consultation_type_id != 5">
+        <div class="form-group col-md-2" *ngIf="scheduleSel && scheduleSel?.consultation_type_id != 4 && scheduleSel.is_allow_waiting_list == true">
           <label style="display: block; text-align: left;">Block Waiting List Only</label>
           <input class="form-control custom-checkbox" type="checkbox" name="blockWaitingList" (change)="blockWaitingList($event)" [(ngModel)]="isBlockWaitingList">
         </div>
-        <div class="form-group col-md-8" *ngIf="scheduleSel && scheduleSel?.consultation_type_id != 4 && scheduleSel?.consultation_type_id != 5">
+        <div class="form-group col-md-8" *ngIf="scheduleSel && scheduleSel?.consultation_type_id != 4 && scheduleSel.is_allow_waiting_list == true">
         </div>
 
         <div class="form-group col-md-2" style="padding: 0">

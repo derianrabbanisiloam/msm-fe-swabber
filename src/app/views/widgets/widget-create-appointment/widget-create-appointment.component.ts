@@ -494,8 +494,6 @@ export class WidgetCreateAppointmentComponent implements OnInit {
         this.fromBpjs = true;
         this.fromRegistration = true;
         this.consulType = this.bodyBpjs.consulType;
-        this.flagCreateApp = this.activatedRoute.snapshot.queryParamMap.get('fromPatientData') === 'true' ?
-        true : false;
     }
   }
 

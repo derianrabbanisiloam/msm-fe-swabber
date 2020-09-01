@@ -48,7 +48,6 @@ export class WidgetReservationBpjsComponent implements OnInit {
 
   async ngOnInit() {
     if (this.doctorService.searchDoctorSource2) {
-      console.log('masuk sini')
       if(this.doctorService.searchDoctorSource2.fromBpjs === true &&
         this.doctorService.searchDoctorSource2.fromRegistration === false) { //from BPJS request list
           localStorage.setItem('fromBPJS', JSON.stringify(this.doctorService.searchDoctorSource2));
@@ -62,7 +61,6 @@ export class WidgetReservationBpjsComponent implements OnInit {
       this.keywords = this.doctorService.searchDoctorSource2;
     } else if(this.route.snapshot.queryParamMap.get('fromBpjs') === 'true' &&
         this.route.snapshot.queryParamMap.get('fromRegistration') === 'false') {
-          console.log('masuk sana')
         this.bodyBpjs = JSON.parse(localStorage.getItem('fromBPJS'));
         this.fromBpjs = true;
         this.fromRegistration = false;

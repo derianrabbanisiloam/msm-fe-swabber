@@ -485,12 +485,17 @@ export class WidgetCreateAppointmentComponent implements OnInit {
         this.fromRegistration = false;
         this.patFromBpjs = this.bodyBpjs.patientBpjs;
         this.consulType = this.bodyBpjs.consulType;
+        this.flagCreateApp = this.activatedRoute.snapshot.queryParamMap.get('fromPatientData') === 'true' ?
+        true : false;
+
     } else if(this.activatedRoute.snapshot.queryParamMap.get('fromBpjs') === 'true' &&
         this.activatedRoute.snapshot.queryParamMap.get('fromRegistration') === 'true') {
         this.bodyBpjs = JSON.parse(localStorage.getItem('fromBPJS'));
         this.fromBpjs = true;
         this.fromRegistration = true;
         this.consulType = this.bodyBpjs.consulType;
+        this.flagCreateApp = this.activatedRoute.snapshot.queryParamMap.get('fromPatientData') === 'true' ?
+        true : false;
     }
   }
 
@@ -1157,14 +1162,6 @@ export class WidgetCreateAppointmentComponent implements OnInit {
     const date = this.appointmentPayload.appointmentDate;
     const sortBy = 'appointment_no';
     const orderBy = 'ASC';
-    let exclude = this.fromBpjs === true ? false : true;
-    if(this.reschBpjs === true) exclude = false; // reschedule bpjs
-    const isBpjs = channelId.BPJS;
-    // await this.appointmentService.getAppointmentByDay(hospitalId, doctorId, date, sortBy, orderBy, isBpjs, exclude).toPromise().then(
-    //   data => {
-    //     this.appointments = data.data;
-    //   }
-    // ); //dummy
     await this.appointmentService.getAppointmentByDay(hospitalId, doctorId, date, sortBy, orderBy).toPromise().then(
       data => {
         this.appointments = data.data;
@@ -1550,7 +1547,8 @@ export class WidgetCreateAppointmentComponent implements OnInit {
           if(this.fromBpjs === true) {
             params = {
               appointmentId: detail.appointment_id,
-              fromBpjs: true
+              fromBpjs: this.fromBpjs,
+              fromRegistration: this.fromRegistration
             };
           } else {
             params = {
@@ -2112,11 +2110,6 @@ export class WidgetCreateAppointmentComponent implements OnInit {
   prevPageTwo() {
     if(this.fromBpjs === true && this.fromRegistration === false) {
       this.doctorService.searchDoctorSource2 = this.bodyBpjs;
-      const query = {
-        fromBpjs: true,
-        fromRegistration: false
-      }
-      //this.router.navigate(['./doctor-schedule'], {queryParams: query}); dummy
       const searchKey = JSON.parse(localStorage.getItem('searchKey'));
       this.router.navigate(['./bpjs-registration'], { queryParams: searchKey });
     } else if(this.fromBpjs === true && this.fromRegistration === true) {

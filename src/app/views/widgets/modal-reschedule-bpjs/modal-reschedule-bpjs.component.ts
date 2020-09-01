@@ -98,7 +98,7 @@ export class ModalRescheduleBpjsComponent implements OnInit {
       appointmentDate: data.date,
       name: name,
       doctorId: data.doctor_id,
-      consulType: consultationType.BPJS,
+      consulType: consultationType.BPJS+':'+consultationType.BPJS_REGULER,
       isRescheduleBpjs: true
     };
   }

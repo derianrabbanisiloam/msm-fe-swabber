@@ -137,6 +137,7 @@ export class WidgetPatientDataComponent implements OnInit {
   public validName: boolean = false;
   public phoneNumber: any;
   public fromBpjs: boolean = false;
+  public fromRegistration: boolean = false;
   public maxSize10MB: number = 10485760;
   public flagFile1: boolean = false;
   public flagFile2: boolean = false;
@@ -265,8 +266,9 @@ export class WidgetPatientDataComponent implements OnInit {
 
   async isAppointment() {
     this.appointmentId = this.route.snapshot.queryParams['appointmentId'];
-    if(this.route.snapshot.queryParams['fromBpjs']){
-      this.fromBpjs = true;
+    if(this.route.snapshot.queryParams['fromBpjs'] && this.route.snapshot.queryParams['fromRegistration']){
+      this.fromBpjs = this.route.snapshot.queryParams['fromBpjs'] === 'true' ? true : false;
+      this.fromRegistration = this.route.snapshot.queryParams['fromRegistration'] === 'true' ? true : false;
     }
 
     if (this.appointmentId) {
@@ -1918,8 +1920,21 @@ export class WidgetPatientDataComponent implements OnInit {
     pdfMake.createPdf(docDefinition).print();
 
     //redirect to create appointment
-    const params = { doctorId: this.selectedCheckIn.doctor_id, date: this.selectedCheckIn.appointment_date };
-    this.router.navigate(['./create-appointment'], { queryParams: params });
+    if(this.fromBpjs === true) {
+      
+      this.router.navigate(['/create-appointment'], {
+        queryParams: {
+          fromBpjs: this.fromBpjs,
+          fromRegistration: this.fromRegistration,
+          doctorId: this.selectedCheckIn.doctor_id, 
+          date: this.selectedCheckIn.appointment_date,
+          fromPatientData: true
+        }
+      });
+    } else {
+      const params = { doctorId: this.selectedCheckIn.doctor_id, date: this.selectedCheckIn.appointment_date };
+      this.router.navigate(['./create-appointment'], { queryParams: params });
+    }
 
   }
 

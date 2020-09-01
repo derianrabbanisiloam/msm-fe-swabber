@@ -810,7 +810,8 @@ export class WidgetAppointmentListBpjsComponent implements OnInit {
           if(this.fromBpjs === true) {
             params = {
               appointmentId: detail.appointment_id,
-              fromBpjs: true
+              fromBpjs: this.fromBpjs,
+              fromRegistration: true
             };
           } else {
             params = {

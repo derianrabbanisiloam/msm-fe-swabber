@@ -418,6 +418,13 @@ a{ text-decoration: none !important;}
 }
 
 /* Style the checkmark/indicator */
+.icon_bpjs{
+  height: 1.5em;
+  width: 1.5em;
+  margin-left: 1em;
+  border: 0px;
+}
+
 .check_box_container .checkmark:after {
   left: 4px;
   top: 1px;

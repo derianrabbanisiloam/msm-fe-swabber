@@ -154,7 +154,7 @@ export class WidgetReservationBpjsComponent implements OnInit {
       },
       fromBpjs: true,
       fromRegistration: true,
-      consulType: consultationType.BPJS
+      consulType: consultationType.BPJS+':'+consultationType.BPJS_REGULER
     };
 
     this.searchKeywords.doctor = {
@@ -201,7 +201,7 @@ export class WidgetReservationBpjsComponent implements OnInit {
       fromBpjs: true,
       fromRegistration: false,
       patientBpjs: this.bodyBpjs.patientBpjs,
-      consulType: consultationType.BPJS
+      consulType: consultationType.BPJS+':'+consultationType.BPJS_REGULER
     };
 
     const searchKey = {
@@ -236,7 +236,7 @@ export class WidgetReservationBpjsComponent implements OnInit {
       fromBpjs: true,
       fromRegistration: false,
       patientBpjs: this.bodyBpjs.patientBpjs,
-      consulType: consultationType.BPJS
+      consulType: consultationType.BPJS+':'+consultationType.BPJS_REGULER
     };
 
     this.searchKeywords.doctor = {
@@ -283,7 +283,7 @@ export class WidgetReservationBpjsComponent implements OnInit {
       fromBpjs: true,
       fromRegistration: false,
       patientBpjs: this.bodyBpjs.patientBpjs,
-      consulType: consultationType.BPJS
+      consulType: consultationType.BPJS+':'+consultationType.BPJS_REGULER
     };
 
     const searchKey = {

@@ -262,7 +262,7 @@ export class WidgetRescheduleWorklistComponent implements OnInit {
       else if(this.isBpjs === true) {
         this.keywordsModel.fromDate = bYear + '-' + bMonth + '-' + bDay;
         this.keywordsModel.toDate = eYear + '-' + eMonth + '-' + eDay;
-        this.getRescheduleWorklist();
+        this.getRescheduleWorklistBpjs();
       }
     }
   }

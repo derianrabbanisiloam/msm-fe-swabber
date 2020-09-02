@@ -361,12 +361,13 @@ export class ModalScheduleBlockComponent implements OnInit {
     );
   }
 
-  openModalBlockConfirmation(content, data, i) {
+  openModalBlockConfirmation(content, data, i, fromDelete?) {
     this.index = i;
     this.schBlockSelected = data;
     if((!(this.schBlockSelected.fh === '00' && this.schBlockSelected.fm === '00')
-      && !(this.schBlockSelected.th === '00' && this.schBlockSelected.tm === '00'))) {
-      this.modalService.open(content);
+      && !(this.schBlockSelected.th === '00' && this.schBlockSelected.tm === '00'))
+      || fromDelete === true) {
+        this.modalService.open(content);
     }
   }
 

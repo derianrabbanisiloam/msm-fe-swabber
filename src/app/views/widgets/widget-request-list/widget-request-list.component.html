@@ -31,7 +31,11 @@
       <tr class="fo_header_grey filter-row">
         <td></td>
         <td></td>
-        <td></td>
+        <td>
+          <my-date-range-picker name="mydaterange" [options]="myDateRangeCreatedDate" [(ngModel)]="datePickerCreatedDate"
+            (dateRangeChanged)="changeDateRangeCreatedDate($event)" #date>
+          </my-date-range-picker>
+        </td>
         <td>
           <div class="inner-addon right-addon">
             <i class="glyphicon fa fa-search"></i>

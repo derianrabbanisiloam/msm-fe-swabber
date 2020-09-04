@@ -21,7 +21,8 @@
       <th>Mobile No.</th>
       <th>BPJS Number</th>
       <th style="min-width: 5em">Preferred Appointment Date</th>
-      <th>Control Number</th>
+      <th>Control No.</th>
+      <th>Reference No.</th>
       <th>Document</th>
       <th>Action</th>
     </thead>
@@ -57,6 +58,7 @@
         <td></td>
         <td></td>
         <td></td>
+        <td></td>
       </tr>
 
       <tr *ngFor="let r of appRequestList; let i = index">
@@ -78,6 +80,7 @@
         <td style="text-align: center">{{ r.bpjs_card_number }}</td>
         <td style="min-width: 8em">{{ r.appointment_date }}</td>
         <td>{{r.control_number}}</td>
+        <td>{{r.reference_no}}</td>
         <td>
           <span *ngIf="r.bpjs_card_file">
             <a href=":javascript"

@@ -74,20 +74,7 @@ export class ModalAppointmentBpjsComponent implements OnInit {
   async getListDoctor() {
 
     this.alerts = [];
-    let index;
-
-    this.doctorList = await this.doctorService.getListDoctor(this.hospital.id)
-      .toPromise().then(res => {
-        return res.data;
-      }).catch(err => {
-        this.alertService.error(err.error.message);
-        return [];
-      });
-    
-    index = this.doctorList.findIndex((a) => {
-      return a.doctor_id == this.appointment.doctor_id;
-    })
-    this.specialtyDoctor = this.doctorList[index].specialty_id;
+    this.specialtyDoctor = this.appointmentSelected.speciality_id;
 
     this.doctorBySpecialty = await this.doctorService.getDoctorBySpeciality(
       this.hospital.id,

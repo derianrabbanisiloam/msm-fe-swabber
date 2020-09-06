@@ -19,6 +19,12 @@ export class BpjsService {
   private lakaLantasUrl = environment.BPJS_SERVICE + '/lookups';
   private sendSmsUrl = environment.FRONT_OFFICE_SERVICE + '/notifications/bpjs';
   private sendEmailUrl = environment.MOBILE_SERVICE + '/mobile/bpjs/mailer';
+  private countReqListUrl = environment.BPJS_SERVICE + '/appointments/bpjs/count';
+
+  getCountReqList(hospital: string) {
+    let url = `${this.countReqListUrl}?hospitalId=${hospital}`;
+    return this.http.get<any>(url, httpOptions);
+  }
 
   notifySmsBpjs(payload: any): Observable<any> {
     const url = `${this.sendSmsUrl}`;
@@ -43,8 +49,8 @@ export class BpjsService {
     createTo?: string,
   ): Observable<any> {
       let url = `${this.appointmentBpjsUrl}?`;
-      url = fromDate ? `${url}&from=${hospitalId}` : url;
-      url = toDate ? `${url}&to=${hospitalId}` : url;
+      url = fromDate ? `${url}&from=${fromDate}` : url;
+      url = toDate ? `${url}&to=${toDate}` : url;
       url = hospitalId ? `${url}&hospitalId=${hospitalId}` : url;
       url = name ? `${url}&name=${name}` : url;
       url = birthDate ? `${url}&birthDate=${birthDate}` : url;

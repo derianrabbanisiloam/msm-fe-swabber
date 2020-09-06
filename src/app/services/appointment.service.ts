@@ -86,11 +86,6 @@ export class AppointmentService {
     return this.http.get<any>(url, httpOptions);
   }
 
-  getCountReqList(hospital: string) {
-    let url = `${null}?hospitalId=${hospital}`;
-    return this.http.get<any>(url, httpOptions);
-  }
-
   getCountAppRescheduleAido(hospital: string) {
     let url = `${this.appointmentRescheduleAidoCount}?hospitalId=${hospital}`;
     return this.http.get<any>(url, httpOptions);

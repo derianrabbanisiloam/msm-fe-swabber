@@ -24,16 +24,12 @@ export class WidgetRequestListComponent implements OnInit {
   public hospital: any = this.key.hospital;
   public assetPath = environment.ASSET_PATH;
   public urlBpjsCard = environment.GET_IMAGE;
-  public todayDateISO: any = moment().format('YYYY-MM-DD');
+  public todayDateISO: any = moment().add(1, 'days').format('YYYY-MM-DD');
   public myDateRangePickerOptions: IMyDrpOptions = {
     dateFormat: 'dd/mm/yyyy',
-    height: '30px'
-  };
-  public myDateRangeCreatedDate: IMyDrpOptions = {
-    dateFormat: 'dd/mm/yyyy',
     height: '30px',
-    width: '100px',
   };
+  public myDateRangeCreatedDate: IMyDrpOptions;
   public datePickerModel: any = {};
   public datePickerCreatedDate: any = {};
   public keywordsModel: KeywordsModel = new KeywordsModel;
@@ -94,12 +90,19 @@ export class WidgetRequestListComponent implements OnInit {
    }
 
   ngOnInit() {
+    let today = this.todayDateISO.split('-');
+    this.myDateRangeCreatedDate = {
+      dateFormat: 'dd/mm/yyyy',
+      height: '30px',
+      width: '100px',
+      editableDateRangeField: false,
+      disableSince: { year: today[0], month: today[1], day: today[2] }
+    };
     if(this.doctorService.goBack) { //when click prev page
       this.showSchedule = false;
     }
     this.getSpecialities();
     this.keywordsModel.hospitalId = this.hospital.id;
-    this.initializeDateRangePicker();
     this.getCollectionAlert();
     this.getAppointmentBpjs();
   }
@@ -118,17 +121,6 @@ export class WidgetRequestListComponent implements OnInit {
         x.speciality_name = isEmpty(x.speciality_name) ? '' : x.speciality_name;
       });
     }
-  }
-
-  initializeDateRangePicker() {
-    const m = moment();
-    const year = Number(m.format('YYYY'));
-    const month = Number(m.format('MM'));
-    const date = Number(m.format('DD'));
-    this.datePickerModel = {
-      beginDate: { year: year, month: month, day: date },
-      endDate: { year: year, month: month, day: date },
-    };
   }
 
   getImage(fileName) {
@@ -151,7 +143,14 @@ export class WidgetRequestListComponent implements OnInit {
       eDay = Number(eDay) < 10 ? '0' + eDay : eDay;
       this.keywordsModel.fromDate = bYear + '-' + bMonth + '-' + bDay;
       this.keywordsModel.toDate = eYear + '-' + eMonth + '-' + eDay;
-      this.getAppointmentBpjs();
+      if(this.keywordsModel.fromDate === '0-00-00' 
+        && this.keywordsModel.toDate === '0-00-00') {
+          this.keywordsModel.fromDate = '';
+          this.keywordsModel.toDate = '';
+          this.getAppointmentBpjs();
+      } else {
+        this.getAppointmentBpjs();
+      }
     }
   }
 
@@ -169,7 +168,14 @@ export class WidgetRequestListComponent implements OnInit {
       eDay = Number(eDay) < 10 ? '0' + eDay : eDay;
       this.keywordsModel.createFrom = bYear + '-' + bMonth + '-' + bDay;
       this.keywordsModel.createTo = eYear + '-' + eMonth + '-' + eDay;
-      this.getAppointmentBpjs();
+      if(this.keywordsModel.createFrom === '0-00-00' 
+        && this.keywordsModel.createTo === '0-00-00') {
+          this.keywordsModel.createFrom = '';
+          this.keywordsModel.createTo = '';
+          this.getAppointmentBpjs();
+      } else {
+        this.getAppointmentBpjs();
+      }
     }
   }
 

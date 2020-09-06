@@ -1,5 +1,5 @@
 import { Component, OnInit } from '@angular/core';
-import { AppointmentService } from '../../../services/appointment.service';
+import { BpjsService } from '../../../services/bpjs.service';
 import socket from 'socket.io-client';
 import { SecretKey, Jwt, REQUEST_LIST, keySocket } from '../../../variables/common.variable';
 import Security from 'msm-kadapat';
@@ -20,14 +20,15 @@ export class SectionSidebarComponent implements OnInit {
   public yogyaHospitalId = hospitalId.yogyakarta;
 
   constructor(
-    private appointmentService: AppointmentService,
+    private bpjsService: BpjsService,
   ) {
-    this.socket = socket(`${environment.WEB_SOCKET_SERVICE + keySocket.APPOINTMENT}`, {
+    this.socket = socket(`${environment.WEB_SOCKET_SERVICE + keySocket.BPJS}`, {
       transports: ['websocket'],
       query: `data=${
         Security.encrypt({ secretKey: SecretKey }, Jwt)
-        }&url=${environment.CALL_CENTER_SERVICE}`,
+        }&url=${environment.BPJS_SERVICE}`,
     });
+    this.countRechedule();
   }
 
   ngOnInit() {
@@ -37,7 +38,7 @@ export class SectionSidebarComponent implements OnInit {
   }
 
   countRechedule() {
-    this.appointmentService.getCountReqList(this.hospital.id).subscribe(
+    this.bpjsService.getCountReqList(this.hospital.id).subscribe(
       data => {
         this.countReqList = data.data;
       }

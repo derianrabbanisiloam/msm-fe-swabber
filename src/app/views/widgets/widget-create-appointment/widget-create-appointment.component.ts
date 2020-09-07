@@ -1262,7 +1262,6 @@ export class WidgetCreateAppointmentComponent implements OnInit {
     }
     const fromTime = item.appointment_from_time ? item.appointment_from_time : item.schedule_from_time; 
     const toTime = item.appointment_to_time ? item.appointment_to_time : item.schedule_to_time;
-    console.log('this.bodyBpjs', this.bodyBpjs)
     const data = {
       schedule_id: item.schedule_id,
       appointment_date: this.appointmentPayload.appointmentDate,
@@ -2144,6 +2143,8 @@ export class WidgetCreateAppointmentComponent implements OnInit {
           this.doctorService.searchDoctorSource2 = null;
           this.patFromBpjs = null;
           this.flagCreateNewApp = true;
+          this.bodyBpjs.fromRegistration = true;
+          this.bodyBpjs.patientBpjs = null;
         }
         await this.getAppointmentList();
         await this.dataProcessing();

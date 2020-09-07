@@ -249,7 +249,6 @@ export class WidgetRequestListComponent implements OnInit {
             fixDate = x.created_date.substr(0, 10);
             x.created_date = moment(fixDate).format('DD-MM-YYYY');
           });
-          console.log('this.applist', this.appRequestList)
           this.isCanNextPage = this.appRequestList.length >= 10 ? true : false;
         }
         else {

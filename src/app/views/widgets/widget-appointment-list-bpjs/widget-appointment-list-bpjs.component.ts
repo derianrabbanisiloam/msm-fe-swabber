@@ -414,7 +414,6 @@ export class WidgetAppointmentListBpjsComponent implements OnInit {
           else if(nameFile === 'familyCard') {
             this.flagFile3 = true;
             file = event.target.files[0];
-            console.log('###########', file)
             this.uploadForm.get('familyCard').setValue(file);
             formData_1.append('bpjs_family_card', this.uploadForm.get('familyCard').value);
           }

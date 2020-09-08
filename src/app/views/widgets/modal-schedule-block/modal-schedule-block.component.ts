@@ -34,7 +34,9 @@ export class ModalScheduleBlockComponent implements OnInit {
   public minuteOptions: any = ['00', '30'];
   public scheduleBlocks: any = [];
   public addSchBlockPayload: addScheduleBlockPayload;
+  public blockWaitingListOnly: any;
   public updateSchBlockPayload: updateScheduleBlockPayload;
+  public updateWaitingListOnlyPayload: any;
   public deleteSchBlockPayload: deleteScheduleBlockPayload;
   public isValidBlock: boolean = false;
   public addBlockErrMsg: string;
@@ -47,7 +49,9 @@ export class ModalScheduleBlockComponent implements OnInit {
   private index: any;
   private undoWaitingList: boolean = false;
   private undoTeleconsultation: boolean = false;
+  private undoWaitingListOnly: boolean = false;
   public scheduleSel: any;
+  public isBlockWaitingList: boolean = false;
 
   constructor(
     private modalService: NgbModal,
@@ -80,6 +84,7 @@ export class ModalScheduleBlockComponent implements OnInit {
           let result = data.data;
           let ft: any;
           let tt: any;
+          let waitingOnly: any;
           for(let i = 0, { length } = this.inputedParams.scheduleId; i < length; i += 1) {
             this.scheduleBlocks.push(
               {
@@ -94,9 +99,19 @@ export class ModalScheduleBlockComponent implements OnInit {
               if(this.scheduleBlocks[i].schedule_id === result[j].schedule_id) {
                 ft = result[j].from_time.split(':');
                 tt = result[j].to_time.split(':');
+                if(result[j].is_include_waiting_list === true
+                  && ft[0] === '00' && ft[1] === '00'
+                  && tt[0] === '00' && tt[1] === '00') {
+                    waitingOnly = true;
+                  }
+                else {
+                  waitingOnly = false;
+                }
                 this.scheduleBlocks[i].schedule_block.push({
                   ...result[j],
                   consultation_type_id: this.inputedParams.scheduleId[i].consultation_type_id,
+                  is_allow_waiting_list: this.inputedParams.scheduleId[i].is_allow_waiting_list,
+                  waiting_list_only: waitingOnly,
                   fh: ft[0],
                   fm: ft[1],
                   th: tt[0],
@@ -162,6 +177,37 @@ export class ModalScheduleBlockComponent implements OnInit {
     }
   }
 
+  async addWaitingListOnly() {
+    const scheduleId = this.scheduleSel.schedule_id;
+    const { reason } = this.blockModel;
+    const date = this.inputedParams.date;
+    this.blockWaitingListOnly = {
+      fromDate: date,
+      toDate: date,
+      fromTime: '00:00', //because waiting list only
+      toTime: '00:00', //because waiting list only
+      reason: reason,
+      isIncludeWaitingList: true,
+      userId: this.userId,
+      userName: this.userName,
+      source: this.source
+    }
+
+    await this.scheduleService.addScheduleBlock(scheduleId, this.blockWaitingListOnly).toPromise().then(
+      data => {
+        let dataScheduleBlock = {...data.data};
+        dataScheduleBlock.method = 'post';
+        dataScheduleBlock.hospitalId = this.hospital.id;
+        this.socket.emit(SCHEDULE_BLOCK, dataScheduleBlock);
+        this.scheduleService.emitScheduleBlock(true);
+        this.alertService.success('Schedule Blocks Added', false, 3000);
+      }, error => {
+        this.alertService.error(error.error.message, false, 3000);
+      }
+    );
+    this.getScheduleBlock();
+  }
+
   async addScheduleBlock() {
     const scheduleId = this.scheduleSel.schedule_id;
     const date = this.inputedParams.date;
@@ -178,6 +224,7 @@ export class ModalScheduleBlockComponent implements OnInit {
     }
     else {
       const { reason, isIncludeWaitingList, isRescheduleTeleconsultation } = this.blockModel;
+      let body;
       this.addSchBlockPayload = {
         fromDate: date,
         toDate: date,
@@ -205,6 +252,41 @@ export class ModalScheduleBlockComponent implements OnInit {
       );
       this.getScheduleBlock();
     }
+  }
+
+  async updateWaitingListOnly() {
+    const fromDate = this.schBlockSelected.from_date;
+    const toDate = this.schBlockSelected.to_date;
+    const scheduleBlockId = this.schBlockSelected.schedule_block_id;
+    const reason = this.schBlockSelected.reason;
+    this.updateWaitingListOnlyPayload = {
+      scheduleId: this.schBlockSelected.schedule_id,
+      fromDate: fromDate,
+      toDate: toDate,
+      fromTime: '00:00', //because waiting list only
+      toTime: '00:00', //because waiting list only
+      reason: reason,
+      isIncludeWaitingList: this.schBlockSelected.waiting_list_only,
+      userId: this.userId,
+      userName: this.userName,
+      source: this.source
+    }
+
+    await this.scheduleService.updateScheduleBlock(scheduleBlockId, this.updateWaitingListOnlyPayload).toPromise().then(
+      data => {
+        this.undoWaitingListOnly = false;
+        let dataScheduleBlock = {...data.data};
+        dataScheduleBlock.method = 'put';
+        dataScheduleBlock.hospitalId = this.hospital.id;
+        this.socket.emit(SCHEDULE_BLOCK, dataScheduleBlock);
+        this.scheduleService.emitScheduleBlock(true);
+        this.alertService.success('Schedule Blocks Updated', false, 3000);
+      }, error => {
+        this.scheduleBlocks[this.index].is_include_waiting_list = this.scheduleBlocks[this.index].is_include_waiting_list ? false : true;
+        this.alertService.error(error.error.message, false, 3000);
+      }
+    );
+    this.getScheduleBlock();
   }
 
   async updateScheduleBlock() {
@@ -279,14 +361,27 @@ export class ModalScheduleBlockComponent implements OnInit {
     );
   }
 
-  openModalBlockConfirmation(content, data, i) {
+  openModalBlockConfirmation(content, data, i, fromDelete?) {
     this.index = i;
+    this.schBlockSelected = data;
+    if((!(this.schBlockSelected.fh === '00' && this.schBlockSelected.fm === '00')
+      && !(this.schBlockSelected.th === '00' && this.schBlockSelected.tm === '00'))
+      || fromDelete === true) {
+        this.modalService.open(content);
+    }
+  }
+
+  openModalWaitingListOnlyConfirmation(content, data) {
     this.schBlockSelected = data;
     this.modalService.open(content);
   }
 
   close() {
     this.activeModal.close();
+  }
+
+  blockWaitingList(e) {
+    this.isBlockWaitingList = this.isBlockWaitingList ? true : false;
   }
 
   blockCheckBox(e) {
@@ -305,6 +400,10 @@ export class ModalScheduleBlockComponent implements OnInit {
     this.undoTeleconsultation = true;
   }
 
+  blockCheckBoxWaitingListOnly() {
+    this.undoWaitingListOnly = true;
+  }
+
   cancelCheckBox() {
     for(let i = 0, { length } = this.scheduleBlocks; i < length; i += 1) {
       if(this.scheduleBlocks[i].schedule_id === this.schBlockSelected.schedule_id) {
@@ -314,6 +413,17 @@ export class ModalScheduleBlockComponent implements OnInit {
         } else if(this.undoTeleconsultation === true) {
           this.undoTeleconsultation = false;
           this.scheduleBlocks[i].schedule_block[this.index].is_reschedule_teleconsultation = this.scheduleBlocks[i].schedule_block[this.index].is_reschedule_teleconsultation ? false : true;
+        }
+      }
+    }
+  }
+
+  cancelWaitingListOnly() {
+    for(let i = 0, { length } = this.scheduleBlocks; i < length; i += 1) {
+      if(this.scheduleBlocks[i].schedule_id === this.schBlockSelected.schedule_id) {
+        if(this.undoWaitingListOnly === true) {
+          this.undoWaitingListOnly = false;
+          this.scheduleBlocks[i].schedule_block[this.index].waiting_list_only = this.scheduleBlocks[i].schedule_block[this.index].waiting_list_only ? false : true;
         }
       }
     }

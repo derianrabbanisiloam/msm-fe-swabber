@@ -10,7 +10,10 @@
     <form name="form" (ngSubmit)="b.form.valid" #b="ngForm" novalidate>
 
       <div class="row">
-        <div class="form-group col-md-12" style="padding: 0">
+        <div class="form-group col-md-12" style="padding: 0" *ngIf="
+        !scheduleSel || 
+        (scheduleSel && scheduleSel?.consultation_type_id == 4) ||
+        (scheduleSel && scheduleSel.is_allow_waiting_list == false)">
           <label>Select schedule</label>
           <br>
           <select class="form-control select-schedule" name="selectSchedule"
@@ -23,25 +26,46 @@
           <br>
           <span class="custom-text" *ngIf="!scheduleSel">Select schedule first</span>
         </div>
+
+        <div class="form-group col-md-2" style="padding: 0" *ngIf="scheduleSel && scheduleSel?.consultation_type_id != 4 && scheduleSel.is_allow_waiting_list == true">
+          <label>Select schedule</label>
+          <br>
+          <select class="form-control select-schedule" name="selectSchedule"
+          [(ngModel)]="scheduleSel" required>
+            <option [disabled]="schedule.doctor_type_id == 1" 
+            [ngStyle]="{'background-color': schedule.doctor_type_id == 1 ? '#E5E7E9 ' : '' }"
+            *ngFor="let schedule of inputedParams.scheduleId" [ngValue]="schedule">
+              {{schedule.from_time}} - {{schedule.to_time}}</option>
+          </select>
+          <br>
+          <span class="custom-text" *ngIf="!scheduleSel">Select schedule first</span>
+        </div>
+        <div class="form-group col-md-2" *ngIf="scheduleSel && scheduleSel?.consultation_type_id != 4 && scheduleSel.is_allow_waiting_list == true">
+          <label style="display: block; text-align: left;">Block Waiting List Only</label>
+          <input class="form-control custom-checkbox" type="checkbox" name="blockWaitingList" (change)="blockWaitingList($event)" [(ngModel)]="isBlockWaitingList">
+        </div>
+        <div class="form-group col-md-8" *ngIf="scheduleSel && scheduleSel?.consultation_type_id != 4 && scheduleSel.is_allow_waiting_list == true">
+        </div>
+
         <div class="form-group col-md-2" style="padding: 0">
           <label>From Time</label>
           <br>
-          <select [disabled]="!scheduleSel" class="form-control select-time" name="fh" [(ngModel)]="blockModel.fh" (change)="checkBlockTime()" required>
+          <select [disabled]="!scheduleSel || isBlockWaitingList == true" class="form-control select-time" name="fh" [(ngModel)]="blockModel.fh" (change)="checkBlockTime()" required>
             <option *ngFor="let h of hourOptions" value="{{h}}">{{h}}</option>
           </select>
           <span> : </span>
-          <select [disabled]="!scheduleSel" class="form-control select-time" name="fm" [(ngModel)]="blockModel.fm" (change)="checkBlockTime()" required>
+          <select [disabled]="!scheduleSel || isBlockWaitingList == true" class="form-control select-time" name="fm" [(ngModel)]="blockModel.fm" (change)="checkBlockTime()" required>
             <option *ngFor="let m of minuteOptions" value="{{m}}">{{m}}</option>
           </select>
         </div>
         <div class="form-group col-md-2" style="padding: 0">
           <label>To Time</label>
           <br>
-          <select [disabled]="!scheduleSel" class="form-control select-time" name="th" [(ngModel)]="blockModel.th" (change)="checkBlockTime()" required>
+          <select [disabled]="!scheduleSel || isBlockWaitingList == true" class="form-control select-time" name="th" [(ngModel)]="blockModel.th" (change)="checkBlockTime()" required>
             <option *ngFor="let h of hourOptions" value="{{h}}">{{h}}</option>
           </select>
           <span> : </span>
-          <select [disabled]="!scheduleSel" class="form-control select-time" name="tm" [(ngModel)]="blockModel.tm" (change)="checkBlockTime()" required>
+          <select [disabled]="!scheduleSel || isBlockWaitingList == true" class="form-control select-time" name="tm" [(ngModel)]="blockModel.tm" (change)="checkBlockTime()" required>
             <option *ngFor="let m of minuteOptions" value="{{m}}">{{m}}</option>
           </select>
         </div>
@@ -61,11 +85,11 @@
 
         <div class="form-group col-md-2" *ngIf="!scheduleSel">
           <label style="display: block; text-align: center;">Include Waiting List</label>
-          <input [disabled]="!scheduleSel" class="form-control custom-checkbox" type="checkbox" name="isIncludeWaitingList" (change)="blockCheckBox($event)" [(ngModel)]="blockModel.isIncludeWaitingList">
+          <input [disabled]="!scheduleSel || isBlockWaitingList == true" class="form-control custom-checkbox" type="checkbox" name="isIncludeWaitingList" (change)="blockCheckBox($event)" [(ngModel)]="blockModel.isIncludeWaitingList">
         </div>
         <div class="form-group col-md-2" *ngIf="scheduleSel && scheduleSel?.consultation_type_id != 4 && scheduleSel?.consultation_type_id != 6">
           <label style="display: block; text-align: center;">Include Waiting List</label>
-          <input [disabled]="!scheduleSel" class="form-control custom-checkbox" type="checkbox" name="isIncludeWaitingList" (change)="blockCheckBox($event)" [(ngModel)]="blockModel.isIncludeWaitingList">
+          <input [disabled]="!scheduleSel || isBlockWaitingList == true" class="form-control custom-checkbox" type="checkbox" name="isIncludeWaitingList" (change)="blockCheckBox($event)" [(ngModel)]="blockModel.isIncludeWaitingList">
         </div>
         <div class="form-group col-md-2" *ngIf="scheduleSel && scheduleSel?.consultation_type_id == 4">
           <label style="display: block; text-align: center;">Include Teleconsult</label>
@@ -74,15 +98,18 @@
 
         <div class="form-group col-md-2" *ngIf="scheduleSel && scheduleSel?.consultation_type_id == 6">
           <label style="display: block; text-align: center;">Include Waiting List</label>
-          <input [disabled]="!scheduleSel" class="form-control custom-checkbox" type="checkbox" name="isIncludeWaitingList" (change)="blockCheckBox($event)" [(ngModel)]="blockModel.isIncludeWaitingList">
+          <input [disabled]="!scheduleSel || isBlockWaitingList == true" class="form-control custom-checkbox" type="checkbox" name="isIncludeWaitingList" (change)="blockCheckBox($event)" [(ngModel)]="blockModel.isIncludeWaitingList">
         </div>
         <div class="form-group col-md-2" *ngIf="scheduleSel && scheduleSel?.consultation_type_id == 6">
           <label style="display: block; text-align: center;">Include Teleconsult</label>
           <input [disabled]="!scheduleSel" class="form-control custom-checkbox" type="checkbox" name="isRescheduleTeleconsultation" (change)="blockCheckBoxTwo($event)" [(ngModel)]="blockModel.isRescheduleTeleconsultation">
         </div>
         
-        <div class="form-group col-md-2">
+        <div class="form-group col-md-2" *ngIf="isBlockWaitingList == false">
           <button [disabled]="!isValidBlock || !b.form.valid" (click)="addScheduleBlock()" class="btn btn-green">Add Block</button>
+        </div>
+        <div class="form-group col-md-2" *ngIf="isBlockWaitingList == true">
+          <button [disabled]="!blockModel.reason" (click)="addWaitingListOnly()" class="btn btn-green">Add Block</button>
         </div>
         <div class="col-md-12 alert alert-danger-2">
           <strong>* NOTE: Slot yang ter-block akan membuat pasien yang sudah terjadwal masuk ke reschedule worklist, dan tidak bisa dikembalikan lagi !</strong>
@@ -99,29 +126,38 @@
 
   <div class="col-md-12" *ngFor="let schBlock of scheduleBlocks; let g=index;" style="margin-top: 1em;">
     <div class="row" style="font-weight: bold;">
-      SCHEDULE TIME : {{schBlock.schedule_time}} <span class="flag-tele" *ngIf="schBlock.consultation_type_id == 4">TELE</span>
+      SCHEDULE TIME : {{schBlock.schedule_time}}
+      <span class="flag-tele" *ngIf="schBlock.consultation_type_id == 4">TELE</span>
     </div>
     <div *ngIf="schBlock.schedule_block.length > 0">
       <div class="row" *ngFor="let bl of schBlock.schedule_block; let i=index;" style="margin-top: 0.5em;">
+        <div class="col-md-12" style="padding: 0">
+          <input style="margin-top: 0.3em; margin-right: 1em" 
+          *ngIf="bl.consultation_type_id != 4 && bl.is_allow_waiting_list == true"
+            type="checkbox" name="blockWaitingList"(change)="openModalBlockConfirmation(content9, bl, i)" (change)="blockCheckBoxWaitingListOnly()" [(ngModel)]="bl.waiting_list_only">
+          <span *ngIf="bl.consultation_type_id != 4 && bl.is_allow_waiting_list == true">Block Waiting List only</span>
+          <span *ngIf="bl.consultation_type_id != 4 && bl.is_allow_waiting_list == true && bl.waiting_list_only == false
+          && (bl.fh == '00' && bl.fm == '00' || bl.th == '00' && bl.tm == '00')" class="block-error-msg" style="margin-left: 2em;">Masukan from time dan to time</span>
+        </div>
         <div class="form-group col-md-2" style="padding: 0;">
           <label>From Time</label>
           <br>
-          <select class="form-control select-time" (change)="openModalBlockConfirmation(content6, bl)" name="block_model_fh" [(ngModel)]="bl.fh" required>
+          <select [disabled]="bl.waiting_list_only == true" class="form-control select-time" (change)="openModalBlockConfirmation(content6, bl)" name="block_model_fh" [(ngModel)]="bl.fh" required>
             <option *ngFor="let h of hourOptions" value="{{h}}">{{h}}</option>
           </select>
           <span>:</span>
-          <select class="form-control select-time" (change)="openModalBlockConfirmation(content6, bl)" name="block_model_fm" [(ngModel)]="bl.fm" required>
+          <select [disabled]="bl.waiting_list_only == true" class="form-control select-time" (change)="openModalBlockConfirmation(content6, bl)" name="block_model_fm" [(ngModel)]="bl.fm" required>
             <option *ngFor="let m of minuteOptions" value="{{m}}">{{m}}</option>
           </select>
         </div>
         <div class="form-group col-md-2" style="padding: 0">
           <label>To Time</label>
           <br>
-          <select class="form-control select-time" (change)="openModalBlockConfirmation(content6, bl)" name="block_model_th" [(ngModel)]="bl.th" required>
+          <select [disabled]="bl.waiting_list_only == true" class="form-control select-time" (change)="openModalBlockConfirmation(content6, bl)" name="block_model_th" [(ngModel)]="bl.th" required>
             <option *ngFor="let h of hourOptions" value="{{h}}">{{h}}</option>
           </select>
           <span>:</span>
-          <select class="form-control select-time" (change)="openModalBlockConfirmation(content6, bl)" name="block_model_tm" [(ngModel)]="bl.tm" required>
+          <select [disabled]="bl.waiting_list_only == true" class="form-control select-time" (change)="openModalBlockConfirmation(content6, bl)" name="block_model_tm" [(ngModel)]="bl.tm" required>
             <option *ngFor="let m of minuteOptions" value="{{m}}">{{m}}</option>
           </select>
         </div>
@@ -137,7 +173,7 @@
 
         <div class="form-group col-md-2" *ngIf="bl?.consultation_type_id != 4 && bl?.consultation_type_id != 6">
           <label style="display: block; text-align: center;">Include Waiting List</label>
-          <input class="form-control custom-checkbox" type="checkbox" name="block_model_is_waiting_list" (change)="blockCheckBoxEdit()" (change)="openModalBlockConfirmation(content6, bl, i)" [(ngModel)]="bl.is_include_waiting_list">
+          <input [disabled]="bl.waiting_list_only == true" class="form-control custom-checkbox" type="checkbox" name="block_model_is_waiting_list" (change)="blockCheckBoxEdit()" (change)="openModalBlockConfirmation(content6, bl, i)" [(ngModel)]="bl.is_include_waiting_list">
         </div>
         <div class="form-group col-md-2" *ngIf="bl?.consultation_type_id == 4">
           <label style="display: block; text-align: center;">Include Teleconsult</label>
@@ -145,15 +181,15 @@
         </div>
         <div class="form-group col-md-2" *ngIf="bl?.consultation_type_id == 6">
           <label style="display: block; text-align: center;">Include Waiting List</label>
-          <input class="form-control custom-checkbox" type="checkbox" name="block_model_is_waiting_list" (change)="blockCheckBoxEdit()" (change)="openModalBlockConfirmation(content6, bl, i)" [(ngModel)]="bl.is_include_waiting_list">
+          <input [disabled]="bl.waiting_list_only == true" class="form-control custom-checkbox" type="checkbox" name="block_model_is_waiting_list" (change)="blockCheckBoxEdit()" (change)="openModalBlockConfirmation(content6, bl, i)" [(ngModel)]="bl.is_include_waiting_list">
         </div>
         <div class="form-group col-md-2" *ngIf="bl?.consultation_type_id == 6">
           <label style="display: block; text-align: center;">Include Teleconsult</label>
-          <input class="form-control custom-checkbox" type="checkbox" name="block_model_is_teleconsultation" (change)="blockCheckBoxEditTwo()" (change)="openModalBlockConfirmation(content6, bl, i)" [(ngModel)]="bl.is_reschedule_teleconsultation">
+          <input [disabled]="bl.waiting_list_only == true" class="form-control custom-checkbox" type="checkbox" name="block_model_is_teleconsultation" (change)="blockCheckBoxEditTwo()" (change)="openModalBlockConfirmation(content6, bl, i)" [(ngModel)]="bl.is_reschedule_teleconsultation">
         </div>
 
         <div class="form-group col-md-2">
-          <button (click)="openModalBlockConfirmation(content7, bl)" class="btn btn-danger">Delete</button>
+          <button (click)="openModalBlockConfirmation(content7, bl, i, true)" class="btn btn-danger">Delete</button>
         </div>
       </div>
     </div>
@@ -193,4 +229,17 @@
     <button class="ms_btn_border ms_btn_red" style="padding: 0.3vw 0vw; width: 5vw" (click)="deleteScheduleBlock()" (click)="d('Cross click')">Yes</button>
   </div>
 </div>
+</ng-template>
+
+<ng-template #content9 let-c="close" let-d="dismiss">
+  <div class="modal-header" style="padding-bottom: 0px">
+    <h4 class="modal-title" style="padding: 4px">Confirmation !</h4>
+  </div>
+  <div class="modal-body">
+    <p style="padding: 1vw 4vw">Are you sure to modify this block?</p>
+    <div style="text-align: center">
+      <button class="ms_btn_border ms_btn_black" style="padding: 0.3vw 0vw; width: 5vw" (click)="cancelWaitingListOnly()" aria-label="Close" (click)="d('Cross click')">Cancel</button>
+      <button class="ms_btn_border ms_btn_red" style="padding: 0.3vw 0vw; width: 5vw" (click)="updateWaitingListOnly()" (click)="d('Cross click')">Yes</button>
+    </div>
+  </div>
 </ng-template>

@@ -421,7 +421,7 @@ export class WidgetAppointmentListBpjsComponent implements OnInit {
             this.flagFile4 = true;
             file = event.target.files[0];
             this.uploadForm.get('referenceLetter').setValue(file);
-            formData_1.append('bpjs_reference_later', this.uploadForm.get('referenceLetter').value);
+            formData_1.append('bpjs_reference_letter', this.uploadForm.get('referenceLetter').value);
           }
             this.assetUpload = await this.patientService.uploadDocBpjs(formData_1)
             .toPromise().then(res => {

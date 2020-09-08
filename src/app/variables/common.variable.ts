@@ -7,6 +7,7 @@ export const RESCHEDULE_APP = 'APPOINTMENT__RESCHEDULE';
 export const QUEUE_NUMBER = 'QUEUE__CREATE_QUEUE';
 export const APP_TEMP = 'APPOINTMENT_TEMPORARY__COUNT';
 export const APP_RESCHEDULE = 'APPOINTMENT_RESCHEDULE__COUNT';
+export const REQUEST_LIST = 'BPJS__APPOINTMENT_COUNT';
 export const SCHEDULE_BLOCK = 'SCHEDULE__BLOCK';
 export const USER_LOGIN__FRONT_OFFICE = 'USER_LOGIN__FRONT_OFFICE';
 
@@ -14,7 +15,8 @@ export const keySocket = {
   APPOINTMENT: '/appointments',
   QUEUE: '/queues',
   SCHEDULE: '/schedules',
-  USERS: '/users'
+  USERS: '/users',
+  BPJS: '/bpjs'
 }
 
 export const appInfo = {

@@ -15,6 +15,7 @@ import Swal from 'sweetalert2';
 import { dateFormatter } from '../../../utils/helpers.util';
 import { DoctorService } from '../../../services/doctor.service';
 import { ModalSearchPatientComponent } from '../../../views/widgets/modal-search-patient/modal-search-patient.component';
+import { Router } from '@angular/router';
 
 @Component({
   selector: 'app-modal-create-app-bpjs',
@@ -93,6 +94,7 @@ export class ModalCreateAppBpjsComponent implements OnInit {
     private patientService: PatientService,
     private doctorService: DoctorService,
     modalSetting: NgbModalConfig,
+    private router: Router
   ) {
     modalSetting.backdrop = 'static';
     modalSetting.keyboard = false;
@@ -599,7 +601,19 @@ export class ModalCreateAppBpjsComponent implements OnInit {
         }
         this.alertService.success('Success to create appointment', false, 3000);
         this.appointmentService.emitCreateApp(true);
-        setTimeout(() => { this.close(); }, 2000);
+        setTimeout(() => { 
+          this.close();
+          if(this.bpjsInfo.fromBpjs === true && this.bpjsInfo.fromRegistration === false) {
+            this.router.navigate(['/create-appointment'], {
+              queryParams: {
+                doctorId: this.addAppPayload.doctorId,
+                date: this.addAppPayload.appointmentDate,
+                fromBpjs: true,
+                fromRegistration: true
+              }
+            }); 
+          }
+        }, 2000);
       }, err => {
         this.alertService.error(err.error.message, false, 3000);
       }

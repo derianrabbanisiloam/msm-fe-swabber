@@ -24,12 +24,14 @@ export class WidgetRequestListComponent implements OnInit {
   public hospital: any = this.key.hospital;
   public assetPath = environment.ASSET_PATH;
   public urlBpjsCard = environment.GET_IMAGE;
-  public todayDateISO: any = moment().format('YYYY-MM-DD');
+  public todayDateISO: any = moment().add(1, 'days').format('YYYY-MM-DD');
   public myDateRangePickerOptions: IMyDrpOptions = {
     dateFormat: 'dd/mm/yyyy',
-    height: '30px'
+    height: '30px',
   };
+  public myDateRangeCreatedDate: IMyDrpOptions;
   public datePickerModel: any = {};
+  public datePickerCreatedDate: any = {};
   public keywordsModel: KeywordsModel = new KeywordsModel;
   public maskBirth = [/\d/, /\d/, '-', /\d/, /\d/, '-', /\d/, /\d/, /\d/, /\d/];
   public alerts: Alert[] = [];
@@ -40,8 +42,12 @@ export class WidgetRequestListComponent implements OnInit {
   public closeResult: string;
   public count: number = -1;
   public selectedApp: any;
-  public bodyKeyword: any = { valueOne: null, valueTwo: null, valueThree: null, valueFour: null };
-  public bodyKeywordTwo: any = { valueOne: null, valueTwo: null, valueThree: null, valueFour: null };
+  public bodyKeyword: any = { 
+    valueOne: null, valueTwo: null, valueThree: null, valueFour: null, valueFive: null,
+    valueSix: null, valueSeven: null, valueEight: null };
+  public bodyKeywordTwo: any = { 
+    valueOne: null, valueTwo: null, valueThree: null, valueFour: null, valueFive: null,
+    valueSix: null, valueSeven: null, valueEight: null };
   public searchKeywords: any = {
     doctor: {},
     area: {},
@@ -84,12 +90,19 @@ export class WidgetRequestListComponent implements OnInit {
    }
 
   ngOnInit() {
+    let today = this.todayDateISO.split('-');
+    this.myDateRangeCreatedDate = {
+      dateFormat: 'dd/mm/yyyy',
+      height: '30px',
+      width: '100px',
+      editableDateRangeField: false,
+      disableSince: { year: today[0], month: today[1], day: today[2] }
+    };
     if(this.doctorService.goBack) { //when click prev page
       this.showSchedule = false;
     }
     this.getSpecialities();
     this.keywordsModel.hospitalId = this.hospital.id;
-    this.initializeDateRangePicker();
     this.getCollectionAlert();
     this.getAppointmentBpjs();
   }
@@ -108,19 +121,6 @@ export class WidgetRequestListComponent implements OnInit {
         x.speciality_name = isEmpty(x.speciality_name) ? '' : x.speciality_name;
       });
     }
-  }
-
-  initializeDateRangePicker() {
-    const m = moment();
-    const year = Number(m.format('YYYY'));
-    const month = Number(m.format('MM'));
-    const date = Number(m.format('DD'));
-    this.datePickerModel = {
-      beginDate: { year: year, month: month, day: date },
-      endDate: { year: year, month: month, day: date },
-    };
-    this.keywordsModel.fromDate = m.format('YYYY-MM-DD');
-    this.keywordsModel.toDate = this.keywordsModel.fromDate;
   }
 
   getImage(fileName) {
@@ -143,7 +143,39 @@ export class WidgetRequestListComponent implements OnInit {
       eDay = Number(eDay) < 10 ? '0' + eDay : eDay;
       this.keywordsModel.fromDate = bYear + '-' + bMonth + '-' + bDay;
       this.keywordsModel.toDate = eYear + '-' + eMonth + '-' + eDay;
-      this.getAppointmentBpjs();
+      if(this.keywordsModel.fromDate === '0-00-00' 
+        && this.keywordsModel.toDate === '0-00-00') {
+          this.keywordsModel.fromDate = '';
+          this.keywordsModel.toDate = '';
+          this.getAppointmentBpjs();
+      } else {
+        this.getAppointmentBpjs();
+      }
+    }
+  }
+
+  changeDateRangeCreatedDate(dateRange: any) {
+    if (dateRange) {
+      let bYear = dateRange.beginDate.year;
+      let bMonth = dateRange.beginDate.month;
+      bMonth = Number(bMonth) < 10 ? '0' + bMonth : bMonth;
+      let bDay = dateRange.beginDate.day;
+      bDay = Number(bDay) < 10 ? '0' + bDay : bDay;
+      let eYear = dateRange.endDate.year;
+      let eMonth = dateRange.endDate.month;
+      eMonth = Number(eMonth) < 10 ? '0' + eMonth : eMonth;
+      let eDay = dateRange.endDate.day;
+      eDay = Number(eDay) < 10 ? '0' + eDay : eDay;
+      this.keywordsModel.createFrom = bYear + '-' + bMonth + '-' + bDay;
+      this.keywordsModel.createTo = eYear + '-' + eMonth + '-' + eDay;
+      if(this.keywordsModel.createFrom === '0-00-00' 
+        && this.keywordsModel.createTo === '0-00-00') {
+          this.keywordsModel.createFrom = '';
+          this.keywordsModel.createTo = '';
+          this.getAppointmentBpjs();
+      } else {
+        this.getAppointmentBpjs();
+      }
     }
   }
 
@@ -153,7 +185,7 @@ export class WidgetRequestListComponent implements OnInit {
     this.showNotFoundMsg = false;
     let offsetTemp;
     const {
-      hospitalId = this.hospital.id, fromDate = this.todayDateISO, toDate = this.todayDateISO,
+      hospitalId = this.hospital.id, fromDate = '', toDate = '', createFrom = '', createTo = '',
       patientName = '', birthDate = '', noBpjs = '',  offset = 0, specialtyId = '', limit = 10
     } = await this.keywordsModel;
     offsetTemp = offset;
@@ -167,23 +199,23 @@ export class WidgetRequestListComponent implements OnInit {
     if(this.count === 0) {
       this.bodyKeyword.valueOne = hospitalId, this.bodyKeyword.valueTwo = fromDate, this.bodyKeyword.valueThree = toDate;
       this.bodyKeyword.valueFour = patientName, this.bodyKeyword.valueFive = fixBirthDate;
-      this.bodyKeyword.valueSix = noBpjs, this.bodyKeyword.valueSeven = specialty;
+      this.bodyKeyword.valueSix = noBpjs, this.bodyKeyword.valueSeven = createFrom, this.bodyKeyword.valueEight = createTo;
 
       this.bodyKeywordTwo.valueOne = hospitalId, this.bodyKeywordTwo.valueTwo = fromDate, this.bodyKeywordTwo.valueThree = toDate;
       this.bodyKeywordTwo.valueFour = patientName, this.bodyKeywordTwo.valueFive = fixBirthDate;
-      this.bodyKeywordTwo.valueSix = noBpjs, this.bodyKeywordTwo.valueSeven = specialty;
+      this.bodyKeywordTwo.valueSix = noBpjs, this.bodyKeywordTwo.valueSeven = createFrom, this.bodyKeywordTwo.valueEight = createTo;
     } else if(this.count > 0) {
       this.bodyKeyword.valueOne = hospitalId, this.bodyKeyword.valueTwo = fromDate, this.bodyKeyword.valueThree = toDate;
       this.bodyKeyword.valueFour = patientName, this.bodyKeyword.valueFive = fixBirthDate;
-      this.bodyKeyword.valueSix = noBpjs, this.bodyKeyword.valueSeven = specialty;
+      this.bodyKeyword.valueSix = noBpjs, this.bodyKeyword.valueSeven = createFrom, this.bodyKeyword.valueEight = createTo;
 
       if(this.bodyKeyword.valueOne !== this.bodyKeywordTwo.valueOne || this.bodyKeyword.valueTwo !== this.bodyKeywordTwo.valueTwo ||
         this.bodyKeyword.valueThree !== this.bodyKeywordTwo.valueThree || this.bodyKeyword.valueFour !== this.bodyKeywordTwo.valueFour ||
         this.bodyKeyword.valueFive !== this.bodyKeywordTwo.valueFive || this.bodyKeyword.valueSix !== this.bodyKeywordTwo.valueSix ||
-        this.bodyKeyword.valueSeven !== this.bodyKeywordTwo.valueSeven) {
+        this.bodyKeyword.valueSeven !== this.bodyKeywordTwo.valueSeven || this.bodyKeyword.valueEight !== this.bodyKeywordTwo.valueEight) {
           this.bodyKeywordTwo.valueOne = hospitalId, this.bodyKeywordTwo.valueTwo = fromDate, this.bodyKeywordTwo.valueThree = toDate;
           this.bodyKeywordTwo.valueFour = patientName, this.bodyKeywordTwo.valueFive = fixBirthDate;
-          this.bodyKeywordTwo.valueSix = noBpjs, this.bodyKeywordTwo.valueSeven = specialty;
+          this.bodyKeywordTwo.valueSix = noBpjs, this.bodyKeywordTwo.valueSeven = createFrom, this.bodyKeywordTwo.valueSeven = createTo;
         
           this.page = 0;
           offsetTemp = 0;
@@ -201,7 +233,9 @@ export class WidgetRequestListComponent implements OnInit {
       noBpjs,
       specialty,
       offsetTemp,
-      limit
+      limit,
+      createFrom,
+      createTo
     ).subscribe(
       data => {
         if (data.data.length !== 0) {
@@ -366,6 +400,8 @@ class KeywordsModel {
   hospitalId: string;
   fromDate: string;
   toDate: string;
+  createFrom: string;
+  createTo: string;
   patientName: string;
   localMrNo: string;
   birthDate: string;

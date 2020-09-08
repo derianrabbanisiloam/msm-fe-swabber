@@ -118,9 +118,10 @@ export class WidgetDoctorScheduleComponent implements OnInit {
       this.keywords = this.bodyBpjs;
   }
 
+    var dateFix = null;
     if(this.fromBpjs === true && this.fromRegistration === false) {
       var splitDate = this.patFromBpjs.appointment_date.split('-');
-      var dateFix = splitDate[2]+'-'+splitDate[1]+'-'+splitDate[0];
+      dateFix = splitDate[2]+'-'+splitDate[1]+'-'+splitDate[0];
       let dateChoosed = moment(dateFix); 
       this.todayDateISOBPJS = dateChoosed.add(90, 'days').format('YYYY-MM-DD');
       let today = this.todayDateISOBPJS.split('-');
@@ -135,6 +136,9 @@ export class WidgetDoctorScheduleComponent implements OnInit {
         showInputField: true,
         disableSince: { year: today[0], month: today[1], day: today[2] }
       };
+    }
+    if(dateFix !== null) {
+      this.initDate = dateFix;
     }
     
     this.doctorService.searchDoctorSource2 = null;

@@ -75,7 +75,7 @@
             <td>
               {{app.no}}
               <span *ngIf="app.channel_id == 15" style="padding-right: 0; margin-right: -2em;">
-                <img class="icon_bpjs" src="../../../../assets/icons/bpjs_logo.png">
+                <img class="icon_bpjs" src="{{assetPath}}icons/bpjs_logo.png">
               </span>
             </td>
             <td *ngIf="app.is_can_create && isOriginal && app.is_walkin == false" class="st-kolom-available"
@@ -182,7 +182,7 @@
             <td>
               {{app.no}}
               <span *ngIf="app.channel_id == 15" style="padding-right: 0; margin-right: -2em;">
-                <img class="icon_bpjs" src="../../../../assets/icons/bpjs_logo.png">
+                <img class="icon_bpjs" src="{{assetPath}}icons/bpjs_logo.png">
               </span>
             </td>
             <td *ngIf="app.is_can_create && isOriginal && app.is_walkin == false" class="st-kolom-available"
@@ -247,7 +247,7 @@
             <td>
               {{app.no}}
               <span *ngIf="app.channel_id == 15" style="padding-right: 0; margin-right: -2em;">
-                <img class="icon_bpjs" src="../../../../assets/icons/bpjs_logo.png">
+                <img class="icon_bpjs" src="{{assetPath}}icons/bpjs_logo.png">
               </span>
             </td>
             <td *ngIf="app.is_can_create && isOriginal && isOpen == true" class="st-kolom-available"
@@ -340,7 +340,7 @@
             <td>
               {{app.no}}
               <span *ngIf="app.channel_id == 15" style="padding-right: 0; margin-right: -2em;">
-                <img class="icon_bpjs" src="../../../../assets/icons/bpjs_logo.png">
+                <img class="icon_bpjs" src="{{assetPath}}icons/bpjs_logo.png">
               </span>
             </td>
             <td *ngIf="app.is_can_create && isOriginal && app.is_walkin == false" class="st-kolom-available"
@@ -461,7 +461,7 @@
                 <td>
                   {{app.no}}
                   <span *ngIf="app.channel_id == 15" style="padding-right: 0; margin-right: -2em;">
-                    <img class="icon_bpjs" src="../../../../assets/icons/bpjs_logo.png">
+                    <img class="icon_bpjs" src="{{assetPath}}icons/bpjs_logo.png">
                   </span>
                 </td>
                 <td *ngIf="app.is_can_create && isOriginal && fromBpjs == false" class="st-kolom-available" (click)="openCreateAppModal(app)">

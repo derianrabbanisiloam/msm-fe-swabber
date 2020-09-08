@@ -111,3 +111,8 @@ export const paymentStatus = {
   UNPAID: '2',
   NOTPAID: '3',
 };
+
+export const pathImage = {
+  DISCLAIMER: '/disclaimer_1/',
+  BPJS_CARD: '/bpjs_identity_card'
+}

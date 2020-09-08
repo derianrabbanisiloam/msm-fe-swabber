@@ -14,18 +14,20 @@ import { ScheduleService } from '../../../services/schedule.service';
 import { AlertService } from '../../../services/alert.service';
 import { Alert, AlertType } from '../../../models/alerts/alert';
 import { dateFormatter } from '../../../utils/helpers.util';
-import { channelId, sourceApps, queueType } from '../../../variables/common.variable';
+import { channelId, sourceApps, queueType, typeFile } from '../../../variables/common.variable';
 import { NgbModal, ModalDismissReasons } from '@ng-bootstrap/ng-bootstrap';
 import * as pdfMake from 'pdfmake/build/pdfmake';
 import * as pdfFonts from 'pdfmake/build/vfs_fonts';
 import * as $ from 'jquery';
 import { THIS_EXPR } from '@angular/compiler/src/output/output_ast';
 import socket from 'socket.io-client';
-import { SecretKey, Jwt, QUEUE_NUMBER, CHECK_IN, keySocket } from '../../../variables/common.variable';
+import { SecretKey, Jwt, QUEUE_NUMBER, CHECK_IN, keySocket, pathImage } from '../../../variables/common.variable';
 import Security from 'msm-kadapat';
 import { environment } from '../../../../environments/environment';
 import { localSpliter } from '../../../../app/utils/helpers.util';
 import { isEmpty } from 'lodash';
+import Swal from 'sweetalert2';
+import { FormBuilder, FormGroup, FormControl } from '@angular/forms';
 
 @Component({
   selector: 'app-widget-patient-data',
@@ -115,6 +117,7 @@ export class WidgetPatientDataComponent implements OnInit {
 
   public closeAdm: any;
   public closeQue: any;
+  public closeDocument: any;
 
   public resQueue: any;
   public roomDetail: any;
@@ -133,6 +136,17 @@ export class WidgetPatientDataComponent implements OnInit {
   public validInputNoSim: boolean = false;
   public validName: boolean = false;
   public phoneNumber: any;
+  public fromBpjs: boolean = false;
+  public fromRegistration: boolean = false;
+  public maxSize10MB: number = 10485760;
+  public flagFile1: boolean = false;
+  public flagFile2: boolean = false;
+  public flagFile3: boolean = false;
+  public flagFile4: boolean = false;
+  uploadForm: FormGroup;
+  public assetUpload: any = null;
+  public bodyUpload: any = {};
+  public urlBpjsCard = environment.GET_IMAGE;
 
   public flagErrorMobile1: boolean = false;
   public flagErrorMobile2: boolean = false;
@@ -153,6 +167,7 @@ export class WidgetPatientDataComponent implements OnInit {
     private queueService: QueueService,
     private scheduleService: ScheduleService,
     private router: Router,
+    private formBuilder: FormBuilder,
   ) {
     this.model.sex = {};
     this.model.CentralRegDate = dateFormatter(new Date(), true);
@@ -177,6 +192,12 @@ export class WidgetPatientDataComponent implements OnInit {
   }
 
   ngOnInit() {
+    this.uploadForm = this.formBuilder.group({
+      bpjsCard: [''],
+      identityCard: [''],
+      referenceLetter: [''],
+      familyCard: ['']
+    });
     this.admissionType();
     this.getListRoomHope();
     this.getPatientType();
@@ -245,6 +266,10 @@ export class WidgetPatientDataComponent implements OnInit {
 
   async isAppointment() {
     this.appointmentId = this.route.snapshot.queryParams['appointmentId'];
+    if(this.route.snapshot.queryParams['fromBpjs'] && this.route.snapshot.queryParams['fromRegistration']){
+      this.fromBpjs = this.route.snapshot.queryParams['fromBpjs'] === 'true' ? true : false;
+      this.fromRegistration = this.route.snapshot.queryParams['fromRegistration'] === 'true' ? true : false;
+    }
 
     if (this.appointmentId) {
       this.isFromAppointmentList = true;
@@ -1153,6 +1178,139 @@ export class WidgetPatientDataComponent implements OnInit {
     }
   }
 
+  async upload(event, nameFile){
+    if (event.target.files.length > 0) {
+      if(event.target.files[0].type === typeFile.image || event.target.files[0].type === typeFile.pdf) {
+        if(event.target.files[0].size > this.maxSize10MB) {
+          Swal.fire({
+            position: 'center',
+            type: 'error',
+            title: 'Max size 10MB',
+            showConfirmButton: false,
+            timer: 2000
+          })
+        } else {
+          let file;
+          const formData_1 = new FormData();
+          if(nameFile === 'bpjsCard') {
+            this.flagFile1 = true;
+            file = event.target.files[0];
+            this.uploadForm.get('bpjsCard').setValue(file);
+            formData_1.append('bpjs_bpjs_card', this.uploadForm.get('bpjsCard').value);
+          } 
+          else if(nameFile === 'identityCard') {
+            this.flagFile2 = true;
+            file = event.target.files[0];
+            this.uploadForm.get('identityCard').setValue(file);
+            formData_1.append('bpjs_identity_card', this.uploadForm.get('identityCard').value);
+          } 
+          else if(nameFile === 'familyCard') {
+            this.flagFile3 = true;
+            file = event.target.files[0];
+            this.uploadForm.get('familyCard').setValue(file);
+            formData_1.append('bpjs_family_card', this.uploadForm.get('familyCard').value);
+          }
+          else if(nameFile === 'referenceLetter') {
+            this.flagFile4 = true;
+            file = event.target.files[0];
+            this.uploadForm.get('referenceLetter').setValue(file);
+            formData_1.append('bpjs_reference_later', this.uploadForm.get('referenceLetter').value);
+          }
+            this.assetUpload = await this.patientService.uploadDocBpjs(formData_1)
+            .toPromise().then(res => {
+              this.uploadForm = this.formBuilder.group({
+                bpjsCard: [''],
+                identityCard: [''],
+                referenceLetter: [''],
+                familyCard: ['']
+              });
+              this.flagFile1 = false;
+              this.flagFile2 = false;
+              this.flagFile3 = false;
+              this.flagFile4 = false;
+              
+              return res.data;
+            }).catch(err => {
+              this.flagFile1 = false;
+              this.flagFile2 = false;
+              this.flagFile3 = false;
+              this.flagFile4 = false;
+              Swal.fire({
+                type: 'error',
+                title: 'Oops...',
+                text: err.error.message,
+                timer: 4000
+              })
+              return null
+            });
+            if(this.assetUpload) {
+              this.editAppointmentData(this.assetUpload[0].name, nameFile)
+            }
+        }
+      } else {
+        Swal.fire({
+          position: 'center',
+          type: 'error',
+          title: 'Format file JPG and PDF only',
+          showConfirmButton: false,
+          timer: 2000
+        })
+      }
+    }
+  }
+
+  getImage(fileName) {
+    let split = fileName.split('-');
+    let pathFile = split[0];
+    window.open(this.urlBpjsCard +'/'+ pathFile +'/'+ fileName, '_blank', "status=1");
+  }
+
+  async editAppointmentData(pathFile, nameFile) {
+    this.bodyUpload = {
+      userId: this.user.id,
+      userName: this.user.username,
+      source: sourceApps,
+    }
+    if(nameFile === 'bpjsCard') this.bodyUpload.bpjsCardFile = pathFile;
+    else if(nameFile === 'identityCard') this.bodyUpload.identityCardFile = pathFile;
+    else if(nameFile === 'referenceLetter') this.bodyUpload.refferenceLetterFile = pathFile;
+    else if(nameFile === 'familyCard') this.bodyUpload.familyCardFile = pathFile;
+    
+    this.appointmentService.updateAppBpjs(this.selectedCheckIn.appointment_id, this.bodyUpload).subscribe(
+      data => {
+        this.bodyUpload = {};
+        this.refreshDataApp(this.selectedCheckIn.appointment_id);
+        if(nameFile === 'bpjsCard') this.uploadForm.get('bpjsCard').setValue(null);
+        else if(nameFile === 'identityCard') this.uploadForm.get('identityCard').setValue(null);
+        else if(nameFile === 'referenceLetter') this.uploadForm.get('referenceLetter').setValue(null);
+        else if(nameFile === 'familyCard') this.uploadForm.get('familyCard').setValue(null);
+        Swal.fire({
+          position: 'center',
+          type: 'success',
+          title: 'Upload Successful',
+          showConfirmButton: false,
+          timer: 2000
+        })
+      }, error => {
+        Swal.fire({
+          type: 'error',
+          title: 'Oops...',
+          text: error.error.message,
+          timer: 4000
+        })
+      }
+    )
+  }
+
+  async refreshDataApp(appointment){
+    await this.appointmentService.getAppointmentById(appointment).subscribe(
+      data => {
+        this.selectedCheckIn = data.data[0];
+        this.selectedCheckIn.custome_birth_date = dateFormatter(this.selectedCheckIn.birth_date, true);
+      }
+    );
+  }
+
   async checkSearchPatientHope(content, fromSaveButton) {
     this.isButtonSave = true;
     let isValid;
@@ -1455,7 +1613,11 @@ export class WidgetPatientDataComponent implements OnInit {
     this.nationalIdTypeId = await this.patientService.getDefaultPatientType(patientHopeId).toPromise()
       .then(res => {
         if (res.data) {
-          return res.data.nationalIdTypeId;
+          if(res.data.nationalIdTypeId === null) {
+            return '';
+          } else {
+            return res.data.nationalIdTypeId;
+          }
         } else {
           return '';
         }
@@ -1465,7 +1627,7 @@ export class WidgetPatientDataComponent implements OnInit {
 
     let idx = null;
 
-    if (this.nationalIdTypeId) {
+    if (this.nationalIdTypeId && this.fromBpjs === false) {
       if (this.nationalIdTypeId == 3) {
         //Passport
         idx = this.patientTypeList.findIndex((a) => {
@@ -1482,10 +1644,28 @@ export class WidgetPatientDataComponent implements OnInit {
           return a.description == "PRIVATE";
         })
       }
-    } else {
+    } else if(this.nationalIdTypeId && this.fromBpjs === true) {
+      this.txtPayer = false;
+      this.txtPayerNo = false;
+      this.txtPayerEligibility = false;
+      this.payerNo = this.selectedCheckIn.bpjs_card_number;
       idx = this.patientTypeList.findIndex((a) => {
-        return a.description == "PRIVATE";
+        return a.description == "PAYER";
       })
+    } else {
+      if(this.fromBpjs === true) {
+        this.txtPayer = false;
+        this.txtPayerNo = false;
+        this.txtPayerEligibility = false;
+        this.payerNo = this.selectedCheckIn.bpjs_card_number;
+        idx = this.patientTypeList.findIndex((a) => {
+          return a.description == "PAYER";
+        })
+      } else {
+        idx = this.patientTypeList.findIndex((a) => {
+          return a.description == "PRIVATE";
+        })
+      }
     }
     this.patientType = this.patientTypeList[idx];
   }
@@ -1503,7 +1683,15 @@ export class WidgetPatientDataComponent implements OnInit {
     this.selectedCheckIn.custome_birth_date = dateFormatter(this.selectedCheckIn.birth_date, true);
 
     await this.defaultPatientType(this.selectedCheckIn.patient_hope_id);
-    this.openAdmission(content);
+    if(this.fromBpjs === true) {
+      this.documentModal(content);
+    } else {
+      this.openAdmission(content);
+    }
+  }
+
+  async documentModal(content) {
+    this.modalService.open(content, { windowClass: 'fo_modal_admission_3', size: 'lg' });
   }
 
   async actionAdmission(activeModal) {
@@ -1579,6 +1767,11 @@ export class WidgetPatientDataComponent implements OnInit {
     this.closeAdm = close;
   }
 
+  afterUploadCheckIn(content, close) {
+    this.modalService.open(content, { windowClass: 'fo_modal_admission_4', size: 'lg' });
+    this.closeDocument = close;
+  }
+
   async printQueueAction(val, isReguler, content) {
     this.buttonReguler = true;
     this.buttonVIP = true;
@@ -1644,6 +1837,9 @@ export class WidgetPatientDataComponent implements OnInit {
   printQueueTicket(val) {
     this.closeQue.click();
     this.closeAdm.click();
+    if(this.fromBpjs === true) {
+      this.closeDocument.click();
+    }
 
     const queueNo = this.resQueue.name;
     const isWalkin = this.selectedCheckIn.is_walkin ? 'WALK IN' : 'APPOINTMENT';
@@ -1724,8 +1920,21 @@ export class WidgetPatientDataComponent implements OnInit {
     pdfMake.createPdf(docDefinition).print();
 
     //redirect to create appointment
-    const params = { doctorId: this.selectedCheckIn.doctor_id, date: this.selectedCheckIn.appointment_date };
-    this.router.navigate(['./create-appointment'], { queryParams: params });
+    if(this.fromBpjs === true) {
+      
+      this.router.navigate(['/create-appointment'], {
+        queryParams: {
+          fromBpjs: this.fromBpjs,
+          fromRegistration: this.fromRegistration,
+          doctorId: this.selectedCheckIn.doctor_id, 
+          date: this.selectedCheckIn.appointment_date,
+          fromPatientData: true
+        }
+      });
+    } else {
+      const params = { doctorId: this.selectedCheckIn.doctor_id, date: this.selectedCheckIn.appointment_date };
+      this.router.navigate(['./create-appointment'], { queryParams: params });
+    }
 
   }
 

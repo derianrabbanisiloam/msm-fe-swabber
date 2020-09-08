@@ -34,7 +34,10 @@
           <td>
             {{ appointment.doctor_name }}
           </td>
-          <td>{{ appointment.is_waiting_list }}</td>
+          <td>
+            <span *ngIf="appointment.is_waiting_list === false">No</span>
+            <span *ngIf="appointment.is_waiting_list === true">Yes</span>
+          </td>
           <td>{{ appointment.queue_number }}</td>
           <td>{{ appointment.created_name }}</td>
           <td>
@@ -47,21 +50,103 @@
       </table>
     </div>
     <div class="col-md-12" *ngIf="specialtyDoctor">
-      <span style="color: red;">*Please find a doctor first</span>
-      <select id="doctor" (change)="searchSchedule1()" style="width: 15em;" class="form-control"  [(ngModel)]="doctorVal" name="doctor" required>
-        <option *ngFor = "let doctor of doctorBySpecialty" [ngValue]="doctor">
-          {{doctor.name}}
-        </option>
-      </select>
-      <div [style.display]="flag">
+      <div class="row">
+        <div class="col-md-3" style="padding: 0">
+          <span style="color: red;">*Please find a doctor first</span>
+          <select id="doctor" [disabled]="isReschNonBpjs" (change)="searchSchedule1()" style="width: 20em;" class="form-control"  [(ngModel)]="doctorVal" name="doctor" required>
+            <option *ngFor = "let doctor of doctorBySpecialty" [ngValue]="doctor">
+              {{doctor.name}}
+            </option>
+          </select>
+        </div>
+        <div class="col-md-4" style="padding: 0">
+          <button class="ms_btn_border" [ngClass]="isReschNonBpjs == false ? 'ms_btn_blue' : 'ms_btn_darkgrey'"
+            style="padding: 0.3vw 0vw; width: 11vw; margin-top: 1.3vw;" (click)="rescheduleToNonBpjs()">
+              Reschedule to non BPJS
+          </button>
+        </div>
+      </div>
+
+      <div class="row" style="margin-top: 2em;" *ngIf="isReschNonBpjs">
+        <div class="col-md-12">
+          <ngb-tabset>
+            <ngb-tab title="By Doctor">
+              <ng-template ngbTabContent>
+                <div class="fo_create_input_panel">
+                  <div class="fo_create_input d-flex justify-content-start">
+                    <div class="ng-autocomplete" class="angular-autocomplete">
+                      <ng-autocomplete
+                        placeHolder="Doctor name ..."
+                        [(ngModel)]="model.doctor.name"
+                        [data]="doctorList"
+                        searchKeyword="name"
+                        (selected)='searchSchedule1($event)'
+                        [itemTemplate]="itemTemplateDoctor"
+                        [notFoundTemplate]="notFoundTemplate"> 
+                      </ng-autocomplete>
+                      
+                      <ng-template #itemTemplateDoctor let-item>
+                        <a [innerHTML]="item.name"></a>
+                      </ng-template>
+                      
+                      <ng-template #notFoundTemplate let-notFound>
+                        <div [innerHTML]="notFound"></div>
+                      </ng-template>
+                    </div>
+                  </div>
+                  <div class="">
+                    <div class="alert alert-warning alert-msg-wait" *ngIf="showWaitMsg">
+                      Please wait...
+                    </div>
+                    <div class="alert alert-danger" *ngIf="showNotFoundMsg">
+                      Schedule not found
+                    </div>
+                  </div>
+                </div>
+              </ng-template>
+            </ngb-tab>
+    
+            <ngb-tab title="By Specialist">
+              <ng-template ngbTabContent>
+                <div class="fo_create_input_panel">
+                  <div class=" fo_create_input d-flex justify-content-start">
+                    <div class=" form-group">
+                      <select class="form-control" [(ngModel)]="model.speciality" name="speciality" (change)="searchSchedule2()">
+                        <option>-----</option>
+                        <option *ngFor="let sp of specialities" [ngValue]="sp" [selected] = "sp.speciality_id == model.speciality.speciality_id">{{sp.speciality_name}}</option>
+                      </select>
+                    </div>
+                  </div>
+                  <div class="">
+                    <div class="alert alert-warning alert-msg-wait" *ngIf="showWaitMsg">
+                      Please wait...
+                    </div>
+                    <div class="alert alert-danger" *ngIf="showNotFoundMsg">
+                      Schedule not found
+                    </div>
+                  </div>
+                </div>
+              </ng-template>
+            </ngb-tab>
+          </ngb-tabset>
+        </div>
+      </div>
+
+      <div [style.display]="flag" *ngIf="!isReschNonBpjs && openWidget === true">
         <app-widget-doctor-schedule
         (opScheduleSelected)="getScheduleData($event)">
-      </app-widget-doctor-schedule>
-    </div>
+        </app-widget-doctor-schedule>
+      </div>
+
+      <div [style.display]="flagTwo" *ngIf="isReschNonBpjs && openWidget === true">
+        <app-widget-doctor-schedule
+        (opScheduleSelected)="getScheduleData($event)">
+        </app-widget-doctor-schedule>
+      </div>
       
       <div style="height:5vw; clear:both;"></div>
       <app-widget-create-appointment
-        *ngIf="opScheduleSelected"
+        *ngIf="opScheduleSelected && openWidgetCreateApp"
         (opSlotSelected)="getSlotData($event)"
         [appointmentPayloadInput]="createAppInputData">
       </app-widget-create-appointment>

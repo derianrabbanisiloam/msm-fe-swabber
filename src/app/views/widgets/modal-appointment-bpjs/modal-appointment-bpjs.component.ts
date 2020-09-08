@@ -37,7 +37,10 @@ export class ModalAppointmentBpjsComponent implements OnInit {
   public editModel: any = {};
   public isReschedule: boolean = false;
   public flag: string = 'none';
+  public flagTwo: string = 'none';
   public dateConvert: any;
+  public appBPJS: boolean = true;
+  public openWidgetCreateApp: boolean = false;
 
   public doctorList: any;
   public doctorBySpecialty: any;
@@ -51,10 +54,13 @@ export class ModalAppointmentBpjsComponent implements OnInit {
     hospital: {},
     speciality: {}
   };
+  public modelTwo: any = { hospital_id: '', name: '', mr: '', doctor: '', modifiedName: '',
+   iswaitingList: '' };
   public doctorVal: any;
+  public openWidget: boolean = false;
 
-  public showSchedule: boolean = false;
   public searchAutoComplete: any;
+  public isReschNonBpjs: boolean = false;
   constructor(
     private doctorService: DoctorService,
     private appointmentService: AppointmentService,
@@ -67,11 +73,12 @@ export class ModalAppointmentBpjsComponent implements OnInit {
 
   async ngOnInit() {
     await this.getAppointmentById();
+    await this.getListDoctorBySpecialty();
     await this.getListDoctor();
     await this.getSpecialities();
   }
 
-  async getListDoctor() {
+  async getListDoctorBySpecialty() {
 
     this.alerts = [];
     this.specialtyDoctor = this.appointmentSelected.speciality_id;
@@ -80,6 +87,17 @@ export class ModalAppointmentBpjsComponent implements OnInit {
       this.hospital.id,
       this.specialtyDoctor
       )
+      .toPromise().then(res => {
+        return res.data;
+      }).catch(err => {
+        this.alertService.error(err.error.message);
+        return [];
+      });
+  }
+
+  async getListDoctor() {
+    this.alerts = [];
+    this.doctorList = await this.doctorService.getListDoctor(this.hospital.id)
       .toPromise().then(res => {
         return res.data;
       }).catch(err => {
@@ -104,39 +122,114 @@ export class ModalAppointmentBpjsComponent implements OnInit {
     }
   }
 
-  searchSchedule1() {
-    this.flag = 'block';
+  rescheduleToNonBpjs(){
+    this.isReschNonBpjs = this.isReschNonBpjs ? false : true;
+    this.doctorVal = null;
+    this.searchKeywords = {
+      doctor: {},
+      area: {},
+      hospital: {},
+      speciality: {}
+    };
+    this.flag = 'none';
+    this.doctorService.searchDoctorSource2 = null;
+    this.openWidgetCreateApp = false;
+  }
+
+  async searchSchedule1(item?) {
+    this.openWidgetCreateApp = false;
     this.model.speciality = '';
+    let doctorId = null;
+    let doctorName = null;
+    let specialty = null;
+    if(item) { //non bpjs
+      this.appBPJS = false;
+      this.flag = 'none';
+      this.flagTwo = 'block';
+      doctorId = item.doctor_id;
+      doctorName = item.name;
+      specialty = item.specialty_id;
+    } else { //bpjs
+      this.appBPJS = true;
+      this.flag = 'block';
+      this.flagTwo = 'none';
+      doctorId = this.doctorVal.doctor_id;
+      doctorName = this.doctorVal.name;
+      specialty = this.doctorVal.specialty_id;
+    }
 
     this.searchKeywords = {
       doctor: {
-        doctor_id: this.doctorVal.doctor_id,
-        name: this.doctorVal.name
+        doctor_id: doctorId,
+        name: doctorName
       },
       hospital: {
         hospital_id: this.hospital.id,
         name: this.hospital.name,
       },
       speciality: {
-        speciality_id: this.doctorVal.specialty_id,
+        speciality_id: specialty,
       },
-      fromBpjs: true,
-      fromRegistration: true,
-      isRescheduleBpjs: true,
-      consulType: consultationType.BPJS+':'+consultationType.BPJS_REGULER,
+      fromBpjs: item ? null : true,
+      fromRegistration: item ? null : true,
+      isRescheduleBpjs: item ? null : true,
+      consulType: item ? null : consultationType.BPJS+':'+consultationType.BPJS_REGULER,
       original: false
     };
 
     const searchKey = {
       type: 'doctor',
-      doctor_id: this.doctorVal.doctor_id,
-      name: this.doctorVal.name
+      doctor_id: doctorId,
+      name: doctorName
     };
 
     localStorage.setItem('searchKey', JSON.stringify(searchKey));
 
     this.doctorService.changeSearchDoctor(this.searchKeywords);
     this.doctorService.searchDoctorSource2 = this.searchKeywords;
+    this.openWidget = true;
+  }
+
+  searchSchedule2() {
+    this.openWidgetCreateApp = false;
+    this.appBPJS = false;
+    this.flag = 'none';
+    this.flagTwo = 'block';
+    this.model.doctor = '';
+
+    const speciality = this.model.speciality;
+
+    this.searchKeywords = {
+      doctor: {
+        doctor_id: null,
+        name: null,
+      },
+      area: {
+        area_id: null,
+        name: null,
+      },
+      hospital: {
+        hospital_id: this.hospital.id,
+        name: this.hospital.name,
+      },
+      speciality: {
+        speciality_id: speciality.speciality_id,
+        speciality_name: speciality.speciality_name,
+      },
+      original: false
+    };
+
+    const searchKey = {
+      type: 'spesialist',
+      speciality_id: speciality.speciality_id,
+      speciality_name: speciality.speciality_name,
+    };
+
+    localStorage.setItem('searchKey', JSON.stringify(searchKey));
+
+    this.doctorService.changeSearchDoctor(this.searchKeywords);
+    this.doctorService.searchDoctorSource2 = this.searchKeywords;
+    this.openWidget = true;
   }
 
   async getAppointmentById() {
@@ -160,16 +253,25 @@ export class ModalAppointmentBpjsComponent implements OnInit {
   }
 
   getScheduleData(data: any) {
+    this.openWidgetCreateApp = true;
     this.opScheduleSelected = data;
     let name = this.appointment.contact_name;
     name = name ? name : this.appointment.patient_name;
-    this.createAppInputData = {
-      appointmentDate: data.date,
-      name: name,
-      doctorId: data.doctor_id,
-      consulType: consultationType.BPJS+':'+consultationType.BPJS_REGULER,
-      isRescheduleBpjs: true
-    };    
+    if(this.appBPJS === true) {
+      this.createAppInputData = {
+        appointmentDate: data.date,
+        name: name,
+        doctorId: data.doctor_id,
+        consulType: consultationType.BPJS+':'+consultationType.BPJS_REGULER,
+        isRescheduleBpjs: true
+      };
+    } else {
+      this.createAppInputData = {
+        appointmentDate: data.date,
+        name: name,
+        doctorId: data.doctor_id
+      };
+    }  
   }
 
   getSlotData(data: any) {
@@ -182,7 +284,7 @@ export class ModalAppointmentBpjsComponent implements OnInit {
       appointmentFromTime: data.appointment_from_time,
       appointmentToTime: data.appointment_to_time,
       appointmentNo: data.appointment_no,
-      channelId: channelId.BPJS,
+      channelId: this.appBPJS === true ? channelId.BPJS : channelId.FRONT_OFFICE,
       hospitalId: data.hospital_id,
       isWaitingList: data.is_waiting_list,
       doctorId: data.doctor_id,

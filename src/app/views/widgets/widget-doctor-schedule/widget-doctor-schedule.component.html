@@ -260,7 +260,10 @@
                             && !(holidaysSpecialty.indexOf(itemSch.doctor_id+'-'+date.dateISO+'-'+itemSch.hospital_id) != -1))">
                             <span *ngIf="!itemSch.is_full" class="success-light"></span>
                             <span *ngIf="itemSch.is_full" class="danger-light"></span>
-                            <a (click)="gotoCreateApp(itemSch, date.dateISO)">
+                            <a *ngIf="isOriginal" (click)="gotoCreateApp(itemSch, date.dateISO)">
+                              {{itemSch.from_time.substr(0,5)}} - {{itemSch.to_time.substr(0,5)}}
+                            </a>
+                            <a *ngIf="!isOriginal" (click)="gotoCreateApp2(itemSch, date.dateISO)">
                               {{itemSch.from_time.substr(0,5)}} - {{itemSch.to_time.substr(0,5)}}
                             </a>
                             <span class="flag-tele" *ngIf="itemSch.consultation_type_id == 4">TELE</span>

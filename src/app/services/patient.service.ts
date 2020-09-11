@@ -41,6 +41,17 @@ export class PatientService {
     this.updateContactSource.next(params);
   }
 
+  getNotesAndEmailPatient(contactId: string): Observable<any> {
+    const url = `${this.contactUrl}/${contactId}`;
+    return this.http.get<any>(url, httpOptions);
+  }
+
+  editNotesAndEmailPatient(payload: any, contactId: string): Observable<any> {
+    const url = `${this.patientUrl}/sync/email-notes/${contactId}`;
+    const body = JSON.stringify(payload);
+    return this.http.put<any>(url, body, httpOptions);
+  }
+
   getPatientHopeSearch(name, dob, phoneNumber, hospitalId): Observable<any> {
     const uri = `${this.contactFoUrl}/confirm?name=${name}&dob=${dob}&phoneNumber=${phoneNumber}&hospitalId=${hospitalId}`;
     return this.http.get<any>(uri, httpOptions);

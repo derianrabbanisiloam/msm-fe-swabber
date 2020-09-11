@@ -151,10 +151,21 @@ export class WidgetAppointmentListBpjsComponent implements OnInit {
   public flagFile2: boolean = false;
   public flagFile3: boolean = false;
   public flagFile4: boolean = false;
+  public flagFile5: boolean = false;
   uploadForm: FormGroup;
   public assetUpload: any = null;
   public bodyUpload: any = {};
   public urlBpjsCard = environment.GET_IMAGE;
+  public email: string = '';
+  public emailTemp: string = '';
+  public notes: string = '';
+  public notesTemp: string = '';
+  public isSigned: boolean = false;
+  public isSignedTemp: boolean = false;
+  public checkListModel: any = {
+    checkOne: false, checkTwo: false, checkThree: false,
+    checkFour: false, checkFive: false
+  }
 
   constructor(
     private doctorService: DoctorService,
@@ -191,7 +202,8 @@ export class WidgetAppointmentListBpjsComponent implements OnInit {
       bpjsCard: [''],
       identityCard: [''],
       referenceLetter: [''],
-      familyCard: ['']
+      familyCard: [''],
+      controlLetter: ['']
     });
     this.admissionType();
     this.getPayer();
@@ -243,6 +255,14 @@ export class WidgetAppointmentListBpjsComponent implements OnInit {
         });
       }
     });
+  }
+
+  async changeCheckbox(val) {
+    if(val === '1') this.checkListModel.checkOne = this.checkListModel.checkOne ? true : false;
+    else if(val === '2') this.checkListModel.checkTwo = this.checkListModel.checkTwo ? true : false;
+    else if(val === '3') this.checkListModel.checkThree = this.checkListModel.checkThree ? true : false;
+    else if(val === '4') this.checkListModel.checkFour = this.checkListModel.checkFour ? true : false;
+    else if(val === '5') this.checkListModel.checkFive = this.checkListModel.checkFive ? true : false;
   }
 
   async downloadDoc() {
@@ -423,18 +443,26 @@ export class WidgetAppointmentListBpjsComponent implements OnInit {
             this.uploadForm.get('referenceLetter').setValue(file);
             formData_1.append('bpjs_reference_letter', this.uploadForm.get('referenceLetter').value);
           }
+          else if(nameFile === 'controlLetter') {
+            this.flagFile5 = true;
+            file = event.target.files[0];
+            this.uploadForm.get('controlLetter').setValue(file);
+            formData_1.append('bpjs_control_letter', this.uploadForm.get('controlLetter').value);
+          }
             this.assetUpload = await this.patientService.uploadDocBpjs(formData_1)
             .toPromise().then(res => {
               this.uploadForm = this.formBuilder.group({
                 bpjsCard: [''],
                 identityCard: [''],
                 referenceLetter: [''],
-                familyCard: ['']
+                familyCard: [''],
+                controlLetter: ['']
               });
               this.flagFile1 = false;
               this.flagFile2 = false;
               this.flagFile3 = false;
               this.flagFile4 = false;
+              this.flagFile5 = false;
               
               return res.data;
             }).catch(err => {
@@ -442,6 +470,7 @@ export class WidgetAppointmentListBpjsComponent implements OnInit {
               this.flagFile2 = false;
               this.flagFile3 = false;
               this.flagFile4 = false;
+              this.flagFile5 = false;
               Swal.fire({
                 type: 'error',
                 title: 'Oops...',
@@ -476,6 +505,7 @@ export class WidgetAppointmentListBpjsComponent implements OnInit {
     else if(nameFile === 'identityCard') this.bodyUpload.identityCardFile = pathFile;
     else if(nameFile === 'referenceLetter') this.bodyUpload.refferenceLetterFile = pathFile;
     else if(nameFile === 'familyCard') this.bodyUpload.familyCardFile = pathFile;
+    else if(nameFile === 'controlLetter') this.bodyUpload.controlLetterFile = pathFile;
     
     this.appointmentService.updateAppBpjs(this.selectedCheckIn.appointment_id, this.bodyUpload).subscribe(
       data => {
@@ -485,6 +515,7 @@ export class WidgetAppointmentListBpjsComponent implements OnInit {
         else if(nameFile === 'identityCard') this.uploadForm.get('identityCard').setValue(null);
         else if(nameFile === 'referenceLetter') this.uploadForm.get('referenceLetter').setValue(null);
         else if(nameFile === 'familyCard') this.uploadForm.get('familyCard').setValue(null);
+        else if(nameFile === 'controlLetter') this.uploadForm.get('controlLetter').setValue(null);
         Swal.fire({
           position: 'center',
           type: 'success',
@@ -501,6 +532,29 @@ export class WidgetAppointmentListBpjsComponent implements OnInit {
         })
       }
     )
+  }
+
+  async getNotesAndEmail(contactId) {
+    await this.patientService.getNotesAndEmailPatient(contactId).toPromise().then(res => {
+      this.email = res.data.email_address;
+      this.emailTemp = res.data.email_address;
+      this.notes = res.data.notes;
+      this.notesTemp = res.data.notes;
+      this.isSigned = res.data.is_signed;
+      this.isSignedTemp = res.data.is_signed;
+    }).catch(err => {
+      this.email = null;
+      this.notes = null;
+    });
+  }
+
+  async editNotesAndEmail(payload, contactId) {
+    await this.patientService.editNotesAndEmailPatient(payload, contactId).toPromise().then(res => {
+      return res.data;
+    }).catch(err => {
+      this.alertService.error(err.error.message);
+      return null;
+    });
   }
 
   async refreshDataApp(appointment){
@@ -802,6 +856,7 @@ export class WidgetAppointmentListBpjsComponent implements OnInit {
     if (now !== appDate) {
       this.alertService.error('This appointment cannot checkin in this day', false, 3000);
     } else {
+      this.getNotesAndEmail(detail.contact_id);
       if (!detail.medical_record_number) {
         if (detail.patient_hope_id) {
           this.open(mrLocalModal);
@@ -1001,8 +1056,24 @@ export class WidgetAppointmentListBpjsComponent implements OnInit {
         source: sourceApps,
         userName: this.user.fullname,
       };
-      var dataPatient;
   
+      if(this.notes !== this.notesTemp 
+        || this.email !== this.emailTemp
+        || this.isSigned !== this.isSignedTemp) {
+        const modifyNotesEmail = {
+          patientOrganizationId: val.patient_organization_id,
+          organizationId: Number(this.hospital.orgId),
+          emailAddress: this.email,
+          notes: this.notes,
+          isSigned: this.isSigned,
+          source: sourceApps,
+          userName: this.user.fullname,
+          userId: this.user.id
+        }
+        this.editNotesAndEmail(modifyNotesEmail, val.contact_id);
+      }
+      
+      var dataPatient;
       this.admissionService.createAdmission(body).toPromise()
         .then(res => {
           dataPatient = {

@@ -135,6 +135,12 @@ export class WidgetAppointmentListComponent implements OnInit {
   public dateApp;
   public listRoomHope: any = [];
   public roomHope: any;
+  public email: string = '';
+  public emailTemp: string = '';
+  public notes: string = '';
+  public notesTemp: string = '';
+  public isSigned: boolean = false;
+  public isSignedTemp: boolean = false;
 
   constructor(
     private doctorService: DoctorService,
@@ -466,6 +472,29 @@ export class WidgetAppointmentListComponent implements OnInit {
     this.open(content);
   }
 
+  async getNotesAndEmail(contactId) {
+    await this.patientService.getNotesAndEmailPatient(contactId).toPromise().then(res => {
+      this.email = res.data.email_address;
+      this.emailTemp = res.data.email_address;
+      this.notes = res.data.notes;
+      this.notesTemp = res.data.notes;
+      this.isSigned = res.data.is_signed;
+      this.isSignedTemp = res.data.is_signed;
+    }).catch(err => {
+      this.email = null;
+      this.notes = null;
+    });
+  }
+
+  async editNotesAndEmail(payload, contactId) {
+    await this.patientService.editNotesAndEmailPatient(payload, contactId).toPromise().then(res => {
+      return res.data;
+    }).catch(err => {
+      this.alertService.error(err.error.message);
+      return null;
+    });
+  }
+
   checkIsLate(appointmentId: string) {
     const msg = this.appointmentService.isLate(appointmentId)
       .toPromise().then(res => {
@@ -531,6 +560,7 @@ export class WidgetAppointmentListComponent implements OnInit {
     if (now !== appDate) {
       this.alertService.error('This appointment cannot checkin in this day', false, 3000);
     } else {
+      this.getNotesAndEmail(detail.contact_id);
       if (!detail.medical_record_number) {
         if (detail.patient_hope_id) {
           this.open(mrLocalModal);
@@ -714,8 +744,24 @@ export class WidgetAppointmentListComponent implements OnInit {
         source: sourceApps,
         userName: this.user.fullname,
       };
+
+      if(this.notes !== this.notesTemp 
+        || this.email !== this.emailTemp
+        || this.isSigned !== this.isSignedTemp) {
+        const modifyNotesEmail = {
+          patientOrganizationId: val.patient_organization_id,
+          organizationId: Number(this.hospital.orgId),
+          emailAddress: this.email,
+          notes: this.notes,
+          isSigned: this.isSigned,
+          source: sourceApps,
+          userName: this.user.fullname,
+          userId: this.user.id
+        }
+        this.editNotesAndEmail(modifyNotesEmail, val.contact_id);
+      }
+
       var dataPatient;
-  
       this.admissionService.createAdmission(body).toPromise()
         .then(res => {
           dataPatient = {

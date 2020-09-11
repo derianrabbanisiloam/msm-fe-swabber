@@ -9,6 +9,10 @@ thead th a{ color: #1A2269; text-decoration: none}
 .row-pink{background: #FFD4D1;}
 .row-orange{background: #FFE17C;}
 
+.checkbox-upload {
+  width: 1.5em;
+}
+
 .ms_btn_blue_module{ 
   background: dodgerblue; 
   color: white;

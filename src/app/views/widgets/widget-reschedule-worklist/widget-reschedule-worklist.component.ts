@@ -247,8 +247,6 @@ export class WidgetRescheduleWorklistComponent implements OnInit {
       eMonth = Number(eMonth) < 10 ? '0' + eMonth : eMonth;
       let eDay = dateRange.endDate.day;
       eDay = Number(eDay) < 10 ? '0' + eDay : eDay;
-      this.keywordsModel.fromDate = bYear + '-' + bMonth + '-' + bDay;
-      this.keywordsModel.toDate = eYear + '-' + eMonth + '-' + eDay;
       if(this.isAido === true) {
         this.keywordsModelTwo.fromDate = bYear + '-' + bMonth + '-' + bDay;
         this.keywordsModelTwo.toDate = eYear + '-' + eMonth + '-' + eDay;
@@ -260,8 +258,8 @@ export class WidgetRescheduleWorklistComponent implements OnInit {
         this.getRescheduleWorklist();
       }
       else if(this.isBpjs === true) {
-        this.keywordsModel.fromDate = bYear + '-' + bMonth + '-' + bDay;
-        this.keywordsModel.toDate = eYear + '-' + eMonth + '-' + eDay;
+        this.keywordsBpjs.fromDate = bYear + '-' + bMonth + '-' + bDay;
+        this.keywordsBpjs.toDate = eYear + '-' + eMonth + '-' + eDay;
         this.getRescheduleWorklistBpjs();
       }
     }

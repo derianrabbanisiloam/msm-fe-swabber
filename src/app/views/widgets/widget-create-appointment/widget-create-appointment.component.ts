@@ -1579,6 +1579,11 @@ export class WidgetCreateAppointmentComponent implements OnInit {
       } else {
         await this.defaultPatientType(detail.patient_hope_id);
         if(this.fromBpjs === true) {
+          this.checkListModel = {
+            checkOne: false, checkTwo: false, checkThree: false,
+            checkFour: false, checkFive: false
+          }
+          this.closeDocument = checkInModal;
           this.modalService.open(checkInModal, { windowClass: 'fo_modal_admission_3', size: 'lg' });
         } else {
           this.open50(checkInModal);

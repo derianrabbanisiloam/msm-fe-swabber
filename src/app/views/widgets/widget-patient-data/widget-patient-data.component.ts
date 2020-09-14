@@ -1761,6 +1761,11 @@ export class WidgetPatientDataComponent implements OnInit {
   }
 
   async documentModal(content) {
+    this.checkListModel = {
+      checkOne: false, checkTwo: false, checkThree: false,
+      checkFour: false, checkFive: false
+    }
+    this.closeDocument = content;
     this.modalService.open(content, { windowClass: 'fo_modal_admission_3', size: 'lg' });
   }
 

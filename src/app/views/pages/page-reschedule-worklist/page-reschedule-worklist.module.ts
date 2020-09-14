@@ -18,6 +18,8 @@ import { SectionFooterModule } from '../../sections/section-footer/section-foote
 
 import { ModalRescheduleAppointmentModule } from '../../widgets/modal-reschedule-appointment/modal-reschedule-appointment.module';
 import { ModalRescheduleAppointmentComponent } from '../../widgets/modal-reschedule-appointment/modal-reschedule-appointment.component';
+import { ModalAppointmentBpjsModule } from '../../widgets/modal-appointment-bpjs/modal-appointment-bpjs.module';
+import { ModalAppointmentBpjsComponent } from '../../widgets/modal-appointment-bpjs/modal-appointment-bpjs.component';
 
 @NgModule({
   declarations: [
@@ -38,10 +40,12 @@ import { ModalRescheduleAppointmentComponent } from '../../widgets/modal-resched
     SectionSidebarModule,
     SectionFooterModule,
     PageRescheduleWorklistRoutingModule,
-    ModalRescheduleAppointmentModule
+    ModalRescheduleAppointmentModule,
+    ModalAppointmentBpjsModule
   ],
   entryComponents: [
-    ModalRescheduleAppointmentComponent
+    ModalRescheduleAppointmentComponent,
+    ModalAppointmentBpjsComponent
   ]
 })
 export class PageRescheduleWorklistModule { }

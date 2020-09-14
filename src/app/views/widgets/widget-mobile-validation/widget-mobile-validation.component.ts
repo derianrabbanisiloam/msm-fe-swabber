@@ -13,6 +13,7 @@ import { environment } from '../../../../environments/environment';
 import Swal from 'sweetalert2';
 import { dateFormatter } from '../../../utils/helpers.util';
 import { activityType } from '../../../variables/common.variable';
+import { pathImage } from '../../../variables/common.variable';
 
 @Component({
   selector: 'app-widget-mobile-validation',
@@ -22,7 +23,7 @@ import { activityType } from '../../../variables/common.variable';
 export class WidgetMobileValidationComponent implements OnInit {
   public maxSize10MB: number = 10485760;
   public assetPath = environment.ASSET_PATH;
-  public urlDisclaimer = environment.GET_IMAGE_DISCLAIMER;
+  public urlDisclaimer = environment.GET_IMAGE+pathImage.DISCLAIMER;
   public getDisclaimer;
   public key: any = JSON.parse(localStorage.getItem('key'));
   public hospital = this.key.hospital;
@@ -170,7 +171,6 @@ export class WidgetMobileValidationComponent implements OnInit {
     const formData_1 = new FormData();
     formData_1.append('uploader', 'disclaimer_1');
     formData_1.append('filePdf', this.uploadForm.get('disclaimer').value);
-
     if(this.dataContact.email_address) {
       if(this.uploadForm.get('disclaimer').value) {
         this.assetDisclaimer = await this.patientService.uploadImage(formData_1)

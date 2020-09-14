@@ -1,3 +1,23 @@
+:host(app-widget-doctor-schedule) { width:100% }
+
+.loading-div-bpjs img {
+  width: 8vw;
+  text-align: center;
+}
+
+.center-text{
+  text-align: left;
+  align-items: center;
+  font-size: 16px;
+  font-weight: bold;
+}
+
+.custom-app-bpjs{
+  background-color: white;
+  border-radius: 10px;
+  padding: 1em;
+}
+
 .flag-tele {
   background-color: #6767ff; 
   color: white; 

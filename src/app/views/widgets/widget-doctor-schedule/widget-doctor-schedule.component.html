@@ -4,15 +4,20 @@
     <p>{{message1.message}}</p>
   </div>
   <div id="tutorial_week_button" class="btn-box header_right" *ngIf="showScheduleType1">
-    <div style="padding-right: 0.5em">
+    <div style="padding-right: 0.5em" *ngIf="fromRegistration == false && reschBpjs == false && fromBpjs == false">
       <select class="form-control" (change)="getScheduleByConsType()" [(ngModel)]="consulType">
         <option [ngValue]=null [selected]="consulType === null">All Schedule</option>
         <option value=4 selected="consulType == 4">Teleconsultation</option>
         <option value=1 selected="consulType == 1">Regular</option>
       </select>
     </div>
-    <div>
+    <div *ngIf="fromRegistration == false && reschBpjs == false && fromBpjs == false">
       <my-date-picker name="mydate" [options]="myDatePickerOptions" [(ngModel)]="datePickerModel"
+        (dateChanged)="gotoDate($event)">
+      </my-date-picker>
+    </div>
+    <div *ngIf="fromRegistration == false && fromBpjs == true && reschBpjs == false">
+      <my-date-picker name="mydate" [options]="myDateRangePickerOptionsTwo" [(ngModel)]="datePickerModel"
         (dateChanged)="gotoDate($event)">
       </my-date-picker>
     </div>
@@ -58,28 +63,38 @@
                     <td *ngFor="let date of dates">
                       <ng-container *ngFor="let itemSch of sch.schedules">
                           <span
-                            *ngIf="itemSch.day == date.dateDay && 
-                                    date.dateISO >= todayDateISO && !(holidaysSpecialty.indexOf(sch.doctor_id+'-'+date.dateISO+'-'+sch.hospital_id) != -1)">
+                            *ngIf="(itemSch.day == date.dateDay && date.dateISO >= todayDateISO && fromBpjs == false
+                            && !(holidaysSpecialty.indexOf(itemSch.doctor_id+'-'+date.dateISO+'-'+itemSch.hospital_id) != -1))
+                            || (itemSch.day == date.dateDay && (date.dateISO >= todayDateISO && date.dateISO < todayDateISOBPJS)
+                            && !(holidaysSpecialty.indexOf(itemSch.doctor_id+'-'+date.dateISO+'-'+itemSch.hospital_id) != -1)
+                            && fromBpjs == true && fromRegistration == false)
+                            || (itemSch.day == date.dateDay && date.dateISO >= todayDateISO && fromBpjs == true && fromRegistration == true
+                            && !(holidaysSpecialty.indexOf(itemSch.doctor_id+'-'+date.dateISO+'-'+itemSch.hospital_id) != -1))">
                             <span *ngIf="!itemSch.is_full" class="success-light"></span>
                             <span *ngIf="itemSch.is_full" class="danger-light"></span>
                             <a *ngIf="isOriginal && !isForeign" (click)="gotoCreateApp(itemSch, date.dateISO)">
                               {{itemSch.from_time.substr(0,5)}} - {{itemSch.to_time.substr(0,5)}}
                               <span class="flag-tele" *ngIf="itemSch.consultation_type_id == 4">TELE</span>
+                              <span *ngIf="fromBpjs == true"><br></span>
+                              <span *ngIf="fromBpjs == true" style="font-weight: bold;">Available slot = {{itemSch.available_slot}}</span>
                             </a>
                             <a *ngIf="!isOriginal" (click)="gotoCreateApp2(itemSch, date.dateISO)">
                               {{itemSch.from_time.substr(0,5)}} - {{itemSch.to_time.substr(0,5)}}
                               <span class="flag-tele" *ngIf="itemSch.consultation_type_id == 4">TELE</span>
+                              <span *ngIf="fromBpjs == true"><br></span>
+                              <span *ngIf="fromBpjs == true" style="font-weight: bold;">Available slot = {{itemSch.available_slot}}</span>
                             </a>
                             <a *ngIf="isOriginal && isForeign" (click)="gotoCreateApp3(itemSch, date.dateISO)">
                               {{itemSch.from_time.substr(0,5)}} - {{itemSch.to_time.substr(0,5)}}
                               <span class="flag-tele" *ngIf="itemSch.consultation_type_id == 4">TELE</span>
+                              <span *ngIf="fromBpjs == true"><br></span>
+                              <span *ngIf="fromBpjs == true" style="font-weight: bold;">Available slot = {{itemSch.available_slot}}</span>
                             </a>
                             <br>
                           </span>
-                          <span *ngIf="(itemSch.day == date.dateDay &&
-                                    date.dateISO < todayDateISO) || 
-                                    (itemSch.day == date.dateDay &&
-                                    date.dateISO >= todayDateISO && holidaysSpecialty.indexOf(sch.doctor_id+'-'+date.dateISO+'-'+sch.hospital_id) != -1)"
+                          <span *ngIf="(itemSch.day == date.dateDay && date.dateISO < todayDateISO) 
+                          || (itemSch.day == date.dateDay && date.dateISO >= todayDateISO && holidaysSpecialty.indexOf(itemSch.doctor_id+'-'+date.dateISO+'-'+itemSch.hospital_id) != -1)
+                          || (itemSch.day == date.dateDay && fromBpjs == true && fromRegistration == false && date.dateISO >= todayDateISOBPJS)"
                             class="unavailable">
                             {{itemSch.from_time.substr(0,5)}} - {{itemSch.to_time.substr(0,5)}}
                             <span class="flag-tele" *ngIf="itemSch.consultation_type_id == 4">TELE</span>
@@ -98,8 +113,22 @@
     </div>
   </div>
 
+  <div class="row" *ngIf="fromBpjs && !showScheduleType2 && hideLoading">
+    <div class="col-md-12">
+      <div style="text-align: center;">
+        <img src="../../../../assets/icons/Logo-Animation---S(FAST).gif" width="200px" height="200px">
+      </div>
+    </div>
+  </div>
+
+  <!-- <div class="d-flex justify-content-start cc_container_btn_topleft" *ngIf="fromBpjs && !showScheduleType2 && !hideLoading && fromRegistration == false">
+    <div class="btn" style="background: white; padding: 0.2vw 0.5vw" (click)="prevPage()">
+      <img style="width: 1vw" src="{{assetPath}}icons/ic_BackGreen@2x.png">
+    </div>
+  </div> -->
+
   <div class="content-doctor-schedule-group" *ngIf="showScheduleType2">
-    <div class="content-header-container">
+    <div class="content-header-container" *ngIf="!fromBpjs">
       <div class="content-doctor-schedule-group-1">
         <span class="showing_result foot-note" *ngIf="keywords.area"><span class="bold">Area:</span>
           {{keywords.area.name}}</span>
@@ -136,6 +165,67 @@
         </button>
       </div>
     </div>
+    <div class="content-header-container" *ngIf="fromBpjs === true && fromRegistration == true && keywords?.speciality?.speciality_name">
+      <div class="content-doctor-schedule-group-1">
+        <span class="showing_result foot-note" *ngIf="keywords.area"><span class="bold">Area:</span>
+          {{keywords.area.name}}</span>
+        <span class="showing_result foot-note" *ngIf="keywords.hospital"><span class="bold">Hospital:</span>
+          {{keywords.hospital.name}}</span>
+        <span class="showing_result foot-note"><span class="bold">Speciality:</span>
+          {{keywords.speciality.speciality_name}}</span>
+      </div>
+      <div class="header_right">
+        <div>
+          <my-date-picker name="mydate" [options]="myDatePickerOptions" [(ngModel)]="datePickerModel"
+            (dateChanged)="gotoDate($event)">
+          </my-date-picker>
+        </div>
+        <button class="btn-nav btn-left-right" (click)="gotoPrevWeek()" [disabled]="btnActive.prevWeek == false"
+          [ngClass]="btnActive.prevWeek == false ? 'btn-left-right-disabled' : ''">
+          <img src="{{assetPath}}icons/ic_ArrowRight_White.png">
+        </button>
+        <button class="btn-nav btn-green btn-green header-3" (click)="gotoThisWeek()"
+          [disabled]="btnActive.thisWeek == false"
+          [ngClass]="btnActive.thisWeek == false ? 'btn-left-right-disabled' : ''">
+          <span>This week</span>
+        </button>
+        <button class="btn-nav btn-left-right" (click)="gotoNextWeek()" [disabled]="btnActive.nextWeek == false"
+          [ngClass]="btnActive.nextWeek == false ? 'btn-left-right-disabled' : ''">
+          <img src="{{assetPath}}icons/ic_ArrowLeft_White.png">
+        </button>
+      </div>
+    </div>
+    <!-- <div class="content-header-container" *ngIf="fromBpjs == true && fromRegistration == false">
+      <div class="content-doctor-schedule-group-1 custom-app-bpjs">
+        <div class="center-text">{{patFromBpjs.patient_name}}, {{patFromBpjs.patient_birth_date}}</div>
+        <div class="center-text">{{patFromBpjs.speciality_name}}, Preferred Consultation Date: {{patFromBpjs.appointment_date}}</div>
+      </div>
+    </div>
+    <div class="d-flex justify-content-start cc_container_btn_topleft" *ngIf="fromBpjs == true && fromRegistration == false">
+      <div class="btn" style="background: white; padding: 0.2vw 0.5vw" (click)="prevPage()">
+        <img style="width: 1vw" src="{{assetPath}}icons/ic_BackGreen@2x.png">
+      </div>
+    </div> -->
+    <div class="header_right" *ngIf="fromBpjs == true && fromRegistration == false">
+      <div>
+        <my-date-picker name="mydate" [options]="myDateRangePickerOptionsTwo" [(ngModel)]="datePickerModel"
+          (dateChanged)="gotoDate($event)">
+        </my-date-picker>
+      </div>
+      <button class="btn-nav btn-left-right" (click)="gotoPrevWeek()" [disabled]="btnActive.prevWeek == false"
+        [ngClass]="btnActive.prevWeek == false ? 'btn-left-right-disabled' : ''">
+        <img src="{{assetPath}}icons/ic_ArrowRight_White.png">
+      </button>
+      <button class="btn-nav btn-green btn-green header-3" (click)="gotoThisWeek()"
+        [disabled]="btnActive.thisWeek == false"
+        [ngClass]="btnActive.thisWeek == false ? 'btn-left-right-disabled' : ''">
+        <span>This week</span>
+      </button>
+      <button class="btn-nav btn-left-right" (click)="gotoNextWeek()" [disabled]="btnActive.nextWeek == false"
+        [ngClass]="btnActive.nextWeek == false ? 'btn-left-right-disabled' : ''">
+        <img src="{{assetPath}}icons/ic_ArrowLeft_White.png">
+      </button>
+    </div>
     <div class="content-doctor-schedule-group-2 group-2" *ngIf="!message1">
       <ngb-accordion #acc="ngbAccordion" activeIds="static-0">
         <ngb-panel class="header-2 table-align-left" *ngFor="let sch of doctorSchedules2; let i=index"
@@ -161,21 +251,30 @@
                     <td class="body-text" *ngFor="let date of dates">
                       <ng-container *ngFor="let itemSch of doc.schedules">
                           <span
-                            *ngIf="itemSch.day == date.dateDay && 
-                          date.dateISO >= todayDateISO && !(holidaysSpecialty.indexOf(itemSch.doctor_id+'-'+date.dateISO+'-'+itemSch.hospital_id) != -1)">
+                            *ngIf="(itemSch.day == date.dateDay && date.dateISO >= todayDateISO && fromBpjs == false
+                            && !(holidaysSpecialty.indexOf(itemSch.doctor_id+'-'+date.dateISO+'-'+itemSch.hospital_id) != -1))
+                            || (itemSch.day == date.dateDay && (date.dateISO >= todayDateISO && date.dateISO < todayDateISOBPJS)
+                            && !(holidaysSpecialty.indexOf(itemSch.doctor_id+'-'+date.dateISO+'-'+itemSch.hospital_id) != -1)
+                            && fromBpjs == true && fromRegistration == false)
+                            || (itemSch.day == date.dateDay && date.dateISO >= todayDateISO && fromBpjs == true && fromRegistration == true
+                            && !(holidaysSpecialty.indexOf(itemSch.doctor_id+'-'+date.dateISO+'-'+itemSch.hospital_id) != -1))">
                             <span *ngIf="!itemSch.is_full" class="success-light"></span>
                             <span *ngIf="itemSch.is_full" class="danger-light"></span>
-                            <a (click)="gotoCreateApp(itemSch, date.dateISO)">
+                            <a *ngIf="isOriginal" (click)="gotoCreateApp(itemSch, date.dateISO)">
+                              {{itemSch.from_time.substr(0,5)}} - {{itemSch.to_time.substr(0,5)}}
+                            </a>
+                            <a *ngIf="!isOriginal" (click)="gotoCreateApp2(itemSch, date.dateISO)">
                               {{itemSch.from_time.substr(0,5)}} - {{itemSch.to_time.substr(0,5)}}
                             </a>
                             <span class="flag-tele" *ngIf="itemSch.consultation_type_id == 4">TELE</span>
+                            <span *ngIf="fromBpjs == true"><br></span>
+                            <span *ngIf="fromBpjs == true" style="font-weight: bold;">Available slot = {{itemSch.available_slot}}</span>
                             <br>
                           </span>
                           <span
-                            *ngIf="(itemSch.day == date.dateDay &&
-                          date.dateISO < todayDateISO) || 
-                          (itemSch.day == date.dateDay &&
-                          date.dateISO >= todayDateISO && holidaysSpecialty.indexOf(itemSch.doctor_id+'-'+date.dateISO+'-'+itemSch.hospital_id) != -1)"
+                            *ngIf="(itemSch.day == date.dateDay && date.dateISO < todayDateISO) 
+                            || (itemSch.day == date.dateDay && date.dateISO >= todayDateISO && holidaysSpecialty.indexOf(itemSch.doctor_id+'-'+date.dateISO+'-'+itemSch.hospital_id) != -1)
+                            || (itemSch.day == date.dateDay && fromBpjs == true && fromRegistration == false && date.dateISO >= todayDateISOBPJS)"
                             class="unavailable">
                             {{itemSch.from_time.substr(0,5)}} - {{itemSch.to_time.substr(0,5)}}
                             <span class="flag-tele" *ngIf="itemSch.consultation_type_id == 4">TELE</span><br>

@@ -410,9 +410,14 @@
           (click)="checkSearchPatientHope(comparePatient, true)">Save</button>
 
         <!-- false if patient failed to saved or not saved yet -->
-        <button *ngIf="isSuccessCreatePatient && isFromAppointmentList" type="button" [disabled]="buttonCreateAdmission"
+        <button *ngIf="isSuccessCreatePatient && isFromAppointmentList && !fromBpjs" type="button" [disabled]="buttonCreateAdmission"
           class="fo_btn_registration fo_btn_disabled" [ngClass]="{'fo_btn_create_admission': isFromAppointmentList}"
           (click)="createAdmission(checkInOldPatient)">
+          Create Admission
+        </button>
+        <button *ngIf="isSuccessCreatePatient && isFromAppointmentList && fromBpjs" type="button" [disabled]="buttonCreateAdmission"
+          class="fo_btn_registration fo_btn_disabled" [ngClass]="{'fo_btn_create_admission': isFromAppointmentList}"
+          (click)="createAdmission(confirmDocument)">
           Create Admission
         </button>
 
@@ -432,7 +437,173 @@
   </form>
 </div>
 
-
+<ng-template #confirmDocument let-modal let-c="close">
+  <div class="modal-header">
+    <div class="header-2 modal-padding" *ngIf="selectedCheckIn?.contact_name">{{selectedCheckIn.contact_name}} {{selectedCheckIn.custome_birth_date}} | Document uploads</div>
+    <button #cls_confirm_document type="button" class="close" aria-label="Close" (click)="c('Cross click')">
+      <span aria-hidden="true">&times;</span>
+    </button>
+  </div>
+  <div class="modal-body">
+    <div class="form-ca-phoneno form-group row" style="font-weight: bold; margin-top: 1em;">
+      <div class="col-md-5">
+        <div class="row space-text-two">
+          <div class="col-md-12">
+            Kartu BPJS*
+          </div>
+        </div>
+        <div class="row space-text-two">
+          <div class="col-md-12">
+            KTP
+          </div>
+        </div>
+        <div class="row space-text-two">
+          <div class="col-md-12">
+            Kartu Keluarga
+          </div>
+        </div>
+        <div class="row space-text-two">
+          <div class="col-md-12">
+            Surat Rujukan/Surat Keterangan*
+          </div>
+        </div>
+        <div class="row space-text-two">
+          <div class="col-md-12">
+            Surat kontrol
+          </div>
+        </div>
+      </div>
+      <div class="col-md-5" style="padding-left: 0;">
+        <div class="row space-text">
+          <div class="col-md-5" style="padding-left: 0" *ngIf="selectedCheckIn?.bpjs_card_file">
+            <span style="margin-left: 2.5em;">
+              <a href=":javascript"
+              (click)="getImage(selectedCheckIn.bpjs_card_file)"
+              target="_blank">View<br></a>
+            </span>
+          </div>
+          <div class="col-md-4" style="padding-left: 0">
+            <button type="button" class="btn ms_btn_blue_module" [disabled]="flagFile1 || checkListModel.checkOne === true" (click)="fileInputOne.click()">
+              <span *ngIf="!selectedCheckIn?.bpjs_card_file">Upload</span>
+              <span *ngIf="selectedCheckIn?.bpjs_card_file">Re-upload</span>
+              <input #fileInputOne type="file" (change)="upload($event, 'bpjsCard')" style="display:none;" accept="application/pdf, .jpg, .jpeg"/>
+            </button>
+          </div>
+          <div class="col-md-3">
+            <span *ngIf="flagFile1">
+              <ngb-progressbar type="success" value="500" [striped]="true" height="2.3rem" [animated]="true">Loading...</ngb-progressbar>
+            </span>
+          </div>
+          <div class="col-md-4" style="padding-left: 0" *ngIf="!selectedCheckIn?.bpjs_card_file">
+            <input class="form-control checkbox-upload" type="checkbox" (change)="changeCheckbox('1')" [(ngModel)]="checkListModel.checkOne">
+          </div>
+        </div>
+        <div class="row space-text">
+          <div class="col-md-5" style="padding-left: 0" *ngIf="selectedCheckIn?.identity_card_file">
+            <span style="margin-left: 2.5em;">
+              <a href=":javascript"
+              (click)="getImage(selectedCheckIn.identity_card_file)"
+              target="_blank">View<br></a>
+            </span>
+          </div>
+          <div class="col-md-4" style="padding-left: 0">
+            <button type="button" class="btn ms_btn_blue_module" [disabled]="flagFile2 || checkListModel.checkTwo === true" (click)="fileInputTwo.click()">
+              <span *ngIf="!selectedCheckIn?.identity_card_file">Upload</span>
+              <span *ngIf="selectedCheckIn?.identity_card_file">Re-upload</span>
+              <input #fileInputTwo type="file" (change)="upload($event, 'identityCard')" style="display:none;" accept="application/pdf, .jpg, .jpeg"/>
+            </button>
+          </div>
+          <div class="col-md-3">
+            <span *ngIf="flagFile2">
+              <ngb-progressbar type="success" value="1000" [striped]="true" height="2.3rem" [animated]="true">Loading...</ngb-progressbar>
+            </span>
+          </div>
+          <div class="col-md-4" style="padding-left: 0" *ngIf="!selectedCheckIn?.identity_card_file">
+            <input class="form-control checkbox-upload" type="checkbox" (change)="changeCheckbox('2')" [(ngModel)]="checkListModel.checkTwo">
+          </div>
+        </div>
+        <div class="row space-text">
+          <div class="col-md-5" style="padding-left: 0" *ngIf="selectedCheckIn?.family_card_file">
+            <span style="margin-left: 2.5em;">
+              <a href=":javascript"
+              (click)="getImage(selectedCheckIn.family_card_file)"
+              target="_blank">View<br></a>
+            </span>
+          </div>
+          <div class="col-md-4" style="padding-left: 0">
+            <button type="button" class="btn ms_btn_blue_module" [disabled]="flagFile3 || checkListModel.checkThree === true" (click)="fileInputThree.click()">
+              <span *ngIf="!selectedCheckIn?.family_card_file">Upload</span>
+              <span *ngIf="selectedCheckIn?.family_card_file">Re-upload</span>
+              <input #fileInputThree type="file" (change)="upload($event, 'familyCard')" style="display:none;" accept="application/pdf, .jpg, .jpeg"/>
+            </button>
+          </div>
+          <div class="col-md-3">
+            <span *ngIf="flagFile3">
+              <ngb-progressbar type="success" value="1000" [striped]="true" height="2.3rem" [animated]="true">Loading...</ngb-progressbar>
+            </span>
+          </div>
+          <div class="col-md-4" style="padding-left: 0" *ngIf="!selectedCheckIn?.family_card_file">
+            <input class="form-control checkbox-upload" type="checkbox" (change)="changeCheckbox('3')" [(ngModel)]="checkListModel.checkThree">
+          </div>
+        </div>
+        <div class="row space-text">
+          <div class="col-md-5" style="padding-left: 0" *ngIf="selectedCheckIn?.refference_letter_file">
+            <span style="margin-left: 2.5em;">
+              <a href=":javascript"
+              (click)="getImage(selectedCheckIn.refference_letter_file)"
+              target="_blank">View<br></a>
+            </span>
+          </div>
+          <div class="col-md-4" style="padding-left: 0">
+            <button type="button" class="btn ms_btn_blue_module" [disabled]="flagFile4 || checkListModel.checkFour === true" (click)="fileInputFour.click()">
+              <span *ngIf="!selectedCheckIn?.refference_letter_file">Upload</span>
+              <span *ngIf="selectedCheckIn?.refference_letter_file">Re-upload</span>
+              <input #fileInputFour type="file" (change)="upload($event, 'referenceLetter')" style="display:none;" accept="application/pdf, .jpg, .jpeg"/>
+            </button>
+          </div>
+          <div class="col-md-3">
+            <span *ngIf="flagFile4">
+              <ngb-progressbar type="success" value="1000" [striped]="true" height="2.3rem" [animated]="true">Loading...</ngb-progressbar>
+            </span>
+          </div>
+          <div class="col-md-4" style="padding-left: 0" *ngIf="!selectedCheckIn?.refference_letter_file">
+            <input class="form-control checkbox-upload" type="checkbox" (change)="changeCheckbox('4')" [(ngModel)]="checkListModel.checkFour">
+          </div>
+        </div>
+        <div class="row space-text">
+          <div class="col-md-5" style="padding-left: 0" *ngIf="selectedCheckIn?.control_letter_file">
+            <span style="margin-left: 2.5em;">
+              <a href=":javascript"
+              (click)="getImage(selectedCheckIn.control_letter_file)"
+              target="_blank">View<br></a>
+            </span>
+          </div>
+          <div class="col-md-4" style="padding-left: 0">
+            <button type="button" class="btn ms_btn_blue_module" [disabled]="flagFile5 || checkListModel.checkFive === true" (click)="fileInputFive.click()">
+              <span *ngIf="!selectedCheckIn?.control_letter_file">Upload</span>
+              <span *ngIf="selectedCheckIn?.control_letter_file">Re-upload</span>
+              <input #fileInputFive type="file" (change)="upload($event, 'controlLetter')" style="display:none;" accept="application/pdf, .jpg, .jpeg"/>
+            </button>
+          </div>
+          <div class="col-md-3">
+            <span *ngIf="flagFile5">
+              <ngb-progressbar type="success" value="1000" [striped]="true" height="2.3rem" [animated]="true">Loading...</ngb-progressbar>
+            </span>
+          </div>
+          <div class="col-md-4" style="padding-left: 0" *ngIf="!selectedCheckIn?.control_letter_file">
+            <input class="form-control checkbox-upload" type="checkbox" (change)="changeCheckbox('5')" [(ngModel)]="checkListModel.checkFive">
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+  <div class="modal-footer">
+    <button class="btn ms_btn_green" 
+    [disabled]="!(selectedCheckIn.bpjs_card_file && selectedCheckIn.refference_letter_file) && !(checkListModel.checkOne === true && checkListModel.checkFour === true)" 
+    (click)="afterUploadCheckIn(checkInOldPatient, cls_confirm_document)">Continue</button>
+    <button type="button" class="btn ms_btn_red" (click)="c('Cross click')">Cancel</button>
+  </div>
+</ng-template>
 
 <ng-template #comparePatient let-c="close" let-d="dismiss">
   <div class="modal-header">
@@ -690,10 +861,13 @@
             <div class="">
               <select id="title" class="form-control" required (change)="changeCondition($event)" name="dropDownPatientType">
                 <option *ngFor="let itr of patientTypeList" [ngValue]="itr" [disabled]="itr.description == 'EMPLOYEE'"
-                      [selected]="(itr.description == 'KITAS' && nationalIdTypeId == 4) || (itr.description == 'PASSPORT' && nationalIdTypeId == 3)
-                        || itr.description == 'PRIVATE' && nationalIdTypeId == 1 || (itr.description == 'PRIVATE' && nationalIdTypeId == 2) || (itr.description == 'PRIVATE' && nationalIdTypeId == 5) || (itr.description == 'PRIVATE' && nationalIdTypeId == '')">
-                      {{itr.description}}
-                </option>
+                      [selected]="(itr.description == patientType.description && nationalIdTypeId == 4) 
+                      || (itr.description == patientType.description && nationalIdTypeId == 3)
+                      || (itr.description == patientType.description && nationalIdTypeId == 1)
+                      || (itr.description == patientType.description && nationalIdTypeId == 2)
+                      || (itr.description == patientType.description && nationalIdTypeId == 5)
+                      || (itr.description == patientType.description && nationalIdTypeId == '')">
+                      {{itr.description}}</option>
               </select>
               <input type="hidden" name="patientType" [(ngModel)]="patientType">
             </div>
@@ -731,6 +905,26 @@
             <div class="input-group">
               <input type="text" class="form-control" name="payerEligibility" [(ngModel)]="payerEligibility"
                 [disabled]="txtPayerEligibility">
+            </div>
+          </div>
+        </div>
+        <div class="d-flex">
+          <div style="width: 10%">
+            <label class="">Form Signed</label>
+            <div class="">
+              <input class="form-control checkbox-upload" style="margin-left: 1.8em;" type="checkbox" [(ngModel)]="isSigned">
+            </div>
+          </div>
+          <div style="width: 40%">
+            <label class="">email</label>
+            <div class="">
+              <input type="text" class="form-control" name="email" [(ngModel)]="email">
+            </div>
+          </div>
+          <div style="width: 30%">
+            <label class="">Notes</label>
+            <div class="input-group">
+              <input type="text" class="form-control" name="notes" [(ngModel)]="notes">
             </div>
           </div>
         </div>

@@ -200,6 +200,11 @@
           (click)="getImage(itr.selfie_with_identity_file)"
           target="_blank">{{itr.selfie_with_identity_file}}<br></a>
           </span>
+          <span *ngIf="itr.control_letter_file">
+            <a href=":javascript"
+          (click)="getImage(itr.control_letter_file)"
+          target="_blank">{{itr.control_letter_file}}<br></a>
+          </span>
         </td>
       </tr>
       <tr>

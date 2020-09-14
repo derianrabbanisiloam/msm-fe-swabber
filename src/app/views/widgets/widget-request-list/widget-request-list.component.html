@@ -108,6 +108,11 @@
           (click)="getImage(r.selfie_with_identity_file)"
           target="_blank">{{r.selfie_with_identity_file}}<br></a>
           </span>
+          <span *ngIf="r.control_letter_file">
+            <a href=":javascript"
+          (click)="getImage(r.control_letter_file)"
+          target="_blank">{{r.control_letter_file}}<br></a>
+          </span>
         </td>
         <td style="min-width: 5em">
           <div class="cell-img-nav d-flex justify-content-center">

@@ -2,7 +2,7 @@
 .fo_appointment_date{ width: 15%;}
 .fo_container_input_date{ margin-bottom: 2rem}
 .fo_container_input_date input { width: 200px}
-.fo_container_list{ background: white; border: none; border-radius: 4px;}
+.fo_container_list{ background: white; width: 120%; border: none; border-radius: 4px;}
 .fo_header_grey{ background: #F4F4F4}
 .fo_color_blue{ color: #1A2269;}
 thead th a{ color: #1A2269; text-decoration: none}

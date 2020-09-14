@@ -1649,7 +1649,7 @@ export class WidgetCreateAppointmentComponent implements OnInit {
     return patient;
   }
 
-  async buildMrLocal(detail, close, modal) {
+  async buildMrLocal(detail, close, modal, modalDoc) {
     const body = {
       patientHopeId: Number(detail.patient_hope_id),
       organizationId: Number(this.hospital.orgId),
@@ -1667,7 +1667,11 @@ export class WidgetCreateAppointmentComponent implements OnInit {
       await this.getAppointmentList();
       await this.dataProcessing();
       close.click();
-      this.open50(modal);
+      if(this.selectedCheckIn.channel_id === channelId.BPJS) {
+        this.modalService.open(modalDoc, { windowClass: 'fo_modal_admission_3', size: 'lg' });
+      } else {
+        this.open50(modal);
+      }
     }
   }
 

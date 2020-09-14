@@ -359,7 +359,15 @@ export class WidgetRescheduleWorklistComponent implements OnInit {
       result => {
         if (result === true) {
           this.alertService.success('Reschedule appointment berhasil', false, 5000);
-          this.getRescheduleWorklist();
+          if(this.isAido === true) {
+            this.getAidoWorklist();
+          }
+          else if(this.isWorklist === true) {
+            this.getRescheduleWorklist();
+          }
+          else if(this.isBpjs === true) {
+            this.getRescheduleWorklistBpjs();
+          }
         } else {
           this.alertService.error(result, false, 5000);
         }

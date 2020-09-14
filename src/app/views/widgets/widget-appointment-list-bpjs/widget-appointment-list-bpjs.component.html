@@ -16,7 +16,7 @@
     <button class="btn fo_btn_green" (click)="downloadDoc()" style="margin-bottom: 0.5em;">Download Doc</button>
   </div>
 </div>
-<div class="fo_container_list shadow-4">
+<div class="fo_container_list">
   <table class="table table-bordered">
     <thead class="fo_color_blue foot-note">
       <th>
@@ -33,7 +33,7 @@
       <th style="min-width: 13em">
         Doctor
       </th>
-      <th>BJPS Number</th>
+      <th>BPJS Number</th>
       <th style="min-width: 6em">Referral Number</th>
       <th>Queue#</th>
       <th>Notes</th>
@@ -124,8 +124,8 @@
         <td style="text-align: center; white-space: nowrap;">{{itr.custome_appointment_date}}</td>
         <td style="text-align: center; white-space: nowrap;">{{itr.custome_from_time}} - {{itr.custome_to_time}}</td>
         <td style="min-width: 8em">{{itr.doctor_name}}</td>
-        <td></td>
-        <td style="text-align: center"></td>
+        <td>{{itr.bpjs_card_number}}</td>
+        <td style="text-align: center">{{itr.reference_no}}</td>
         <td style="text-align: center">
           <div *ngIf="itr.queue_number && itr.queue_type === qType.VIP">
             <span class="" style="background: #F2C22C; color: white; padding: 0px 5px">{{itr.queue_number}}</span>
@@ -484,7 +484,7 @@
 
       <div class="fo_confirmation_button d-flex justify-content-center">
         <button type="button" class="btn fo_btn_green"
-          (click)="buildMrLocal(selectedCheckIn, cls_btn_confirm, checkInOldPatient)" (click)="c('Cross click')">Create
+          (click)="buildMrLocal(selectedCheckIn, cls_btn_confirm, checkInOldPatient, confirmDocument)" (click)="c('Cross click')">Create
           MR Local
         </button>
         <!-- <button type="button" class="btn fo_btn_blue" (click)="newPatient()" (click)="c('Cross click')">New Patient

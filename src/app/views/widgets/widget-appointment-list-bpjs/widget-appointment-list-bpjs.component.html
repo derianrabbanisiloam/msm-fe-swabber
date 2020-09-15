@@ -20,7 +20,9 @@
   <table class="table table-bordered">
     <thead class="fo_color_blue foot-note">
       <th>
-        <input type="checkbox" (click)="CheckAllOptions()" [(ngModel)]="checkAll">
+        <div>
+          <input type="checkbox" (click)="CheckAllOptions()" [(ngModel)]="checkAll">
+        </div>
       </th>
       <th style="min-width: 14em">
         Patient Name

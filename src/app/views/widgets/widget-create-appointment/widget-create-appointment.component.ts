@@ -248,7 +248,7 @@ export class WidgetCreateAppointmentComponent implements OnInit {
     });
 
     await this.getAppBpjs();
-    await this.provinceLakaLantas();
+    //await this.provinceLakaLantas();
     await this.getQueryParams();
     await this.enableWalkInChecker(); 
     await this.getSchedule();
@@ -419,7 +419,7 @@ export class WidgetCreateAppointmentComponent implements OnInit {
 
   async ngOnChanges() {
     await this.getAppBpjs();
-    await this.provinceLakaLantas();
+    //await this.provinceLakaLantas();
     await this.getQueryParams();
     await this.enableWalkInChecker();
     await this.getSchedule();
@@ -648,41 +648,41 @@ export class WidgetCreateAppointmentComponent implements OnInit {
     this.suplesi.suplesi = this.suplesi.suplesi ? 1 : 0;
   }
 
-  async provinceLakaLantas() {
-    const hospitalId = this.hospital.id;
-    this.listProvince = await this.bpjsService.getProvinceLakaLantas(hospitalId)
-      .toPromise().then(res => {
-        return res.data;
-      }).catch(err => {
-        return null;
-      })
-  }
+  // async provinceLakaLantas() {
+  //   const hospitalId = this.hospital.id;
+  //   this.listProvince = await this.bpjsService.getProvinceLakaLantas(hospitalId)
+  //     .toPromise().then(res => {
+  //       return res.data;
+  //     }).catch(err => {
+  //       return null;
+  //     })
+  // }
 
-  async districtLakaLantas() {
-    const hospitalId = this.hospital.id;
-    const provinceId = this.lokasiLakaBody.kdPropinsi ? this.lokasiLakaBody.kdPropinsi : null;
-    if(provinceId) {
-      this.listDistrict = await this.bpjsService.getDistrictLakaLantas(hospitalId, provinceId)
-      .toPromise().then(res => {
-        return res.data;
-      }).catch(err => {
-        return null;
-      })
-    }
-  }
+  // async districtLakaLantas() {
+  //   const hospitalId = this.hospital.id;
+  //   const provinceId = this.lokasiLakaBody.kdPropinsi ? this.lokasiLakaBody.kdPropinsi : null;
+  //   if(provinceId) {
+  //     this.listDistrict = await this.bpjsService.getDistrictLakaLantas(hospitalId, provinceId)
+  //     .toPromise().then(res => {
+  //       return res.data;
+  //     }).catch(err => {
+  //       return null;
+  //     })
+  //   }
+  // }
 
-  async subDistrictLakaLantas() {
-    const hospitalId = this.hospital.id;
-    const districtId = this.lokasiLakaBody.kdKabupaten ? this.lokasiLakaBody.kdKabupaten : null;
-    if(districtId) {
-      this.listSubDistrict = await this.bpjsService.getSubDistrictLakaLantas(hospitalId, districtId)
-      .toPromise().then(res => {
-        return res.data;
-      }).catch(err => {
-        return null;
-      })
-    }
-  }
+  // async subDistrictLakaLantas() {
+  //   const hospitalId = this.hospital.id;
+  //   const districtId = this.lokasiLakaBody.kdKabupaten ? this.lokasiLakaBody.kdKabupaten : null;
+  //   if(districtId) {
+  //     this.listSubDistrict = await this.bpjsService.getSubDistrictLakaLantas(hospitalId, districtId)
+  //     .toPromise().then(res => {
+  //       return res.data;
+  //     }).catch(err => {
+  //       return null;
+  //     })
+  //   }
+  // }
 
   async enableWalkInChecker() {
     //to enable or disable button checkin and slot walkin 

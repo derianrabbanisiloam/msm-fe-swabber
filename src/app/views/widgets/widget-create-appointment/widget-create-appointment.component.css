@@ -1,3 +1,7 @@
+.checkbox-upload {
+  width: 1.5em;
+}
+
 .set-position {
   margin-left: 3em;
 }
@@ -11,6 +15,75 @@
   font-size: 11px; 
   margin-left: 0.5em;
   margin-right: 0.5em;
+}
+
+.inter-checkbox {
+  height: 19px;
+  width: 19px;
+}
+
+.image-upload>input {
+  display: none;
+}
+.image-upload button
+{
+    width: 80px;
+    cursor: pointer;
+}
+
+.inter-checkbox {
+  height: 15px;
+  width: 15px;
+}
+
+::ng-deep .fo_modal_admission_2 .modal-dialog {
+  width: 55em;
+}
+
+::ng-deep .fo_modal_admission_3 .modal-dialog {
+  width: 45em;
+}
+
+.ms_btn_blue_module{ 
+  background: dodgerblue; 
+  color: white;
+  border-radius: 5px;
+  width: 7em;
+}
+
+.space-text {
+  margin-bottom: 1.5em;
+}
+
+.space-text-two {
+  margin-bottom: 2.4em;
+}
+
+::ng-deep .modal_bpjs .modal-dialog { 
+  max-width: 40%;
+  width: 40%;
+  margin-top: 7vw;
+}
+
+.content-header-container{
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  width: 100%;
+  margin: 10px 0;
+}
+
+.left-text{
+  text-align: left;
+  align-items: center;
+  font-size: 16px;
+  font-weight: bold;
+}
+
+.custom-app-bpjs{
+  background-color: white;
+  border-radius: 10px;
+  padding: 1em;
 }
 
 .flag-tele {
@@ -349,6 +422,13 @@ a{ text-decoration: none !important;}
 }
 
 /* Style the checkmark/indicator */
+.icon_bpjs{
+  height: 1.5em;
+  width: 1.5em;
+  margin-left: 1em;
+  border: 0px;
+}
+
 .check_box_container .checkmark:after {
   left: 4px;
   top: 1px;
@@ -389,6 +469,12 @@ a{ text-decoration: none !important;}
   max-width: 50%;
 }
 
+.fo_create_admission_body_two label{ font-size: 10px}
+::ng-deep .fo_modal_admission .modal-dialog {
+  margin: 10% auto;
+  max-width: 50%;
+}
+
 .fo_btn_admission{ height: 2.7rem; width: 12rem;
   border: none; border-radius: 2px;
   font-size: 14px;
@@ -403,6 +489,16 @@ a{ text-decoration: none !important;}
   padding-top: 30px;
 }
 .fo_create_admission_body .justify-content-between > div:not(:last-child){
+  margin-right: 14px;
+}
+
+.fo_create_admission_body_two > div > div > div:not(:last-child) {
+  margin-right: 14px;
+}
+.fo_create_admission_body_two > div { padding: 9px 0px}
+.fo_create_admission_body_two > div:last-child{
+}
+.fo_create_admission_body_two .justify-content-between > div:not(:last-child){
   margin-right: 14px;
 }
 

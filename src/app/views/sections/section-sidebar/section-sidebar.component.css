@@ -122,6 +122,10 @@
     margin-left: 0.8333rem;
     width: 14rem;
   }
+  .fo_minimized .fo_minimized_text_long{
+    margin-left: 0.8333rem;
+    width: 14rem;
+  }
   .container-button{
     border-radius: 0;
     border-top-right-radius: 5px !important;

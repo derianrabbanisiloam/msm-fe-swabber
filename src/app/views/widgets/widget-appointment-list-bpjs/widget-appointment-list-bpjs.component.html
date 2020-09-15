@@ -1,0 +1,796 @@
+<div class="fo_container_input_date">
+  <label class="foot-note" for="doctor_name">Appointment Date</label>
+  <div>
+    <my-date-picker name="mydate" [options]="myDatePickerOptions" [(ngModel)]="dateAppointment"
+      (dateChanged)="onDateChange($event)"></my-date-picker>
+  </div>
+
+  <div *ngFor="let alert of alerts">
+    <ngb-alert *ngIf="alert" type="{{cssAlertType(alert)}}" (close)="removeAlert(alert)">{{ alert.message }}</ngb-alert>
+  </div>
+
+</div>
+
+<div class="row">
+  <div class="col-md-12">
+    <button class="btn fo_btn_green" (click)="downloadDoc()" style="margin-bottom: 0.5em;">Download Doc</button>
+  </div>
+</div>
+<div class="fo_container_list">
+  <table class="table table-bordered">
+    <thead class="fo_color_blue foot-note">
+      <th>
+        <input type="checkbox" (click)="CheckAllOptions()" [(ngModel)]="checkAll">
+      </th>
+      <th style="min-width: 14em">
+        Patient Name
+      </th>
+      <th style="min-width: 8em">MR No.</th>
+      <th style="white-space: nowrap; text-align: center; min-width: 10em">Date of Birth</th>
+      <th>Phone No.</th>
+      <th width="100px">Appo. Date</th>
+      <th>Time Slot</th>
+      <th style="min-width: 13em">
+        Doctor
+      </th>
+      <th>BPJS Number</th>
+      <th style="min-width: 6em">Referral Number</th>
+      <th>Queue#</th>
+      <th>Notes</th>
+      <th width="90px" style="text-align: center">Action</th>
+      <th style="min-width: 9em">ModifiedBy</th>
+      <th style="min-width: 18rem">Document</th>
+    </thead>
+
+    <tbody>
+      <tr class="fo_header_grey filter-row">
+        <td></td>
+        <td>
+          <div class="inner-addon right-addon">
+            <i class="glyphicon fa fa-search"></i>
+            <input type="text" class="form-control" placeholder="Search name" [(ngModel)]="model.name"
+              (change)="searchAppointment(true)" />
+          </div>
+        </td>
+        <td>
+          <div class="inner-addon right-addon">
+            <i class="glyphicon fa fa-search"></i>
+            <input type="text" class="form-control" placeholder="Search MR" [(ngModel)]="model.mr"
+              (change)="searchAppointment(true)" />
+          </div>
+        </td>
+        <td>
+          <div class="inner-addon right-addon">
+            <i class="glyphicon fa fa-search"></i>
+            <input [textMask]="{mask: mask_birth}" type="text" placeholder="Search dob" class="form-control"
+              [(ngModel)]="model.birth" (change)="searchAppointment(true)" placeholder="dd-mm-yyyy" />
+          </div>
+        </td>
+        <td></td>
+        <td></td>
+        <td></td>
+        <td>
+          <div class="ng-autocomplete" class="angular-autocomplete">
+            <ng-autocomplete placeHolder="Doctor name ..." [(ngModel)]="model.doctor" [data]="doctorList"
+              searchKeyword="name" (selected)='searchAppointment(true)' (inputCleared)='searchAppointment(true)'
+              [itemTemplate]="itemTemplateDoctor" [notFoundTemplate]="notFoundTemplate">
+            </ng-autocomplete>
+
+            <ng-template #itemTemplateDoctor let-item>
+              <a [innerHTML]="item.name"></a>
+            </ng-template>
+
+            <ng-template #notFoundTemplate let-notFound>
+              <div [innerHTML]="notFound"></div>
+            </ng-template>
+          </div>
+
+        </td>
+        <td></td>
+        <td></td>
+        <td></td>
+        <td></td>
+        <td></td>
+        <td>
+          <div class="inner-addon right-addon">
+            <i class="glyphicon fa fa-search"></i>
+            <input type="text" class="form-control" placeholder="Min 3 characters" [(ngModel)]="model.modifiedName"
+            (change)="model.modifiedName.length >= 3 || model.modifiedName.length === 0? searchAppointment(true): ''" />
+          </div>
+        </td>
+        <td></td>
+      </tr>
+
+      <tr *ngFor="let itr of appList" [ngClass]="{
+              'row-pink' : itr.appointment_status_id === appStatusId.INACTIVE && !itr.expired,
+              'row-orange' : itr.expired
+              }">
+        <td>
+          <input type="checkbox" style="margin-top: 0.7vw" [(ngModel)]="itr.checked" [value]="itr.checked">
+        </td>
+        <td style="text-transform: uppercase">
+
+          <a *ngIf="!itr.admission_id" href="javascript:void(0)" (click)="openRescheduleModal(itr)">{{itr.contact_name}}
+          </a>
+          <span *ngIf="itr.admission_id">{{itr.contact_name}}</span>
+          <button *ngIf="itr.is_logged" type="button" class="ms_btn_border ms_btn_darkgrey"
+            style="margin-left: 1.2vw; width: 1.3vw; height: 1.3vw;" (click)="openLogHistory(itr, modalHistory)">
+            <i class="fa fa-exclamation"></i>
+          </button>
+        </td>
+        <td style="width: 1%;">{{itr.medical_record_number}}</td>
+        <td style="text-align: center; white-space: nowrap; width: 1%">{{itr.custome_birth_date}}</td>
+        <td style="text-align: center">{{itr.phone_number}}</td>
+        <td style="text-align: center; white-space: nowrap;">{{itr.custome_appointment_date}}</td>
+        <td style="text-align: center; white-space: nowrap;">{{itr.custome_from_time}} - {{itr.custome_to_time}}</td>
+        <td style="min-width: 8em">{{itr.doctor_name}}</td>
+        <td>{{itr.bpjs_card_number}}</td>
+        <td style="text-align: center">{{itr.reference_no}}</td>
+        <td style="text-align: center">
+          <div *ngIf="itr.queue_number && itr.queue_type === qType.VIP">
+            <span class="" style="background: #F2C22C; color: white; padding: 0px 5px">{{itr.queue_number}}</span>
+          </div>
+          <div *ngIf="itr.queue_number && itr.queue_type === qType.REG">
+            <span class="" style="background: #1A2269; color: white; padding: 0px 5px">{{itr.queue_number}}</span>
+          </div>
+        </td>
+        <td style="white-space: nowrap; overflow: hidden; text-overflow: ellipsis; max-width: 7em">
+          <a ngbPopover="{{itr.appointment_note}}" popoverTitle=""
+            triggers="mouseenter:mouseleave">{{itr.appointment_note && itr.appointment_note.length > 10 ? itr.appointment_note.substr(0,10)+"..." : itr.appointment_note}}</a>
+        </td>
+        <td style="text-align: center; width: 4vw">
+          <div *ngIf="itr.admission_id && itr.queue_number" class="cell-img-nav-single d-flex justify-content-center">
+            <div (click)="printPatientLabel(itr)">
+              <img src="{{assetPath}}icons/ic_Print_Yellow@2x.png">
+            </div>
+          </div>
+
+          <div class="span-canceled" *ngIf="itr.appointment_status_id === appStatusId.INACTIVE && !itr.expired">
+            <span class="">Canceled</span>
+          </div>
+          <div style="color: #C43D32; font-size: 10px; font-weight: bold" *ngIf="itr.expired">
+            <span class="">Expired</span>
+          </div>
+          <button *ngIf="itr.admission_id && !itr.queue_number" type="button" class="btn fo_btn_green"
+            style="height: 2rem" (click)="checkInAppointment(itr, confirmCheckIn)"
+            [disabled]="itr.admission_id && itr.expired">Complete<br>Check In
+          </button>
+
+          <div *ngIf="!itr.expired && itr.appointment_status_id !== appStatusId.INACTIVE && !itr.admission_id">
+
+            <div class="cell-img-nav d-flex justify-content-center">
+              <div (click)="checkInAppointment(itr, confirmCheckInTwo)">
+                <img src="{{assetPath}}icons/ic_Check@2x.png">
+              </div>
+              <span style="opacity: 0; max-width: 0.5em; overflow: hidden">filler</span>
+              <div (click)="cancelAppointment(itr, confirmCancel)">
+                <img src="{{assetPath}}icons/ic_Cancel@2x.png">
+              </div>
+            </div>
+          </div>
+
+        </td>
+        <td>
+          <a ngbPopover="{{itr.modified_name}}" popoverTitle=""
+            triggers="mouseenter:mouseleave">{{itr.modified_name && itr.modified_name.length > 10 ? itr.modified_name.substr(0,10)+"..." : itr.modified_name}}</a>
+        </td>
+        <td>
+          <span *ngIf="itr.bpjs_card_file">
+            <a href=":javascript"
+            (click)="getImage(itr.bpjs_card_file)"
+            target="_blank">{{itr.bpjs_card_file}}<br></a>
+          </span>
+          <span *ngIf="itr.family_card_file">
+            <a href=":javascript"
+            (click)="getImage(itr.family_card_file)"
+            target="_blank">{{itr.family_card_file}}<br></a>
+          </span>
+          <span *ngIf="itr.identity_card_file">
+            <a href=":javascript"
+            (click)="getImage(itr.identity_card_file)"
+            target="_blank">{{itr.identity_card_file}}<br></a>
+          </span>
+          <span *ngIf="itr.refference_letter_file">
+            <a href=":javascript"
+            (click)="getImage(itr.refference_letter_file)"
+            target="_blank">{{itr.refference_letter_file}}<br></a>
+          </span>
+          <span *ngIf="itr.selfie_with_identity_file">
+            <a href=":javascript"
+          (click)="getImage(itr.selfie_with_identity_file)"
+          target="_blank">{{itr.selfie_with_identity_file}}<br></a>
+          </span>
+          <span *ngIf="itr.control_letter_file">
+            <a href=":javascript"
+          (click)="getImage(itr.control_letter_file)"
+          target="_blank">{{itr.control_letter_file}}<br></a>
+          </span>
+        </td>
+      </tr>
+      <tr>
+        <td *ngIf="showNotFoundMsg" colspan="15" style="text-align: center;">Displaying no data</td>
+        <td *ngIf="showWaitMsg" colspan="15">
+          <ngb-progressbar value="1000">Loading...</ngb-progressbar>
+        </td>
+      </tr>
+    </tbody>
+  </table>
+</div>
+
+<section class="full-width" id="group-list-appointment">
+  <button *ngIf="isCanPrevPage" (click)="prevPage()" class="btn ms_btn_blue">
+    <img src="{{assetPath}}icons/ic_ArrowRight_White.png"> Prev
+  </button>
+  <span style="width:10px">&nbsp;</span>
+  <button *ngIf="isCanNextPage" (click)="nextPage()" class="btn ms_btn_blue">
+    Next <img src="{{assetPath}}icons/ic_ArrowLeft_White.png">
+  </button>
+
+  <ng-template #confirmCancel let-c="close" let-d="dismiss">
+    <div class="modal-header">
+      <h4 class="modal-title">Confirmation</h4>
+      <button type="button" class="close" aria-label="Close" (click)="d('Cross click')">
+        <span aria-hidden="true">&times;</span>
+      </button>
+    </div>
+    <div class="modal-body">
+      <p>Are you sure to cancel appointment of {{ selectedCancel.contact_name }} ?</p>
+      <div class="fo_confirmation_button d-flex justify-content-center">
+        <button type="button" class="btn fo_btn_black" (click)="cancelProcess(selectedCancel)"
+          (click)="c('Cross click')">Ok</button>
+        <button type="button" class="btn fo_btn_green" (click)="c('Cross click')">Cancel</button>
+      </div>
+    </div>
+  </ng-template>
+
+  <ng-template #confirmCheckIn let-c="close" let-d="dismiss">
+    <div class="modal-header">
+      <h4 class="modal-title">Confirmation</h4>
+      <button type="button" class="close" aria-label="Close" (click)="d('Cross click')">
+        <span aria-hidden="true">&times;</span>
+      </button>
+    </div>
+    <div class="modal-body">
+      <div *ngIf="late">
+        <p style="color:red;">
+          <font size="4"><b>Pasien Terlambat {{late}}</b></font>
+        </p>
+      </div>
+      <p>Are you sure to check in appointment of {{ selectedCheckIn.contact_name }} ?</p>
+      <div class="fo_confirmation_button d-flex justify-content-center">
+        <button type="button" class="btn fo_btn_green"
+          (click)="confirmCheckInValue(selectedCheckIn, checkInOldPatient, confirmLocalMrCreate)"
+          (click)="c('Cross click')">Ok</button>
+        <div *ngIf="late && selectedCheckIn.admission_id == null">
+          <button type="button" class="btn fo_btn_blue" (click)="openRescheduleModal(selectedCheckIn)"
+            (click)="c('Cross click')">Reschedule</button>
+        </div>
+        <button type="button" class="btn fo_btn_black" (click)="c('Cross click')">Cancel</button>
+      </div>
+    </div>
+  </ng-template>
+
+  <ng-template #confirmCheckInTwo let-c="close" let-d="dismiss">
+    <div class="modal-header">
+      <h4 class="modal-title">Confirmation</h4>
+      <button type="button" class="close" aria-label="Close" (click)="d('Cross click')">
+        <span aria-hidden="true">&times;</span>
+      </button>
+    </div>
+    <div class="modal-body">
+      <div *ngIf="late">
+        <p style="color:red;">
+          <font size="4"><b>Pasien Terlambat {{late}}</b></font>
+        </p>
+      </div>
+      <p>Are you sure to check in this appointment?</p>
+      <div class="fo_confirmation_button d-flex justify-content-center">
+        <button type="button" class="btn fo_btn_green"
+          (click)="confirmCheckInValue(selectedCheckIn, confirmDocument, confirmLocalMrCreate)"
+          (click)="c('Cross click')">Ok</button>
+        <div *ngIf="late">
+          <button type="button" class="btn fo_btn_blue" (click)="openRescheduleModal(selectedCheckIn)"
+            (click)="c('Cross click')">Reschedule</button>
+        </div>
+        <button type="button" class="btn fo_btn_black" (click)="c('Cross click')">Cancel</button>
+      </div>
+    </div>
+  </ng-template>
+
+  <ng-template #confirmDocument let-modal let-c="close">
+    <div class="modal-header">
+      <div class="header-2 modal-padding" *ngIf="selectedCheckIn?.contact_name">{{selectedCheckIn.contact_name}} {{selectedCheckIn.custome_birth_date}} | Document uploads</div>
+      <button #cls_confirm_document type="button" class="close" aria-label="Close" (click)="c('Cross click')">
+        <span aria-hidden="true">&times;</span>
+      </button>
+    </div>
+    <div class="modal-body">
+      <div class="form-ca-phoneno form-group row" style="font-weight: bold; margin-top: 1em;">
+        <div class="col-md-5">
+          <div class="row space-text-two">
+            <div class="col-md-12">
+              Kartu BPJS*
+            </div>
+          </div>
+          <div class="row space-text-two">
+            <div class="col-md-12">
+              KTP
+            </div>
+          </div>
+          <div class="row space-text-two">
+            <div class="col-md-12">
+              Kartu Keluarga
+            </div>
+          </div>
+          <div class="row space-text-two">
+            <div class="col-md-12">
+              Surat Rujukan/Surat Keterangan*
+            </div>
+          </div>
+          <div class="row space-text-two">
+            <div class="col-md-12">
+              Surat kontrol
+            </div>
+          </div>
+        </div>
+        <div class="col-md-5" style="padding-left: 0;">
+          <div class="row space-text">
+            <div class="col-md-5" style="padding-left: 0" *ngIf="selectedCheckIn?.bpjs_card_file">
+              <span style="margin-left: 2.5em;">
+                <a href=":javascript"
+                (click)="getImage(selectedCheckIn.bpjs_card_file)"
+                target="_blank">View<br></a>
+              </span>
+            </div>
+            <div class="col-md-4" style="padding-left: 0">
+              <button type="button" class="btn ms_btn_blue_module" [disabled]="flagFile1 || checkListModel.checkOne === true" (click)="fileInputOne.click()">
+                <span *ngIf="!selectedCheckIn?.bpjs_card_file">Upload</span>
+                <span *ngIf="selectedCheckIn?.bpjs_card_file">Re-upload</span>
+                <input #fileInputOne type="file" (change)="upload($event, 'bpjsCard')" style="display:none;" accept="application/pdf, .jpg, .jpeg"/>
+              </button>
+            </div>
+            <div class="col-md-3">
+              <span *ngIf="flagFile1">
+                <ngb-progressbar type="success" value="500" [striped]="true" height="2.3rem" [animated]="true">Loading...</ngb-progressbar>
+              </span>
+            </div>
+            <div class="col-md-4" style="padding-left: 0" *ngIf="!selectedCheckIn?.bpjs_card_file">
+              <input class="form-control checkbox-upload" type="checkbox" (change)="changeCheckbox('1')" [(ngModel)]="checkListModel.checkOne">
+            </div>
+          </div>
+          <div class="row space-text">
+            <div class="col-md-5" style="padding-left: 0" *ngIf="selectedCheckIn?.identity_card_file">
+              <span style="margin-left: 2.5em;">
+                <a href=":javascript"
+                (click)="getImage(selectedCheckIn.identity_card_file)"
+                target="_blank">View<br></a>
+              </span>
+            </div>
+            <div class="col-md-4" style="padding-left: 0">
+              <button type="button" class="btn ms_btn_blue_module" [disabled]="flagFile2 || checkListModel.checkTwo === true" (click)="fileInputTwo.click()">
+                <span *ngIf="!selectedCheckIn?.identity_card_file">Upload</span>
+                <span *ngIf="selectedCheckIn?.identity_card_file">Re-upload</span>
+                <input #fileInputTwo type="file" (change)="upload($event, 'identityCard')" style="display:none;" accept="application/pdf, .jpg, .jpeg"/>
+              </button>
+            </div>
+            <div class="col-md-3">
+              <span *ngIf="flagFile2">
+                <ngb-progressbar type="success" value="1000" [striped]="true" height="2.3rem" [animated]="true">Loading...</ngb-progressbar>
+              </span>
+            </div>
+            <div class="col-md-4" style="padding-left: 0" *ngIf="!selectedCheckIn?.identity_card_file">
+              <input class="form-control checkbox-upload" type="checkbox" (change)="changeCheckbox('2')" [(ngModel)]="checkListModel.checkTwo">
+            </div>
+          </div>
+          <div class="row space-text">
+            <div class="col-md-5" style="padding-left: 0" *ngIf="selectedCheckIn?.family_card_file">
+              <span style="margin-left: 2.5em;">
+                <a href=":javascript"
+                (click)="getImage(selectedCheckIn.family_card_file)"
+                target="_blank">View<br></a>
+              </span>
+            </div>
+            <div class="col-md-4" style="padding-left: 0">
+              <button type="button" class="btn ms_btn_blue_module" [disabled]="flagFile3 || checkListModel.checkThree === true" (click)="fileInputThree.click()">
+                <span *ngIf="!selectedCheckIn?.family_card_file">Upload</span>
+                <span *ngIf="selectedCheckIn?.family_card_file">Re-upload</span>
+                <input #fileInputThree type="file" (change)="upload($event, 'familyCard')" style="display:none;" accept="application/pdf, .jpg, .jpeg"/>
+              </button>
+            </div>
+            <div class="col-md-3">
+              <span *ngIf="flagFile3">
+                <ngb-progressbar type="success" value="1000" [striped]="true" height="2.3rem" [animated]="true">Loading...</ngb-progressbar>
+              </span>
+            </div>
+            <div class="col-md-4" style="padding-left: 0" *ngIf="!selectedCheckIn?.family_card_file">
+              <input class="form-control checkbox-upload" type="checkbox" (change)="changeCheckbox('3')" [(ngModel)]="checkListModel.checkThree">
+            </div>
+          </div>
+          <div class="row space-text">
+            <div class="col-md-5" style="padding-left: 0" *ngIf="selectedCheckIn?.refference_letter_file">
+              <span style="margin-left: 2.5em;">
+                <a href=":javascript"
+                (click)="getImage(selectedCheckIn.refference_letter_file)"
+                target="_blank">View<br></a>
+              </span>
+            </div>
+            <div class="col-md-4" style="padding-left: 0">
+              <button type="button" class="btn ms_btn_blue_module" [disabled]="flagFile4 || checkListModel.checkFour === true" (click)="fileInputFour.click()">
+                <span *ngIf="!selectedCheckIn?.refference_letter_file">Upload</span>
+                <span *ngIf="selectedCheckIn?.refference_letter_file">Re-upload</span>
+                <input #fileInputFour type="file" (change)="upload($event, 'referenceLetter')" style="display:none;" accept="application/pdf, .jpg, .jpeg"/>
+              </button>
+            </div>
+            <div class="col-md-3">
+              <span *ngIf="flagFile4">
+                <ngb-progressbar type="success" value="1000" [striped]="true" height="2.3rem" [animated]="true">Loading...</ngb-progressbar>
+              </span>
+            </div>
+            <div class="col-md-4" style="padding-left: 0" *ngIf="!selectedCheckIn?.refference_letter_file">
+              <input class="form-control checkbox-upload" type="checkbox" (change)="changeCheckbox('4')" [(ngModel)]="checkListModel.checkFour">
+            </div>
+          </div>
+          <div class="row space-text">
+            <div class="col-md-5" style="padding-left: 0" *ngIf="selectedCheckIn?.control_letter_file">
+              <span style="margin-left: 2.5em;">
+                <a href=":javascript"
+                (click)="getImage(selectedCheckIn.control_letter_file)"
+                target="_blank">View<br></a>
+              </span>
+            </div>
+            <div class="col-md-4" style="padding-left: 0">
+              <button type="button" class="btn ms_btn_blue_module" [disabled]="flagFile5 || checkListModel.checkFive === true" (click)="fileInputFive.click()">
+                <span *ngIf="!selectedCheckIn?.control_letter_file">Upload</span>
+                <span *ngIf="selectedCheckIn?.control_letter_file">Re-upload</span>
+                <input #fileInputFive type="file" (change)="upload($event, 'controlLetter')" style="display:none;" accept="application/pdf, .jpg, .jpeg"/>
+              </button>
+            </div>
+            <div class="col-md-3">
+              <span *ngIf="flagFile5">
+                <ngb-progressbar type="success" value="1000" [striped]="true" height="2.3rem" [animated]="true">Loading...</ngb-progressbar>
+              </span>
+            </div>
+            <div class="col-md-4" style="padding-left: 0" *ngIf="!selectedCheckIn?.control_letter_file">
+              <input class="form-control checkbox-upload" type="checkbox" (change)="changeCheckbox('5')" [(ngModel)]="checkListModel.checkFive">
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="modal-footer">
+      <button class="btn ms_btn_green" 
+      [disabled]="!(selectedCheckIn.bpjs_card_file && selectedCheckIn.refference_letter_file) && !(checkListModel.checkOne === true && checkListModel.checkFour === true)" 
+      (click)="afterUploadCheckIn(checkInOldPatient, cls_confirm_document)">Continue</button>
+      <button type="button" class="btn ms_btn_red" (click)="c('Cross click')">Cancel</button>
+    </div>
+  </ng-template>
+
+  <ng-template #confirmLocalMrCreate let-c="close" let-d="dismiss">
+    <div class="modal-header">
+      <h4 class="modal-title">Confirmation</h4>
+      <button #cls_btn_confirm type="button" class="close" aria-label="Close" (click)="d('Cross click')">
+        <span aria-hidden="true">&times;</span>
+      </button>
+    </div>
+    <div class="modal-body">
+      <ngb-alert *ngIf="successMessage4" type="success" (close)="successMessage4 = null">{{ successMessage4 }}
+      </ngb-alert>
+      <ngb-alert *ngIf="errorMessage4" type="danger" (close)="errorMessage4 = null">{{ errorMessage4 }}</ngb-alert>
+      <div>This patient already register in another siloam hospitals. This is of patient information : </div>
+      <div>Name : {{ selectedCheckIn.contact_name }}</div>
+      <div>Birthdate : {{ selectedCheckIn.custome_birth_date }}</div>
+      <div>Address : {{ selectedCheckIn.current_address }}</div>
+      <div>Phone : {{ selectedCheckIn.phone_number }}</div>
+
+      <div class="fo_confirmation_button d-flex justify-content-center">
+        <button type="button" class="btn fo_btn_green"
+          (click)="buildMrLocal(selectedCheckIn, cls_btn_confirm, checkInOldPatient, confirmDocument)" (click)="c('Cross click')">Create
+          MR Local
+        </button>
+        <!-- <button type="button" class="btn fo_btn_blue" (click)="newPatient()" (click)="c('Cross click')">New Patient
+        </button> -->
+        <button type="button" class="btn fo_btn_black" (click)="c('Cross click')">Cancel</button>
+      </div>
+    </div>
+  </ng-template>
+
+  <ng-template #checkInOldPatient let-c="close" let-d="dismiss">
+    <div class="modal-header">
+      <span class="modal-title header-2"> {{ selectedCheckIn.contact_name }}&nbsp;|&nbsp;Create Admission</span>
+      <button #close_adm type="button" class="close" aria-label="Close" (click)="d('Cross click')">
+        <span aria-hidden="true"><img style="width: 1rem;height: 1rem" src="{{assetPath}}icons/ic_Cross@2x.png"></span>
+      </button>
+    </div>
+    <div class="modal-body">
+      <div class="form-group">
+        <div *ngFor="let alert of alerts">
+          <ngb-alert *ngIf="alert" type="{{cssAlertType(alert)}}" (close)="removeAlert(alert)">{{ alert.message }}
+          </ngb-alert>
+        </div>
+      </div>
+      <div class="fo_create_admission_body ">
+        <div class="" style="width: 100%">
+          <div class="d-flex justify-content-start">
+            <div class="" style="width: 10%; min-width: 60px">
+              <label class="">MR No.</label>
+              <div class="">
+                <input type="text" class="form-control" name="mr_no" [(ngModel)]="selectedCheckIn.medical_record_number"
+                  readonly>
+              </div>
+            </div>
+            <div style="width: 10%; min-width: 120px">
+              <label class="" style="white-space: nowrap;">Reg. admission date</label>
+              <div class="input-group">
+                <input type="text" class="form-control" name="admission_date" [(ngModel)]="dateAdmission" readonly>
+              </div>
+            </div>
+            <div style="width: -webkit-fill-available;">
+              <label class="">Name</label>
+              <div class="">
+                <input type="text" class="form-control" name="patient" [(ngModel)]="selectedCheckIn.contact_name"
+                  readonly>
+              </div>
+            </div>
+            <div style="width: 10%; min-width: 100px">
+              <label class="">Birth Date</label>
+              <div class="input-group">
+                <input type="text" class="form-control" name="birthDate"
+                  [(ngModel)]="selectedCheckIn.custome_birth_date" readonly>
+              </div>
+            </div>
+            <div class="form-group" style="width: -webkit-fill-available">
+              <label class="">Address</label>
+              <div class="">
+                <input type="text" class="form-control" name="address" [(ngModel)]="selectedCheckIn.current_address"
+                  readonly>
+              </div>
+            </div>
+          </div>
+          <div class="d-flex justify-content-start">
+            <div class="" style="width: 15%; min-width: 100px">
+              <label class="">Referal Type</label>
+              <div class="">
+                <input type="text" class="form-control" name="selfReferal" [(ngModel)]="selectedReferral.description"
+                  readonly>
+              </div>
+            </div>
+            <div style="width: 15%; min-width: 100px">
+              <label class="">Mobile Phone</label>
+              <div class="input-group">
+                <input type="text" class="form-control" name="phone" [(ngModel)]="selectedCheckIn.phone_number"
+                  readonly>
+              </div>
+            </div>
+            <div class="">
+              <label class="">Admission Type</label>
+              <div class="input-group">
+                <input type="text" class="form-control" name="admission_type"
+                  [(ngModel)]="selectedAdmissionType.description" readonly>
+              </div>
+            </div>
+            <div class="form-group" style="width: 50%">
+              <label class="">Doctor</label>
+              <div class="input-group">
+                <input type="text" class="form-control" name="doctor_name" [(ngModel)]="selectedCheckIn.doctor_name"
+                  readonly>
+              </div>
+            </div>
+          </div>
+        </div>
+        <div *ngIf="!selectedCheckIn.admission_id" style="border-top: 0.5px solid #C1C1C1">
+          <div class="d-flex justify-content-between">
+              <div style="width: 20%">
+                <label class="">Patient Type</label>
+                <div class="">
+                  <select id="title" class="form-control" required (change)="changeCondition($event)"
+                name="dropDownPatientType">
+                <option *ngFor="let itr of patientTypeList" [ngValue]="itr" [disabled]="itr.description == 'EMPLOYEE'"
+                  [selected]="(itr.description == patientType.description && nationalIdTypeId == 4) 
+                  || (itr.description == patientType.description && nationalIdTypeId == 3)
+                  || (itr.description == patientType.description && nationalIdTypeId == 1)
+                  || (itr.description == patientType.description && nationalIdTypeId == 2)
+                  || (itr.description == patientType.description && nationalIdTypeId == 5)
+                  || (itr.description == patientType.description && nationalIdTypeId == '')">
+                  {{itr.description}}</option>
+                  </select>
+                  <input type="hidden" name="patientType" [(ngModel)]="patientType">
+                </div>
+              </div>
+              <div style="width: 40%">
+                <label class="">Room / Location</label>
+                <div class="input-group">
+                  <select class="form-control" [(ngModel)]="roomHope" name="dropDownRoom">
+                    <option *ngFor="let itr of listRoomHope" [ngValue]="itr">
+                      {{itr.name}} - {{itr.code}}
+                    </option>
+                  </select>
+                </div>
+              </div>
+              <div style="width: 40%">
+              </div>
+          </div>
+          <div class="d-flex justify-content-between">
+            <div style="width: 40%">
+              <label class="">Payer</label>
+              <div class="">
+                <input class="form-control" ngui-auto-complete auto-select-first-item="true" max-num-list="20"
+                  value-formatter="name" list-formatter="name" [match-formatted]="true" min-chars="3"
+                  [source]="listPayer" name="payer" [(ngModel)]="payer" [disabled]="txtPayer">
+              </div>
+            </div>
+            <div style="width: 30%">
+              <label class="">Payer No</label>
+              <div class="input-group">
+                <input type="text" class="form-control" name="payerNo" [(ngModel)]="payerNo" [disabled]="txtPayerNo">
+              </div>
+            </div>
+            <div style="width: 30%">
+              <label class="">Payer Eligibility No</label>
+              <div class="input-group">
+                <input type="text" class="form-control" name="payerEligibility" [(ngModel)]="payerEligibility"
+                  [disabled]="txtPayerEligibility">
+              </div>
+            </div>
+          </div>
+          <div class="d-flex">
+            <div style="width: 10%">
+              <label class="">Form Signed</label>
+              <div class="">
+                <input class="form-control checkbox-upload" style="margin-left: 1.8em;" type="checkbox" [(ngModel)]="isSigned">
+              </div>
+            </div>
+            <div style="width: 40%">
+              <label class="">email</label>
+              <div class="">
+                <input type="text" class="form-control" name="email" [(ngModel)]="email">
+              </div>
+            </div>
+            <div style="width: 30%">
+              <label class="">Notes</label>
+              <div class="input-group">
+                <input type="text" class="form-control" name="notes" [(ngModel)]="notes">
+              </div>
+            </div>
+          </div>
+        </div>
+        <div>
+          <div class="d-flex justify-content-end">
+            <button *ngIf="!selectedCheckIn.admission_id" class="fo_btn_admission fo_btn_save"
+              [disabled]="buttonCreateAdmission || isLoadingCreateAdmission"
+              (click)="createAdmission(selectedCheckIn, confirmCreateAdmissionProcess)">Create Admission</button>
+            <button class="fo_btn_admission fo_btn_blue"
+              [disabled]="buttonPatientLabel && !selectedCheckIn.admission_id"
+              (click)="printPatientLabel(selectedCheckIn)">Print Patient</button>
+            <button class="fo_btn_admission fo_btn_black" [disabled]="buttonPrintQueue && !selectedCheckIn.admission_id"
+              (click)="printQueue(queueNumber, close_adm)">Print Queue Number</button>
+          </div>
+          <div class="modal-message">
+            <img *ngIf="loading"
+              src="data:image/gif;base64,R0lGODlhEAAQAPIAAP///wAAAMLCwkJCQgAAAGJiYoKCgpKSkiH/C05FVFNDQVBFMi4wAwEAAAAh/hpDcmVhdGVkIHdpdGggYWpheGxvYWQuaW5mbwAh+QQJCgAAACwAAAAAEAAQAAADMwi63P4wyklrE2MIOggZnAdOmGYJRbExwroUmcG2LmDEwnHQLVsYOd2mBzkYDAdKa+dIAAAh+QQJCgAAACwAAAAAEAAQAAADNAi63P5OjCEgG4QMu7DmikRxQlFUYDEZIGBMRVsaqHwctXXf7WEYB4Ag1xjihkMZsiUkKhIAIfkECQoAAAAsAAAAABAAEAAAAzYIujIjK8pByJDMlFYvBoVjHA70GU7xSUJhmKtwHPAKzLO9HMaoKwJZ7Rf8AYPDDzKpZBqfvwQAIfkECQoAAAAsAAAAABAAEAAAAzMIumIlK8oyhpHsnFZfhYumCYUhDAQxRIdhHBGqRoKw0R8DYlJd8z0fMDgsGo/IpHI5TAAAIfkECQoAAAAsAAAAABAAEAAAAzIIunInK0rnZBTwGPNMgQwmdsNgXGJUlIWEuR5oWUIpz8pAEAMe6TwfwyYsGo/IpFKSAAAh+QQJCgAAACwAAAAAEAAQAAADMwi6IMKQORfjdOe82p4wGccc4CEuQradylesojEMBgsUc2G7sDX3lQGBMLAJibufbSlKAAAh+QQJCgAAACwAAAAAEAAQAAADMgi63P7wCRHZnFVdmgHu2nFwlWCI3WGc3TSWhUFGxTAUkGCbtgENBMJAEJsxgMLWzpEAACH5BAkKAAAALAAAAAAQABAAAAMyCLrc/jDKSatlQtScKdceCAjDII7HcQ4EMTCpyrCuUBjCYRgHVtqlAiB1YhiCnlsRkAAAOwAAAAAAAAAAAA==" />
+            <span *ngIf="isLoadingCreateAdmission">Loading... Please wait, we are creating the admission now...</span>
+          </div>
+        </div>
+      </div>
+
+      <div class="col-md-12 content-appointment-02-group-col">
+
+        <form name="form" #f="ngForm" novalidate>
+
+          <div class="form-group row">
+
+          </div>
+
+        </form>
+      </div>
+    </div>
+
+  </ng-template>
+
+  <ng-template #confirmCreateAdmissionProcess let-c="close" let-d="dismiss">
+    <div class="modal-header">
+      <h4 class="modal-title">Confirmation</h4>
+      <button type="button" class="close" aria-label="Close" (click)="d('Cross click')">
+        <span aria-hidden="true">&times;</span>
+      </button>
+    </div>
+    <div class="modal-body">
+      <p>Patient has outstanding registrations / admissions. Do you want to register / admit patient ?</p>
+      <p>Outstanding registration / admission :</p>
+      <br>
+      <div *ngFor="let itr of listActiveAdmission">
+        {{itr.admissionNo}}
+      </div>
+      <div class="fo_confirmation_button d-flex justify-content-center">
+        <button type="button" class="btn fo_btn_green" (click)="processCreateAdmission(selectedCheckIn)"
+          (click)="c('Cross click')">Yes</button>
+        <button type="button" class="btn fo_btn_black" (click)="c('Cross click')">No</button>
+      </div>
+    </div>
+  </ng-template>
+
+  <ng-template #queueNumber let-c="close" let-d="dismiss">
+    <div class="modal-header">
+      <h3 class="modal-title">Admission <small>| Print Queue Number</small></h3>
+      <button #close_button type="button" class="close" aria-label="Close" (click)="d('Cross click')">
+        <span aria-hidden="true">&times;</span>
+      </button>
+    </div>
+    <div class="modal-body">
+      <div *ngIf="!resQueue" class="form-group" [ngStyle]="{'text-align': 'center'}">
+        <button class="btn btn-primary col-md-2" [disabled]="buttonReguler"
+          (click)="printQueueAction(selectedCheckIn, true, close_button)">Reguler
+        </button>
+        <button class="btn btn-success col-md-2" [disabled]="buttonVIP"
+          (click)="printQueueAction(selectedCheckIn, false, close_button)">VIP
+        </button>
+      </div>
+      <div *ngIf="resQueue" class="form-group" [ngStyle]="{'text-align': 'center'}">
+        <button class="btn btn-success" (click)="printQueueTicket(selectedCheckIn)">Print Queue Ticket</button>
+      </div>
+    </div>
+    <div class="modal-footer">
+      <div class="form-group">
+        <div *ngFor="let alert of alerts">
+          <ngb-alert *ngIf="alert" type="{{cssAlertType(alert)}}" (close)="removeAlert(alert)">{{ alert.message }}
+          </ngb-alert>
+        </div>
+      </div>
+      <h3 *ngIf="resQueue"> {{ resQueue.name }}</h3>
+    </div>
+  </ng-template>
+
+  <ng-template #modalHistory let-c="close" let-d="dismiss">
+    <div class="modal-header">
+      <h4 class="modal-title">Log History</h4>
+      <button type="button" class="close" aria-label="Close" (click)="d('Cross click')">
+        <span aria-hidden="true">&times;</span>
+      </button>
+    </div>
+    <div class="modal-body">
+      <p *ngIf="flagHistory">Log History from "{{nameHistory}}"</p>
+      <table *ngIf="flagHistory" class="table table-bordered">
+        <thead class="body-text bold">
+          <th>No.</th>
+          <th style="min-width: 6vw">Patient Name</th>
+          <th style="text-align: center">MR No.</th>
+          <th style="white-space: nowrap; min-width:3vw; width: 1%">Date of Birth</th>
+          <th>Phone</th>
+          <th>Appo. Date</th>
+          <th>Time Slot</th>
+          <th>Doctor</th>
+          <th style="width: 1%; min-width: 10rem">Hospital</th>
+          <th>Note</th>
+          <th>Modified By</th>
+          <th style="text-align: center;width: 1%">Status</th>
+        </thead>
+
+        <tbody>
+          <tr *ngFor="let i=index; let his of history">
+            <td>{{i+1}}</td>
+            <td>{{his.contact_name != null ? his.contact_name.substr(0,30) : ''}}</td>
+            <td style="text-align: center">{{his.medical_record_number}}</td>
+            <td style="white-space: nowrap">{{his.birth_date}}</td>
+            <td>{{his.phone_number}}</td>
+            <td style="white-space: nowrap">{{his.appointment_date}}</td>
+            <td style="white-space: nowrap">{{his.from_time}} - {{his.to_time}}</td>
+            <td style="min-width: 7vw">{{his.doctor_name}}</td>
+            <td style="width: 1%; min-width: 10rem">{{his.hospital_name}}</td>
+            <td style="width: 1%; min-width: 10rem">
+              <a ngbPopover="{{his.appointment_note}}" popoverTitle=""
+                triggers="mouseenter:mouseleave">{{his.appointment_note && his.appointment_note.length > 30 ? his.appointment_note.substr(0,30)+"..." : his.appointment_note}}</a>
+            </td>
+            <td style="width: 1%; min-width: 4vw">
+              <a ngbPopover="{{his.modified_name}}" popoverTitle=""
+                triggers="mouseenter:mouseleave">{{his.modified_name && his.modified_name.length > 30 ? his.modified_name.substr(0,30)+"..." : his.modified_name}}</a>
+            </td>
+            <td>
+              <div class="span-canceled" *ngIf="his.appointment_status_id  === appStatusId.INACTIVE && !his.expired">
+                Cancelled</div>
+            </td>
+          </tr>
+        </tbody>
+      </table>
+      <p *ngIf="!flagHistory">Result Not Found</p>
+    </div>
+  </ng-template>
+</section>

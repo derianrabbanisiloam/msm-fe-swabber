@@ -26,6 +26,7 @@ export class PatientService {
   private patientHopeDetailUrl = environment.HIS_SERVICE + '/patient';
 
   private uploadImageUrl = environment.UPLOAD_IMAGE + '/pdf-upload';
+  private uploadDocBpjsUrl = environment.UPLOAD_IMAGE + '/bpjs/';
 
   private searchPatientHopeSource = new Subject<any>();
   public searchPatientHopeSource$ = this.searchPatientHopeSource.asObservable();
@@ -38,6 +39,17 @@ export class PatientService {
   
   emitUpdateContact(params: boolean) {
     this.updateContactSource.next(params);
+  }
+
+  getNotesAndEmailPatient(contactId: string): Observable<any> {
+    const url = `${this.contactUrl}/${contactId}`;
+    return this.http.get<any>(url, httpOptions);
+  }
+
+  editNotesAndEmailPatient(payload: any, contactId: string): Observable<any> {
+    const url = `${this.patientUrl}/sync/email-notes/${contactId}`;
+    const body = JSON.stringify(payload);
+    return this.http.put<any>(url, body, httpOptions);
   }
 
   getPatientHopeSearch(name, dob, phoneNumber, hospitalId): Observable<any> {
@@ -59,6 +71,11 @@ export class PatientService {
 
   uploadImage(formData: any) {
     const url = `${this.uploadImageUrl}`;
+    return this.http.post<any>(url, formData);
+  }
+
+  uploadDocBpjs(formData: any) {
+    const url = `${this.uploadDocBpjsUrl}`;
     return this.http.post<any>(url, formData);
   }
 

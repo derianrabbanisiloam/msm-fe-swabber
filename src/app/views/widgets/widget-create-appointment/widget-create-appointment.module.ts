@@ -3,7 +3,7 @@ import { CommonModule } from '@angular/common';
 import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { 
   NgbAlertModule, NgbPopoverModule, NgbProgressbarModule, 
-  NgbDatepickerModule, NgbModalModule, 
+  NgbDatepickerModule, NgbModalModule, NgbTabsetModule
 } from '@ng-bootstrap/ng-bootstrap';
 import { TextMaskModule } from 'angular2-text-mask';
 import { NguiAutoCompleteModule } from '@ngui/auto-complete';
@@ -30,6 +30,7 @@ import { WidgetCreateAppointmentComponent } from './widget-create-appointment.co
     WidgetCreateAppointmentRoutingModule,
     ModalCancelAppointmentModule,
     NguiAutoCompleteModule,
+    NgbTabsetModule
   ],
   exports: [
     WidgetCreateAppointmentComponent

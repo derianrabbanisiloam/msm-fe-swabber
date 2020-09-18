@@ -37,6 +37,9 @@ import { dateFormatter, regionTime } from '../../../utils/helpers.util';
 import {
   ModalRescheduleAppointmentComponent
 } from '../modal-reschedule-appointment/modal-reschedule-appointment.component';
+import {
+  ModalAppointmentBpjsComponent
+} from '../modal-appointment-bpjs/modal-appointment-bpjs.component';
 import * as pdfMake from 'pdfmake/build/pdfmake';
 import * as pdfFonts from 'pdfmake/build/vfs_fonts';
 import socket from 'socket.io-client';
@@ -1210,7 +1213,9 @@ export class WidgetCreateAppointmentComponent implements OnInit {
         this.slotList = data.data;
         if(this.fromBpjs === true) {
           this.slotList.map(x => {
-            x.is_walkin = false;
+            if(x.consultation_type_id === consultationType.BPJS) {
+              x.is_walkin = false;
+            }
           });
         }
       }
@@ -1245,9 +1250,15 @@ export class WidgetCreateAppointmentComponent implements OnInit {
   }
 
   openRescheduleModal(appointmentSelected: any) {
-    const modalRef = this.modalService.open(ModalRescheduleAppointmentComponent,
+    if(appointmentSelected.channel_id === channelId.BPJS) {
+      const modalRef = this.modalService.open( ModalAppointmentBpjsComponent,
       { windowClass: 'cc_modal_confirmation', size: 'lg' });
     modalRef.componentInstance.appointmentSelected = appointmentSelected;
+    } else {
+      const modalRef = this.modalService.open(ModalRescheduleAppointmentComponent,
+        { windowClass: 'cc_modal_confirmation', size: 'lg' });
+      modalRef.componentInstance.appointmentSelected = appointmentSelected;
+    }
   }
 
   async getSchedule() {

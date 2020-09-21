@@ -21,7 +21,10 @@ import { ModalCancelAppointmentModule } from '../../widgets/modal-cancel-appoint
 import { ModalCancelAppointmentComponent } from '../../widgets/modal-cancel-appointment/modal-cancel-appointment.component';
 
 import { ModalRescheduleAppointmentModule } from '../../widgets/modal-reschedule-appointment/modal-reschedule-appointment.module';
-import { ModalRescheduleAppointmentComponent } from '../../widgets/modal-reschedule-appointment/modal-reschedule-appointment.component'
+import { ModalRescheduleAppointmentComponent } from '../../widgets/modal-reschedule-appointment/modal-reschedule-appointment.component';
+
+import { ModalAppointmentBpjsModule } from '../../widgets/modal-appointment-bpjs/modal-appointment-bpjs.module';
+import { ModalAppointmentBpjsComponent } from '../../widgets/modal-appointment-bpjs/modal-appointment-bpjs.component';
 
 import { ModalSearchPatientModule } from '../../widgets/modal-search-patient/modal-search-patient.module';
 import { ModalSearchPatientComponent } from '../../widgets/modal-search-patient/modal-search-patient.component';
@@ -60,7 +63,8 @@ import { ModalCreateAppBpjsModule } from '../../widgets/modal-create-app-bpjs/mo
     NgbPopoverModule,
     NguiAutoCompleteModule,
     ModalCreateAppBpjsModule,
-    NgbTabsetModule
+    NgbTabsetModule,
+    ModalAppointmentBpjsModule
   ],
   entryComponents: [
     ModalScheduleBlockComponent,
@@ -70,7 +74,8 @@ import { ModalCreateAppBpjsModule } from '../../widgets/modal-create-app-bpjs/mo
     ModalPatientVerificationComponent,
     ModalRescheduleAppointmentComponent,
     ModalVerificationAidoComponent,
-    ModalCreateAppBpjsComponent
+    ModalCreateAppBpjsComponent,
+    ModalAppointmentBpjsComponent
   ],
   exports: [
     PageCreateAppointmentComponent,

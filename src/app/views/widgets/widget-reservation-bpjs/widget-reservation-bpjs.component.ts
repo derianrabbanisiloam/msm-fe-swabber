@@ -199,8 +199,7 @@ export class WidgetReservationBpjsComponent implements OnInit {
         speciality_name: speciality.speciality_name,
       },
       fromBpjs: true,
-      fromRegistration: false,
-      patientBpjs: this.bodyBpjs.patientBpjs,
+      fromRegistration: true,
       consulType: consultationType.BPJS+':'+consultationType.BPJS_REGULER
     };
 

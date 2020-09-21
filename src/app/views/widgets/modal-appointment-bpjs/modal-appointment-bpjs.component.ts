@@ -1,7 +1,8 @@
 import * as moment from 'moment';
 import { Component, OnInit, Input } from '@angular/core';
 import { DoctorService } from '../../../services/doctor.service';
-import { NgbActiveModal } from '@ng-bootstrap/ng-bootstrap';
+import { ScheduleService } from '../../../services/schedule.service';
+import { NgbActiveModal, NgbModal } from '@ng-bootstrap/ng-bootstrap';
 import { AppointmentService } from '../../../services/appointment.service';
 import { editContactPayload } from '../../../payloads/edit-contact.payload';
 import { sourceApps, channelId, consultationType } from '../../../variables/common.variable';
@@ -57,10 +58,12 @@ export class ModalAppointmentBpjsComponent implements OnInit {
   public modelTwo: any = { hospital_id: '', name: '', mr: '', doctor: '', modifiedName: '',
    iswaitingList: '' };
   public doctorVal: any;
+  public doctorValNonBpjs: any;
   public openWidget: boolean = false;
 
   public searchAutoComplete: any;
   public isReschNonBpjs: boolean = false;
+  public directNonBPJS: boolean = false;
   constructor(
     private doctorService: DoctorService,
     private appointmentService: AppointmentService,
@@ -69,6 +72,8 @@ export class ModalAppointmentBpjsComponent implements OnInit {
     private route: ActivatedRoute,
     private router: Router,
     private patientService: PatientService,
+    private modalService: NgbModal,
+    private scheduleService: ScheduleService
   ) { }
 
   async ngOnInit() {
@@ -76,6 +81,31 @@ export class ModalAppointmentBpjsComponent implements OnInit {
     await this.getListDoctorBySpecialty();
     await this.getListDoctor();
     await this.getSpecialities();
+  }
+
+  openConfirmationModal(modal: any) {
+    this.modalService.open(modal);
+  }
+
+  async directChangeToNonBPJS() {
+    let app = this.appointmentSelected;
+    this.rescheduleAppPayload = {
+      appointmentId: app.appointment_id,
+      scheduleId: app.schedule_id,
+      appointmentDate: app.appointment_date,
+      appointmentFromTime: app.from_time.substr(0,5),
+      appointmentToTime: app.to_time.substr(0,5),
+      appointmentNo: app.appointment_no,
+      channelId: channelId.FRONT_OFFICE,
+      hospitalId: app.hospital_id,
+      isWaitingList: app.is_waiting_list,
+      note: app.appointment_note,
+      userId: this.user.id,
+      userName: this.user.fullname,
+      source: sourceApps
+    };
+
+    await this.rescheduleAppointment();
   }
 
   async getListDoctorBySpecialty() {
@@ -123,6 +153,7 @@ export class ModalAppointmentBpjsComponent implements OnInit {
   }
 
   rescheduleToNonBpjs(){
+    this.doctorValNonBpjs = null;
     this.isReschNonBpjs = this.isReschNonBpjs ? false : true;
     this.doctorVal = null;
     this.searchKeywords = {
@@ -136,20 +167,22 @@ export class ModalAppointmentBpjsComponent implements OnInit {
     this.openWidgetCreateApp = false;
   }
 
-  async searchSchedule1(item?) {
+  async searchSchedule1(isBpjs) {
     this.openWidgetCreateApp = false;
     this.model.speciality = '';
     let doctorId = null;
     let doctorName = null;
     let specialty = null;
-    if(item) { //non bpjs
+    if(isBpjs === false) { //non bpjs
+      this.doctorVal = null;
       this.appBPJS = false;
       this.flag = 'none';
       this.flagTwo = 'block';
-      doctorId = item.doctor_id;
-      doctorName = item.name;
-      specialty = item.specialty_id;
+      doctorId = this.doctorValNonBpjs.doctor_id;
+      doctorName = this.doctorValNonBpjs.name;
+      specialty = this.doctorValNonBpjs.specialty_id;
     } else { //bpjs
+      this.doctorValNonBpjs = null;
       this.appBPJS = true;
       this.flag = 'block';
       this.flagTwo = 'none';
@@ -170,10 +203,10 @@ export class ModalAppointmentBpjsComponent implements OnInit {
       speciality: {
         speciality_id: specialty,
       },
-      fromBpjs: item ? null : true,
-      fromRegistration: item ? null : true,
-      isRescheduleBpjs: item ? null : true,
-      consulType: item ? null : consultationType.BPJS+':'+consultationType.BPJS_REGULER,
+      fromBpjs: isBpjs === false ? null : true,
+      fromRegistration: isBpjs === false ? null : true,
+      isRescheduleBpjs: isBpjs === false ? null : true,
+      consulType: isBpjs === false ? null : consultationType.BPJS+':'+consultationType.BPJS_REGULER,
       original: false
     };
 
@@ -234,6 +267,12 @@ export class ModalAppointmentBpjsComponent implements OnInit {
 
   async getAppointmentById() {
     const app = this.appointmentSelected;
+
+    this.scheduleService.scheduleDetail(this.appointmentSelected.schedule_id).subscribe(
+      data => {
+        if(data.data.consultation_type_id === '5') this.directNonBPJS = true;
+      }
+    );
     this.appointmentService.getAppointmentById(app.appointment_id).subscribe(
       data => {
         this.appointment = data.data[0];

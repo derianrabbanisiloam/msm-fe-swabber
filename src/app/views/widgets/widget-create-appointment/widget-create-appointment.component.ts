@@ -37,6 +37,9 @@ import { dateFormatter, regionTime } from '../../../utils/helpers.util';
 import {
   ModalRescheduleAppointmentComponent
 } from '../modal-reschedule-appointment/modal-reschedule-appointment.component';
+import {
+  ModalAppointmentBpjsComponent
+} from '../modal-appointment-bpjs/modal-appointment-bpjs.component';
 import * as pdfMake from 'pdfmake/build/pdfmake';
 import * as pdfFonts from 'pdfmake/build/vfs_fonts';
 import socket from 'socket.io-client';
@@ -248,7 +251,7 @@ export class WidgetCreateAppointmentComponent implements OnInit {
     });
 
     await this.getAppBpjs();
-    await this.provinceLakaLantas();
+    //await this.provinceLakaLantas();
     await this.getQueryParams();
     await this.enableWalkInChecker(); 
     await this.getSchedule();
@@ -419,7 +422,7 @@ export class WidgetCreateAppointmentComponent implements OnInit {
 
   async ngOnChanges() {
     await this.getAppBpjs();
-    await this.provinceLakaLantas();
+    //await this.provinceLakaLantas();
     await this.getQueryParams();
     await this.enableWalkInChecker();
     await this.getSchedule();
@@ -648,41 +651,41 @@ export class WidgetCreateAppointmentComponent implements OnInit {
     this.suplesi.suplesi = this.suplesi.suplesi ? 1 : 0;
   }
 
-  async provinceLakaLantas() {
-    const hospitalId = this.hospital.id;
-    this.listProvince = await this.bpjsService.getProvinceLakaLantas(hospitalId)
-      .toPromise().then(res => {
-        return res.data;
-      }).catch(err => {
-        return null;
-      })
-  }
+  // async provinceLakaLantas() {
+  //   const hospitalId = this.hospital.id;
+  //   this.listProvince = await this.bpjsService.getProvinceLakaLantas(hospitalId)
+  //     .toPromise().then(res => {
+  //       return res.data;
+  //     }).catch(err => {
+  //       return null;
+  //     })
+  // }
 
-  async districtLakaLantas() {
-    const hospitalId = this.hospital.id;
-    const provinceId = this.lokasiLakaBody.kdPropinsi ? this.lokasiLakaBody.kdPropinsi : null;
-    if(provinceId) {
-      this.listDistrict = await this.bpjsService.getDistrictLakaLantas(hospitalId, provinceId)
-      .toPromise().then(res => {
-        return res.data;
-      }).catch(err => {
-        return null;
-      })
-    }
-  }
+  // async districtLakaLantas() {
+  //   const hospitalId = this.hospital.id;
+  //   const provinceId = this.lokasiLakaBody.kdPropinsi ? this.lokasiLakaBody.kdPropinsi : null;
+  //   if(provinceId) {
+  //     this.listDistrict = await this.bpjsService.getDistrictLakaLantas(hospitalId, provinceId)
+  //     .toPromise().then(res => {
+  //       return res.data;
+  //     }).catch(err => {
+  //       return null;
+  //     })
+  //   }
+  // }
 
-  async subDistrictLakaLantas() {
-    const hospitalId = this.hospital.id;
-    const districtId = this.lokasiLakaBody.kdKabupaten ? this.lokasiLakaBody.kdKabupaten : null;
-    if(districtId) {
-      this.listSubDistrict = await this.bpjsService.getSubDistrictLakaLantas(hospitalId, districtId)
-      .toPromise().then(res => {
-        return res.data;
-      }).catch(err => {
-        return null;
-      })
-    }
-  }
+  // async subDistrictLakaLantas() {
+  //   const hospitalId = this.hospital.id;
+  //   const districtId = this.lokasiLakaBody.kdKabupaten ? this.lokasiLakaBody.kdKabupaten : null;
+  //   if(districtId) {
+  //     this.listSubDistrict = await this.bpjsService.getSubDistrictLakaLantas(hospitalId, districtId)
+  //     .toPromise().then(res => {
+  //       return res.data;
+  //     }).catch(err => {
+  //       return null;
+  //     })
+  //   }
+  // }
 
   async enableWalkInChecker() {
     //to enable or disable button checkin and slot walkin 
@@ -1210,7 +1213,9 @@ export class WidgetCreateAppointmentComponent implements OnInit {
         this.slotList = data.data;
         if(this.fromBpjs === true) {
           this.slotList.map(x => {
-            x.is_walkin = false;
+            if(x.consultation_type_id === consultationType.BPJS) {
+              x.is_walkin = false;
+            }
           });
         }
       }
@@ -1245,9 +1250,15 @@ export class WidgetCreateAppointmentComponent implements OnInit {
   }
 
   openRescheduleModal(appointmentSelected: any) {
-    const modalRef = this.modalService.open(ModalRescheduleAppointmentComponent,
+    if(appointmentSelected.channel_id === channelId.BPJS) {
+      const modalRef = this.modalService.open( ModalAppointmentBpjsComponent,
       { windowClass: 'cc_modal_confirmation', size: 'lg' });
     modalRef.componentInstance.appointmentSelected = appointmentSelected;
+    } else {
+      const modalRef = this.modalService.open(ModalRescheduleAppointmentComponent,
+        { windowClass: 'cc_modal_confirmation', size: 'lg' });
+      modalRef.componentInstance.appointmentSelected = appointmentSelected;
+    }
   }
 
   async getSchedule() {

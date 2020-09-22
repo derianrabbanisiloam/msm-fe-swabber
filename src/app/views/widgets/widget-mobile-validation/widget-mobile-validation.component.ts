@@ -186,6 +186,8 @@ export class WidgetMobileValidationComponent implements OnInit {
           });
       }
     if(this.selectedAccount.mobile_status !== mobileStatus.ACCESSED) {
+        this.flagAlert = true;
+        await this.updateEmailSync();
         if(this.assetDisclaimer) {
           await this.editContactUpload(this.assetDisclaimer.name);
           await this.editDataContact(this.assetDisclaimer.name);
@@ -195,6 +197,7 @@ export class WidgetMobileValidationComponent implements OnInit {
         }
       }
       else if (this.selectedAccount.mobile_status === mobileStatus.ACCESSED) {
+        this.flagAlert = false;
         if(this.assetDisclaimer) {
           this.editDataContact(this.assetDisclaimer.name);
         } else {
@@ -221,7 +224,6 @@ export class WidgetMobileValidationComponent implements OnInit {
         this.assetDisclaimer = null;
         this.flagFile1 = false;
         this.uploadForm.get('disclaimer').setValue(null);
-        this.flagAlert = true;
         this.userModifiedLog(data.data.contact_id, activityType.OPEN_ACCESS_MR);
         Swal.fire({
           position: 'center',
@@ -340,7 +342,7 @@ export class WidgetMobileValidationComponent implements OnInit {
       }
   }
 
-  editDataContact(disclaimer){
+  async editDataContact(disclaimer){
     let body;
     if(this.selectedAccount.mobile_status !== mobileStatus.ACCESSED) {
       this.editContactPayload = {
@@ -500,6 +502,17 @@ export class WidgetMobileValidationComponent implements OnInit {
     return body
   }
 
+  async getPatientOrgId(patientId, orgId) {
+    let body = await this.patientService.getPatientOrg(patientId, orgId)
+      .toPromise().then(res => {
+        return res.data[0];
+      }).catch(err => {
+        return null;
+      });
+
+    return body
+  }
+
   async updateEmailMobile(patientData, contactData, result) {
     let body = null;
     body = await this.getPatientHopeId(patientData);
@@ -652,9 +665,42 @@ export class WidgetMobileValidationComponent implements OnInit {
       });
   }
 
+  async updateEmailSync() {
+    if(this.editEmail !== this.dataContact.email_address) {
+      let email = this.dataContact.email_address;
+      let phoneNo = this.dataContact.phone_number_1;
+      let notes = this.dataContact.notes;
+      let patDetail = await this.getPatientOrgId(this.dataContact.patient_hope_id, this.hospital.orgId);
+      let payload = null;
+      if(patDetail){
+        payload = {
+          patientOrganizationId: patDetail.patientOrganizationId,
+          organizationId: Number(this.hospital.orgId),
+          emailAddress: email,
+          mobileNo1: this.charRemove(phoneNo),
+          notes: notes,
+          source: sourceApps,
+          userName: this.user.fullname,
+          userId: this.user.id
+        }
+
+        let body = await this.patientService.editNotesAndEmailPatient(payload, this.dataContact.contact_id)
+        .toPromise().then(res => {
+          return res.data;
+        }).catch(err => {
+          return null;
+        });
+        return body;
+      } else {
+        return null;
+      }
+    } else {
+      return null;
+    }
+  }
+
   async choosedAccount(val) {
     this.checkData = false;
-    this.flagAlert = false;
     this.patientHope = null;
     this.flagSearch = false;
     this.uploadForm.get('disclaimer').setValue(null);
@@ -670,6 +716,7 @@ export class WidgetMobileValidationComponent implements OnInit {
       contact_status_id: val.contact_status_id,
       mobile_status: val.mobile_status
     };
+    
     if(this.selectedAccount.contact_status_id === contactStatus.VERIFIED
       && this.selectedAccount.mobile_status === mobileStatus.ACTIVE) {
         this.loadingBar = true;

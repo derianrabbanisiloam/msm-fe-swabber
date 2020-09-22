@@ -24,6 +24,7 @@ export class PatientService {
   private auditTrailsUrl = environment.CALL_CENTER_SERVICE + '/audit-trails';
 
   private patientHopeDetailUrl = environment.HIS_SERVICE + '/patient';
+  private patientOrganizationUrl = environment.HIS_SERVICE + '/patient-organization/patient/organization';
 
   private uploadImageUrl = environment.UPLOAD_IMAGE + '/pdf-upload';
   private uploadDocBpjsUrl = environment.UPLOAD_IMAGE + '/bpjs/';
@@ -86,6 +87,11 @@ export class PatientService {
 
   getPatientHopeDetail(patientId: number) {
     const uri = `${this.patientHopeDetailUrl}/${patientId}`;
+    return this.http.get<any>(uri, httpOptions);
+  }
+
+  getPatientOrg(patientId: number, orgId: number) {
+    const uri = `${this.patientOrganizationUrl}/${patientId}/${orgId}`;
     return this.http.get<any>(uri, httpOptions);
   }
 

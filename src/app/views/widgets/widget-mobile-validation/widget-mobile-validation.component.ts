@@ -483,16 +483,6 @@ export class WidgetMobileValidationComponent implements OnInit {
     )
   }
 
-  async getDetailContact(contactId) {
-    let body = await this.patientService.getNotesAndEmailPatient(contactId).toPromise().then(res => {
-      return res.data;
-    }).catch(err => {
-      return null;
-    });
-
-    return body
-  }
-
   async getPatientHopeId(val) {
     let body = await this.patientService.getPatientHopeDetail(val.patientId)
       .toPromise().then(res => {
@@ -512,15 +502,16 @@ export class WidgetMobileValidationComponent implements OnInit {
 
   async updateEmailMobile(patientData, contactData, result) {
     let body = null;
-    body = await this.getDetailContact(result.contact_id);
+    body = await this.getPatientHopeId(patientData);
     if(body) {
+      const { mobileNo1, emailAddress, notes } = body;
       if(contactData.phone_number_1 || contactData.email_address) {  
         let payload = {
           patientOrganizationId: patientData.patientOrganizationId,
           organizationId: Number(this.hospital.orgId),
-          emailAddress: contactData.email_address || body.email_address,
-          mobileNo1: this.charRemove(contactData.phone_number_1) || body.phone_number_1,
-          notes: body.notes,
+          emailAddress: contactData.email_address || emailAddress,
+          mobileNo1: this.charRemove(contactData.phone_number_1) || mobileNo1,
+          notes: notes,
           source: sourceApps,
           userName: this.user.fullname,
           userId: this.user.id

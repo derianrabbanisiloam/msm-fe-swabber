@@ -304,7 +304,7 @@ export class WidgetMobileValidationComponent implements OnInit {
   }
 
   async selectedAndUpdate(result) {
-    let dataUpdate = await this.updateEmailMobile(this.selectPatient, this.selectedAccount);
+    let dataUpdate = await this.updateEmailMobile(this.selectPatient, this.selectedAccount, result);
       if(dataUpdate) {
         this.confirmBut = false;
         this.modalService.dismissAll();
@@ -500,35 +500,24 @@ export class WidgetMobileValidationComponent implements OnInit {
     return body
   }
 
-  async updateEmailMobile(patientData, contactData) {
-    let body = await this.getPatientHopeId(patientData);
+  async updateEmailMobile(patientData, contactData, result) {
+    let body = null;
+    body = await this.getPatientHopeId(patientData);
     if(body) {
-      const { patientId, name, sexId, birthPlaceId, birthDate, titleId, maritalStatusId, address, cityId, districtId, 
-              subDistrictId, postCode, homePhoneNo, officePhoneNo, mobileNo1, mobileNo2, emailAddress,
-              permanentAddress, permanentCityId, permanentPostCode, nationalIdTypeId, nationalIdNo,
-              nationalityId, religionId, bloodTypeId, fatherName, motherName, spouseName, contactName,
-              contactAddress, contactCityId, contactPhoneNo, contactMobileNo, contactEmailAddress, allergy,
-              payerId, payerIdNo, notes } = body;
+      const { mobileNo1, emailAddress, notes } = body;
+      if(contactData.phone_number_1 || contactData.email_address) {  
+        let payload = {
+          patientOrganizationId: patientData.patientOrganizationId,
+          organizationId: Number(this.hospital.orgId),
+          emailAddress: contactData.email_address || emailAddress,
+          mobileNo1: this.charRemove(contactData.phone_number_1) || mobileNo1,
+          notes: notes,
+          source: sourceApps,
+          userName: this.user.fullname,
+          userId: this.user.id
+        }
 
-      let bodyTwo = {
-        name, sexId, birthPlaceId, birthDate, titleId, maritalStatusId, address, cityId, districtId, 
-        subDistrictId, postCode, homePhoneNo, officePhoneNo, mobileNo1, mobileNo2, emailAddress,
-        permanentAddress, permanentCityId, permanentPostCode, nationalIdTypeId, nationalIdNo,
-        nationalityId, religionId, bloodTypeId, fatherName, motherName, spouseName, contactName,
-        contactAddress, contactCityId, contactPhoneNo, contactMobileNo, contactEmailAddress, allergy,
-        payerId, payerIdNo, notes, patientOrganizationId : patientData.patientOrganizationId, organizationId: patientData.hospitalId,
-        channelId: null, userId: null, source: null, userName: null
-      }
-
-      if(contactData.phone_number_1 || contactData.email_address) {
-        bodyTwo.mobileNo1 = this.charRemove(contactData.phone_number_1) || mobileNo1;
-        bodyTwo.emailAddress = contactData.email_address || emailAddress;
-        bodyTwo.channelId = channelId.FRONT_OFFICE;
-        bodyTwo.userId = this.user.id;
-        bodyTwo.source = sourceApps;
-        bodyTwo.userName = this.user.fullname;
-
-        let dataUpdate = await this.patientService.updatePatientComplete(bodyTwo, patientId)
+        let dataUpdate = await this.patientService.editNotesAndEmailPatient(payload, result.contact_id)
         .toPromise().then(res => {
           return res.data;
         }).catch(err => {

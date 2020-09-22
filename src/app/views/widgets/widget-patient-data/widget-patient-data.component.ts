@@ -1838,6 +1838,9 @@ export class WidgetPatientDataComponent implements OnInit {
   }
 
   printQueue(content, close) {
+    if(this.selectedCheckIn.channel_id === channelId.BPJS) this.buttonVIP = true;
+    else this.buttonVIP = false;
+    
     this.modalService.open(content, { windowClass: 'modal_queue', size: 'lg' });
     this.closeAdm = close;
   }

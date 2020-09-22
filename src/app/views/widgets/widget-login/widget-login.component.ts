@@ -115,6 +115,7 @@ export class WidgetLoginComponent implements OnInit {
               name: res.data[i].name,
               alias: res.data[i].alias,
               zone: res.data[i].time_zone,
+              isBpjs: res.data[i].is_bpjs
             });
           }
 
@@ -130,6 +131,7 @@ export class WidgetLoginComponent implements OnInit {
               name: res.data[0].name,
               alias: res.data[0].alias,
               zone: res.data[0].time_zone,
+              isBpjs: res.data[0].is_bpjs
             },
             collection: collections,
           };

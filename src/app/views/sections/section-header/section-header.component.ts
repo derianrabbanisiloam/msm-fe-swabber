@@ -54,6 +54,7 @@ export class SectionHeaderComponent implements OnInit {
       name: this.hospitals[idx].name,
       alias: this.hospitals[idx].alias,
       zone: this.hospitals[idx].zone,
+      isBpjs: this.hospitals[idx].isBpjs
     };
 
     localStorage.setItem('key', JSON.stringify(this.key));

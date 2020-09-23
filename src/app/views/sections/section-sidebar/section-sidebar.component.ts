@@ -18,6 +18,7 @@ export class SectionSidebarComponent implements OnInit {
   public key: any = JSON.parse(localStorage.getItem('key'));
   public hospital = this.key.hospital;
   public yogyaHospitalId = hospitalId.yogyakarta;
+  public isBpjs = this.key.hospital.isBpjs;
 
   constructor(
     private bpjsService: BpjsService,

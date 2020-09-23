@@ -1958,13 +1958,7 @@ export class WidgetCreateAppointmentComponent implements OnInit {
 
 
   printQueue(content, close) {
-    let index;
-    let consulType;
-    index = this.schedule.findIndex((a) => {
-      return a.schedule_id == this.selectedCheckIn.schedule_id;
-    })
-    consulType = this.schedule[index].consultation_type_id;
-    if(consulType === consultationType.BPJS) this.buttonVIP = true;
+    if(this.selectedCheckIn.channel_id === channelId.BPJS) this.buttonVIP = true;
     else this.buttonVIP = false;
 
     this.modalService.open(content, { windowClass: 'modal_queue', size: 'lg' });

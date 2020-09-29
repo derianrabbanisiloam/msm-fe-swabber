@@ -10,6 +10,8 @@ export const APP_RESCHEDULE = 'APPOINTMENT_RESCHEDULE__COUNT';
 export const REQUEST_LIST = 'BPJS__APPOINTMENT_COUNT';
 export const SCHEDULE_BLOCK = 'SCHEDULE__BLOCK';
 export const USER_LOGIN__FRONT_OFFICE = 'USER_LOGIN__FRONT_OFFICE';
+export const RESERVE_SLOT = 'QUEUE__RESERVED_TIME_SLOT';
+export const RELEASE_SLOT = 'QUEUE__RELEASE_TIME_SLOT';
 
 export const keySocket = {
   APPOINTMENT: '/appointments',

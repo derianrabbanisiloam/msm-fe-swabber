@@ -241,9 +241,10 @@ export class AppointmentService {
     scheduleId: string, 
     appointmentDate: string, 
     appointmentNo: number, 
-    userId: string): Observable<any> {
+    userId: string,
+    channelId: string): Observable<any> {
     const url = `${this.reserveSlotAppUrl}?scheduleId=${scheduleId}&appointmentDate=${appointmentDate}`
-      + `&appointmentNo=${appointmentNo}&userId=${userId}`;
+      + `&appointmentNo=${appointmentNo}&userId=${userId}&channelId=${channelId}`;
     return this.http.get<any>(url, httpOptions);
   }
 

@@ -70,7 +70,7 @@
         </thead>
         <tbody *ngIf="schArray.consultation_type_id != 4 && schArray.consultation_type_id != 6 && !fromBpjs">
           <tr *ngFor="let app of schArray.appointment; let i=index"
-            [ngClass]="{'cc_row_rescheduled': app.is_blocked == true || isOpen == false && app.is_walkin == true && reschBpjs == false }">
+            [ngClass]="{'cc_row_rescheduled': app.is_blocked == true || isOpen == false && app.is_walkin == true && reschBpjs == false || app.is_reserved_slot == true }">
             <td class="st-kolom-time">{{app.appointment_range_time}}</td>
             <td>
               {{app.no}}
@@ -78,28 +78,33 @@
                 <img class="icon_bpjs" src="{{assetPath}}icons/bpjs_logo.png">
               </span>
             </td>
-            <td *ngIf="app.is_can_create && isOriginal && app.is_walkin == false" class="st-kolom-available"
+            <td *ngIf="app.is_can_create && isOriginal && app.is_walkin == false && app.is_reserved_slot == false" class="st-kolom-available"
               (click)="openCreateAppModal(app)"><a>Available</a></td>
-            <td *ngIf="app.is_can_create && isOriginal && app.is_walkin == true && isOpen == true"
+            <td *ngIf="app.is_can_create && isOriginal && app.is_walkin == true && isOpen == true && app.is_reserved_slot == false"
               class="st-kolom-available" (click)="openCreateAppModal(app)"><a>Available/Walk In Slot</a></td>
-            <td *ngIf="app.is_can_create && isOriginal && app.is_walkin == true && isOpen == false"
+            <td *ngIf="app.is_can_create && isOriginal && app.is_walkin == true && isOpen == false && app.is_reserved_slot == false"
               class="st-kolom-available">
               <span style="color:red;font-weight:bold">Not Yet Opened</span>
             </td>
-            <td *ngIf="app.is_can_create && !isOriginal && app.is_walkin == false && reschBpjs == false" class="st-kolom-available"
+            <td *ngIf="app.is_can_create && !isOriginal && app.is_walkin == false && reschBpjs == false && app.is_reserved_slot == false" class="st-kolom-available"
               (click)="openCreateAppModal2(app)"><a>Available</a></td>
-            <td *ngIf="app.is_can_create && !isOriginal && app.is_walkin == true && isOpen == true && reschBpjs == false"
+            <td *ngIf="app.is_can_create && !isOriginal && app.is_walkin == true && isOpen == true && reschBpjs == false && app.is_reserved_slot == false"
               class="st-kolom-available" (click)="openCreateAppModal2(app)"><a>Available/Walk In Slot</a></td>
-            <td *ngIf="app.is_can_create && !isOriginal && app.is_walkin == true && isOpen == false && reschBpjs == false"
+            <td *ngIf="app.is_can_create && !isOriginal && app.is_walkin == true && isOpen == false && reschBpjs == false && app.is_reserved_slot == false"
               class="st-kolom-available">
               <span style="color:red;font-weight:bold">Not Yet Opened</span>
             </td>
+
+            <td *ngIf="app.is_can_create && app.is_reserved_slot == true" class="st-kolom-available">
+              <span style="color:black;font-weight:bold">Slot temporarily reserved</span>
+            </td>
+
             <!-- reschedule bpjs -->
-            <td *ngIf="app.is_can_create && !isOriginal && reschBpjs == true && app.is_walkin == false" class="st-kolom-available"
+            <td *ngIf="app.is_can_create && !isOriginal && reschBpjs == true && app.is_walkin == false && app.is_reserved_slot == false" class="st-kolom-available"
               (click)="openCreateAppModal2(app)"><a>Available</a></td>
-            <td *ngIf="app.is_can_create && !isOriginal && reschBpjs == true && app.is_walkin == true && isOpen == true"
+            <td *ngIf="app.is_can_create && !isOriginal && reschBpjs == true && app.is_walkin == true && isOpen == true && app.is_reserved_slot == false"
             class="st-kolom-available" (click)="openCreateAppModal2(app)"><a>Available/Walk In Slot</a></td>
-            <td *ngIf="app.is_can_create && !isOriginal && reschBpjs == true && app.is_walkin == true && isOpen == false"
+            <td *ngIf="app.is_can_create && !isOriginal && reschBpjs == true && app.is_walkin == true && isOpen == false && app.is_reserved_slot == false"
               class="st-kolom-available">
               <span style="color:red;font-weight:bold">Not Yet Opened</span>
             <!-- reschedule bpjs -->
@@ -182,7 +187,7 @@
         </tbody>
         <tbody *ngIf="schArray.consultation_type_id != 4 && fromBpjs">
           <tr *ngFor="let app of schArray.appointment; let i=index"
-            [ngClass]="{'cc_row_rescheduled': app.is_blocked == true || isOpen == false && app.is_walkin == true }">
+            [ngClass]="{'cc_row_rescheduled': app.is_blocked == true || isOpen == false && app.is_walkin == true || app.is_reserved_slot == true }">
             <td class="st-kolom-time">{{app.appointment_range_time}}</td>
             <td>
               {{app.no}}
@@ -191,20 +196,26 @@
               </span>
             </td>
 
-            <td *ngIf="app.is_can_create && isOriginal && app.is_walkin == false" class="st-kolom-available"
+            <td *ngIf="app.is_can_create && isOriginal && app.is_walkin == false && app.is_reserved_slot == false" class="st-kolom-available"
               (click)="createAppBPJSOnly(app)"><a>Available</a></td>
-            <td *ngIf="app.is_can_create && isOriginal && app.is_walkin == true && isOpen == true"
+            <td *ngIf="app.is_can_create && isOriginal && app.is_walkin == true && isOpen == true && app.is_reserved_slot == false"
               class="st-kolom-available" (click)="createAppBPJSOnly(app)"><a>Available/Walk In Slot</a></td>
-            <td *ngIf="app.is_can_create && isOriginal && app.is_walkin == true && isOpen == false"
+            <td *ngIf="app.is_can_create && isOriginal && app.is_walkin == true && isOpen == false && app.is_reserved_slot == false"
               class="st-kolom-available">
               <span style="color:red;font-weight:bold">Not Yet Opened</span>
             </td>
+
+            <td *ngIf="app.is_can_create && app.is_reserved_slot == true"
+              class="st-kolom-available">
+              <span style="color:black;font-weight:bold">Slot temporarily reserved</span>
+            </td>
+
             <!-- reschedule bpjs -->
-            <td *ngIf="app.is_can_create && !isOriginal && reschBpjs == true && app.is_walkin == false" class="st-kolom-available"
+            <td *ngIf="app.is_can_create && !isOriginal && reschBpjs == true && app.is_walkin == false && app.is_reserved_slot == false" class="st-kolom-available"
               (click)="openCreateAppModal2(app)"><a>Available</a></td>
-            <td *ngIf="app.is_can_create && !isOriginal && reschBpjs == true && app.is_walkin == true && isOpen == true"
+            <td *ngIf="app.is_can_create && !isOriginal && reschBpjs == true && app.is_walkin == true && isOpen == true && app.is_reserved_slot == false"
             class="st-kolom-available" (click)="openCreateAppModal2(app)"><a>Available/Walk In Slot</a></td>
-            <td *ngIf="app.is_can_create && !isOriginal && reschBpjs == true && app.is_walkin == true && isOpen == false"
+            <td *ngIf="app.is_can_create && !isOriginal && reschBpjs == true && app.is_walkin == true && isOpen == false && app.is_reserved_slot == false"
               class="st-kolom-available">
               <span style="color:red;font-weight:bold">Not Yet Opened</span>
             <!-- reschedule bpjs -->
@@ -262,7 +273,7 @@
         
         <tbody *ngIf="schArray.consultation_type_id == 4">
           <tr *ngFor="let app of schArray.appointment; let i=index"
-            [ngClass]="{'cc_row_rescheduled': app.is_blocked == true || isOpen == false}">
+            [ngClass]="{'cc_row_rescheduled': app.is_blocked == true || isOpen == false || app.is_reserved_slot == true}">
             <td class="st-kolom-time">{{app.appointment_range_time}}</td>
             <td>
               {{app.no}}
@@ -270,12 +281,17 @@
                 <img class="icon_bpjs" src="{{assetPath}}icons/bpjs_logo.png">
               </span>
             </td>
-            <td *ngIf="app.is_can_create && isOriginal && isOpen == true" class="st-kolom-available"
+            <td *ngIf="app.is_can_create && isOriginal && isOpen == true && app.is_reserved_slot == false" class="st-kolom-available"
               (click)="openCreateAppModal(app)"><a>Available</a></td>
-            <td *ngIf="app.is_can_create && isOriginal && isOpen == false" class="st-kolom-available">Available</td>
-            <td *ngIf="app.is_can_create && !isOriginal && isOpen == true" class="st-kolom-available"
+            <td *ngIf="app.is_can_create && isOriginal && isOpen == false && app.is_reserved_slot == false" class="st-kolom-available">Available</td>
+            <td *ngIf="app.is_can_create && !isOriginal && isOpen == true && app.is_reserved_slot == false" class="st-kolom-available"
               (click)="openCreateAppModal2(app)"><a>Available</a></td>
-            <td *ngIf="app.is_can_create && !isOriginal && isOpen == false" class="st-kolom-available">Available</td>
+            <td *ngIf="app.is_can_create && !isOriginal && isOpen == false && app.is_reserved_slot == false" class="st-kolom-available">Available</td>
+            
+            <td *ngIf="app.is_can_create && app.is_reserved_slot == true"
+              class="st-kolom-available">
+              <span style="color:black;font-weight:bold">Slot temporarily reserved</span>
+            </td>
             <td *ngIf="!app.is_can_create">
               {{app.patient_name}}
               <span *ngIf="app.appointment_temp_id" class="newPatientIcon">
@@ -355,7 +371,7 @@
         </tbody>
         <tbody *ngIf="schArray.consultation_type_id == 6">
           <tr *ngFor="let app of schArray.appointment; let i=index"
-            [ngClass]="{'cc_row_rescheduled': app.is_blocked == true || isOpen == false && app.is_walkin == true }">
+            [ngClass]="{'cc_row_rescheduled': app.is_blocked == true || isOpen == false && app.is_walkin == true || app.is_reserved_slot == true }">
             <td class="st-kolom-time">{{app.appointment_range_time}}</td>
             <td>
               {{app.no}}
@@ -363,14 +379,19 @@
                 <img class="icon_bpjs" src="{{assetPath}}icons/bpjs_logo.png">
               </span>
             </td>
-            <td *ngIf="app.is_can_create && isOriginal && app.is_walkin == false" class="st-kolom-available"
+            <td *ngIf="app.is_can_create && isOriginal && app.is_walkin == false && app.is_reserved_slot == false" class="st-kolom-available"
               (click)="openCreateAppModal(app)"><a>Available</a></td>
-            <td *ngIf="app.is_can_create && isOriginal && app.is_walkin == true && isOpen == true"
+            <td *ngIf="app.is_can_create && isOriginal && app.is_walkin == true && isOpen == true && app.is_reserved_slot == false"
               class="st-kolom-available" (click)="openCreateAppModal(app)"><a>Available/Walk In Slot</a></td>
-            <td *ngIf="app.is_can_create && isOriginal && app.is_walkin == true && isOpen == false"
+            <td *ngIf="app.is_can_create && isOriginal && app.is_walkin == true && isOpen == false && app.is_reserved_slot == false"
               class="st-kolom-available">
               <span style="color:red;font-weight:bold">Not Yet Opened</span>
             </td>
+            <td *ngIf="app.is_can_create && app.is_reserved_slot == true"
+              class="st-kolom-available">
+              <span style="color:black;font-weight:bold">Slot temporarily reserved</span>
+            </td>
+            
             <td *ngIf="app.is_can_create && !isOriginal && app.is_walkin == false" class="st-kolom-available"
               (click)="openCreateAppModal2(app)"><a>Available</a></td>
             <td *ngIf="app.is_can_create && !isOriginal && app.is_walkin == true && isOpen == true"
@@ -486,8 +507,10 @@
                 </td>
                 <td *ngIf="app.is_can_create && isOriginal && fromBpjs == false" class="st-kolom-available" (click)="openCreateAppModal(app)">
                   <a>Available</a></td>
-                  <td *ngIf="app.is_can_create && isOriginal && fromBpjs == true" class="st-kolom-available" (click)="createAppBPJSOnly(app)">
-                    <a>Available</a></td>
+                <td *ngIf="app.is_can_create && isOriginal && fromBpjs == true" class="st-kolom-available" (click)="createAppBPJSOnly(app)">
+                  <a>Available</a></td>
+                <td *ngIf="app.is_can_create && !isOriginal" class="st-kolom-available" (click)="openCreateAppModal2(app)">
+                  <a>Available</a></td>
                 <td *ngIf="app.is_can_create && !isOriginal" class="st-kolom-available" (click)="openCreateAppModal2(app)">
                   <a>Available</a></td>
                 <td *ngIf="!app.is_can_create">

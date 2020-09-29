@@ -57,13 +57,13 @@
             (click)="openDoctorSchedule()">
           Reschedule
         </button>
-        <button class="ms_btn_border"
+        <button *ngIf="isBpjsUnlock === true" class="ms_btn_border"
           style="padding: 0.3vw 0vw; width: 11vw; margin-top: 1.3vw; margin-left: 1vw"
           [ngClass]="isReschBpjs == false ? 'ms_btn_blue' : 'ms_btn_darkgrey'"
           (click)="rescheduleToBpjs()">
             Reschedule to BPJS
         </button>
-        <button class="btn ms_btn_border ms_btn_green" [disabled]="!directBPJS"
+        <button *ngIf="isBpjsUnlock === true" class="btn ms_btn_border ms_btn_green" [disabled]="!directBPJS"
           style="padding: 0.3vw 0vw; width: 11vw; margin-left: 1vw; margin-top: -0.1vw"
           (click)="openConfirmationModal(direct_non_bpjs)">
             Change to BPJS

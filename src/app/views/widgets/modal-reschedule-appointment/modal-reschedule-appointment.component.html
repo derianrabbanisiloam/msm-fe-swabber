@@ -13,7 +13,7 @@
         <th style="width: 1%; min-width: 4vw; text-align: center">MR No.</th>
         <th style="white-space: nowrap; min-width:3vw; width: 1%">Date of Birth</th>
         <th>Mobile No.</th>
-        <th style="white-space: nowrap">Appo. Date</th>
+        <th style="min-width: 6vw">Appo. Date</th>
         <th>Time Slot</th>
         <th style="min-width: 10vw">Doctor</th>
         <th style="width: 1%;">Waiting List</th>
@@ -34,7 +34,10 @@
           <td>
             {{ appointment.doctor_name }}
           </td>
-          <td>{{ appointment.is_waiting_list }}</td>
+          <td>
+            <span *ngIf="appointment.is_waiting_list === false">No</span>
+            <span *ngIf="appointment.is_waiting_list === true">Yes</span>
+          </td>
           <td>{{ appointment.queue_number }}</td>
           <td>{{ appointment.created_name }}</td>
           <td>
@@ -46,19 +49,58 @@
 
       </table>
     </div>
-    <button class="ms_btn_border"
+    <div class="row">
+      <div class="col-md-9">
+        <button class="ms_btn_border"
             [ngClass]="isOpenDoctorSchedule == false ? 'ms_btn_blue' : 'ms_btn_darkgrey'"
             style="padding: 0.3vw 0vw; width: 7vw"
             (click)="openDoctorSchedule()">
-      Reschedule
-    </button>
+          Reschedule
+        </button>
+        <button *ngIf="isBpjsUnlock === true" class="ms_btn_border"
+          style="padding: 0.3vw 0vw; width: 11vw; margin-top: 1.3vw; margin-left: 1vw"
+          [ngClass]="isReschBpjs == false ? 'ms_btn_blue' : 'ms_btn_darkgrey'"
+          (click)="rescheduleToBpjs()" hidden>
+            Reschedule to BPJS
+        </button>
+        <button *ngIf="isBpjsUnlock === true" class="btn ms_btn_border ms_btn_green" [disabled]="!directBPJS"
+          style="padding: 0.3vw 0vw; width: 11vw; margin-left: 1vw; margin-top: -0.1vw"
+          (click)="openConfirmationModal(direct_non_bpjs)" hidden>
+            Change to BPJS
+        </button>
+      </div>
+    </div>
+
+    <div class="row" style="margin-top: 2em;" *ngIf="isReschBpjs">
+      <div class="col-md-3">
+        <span style="color: red;">*Please find a doctor first</span>
+        <select id="doctor" [disabled]="!isReschBpjs" (change)="searchSchedule1(true)" style="width: 20em;" class="form-control"  [(ngModel)]="doctorVal" name="doctor" required>
+          <option *ngFor = "let doctor of doctorBySpecialty" [ngValue]="doctor">
+            {{doctor.name}}
+          </option>
+        </select>
+      </div>
+    </div>
+
+    <div style="height:3vw; clear:both;"></div>
 
     <div class="col-md-12" style="padding: 0;max-height: 350px;overflow-y: scroll">
-      <app-widget-doctor-schedule [style.display]="flag" 
+      <div [style.display]="flag" *ngIf="!isReschBpjs && openWidget === true">
+        <app-widget-doctor-schedule
         (opScheduleSelected)="getScheduleData($event)">
-      </app-widget-doctor-schedule>
-      <app-widget-create-appointment [style.display]="flag" 
-        *ngIf="opScheduleSelected"
+        </app-widget-doctor-schedule>
+      </div>
+
+      <div [style.display]="flagTwo" *ngIf="isReschBpjs && openWidget === true">
+        <app-widget-doctor-schedule
+        (opScheduleSelected)="getScheduleData($event)">
+        </app-widget-doctor-schedule>
+      </div>
+
+      <div style="height:3vw; clear:both;"></div>
+
+      <app-widget-create-appointment
+        *ngIf="opScheduleSelected && openWidgetCreateApp"
         (opSlotSelected)="getSlotData($event)"
         [appointmentPayloadInput]="createAppInputData">
       </app-widget-create-appointment>
@@ -90,3 +132,17 @@
     <button class="ms_btn_border ms_btn_black" style="padding: 0.3vw 0vw; width: 7vw" #close_btn_reschedule aria-label="Close" (click)="close()">Cancel</button>
     <button class="ms_btn_border ms_btn_green" style="padding: 0.3vw 0vw; width: 7vw" (click)="updateAppointment()" (click)="close()">Save & Close</button>
   </div>
+
+  <ng-template #direct_non_bpjs let-modal>
+    <div class="modal-header">
+      <div class="header-2 modal-padding">Confirmation</div>
+    </div>
+    <div class="modal-body">
+      <b>This action will change Regular app to BPJS app without change time slot app. </b>Are you sure to proceed?
+    </div>
+    <div class="modal-footer">
+      <button type="button" class="btn ms_btn_black" (click)="modal.close()">Cancel</button>
+      <button class="btn ms_btn_green" [ngClass]="{'disable': confirmBut}"
+       (click)="directChangeToBPJS()" (click)="close()" (click)="modal.close()">Confirm</button>
+    </div>
+  </ng-template>

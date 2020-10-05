@@ -1,14 +1,19 @@
 import * as moment from 'moment';
 import { Component, OnInit, Input } from '@angular/core';
 import { DoctorService } from '../../../services/doctor.service';
-import { NgbActiveModal } from '@ng-bootstrap/ng-bootstrap';
+import { NgbActiveModal, NgbModal } from '@ng-bootstrap/ng-bootstrap';
 import { AppointmentService } from '../../../services/appointment.service';
+import { ScheduleService } from '../../../services/schedule.service';
 import { PatientService } from '../../../services/patient.service';
 import { Appointment } from '../../../models/appointments/appointment';
 import { editContactPayload } from '../../../payloads/edit-contact.payload';
 import { rescheduleAppointmentPayload } from '../../../payloads/reschedule-appointment.payload';
-import { sourceApps, channelId } from '../../../variables/common.variable';
+import { sourceApps, channelId, consultationType } from '../../../variables/common.variable';
 import { environment } from '../../../../environments/environment';
+import { Speciality } from '../../../models/specialities/speciality';
+import { isEmpty } from 'lodash';
+import { Alert, AlertType } from '../../../models/alerts/alert';
+import { AlertService } from '../../../services/alert.service';
 
 @Component({
   selector: 'app-modal-reschedule-appointment',
@@ -21,7 +26,9 @@ export class ModalRescheduleAppointmentComponent implements OnInit {
   public key: any = JSON.parse(localStorage.getItem('key'));
   public hospital = this.key.hospital;
   public user = this.key.user;
+  public isBpjsUnlock = this.key.hospital.isBpjs;
 
+  public alerts: Alert[] = [];
   public opScheduleSelected: any;
   public opSlotSelected: any;
   public createAppInputData: any = {};
@@ -29,23 +36,191 @@ export class ModalRescheduleAppointmentComponent implements OnInit {
   public isOpenDoctorSchedule: boolean = false;
   public appointment: any = {};
   public editContactPayload: editContactPayload;
-  public rescheduleAppPayload: rescheduleAppointmentPayload;
+  public rescheduleAppPayload: any;
   public editModel: any = {};
-  public flag: string;
+  public flag: string = 'none';
+  public flagTwo: string = 'none';
+  public isReschBpjs: boolean = false;
+  public doctorList: any;
+  public model: any = { speciality: '', doctor: '' };
+  public specialities: Speciality[];
+  public searchKeywords: any = {
+    doctor: {},
+    area: {},
+    hospital: {},
+    speciality: {}
+  };
+  public openWidget: boolean = false;
+  public openWidgetCreateApp: boolean = false;
+  public appToBPJS: boolean = false;
+  public directBPJS: boolean = false;
+  public specialtyDoctor: any = null;
+  public doctorBySpecialty: any;
+
+  public doctorVal: any;
+  public doctorValNonBpjs: any;
 
   constructor(
     private doctorService: DoctorService,
     private appointmentService: AppointmentService,
     private patientService: PatientService,
-    private activeModal: NgbActiveModal
+    private activeModal: NgbActiveModal,
+    private scheduleService: ScheduleService,
+    private modalService: NgbModal,
+    private alertService: AlertService
   ) { }
 
   async ngOnInit() {
     await this.getAppointmentById();
+    await this.getListDoctorBySpecialty();
+    await this.getListDoctor();
+    await this.getSpecialities();
+  }
+
+  async getListDoctorBySpecialty() {
+
+    this.alerts = [];
+    this.specialtyDoctor = this.appointmentSelected.speciality_id;
+    this.doctorBySpecialty = await this.doctorService.getDoctorBySpeciality(
+      this.hospital.id,
+      this.specialtyDoctor
+      )
+      .toPromise().then(res => {
+        return res.data;
+      }).catch(err => {
+        this.alertService.error(err.error.message);
+        return [];
+      });
+  }
+
+  openConfirmationModal(modal: any) {
+    this.modalService.open(modal);
+  }
+
+  async directChangeToBPJS() {
+    let app = this.appointmentSelected;
+    this.rescheduleAppPayload = {
+      appointmentId: app.appointment_id,
+      scheduleId: app.schedule_id,
+      appointmentDate: app.appointment_date,
+      appointmentFromTime: app.from_time.substr(0,5),
+      appointmentToTime: app.to_time.substr(0,5),
+      appointmentNo: app.appointment_no,
+      channelId: channelId.BPJS,
+      hospitalId: app.hospital_id,
+      isWaitingList: app.is_waiting_list,
+      note: app.appointment_note,
+      userId: this.user.id,
+      userName: this.user.fullname,
+      source: sourceApps
+    };
+
+    await this.rescheduleAppointment();
+  }
+
+  rescheduleToBpjs(){
+    this.flag = 'none';
+    this.openWidget = false;
+    this.isReschBpjs = this.isReschBpjs ? false : true;
+    this.isOpenDoctorSchedule = false;
+    this.searchKeywords = {
+      doctor: {},
+      area: {},
+      hospital: {},
+      speciality: {}
+    };
+    this.doctorService.searchDoctorSource2 = null;
+    this.openWidgetCreateApp = false;
+  }
+
+  async getListDoctor() {
+    this.doctorList = await this.doctorService.getListDoctor(this.hospital.id)
+      .toPromise().then(res => {
+        return res.data;
+      }).catch(err => {
+        return [];
+      });
+  }
+
+  async getSpecialities(specialityname = null, total = null) {
+    this.specialities = await this.doctorService.getSpecialities(specialityname, total)
+      .toPromise().then(res => {
+        return res.data;
+      }).catch(err => {
+        return [];
+      });
+
+    if (this.specialities.length !== 0) {
+      this.specialities.map(x => {
+        x.speciality_name = isEmpty(x.speciality_name) ? '' : x.speciality_name;
+      });
+    }
+  }
+
+  async searchSchedule1(isBpjs) {
+    this.openWidgetCreateApp = false;
+    this.model.speciality = '';
+    let doctorId = null;
+    let doctorName = null;
+    let specialty = null;
+    if(isBpjs === false) { //non bpjs
+      this.doctorVal = null;
+      this.appToBPJS = false;
+      this.flag = 'block';
+      this.flagTwo = 'none';
+      doctorId = this.doctorValNonBpjs.doctor_id;
+      doctorName = this.doctorValNonBpjs.name;
+      specialty = this.doctorValNonBpjs.specialty_id;
+    } else { //bpjs
+      this.doctorValNonBpjs = null;
+      this.appToBPJS = true;
+      this.flag = 'none';
+      this.flagTwo = 'block';
+      doctorId = this.doctorVal.doctor_id;
+      doctorName = this.doctorVal.name;
+      specialty = this.doctorVal.specialty_id;
+    }
+
+    this.searchKeywords = {
+      doctor: {
+        doctor_id: doctorId,
+        name: doctorName
+      },
+      hospital: {
+        hospital_id: this.hospital.id,
+        name: this.hospital.name,
+      },
+      speciality: {
+        speciality_id: specialty,
+      },
+      fromBpjs: isBpjs === false ? null : true,
+      fromRegistration: isBpjs === false ? null : true,
+      isRescheduleBpjs: isBpjs === false ? null : true,
+      consulType: isBpjs === false ? null : consultationType.BPJS+':'+consultationType.BPJS_REGULER,
+      original: false
+    };
+
+    const searchKey = {
+      type: 'doctor',
+      doctor_id: doctorId,
+      name: doctorName
+    };
+
+    localStorage.setItem('searchKey', JSON.stringify(searchKey));
+
+    this.doctorService.changeSearchDoctor(this.searchKeywords);
+    this.doctorService.searchDoctorSource2 = this.searchKeywords;
+    this.openWidget = true;
   }
 
   async getAppointmentById() {
     const app = this.appointmentSelected;
+
+    this.scheduleService.scheduleDetail(this.appointmentSelected.schedule_id).subscribe(
+      data => {
+        if(data.data.consultation_type_id === '5') this.directBPJS = true;
+      }
+    );
 
     if (app.appointment_id) {
       this.appointmentService.getAppointmentById(app.appointment_id).subscribe(
@@ -90,14 +265,25 @@ export class ModalRescheduleAppointmentComponent implements OnInit {
   }
 
   getScheduleData(data: any) {
+    this.openWidgetCreateApp = true;
     this.opScheduleSelected = data;
     let name = this.appointmentSelected.contact_name;
     name = name ? name : this.appointmentSelected.patient_name;
-    this.createAppInputData = {
-      appointmentDate: data.date,
-      name: name,
-      doctorId: data.doctor_id
-    };
+    if(this.appToBPJS === true) {
+      this.createAppInputData = {
+        appointmentDate: data.date,
+        name: name,
+        doctorId: data.doctor_id,
+        consulType: consultationType.BPJS+':'+consultationType.BPJS_REGULER,
+        isRescheduleBpjs: true
+      };
+    } else {
+      this.createAppInputData = {
+        appointmentDate: data.date,
+        name: name,
+        doctorId: data.doctor_id
+      };
+    }
   }
 
   getSlotData(data: any) {
@@ -109,7 +295,7 @@ export class ModalRescheduleAppointmentComponent implements OnInit {
       appointmentFromTime: data.appointment_from_time,
       appointmentToTime: data.appointment_to_time,
       appointmentNo: data.appointment_no,
-      channelId: channelId.FRONT_OFFICE,
+      channelId: this.appToBPJS === true ? channelId.BPJS : channelId.FRONT_OFFICE,
       hospitalId: data.hospital_id,
       isWaitingList: data.is_waiting_list,
       note: this.rescheduleSelected.note,
@@ -118,13 +304,20 @@ export class ModalRescheduleAppointmentComponent implements OnInit {
       source: sourceApps,
     };
 
+    this.appToBPJS === true ? this.rescheduleAppPayload.doctorId = data.doctor_id : '';
     app.appointment_id ? this.rescheduleAppPayload.appointmentId = app.appointment_id :
       this.rescheduleAppPayload.appointmentTemporaryId = app.appointment_temporary_id;
   }
 
   openDoctorSchedule() {
+    this.doctorVal = null;
+    this.isReschBpjs = false;
+    this.appToBPJS = false;
+    this.openWidgetCreateApp = false;
+    this.doctorService.searchDoctorSource2 = null;
     this.isOpenDoctorSchedule = this.isOpenDoctorSchedule ? false : true;
     this.flag = this.isOpenDoctorSchedule ? 'block' : 'none';
+    this.flagTwo = 'none';
     this.opScheduleSelected = this.isOpenDoctorSchedule ? this.opScheduleSelected : null;
     const searchKeywords = {
       doctor: {
@@ -134,6 +327,8 @@ export class ModalRescheduleAppointmentComponent implements OnInit {
       original: false,
     };
     this.doctorService.changeSearchDoctor(searchKeywords);
+    this.doctorService.searchDoctorSource2 = searchKeywords;
+    this.openWidget = true;
   }
 
   async updateAppointment() {

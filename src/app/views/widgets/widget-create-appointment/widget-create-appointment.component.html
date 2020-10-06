@@ -107,6 +107,7 @@
             <td *ngIf="app.is_can_create && !isOriginal && reschBpjs == true && app.is_walkin == true && isOpen == false && app.is_reserved_slot == false"
               class="st-kolom-available">
               <span style="color:red;font-weight:bold">Not Yet Opened</span>
+            </td>
             <!-- reschedule bpjs -->
             <td *ngIf="!app.is_can_create">
               {{app.patient_name}}
@@ -195,7 +196,6 @@
                 <img class="icon_bpjs" src="{{assetPath}}icons/bpjs_logo.png">
               </span>
             </td>
-
             <td *ngIf="app.is_can_create && isOriginal && app.is_walkin == false && app.is_reserved_slot == false" class="st-kolom-available"
               (click)="createAppBPJSOnly(app)"><a>Available</a></td>
             <td *ngIf="app.is_can_create && isOriginal && app.is_walkin == true && isOpen == true && app.is_reserved_slot == false"
@@ -218,6 +218,7 @@
             <td *ngIf="app.is_can_create && !isOriginal && reschBpjs == true && app.is_walkin == true && isOpen == false && app.is_reserved_slot == false"
               class="st-kolom-available">
               <span style="color:red;font-weight:bold">Not Yet Opened</span>
+             <td>
             <!-- reschedule bpjs -->
             
             <td *ngIf="!app.is_can_create">

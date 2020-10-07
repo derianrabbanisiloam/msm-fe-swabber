@@ -46,7 +46,7 @@ import socket from 'socket.io-client';
 import {
   SecretKey, Jwt,
   CHECK_IN, CREATE_APP,
-  CANCEL_APP, RESCHEDULE_APP,
+  CANCEL_APP, RESCHEDULE_APP, RESERVE_SLOT, RELEASE_SLOT,
   QUEUE_NUMBER, keySocket, SCHEDULE_BLOCK, channelId, appointmentStatusId, 
   paymentStatus
 } from '../../../variables/common.variable';
@@ -273,6 +273,32 @@ export class WidgetCreateAppointmentComponent implements OnInit {
     this.emitScheduleBlock();
     this.emitRescheduleApp();
     this.getCollectionAlert();
+
+    //socket reserve slot
+    this.socketTwo.on(RESERVE_SLOT+'/'+this.hospital.id, (call) => {
+      for(let k = 0, { length } = this.slotList; k < length; k += 1) {
+        if (call.data.scheduleId == this.slotList[k].schedule_id
+          && call.data.appointmentDate == this.appointmentPayload.appointmentDate
+          && call.data.appointmentNo == this.slotList[k].appointment_no
+          && call.data.userId != this.userId) {
+          this.slotList[k].is_reserved_slot = true;
+          this.dataProcessing();
+        }
+      }
+    });
+
+    //socket release slot
+    this.socketTwo.on(RELEASE_SLOT+'/'+this.hospital.id, (call) => {
+      for(let k = 0, { length } = this.slotList; k < length; k += 1) {
+        if (call.data.scheduleId == this.slotList[k].schedule_id
+          && call.data.appointmentDate == this.appointmentPayload.appointmentDate
+          && call.data.appointmentNo == this.slotList[k].appointment_no
+          && call.data.userId != this.userId) {
+          this.slotList[k].is_reserved_slot = false;
+          this.dataProcessing();
+        }
+      }
+    });
 
     //scoket create appointment
     this.socket.on(CREATE_APP+'/'+this.hospital.id, (call) => {
@@ -909,6 +935,7 @@ export class WidgetCreateAppointmentComponent implements OnInit {
               is_can_cancel: this.slotList[i].is_blocked ? false : true,
               is_blocked: this.slotList[i].is_blocked,
               is_walkin: this.slotList[i].is_walkin,
+              is_reserved_slot: this.slotList[i].is_reserved_slot,
               schedule_id: this.schedule[k].schedule_id,
               doctor_type_id: this.schedule[k].doctor_type_id,
               channel_id: this.appointments[idx].channel_id ? this.appointments[idx].channel_id : null,
@@ -956,6 +983,7 @@ export class WidgetCreateAppointmentComponent implements OnInit {
               is_can_cancel: false,
               is_blocked: this.slotList[i].is_blocked,
               is_walkin: this.slotList[i].is_walkin,
+              is_reserved_slot: this.slotList[i].is_reserved_slot,
               schedule_id: this.schedule[k].schedule_id,
               doctor_type_id: this.schedule[k].doctor_type_id,
               channel_id: null,
@@ -1114,6 +1142,7 @@ export class WidgetCreateAppointmentComponent implements OnInit {
               is_can_cancel: true,
               is_blocked: false,
               is_walkin: false,
+              is_reserved_slot: false,
               schedule_id: this.schedule[k].schedule_id,
               doctor_type_id: this.schedule[k].doctor_type_id,
               channel_id: this.appointments[i].channel_id ? this.appointments[i].channel_id : null,
@@ -1166,6 +1195,7 @@ export class WidgetCreateAppointmentComponent implements OnInit {
           is_can_cancel: false,
           is_blocked: false,
           is_walkin: false,
+          is_reserved_slot: false,
           schedule_id: this.schedule[k].schedule_id,
           doctor_type_id: this.schedule[k].doctor_type_id,
           channel_id: null,
@@ -1427,12 +1457,15 @@ export class WidgetCreateAppointmentComponent implements OnInit {
   }
 
   async reserveSlotApp(app: any) {
+    let channel = this.reschBpjs === true || this.fromBpjs === true ? 
+      channelId.BPJS : channelId.FRONT_OFFICE;
     const payload: reserveSlotPayload = {
       scheduleId: app.schedule_id,
       appointmentDate: this.appointmentPayload.appointmentDate,
       appointmentNo: app.appointment_no,
+      channelId: channel,
       userId: this.userId,
-      source: this.source,
+      source: this.source
     };
 
     await this.appointmentService.reserveSlotApp(payload).toPromise().then(
@@ -2169,11 +2202,14 @@ export class WidgetCreateAppointmentComponent implements OnInit {
     const appointmentDate = this.appointmentPayload.appointmentDate;
     const appointmentNo = app.appointment_no;
     const userId = this.userId;
+    let channel = this.reschBpjs === true || this.fromBpjs === true ? 
+      channelId.BPJS : channelId.FRONT_OFFICE;
     const result = await this.appointmentService.getReservedSlotApp(
       scheduleId,
       appointmentDate,
       appointmentNo,
-      userId
+      userId,
+      channel
     ).toPromise().then(
       data => {
         return data.data;

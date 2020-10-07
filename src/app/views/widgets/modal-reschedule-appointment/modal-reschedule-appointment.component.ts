@@ -26,6 +26,7 @@ export class ModalRescheduleAppointmentComponent implements OnInit {
   public key: any = JSON.parse(localStorage.getItem('key'));
   public hospital = this.key.hospital;
   public user = this.key.user;
+  public isBpjsUnlock = this.key.hospital.isBpjs;
 
   public alerts: Alert[] = [];
   public opScheduleSelected: any;

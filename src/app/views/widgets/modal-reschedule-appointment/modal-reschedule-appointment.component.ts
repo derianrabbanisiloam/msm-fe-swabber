@@ -91,6 +91,8 @@ export class ModalRescheduleAppointmentComponent implements OnInit {
         this.alertService.error(err.error.message);
         return [];
       });
+
+      console.log('!!!!!!!!!!!!!', this.doctorBySpecialty)
   }
 
   openConfirmationModal(modal: any) {

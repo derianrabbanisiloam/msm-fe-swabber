@@ -138,7 +138,11 @@ export class WidgetDoctorScheduleComponent implements OnInit {
       };
     }
     if(dateFix !== null) {
-      this.initDate = dateFix;
+      let d1 = new Date(dateFix); //preferred appointment date
+      let d2 = new Date(moment().format('YYYY-MM-DD')); // date now
+      if(d1 > d2) {
+        this.initDate = dateFix;
+      }
     }
     
     this.doctorService.searchDoctorSource2 = null;

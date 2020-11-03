@@ -45,27 +45,30 @@
           </td>
         </tr>
         </tbody>
-
-
       </table>
     </div>
+
     <div class="row">
-      <div class="col-md-9">
-        <button class="ms_btn_border"
-            [ngClass]="isOpenDoctorSchedule == false ? 'ms_btn_blue' : 'ms_btn_darkgrey'"
-            style="padding: 0.3vw 0vw; width: 7vw"
-            (click)="openDoctorSchedule()">
-          Reschedule
-        </button>
+      <div class="col-md-3">
+        <span style="color: red;">*Please find a doctor first</span>
+        <select id="doctor" [disabled]="isReschBpjs" (change)="searchSchedule1(false)" style="width: 20em;" class="form-control"  [(ngModel)]="doctorValNonBpjs" name="doctor" required>
+          <option *ngFor = "let doctor of doctorBySpecialty" [ngValue]="doctor">
+            {{doctor.name}}
+          </option>
+        </select>
+      </div>
+      <div class="col-md-2">
         <button *ngIf="isBpjsUnlock === true" class="ms_btn_border"
           style="padding: 0.3vw 0vw; width: 11vw; margin-top: 1.3vw; margin-left: 1vw"
           [ngClass]="isReschBpjs == false ? 'ms_btn_blue' : 'ms_btn_darkgrey'"
-          (click)="rescheduleToBpjs()" hidden>
+          (click)="rescheduleToBpjs()">
             Reschedule to BPJS
         </button>
+      </div>
+      <div class="col-md-4">
         <button *ngIf="isBpjsUnlock === true" class="btn ms_btn_border ms_btn_green" [disabled]="!directBPJS"
-          style="padding: 0.3vw 0vw; width: 11vw; margin-left: 1vw; margin-top: -0.1vw"
-          (click)="openConfirmationModal(direct_non_bpjs)" hidden>
+          style="padding: 0.3vw 0vw; width: 11vw; margin-left: 1vw; margin-top: 1.3vw"
+          (click)="openConfirmationModal(direct_non_bpjs)">
             Change to BPJS
         </button>
       </div>
@@ -73,7 +76,7 @@
 
     <div class="row" style="margin-top: 2em;" *ngIf="isReschBpjs">
       <div class="col-md-3">
-        <span style="color: red;">*Please find a doctor first</span>
+        <span style="color: red;">*Please find a doctor first (BPJS schedule)</span>
         <select id="doctor" [disabled]="!isReschBpjs" (change)="searchSchedule1(true)" style="width: 20em;" class="form-control"  [(ngModel)]="doctorVal" name="doctor" required>
           <option *ngFor = "let doctor of doctorBySpecialty" [ngValue]="doctor">
             {{doctor.name}}

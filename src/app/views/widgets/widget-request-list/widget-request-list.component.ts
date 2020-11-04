@@ -76,6 +76,7 @@ export class WidgetRequestListComponent implements OnInit {
   public selectedPat: any;
   public specialities: Speciality[];
   public butdownload: boolean = false;
+  public cancelNote: string;
 
   constructor(
     private doctorService: DoctorService,

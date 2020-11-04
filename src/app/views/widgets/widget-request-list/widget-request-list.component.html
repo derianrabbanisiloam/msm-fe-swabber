@@ -138,14 +138,14 @@
 
 <ng-template #cancel_modal let-modal>
   <div class="modal-header">
-    <div class="header-2 modal-padding">Cancel Request BPJS</div>
+    <div class="header-2 modal-padding">Cancellation Reason: </div>
   </div>
   <div class="modal-body">
-    Are you sure?
+    <textarea rows="5" class="form-control" maxlength="250" [(ngModel)]="cancelNote"></textarea>
   </div>
   <div class="modal-footer">
-    <button type="button" class="btn ms_btn_black" (click)="modal.close()">Cancel</button>
-    <button class="btn ms_btn_green" [ngClass]="{'disable': confirmBut}" (click)="cancelRequestBpjs()">Confirm</button>
+  <button class="btn ms_btn_green" [ngClass]="{'disable': confirmBut}" (click)="cancelRequestBpjs()">Save</button>
+    <button type="button" class="btn ms_btn_red" (click)="modal.close()">Cancel</button>
   </div>
 </ng-template>
 

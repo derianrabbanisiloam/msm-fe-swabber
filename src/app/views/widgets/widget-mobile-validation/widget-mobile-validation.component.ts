@@ -44,7 +44,7 @@ export class WidgetMobileValidationComponent implements OnInit {
   public currentPatientHope: any;
   public patientHope;
   public flagSearch: boolean = false;
-  public selectPatient: any;
+  public selectPatient: any = null;
   public dataContact: any;
   public dataPatientHope: any;
   public editEmail: string;
@@ -700,6 +700,7 @@ export class WidgetMobileValidationComponent implements OnInit {
   }
 
   async choosedAccount(val) {
+    this.selectPatient = null;
     this.checkData = false;
     this.patientHope = null;
     this.flagSearch = false;

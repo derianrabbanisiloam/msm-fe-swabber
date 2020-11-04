@@ -92,7 +92,6 @@ export class WidgetMobileValidationComponent implements OnInit {
   public fileName: any;
   public loadingBut: boolean = false;
   public confirmBut: boolean = false;
-  public emailContact: any = null;
 
   constructor(
     private patientService: PatientService,
@@ -236,7 +235,7 @@ export class WidgetMobileValidationComponent implements OnInit {
         this.getListAccount();
         this.selectedAccount.contact_status_id = contactStatus.VERIFIED;
         this.selectedAccount.mobile_status = mobileStatus.ACCESSED;
-        //this.choosedAccount(this.selectedAccount);
+        this.choosedAccount(this.selectedAccount);
       }, error => {
         Swal.fire({
           type: 'error',
@@ -345,22 +344,11 @@ export class WidgetMobileValidationComponent implements OnInit {
 
   async editDataContact(disclaimer){
     let body;
-    let emailFix;
     if(this.selectedAccount.mobile_status !== mobileStatus.ACCESSED) {
-      if(this.emailContact !== null) {
-        if(this.dataContact.email_address !== this.emailContact) {
-          emailFix = this.emailContact;
-        } else {
-          emailFix = this.dataContact.email_address;
-        }
-      } else {
-        emailFix = this.dataContact.email_address;
-      }
-      
       this.editContactPayload = {
         contactId: this.dataContact.contact_id,
         data: {
-          emailAddress: emailFix
+          emailAddress: this.dataContact.email_address
         },
         userId: this.user.id,
         userName: this.user.username,
@@ -382,13 +370,12 @@ export class WidgetMobileValidationComponent implements OnInit {
       }
       this.editEmail !== this.dataContact.email_address ? 
       body.data.emailAddress = this.dataContact.email_address : '';
-      disclaimer ? body.data.disclaimer1 = disclaimer : ''; //replace disclaimer when already opened access MR
+      disclaimer ? body.data.disclaimer1 = disclaimer : ''; //replace disclaimer when already opened access MR 
     }
 
     this.patientService.updateContact(this.selectedAccount.contact_id, body).subscribe(
       data => {
         this.getListAccount();
-        this.choosedAccount(this.selectedAccount);
         if(disclaimer) {
           this.getDisclaimer = null;
           this.formatFileServer = disclaimer.split('.');
@@ -707,7 +694,6 @@ export class WidgetMobileValidationComponent implements OnInit {
         });
         return body;
       } else {
-        this.emailContact = this.dataContact.email_address;
         return null;
       }
     } else {

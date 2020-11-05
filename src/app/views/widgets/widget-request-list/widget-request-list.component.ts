@@ -545,8 +545,3 @@ class KeywordsModel {
   offset: number;
   limit: number;
 }
-
-class DateModel {
-  beginDate: any;
-  endDate: any;
-}

@@ -142,7 +142,6 @@ export class WidgetRequestListComponent implements OnInit {
         this.searchAppReq(true);
       }
       this.keywordsModel = new KeywordsModel;
-      
     }
   }
 

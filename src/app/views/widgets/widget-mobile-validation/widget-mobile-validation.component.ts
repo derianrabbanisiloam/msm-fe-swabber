@@ -412,6 +412,7 @@ export class WidgetMobileValidationComponent implements OnInit {
   }
 
   getSearchedPatient1() {
+    this.selectPatient = null;
     this.searchPatient = true;
     this.flagSearch = false;
     this.loadingBarTwo = true;
@@ -450,6 +451,7 @@ export class WidgetMobileValidationComponent implements OnInit {
   }
 
   getSearchedPatient2() {
+    this.selectPatient = null;
     this.searchPatient = false;
     this.flagSearch = false;
     this.loadingBarTwo = true;
@@ -799,6 +801,7 @@ export class WidgetMobileValidationComponent implements OnInit {
   charRemove(str: any) {
     if (str) {
       str = str.replace('(+62)', '0');
+      str = str.replace('+62', '0');
       str = str.replace(/_/g, '');
       str = str.replace(/ /g, '');
       str = str.replace(/ /g, '');

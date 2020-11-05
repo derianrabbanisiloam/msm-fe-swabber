@@ -87,6 +87,8 @@ export class WidgetRequestListComponent implements OnInit {
   public isReqCompleted: boolean = false;
   public limit: number = 10;
   public offset: number = 0;
+  public countOne: number = 1;
+  public countTwo: number = 0;
 
   constructor(
     private doctorService: DoctorService,
@@ -120,8 +122,28 @@ export class WidgetRequestListComponent implements OnInit {
   }
 
   async changeTab(buttonActive) {
-    if(buttonActive === 'reqList') this.isReqList = true, this.isReqCompleted = false;
-    else this.isReqList = false, this.isReqCompleted = true;
+    if(buttonActive === 'reqList') {
+      this.isReqList = true;
+      this.isReqCompleted = false;
+      this.countTwo = 0;
+      this.countOne += 1;
+      if(this.countOne === 1) {
+        this.datePickerModel = '';
+        this.getAppointmentBpjs();
+      }
+      this.keywordsModelTwo = new KeywordsModel;
+    } else {
+      this.isReqList = false;
+      this.isReqCompleted = true;
+      this.countOne = 0;
+      this.countTwo += 1;
+      if(this.countTwo === 1) {
+        this.datePickerModel = '';
+        this.searchAppReq(true);
+      }
+      this.keywordsModel = new KeywordsModel;
+      
+    }
   }
 
   async getSpecialities(specialityname = null, total = null) {
@@ -158,15 +180,26 @@ export class WidgetRequestListComponent implements OnInit {
       eMonth = Number(eMonth) < 10 ? '0' + eMonth : eMonth;
       let eDay = dateRange.endDate.day;
       eDay = Number(eDay) < 10 ? '0' + eDay : eDay;
-      this.keywordsModel.fromDate = bYear + '-' + bMonth + '-' + bDay;
-      this.keywordsModel.toDate = eYear + '-' + eMonth + '-' + eDay;
-      if(this.keywordsModel.fromDate === '0-00-00' 
-        && this.keywordsModel.toDate === '0-00-00') {
-          this.keywordsModel.fromDate = '';
-          this.keywordsModel.toDate = '';
-          this.getAppointmentBpjs();
-      } else {
+
+      let datePickFrom = bYear + '-' + bMonth + '-' + bDay;
+      let datePickTo = eYear + '-' + eMonth + '-' + eDay;
+      if(datePickFrom === '0-00-00' && datePickTo === '0-00-00') {
+        this.keywordsModel.fromDate = '';
+        this.keywordsModel.toDate = '';
+        this.keywordsModelTwo.fromDate = '';
+        this.keywordsModelTwo.toDate = '';
         this.getAppointmentBpjs();
+        this.searchAppReq(true);
+      } else {
+        if(this.isReqList === true){
+          this.keywordsModel.fromDate = bYear + '-' + bMonth + '-' + bDay;
+          this.keywordsModel.toDate = eYear + '-' + eMonth + '-' + eDay;
+          this.getAppointmentBpjs();
+        } else {
+          this.keywordsModelTwo.fromDate = bYear + '-' + bMonth + '-' + bDay;
+          this.keywordsModelTwo.toDate = eYear + '-' + eMonth + '-' + eDay;
+          this.searchAppReq(true);
+        }
       }
     }
   }
@@ -512,4 +545,9 @@ class KeywordsModel {
   specialtyId: any;
   offset: number;
   limit: number;
+}
+
+class DateModel {
+  beginDate: any;
+  endDate: any;
 }

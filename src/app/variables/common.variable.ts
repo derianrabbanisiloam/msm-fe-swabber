@@ -13,6 +13,10 @@ export const USER_LOGIN__FRONT_OFFICE = 'USER_LOGIN__FRONT_OFFICE';
 export const RESERVE_SLOT = 'QUEUE__RESERVED_TIME_SLOT';
 export const RELEASE_SLOT = 'QUEUE__RELEASE_TIME_SLOT';
 
+export const reqBpjs = {
+  REQLIST: true,
+  REQCOMPLETED: false
+}
 export const keySocket = {
   APPOINTMENT: '/appointments',
   QUEUE: '/queues',

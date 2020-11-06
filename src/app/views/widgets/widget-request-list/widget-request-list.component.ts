@@ -7,7 +7,7 @@ import { AlertService } from '../../../services/alert.service';
 import { IMyDrpOptions } from 'mydaterangepicker';
 import { NgbModal, NgbModalConfig, ModalDismissReasons } from '@ng-bootstrap/ng-bootstrap';
 import { Alert, AlertType } from '../../../models/alerts/alert';
-import { sourceApps, consultationType, pathImage } from '../../../variables/common.variable';
+import { sourceApps, consultationType, pathImage, reqBpjs } from '../../../variables/common.variable';
 import { IMyDpOptions } from 'mydatepicker';
 import { environment } from '../../../../environments/environment';
 import { Speciality } from '../../../models/specialities/speciality';
@@ -32,13 +32,17 @@ export class WidgetRequestListComponent implements OnInit {
   public myDateRangeCreatedDate: IMyDrpOptions;
   public datePickerModel: any = {};
   public datePickerCreatedDate: any = {};
+  public datePickerCreatedDateTwo: any = {};
   public keywordsModel: KeywordsModel = new KeywordsModel;
+  public keywordsModelTwo: KeywordsModel = new KeywordsModel; 
   public maskBirth = [/\d/, /\d/, '-', /\d/, /\d/, '-', /\d/, /\d/, /\d/, /\d/];
   public alerts: Alert[] = [];
   public showWaitMsg: boolean = false;
   public showNotFoundMsg: boolean = false;
   public isCanPrevPage: boolean = false;
   public isCanNextPage: boolean = false;
+  public isCanPrevPageTwo: boolean = false;
+  public isCanNextPageTwo: boolean = false;
   public closeResult: string;
   public count: number = -1;
   public selectedApp: any;
@@ -73,9 +77,18 @@ export class WidgetRequestListComponent implements OnInit {
     }
   };
   public appRequestList: any = [];
+  public appReqCompleted: any = [];
   public selectedPat: any;
   public specialities: Speciality[];
   public butdownload: boolean = false;
+  public reasonCancel: string;
+  public butActive: string;
+  public isReqList: boolean = true;
+  public isReqCompleted: boolean = false;
+  public limit: number = 10;
+  public offset: number = 0;
+  public countOne: number = 1;
+  public countTwo: number = 0;
 
   constructor(
     private doctorService: DoctorService,
@@ -105,6 +118,31 @@ export class WidgetRequestListComponent implements OnInit {
     this.keywordsModel.hospitalId = this.hospital.id;
     this.getCollectionAlert();
     this.getAppointmentBpjs();
+    this.searchAppReq();
+  }
+
+  async changeTab(buttonActive) {
+    if(buttonActive === 'reqList') {
+      this.isReqList = true;
+      this.isReqCompleted = false;
+      this.countTwo = 0;
+      this.countOne += 1;
+      if(this.countOne === 1) {
+        this.datePickerModel = '';
+        this.getAppointmentBpjs();
+      }
+      this.keywordsModelTwo = new KeywordsModel;
+    } else {
+      this.isReqList = false;
+      this.isReqCompleted = true;
+      this.countOne = 0;
+      this.countTwo += 1;
+      if(this.countTwo === 1) {
+        this.datePickerModel = '';
+        this.searchAppReq(true);
+      }
+      this.keywordsModel = new KeywordsModel;
+    }
   }
 
   async getSpecialities(specialityname = null, total = null) {
@@ -141,20 +179,31 @@ export class WidgetRequestListComponent implements OnInit {
       eMonth = Number(eMonth) < 10 ? '0' + eMonth : eMonth;
       let eDay = dateRange.endDate.day;
       eDay = Number(eDay) < 10 ? '0' + eDay : eDay;
-      this.keywordsModel.fromDate = bYear + '-' + bMonth + '-' + bDay;
-      this.keywordsModel.toDate = eYear + '-' + eMonth + '-' + eDay;
-      if(this.keywordsModel.fromDate === '0-00-00' 
-        && this.keywordsModel.toDate === '0-00-00') {
-          this.keywordsModel.fromDate = '';
-          this.keywordsModel.toDate = '';
-          this.getAppointmentBpjs();
-      } else {
+
+      let datePickFrom = bYear + '-' + bMonth + '-' + bDay;
+      let datePickTo = eYear + '-' + eMonth + '-' + eDay;
+      if(datePickFrom === '0-00-00' && datePickTo === '0-00-00') {
+        this.keywordsModel.fromDate = '';
+        this.keywordsModel.toDate = '';
+        this.keywordsModelTwo.fromDate = '';
+        this.keywordsModelTwo.toDate = '';
         this.getAppointmentBpjs();
+        this.searchAppReq(true);
+      } else {
+        if(this.isReqList === true){
+          this.keywordsModel.fromDate = bYear + '-' + bMonth + '-' + bDay;
+          this.keywordsModel.toDate = eYear + '-' + eMonth + '-' + eDay;
+          this.getAppointmentBpjs();
+        } else {
+          this.keywordsModelTwo.fromDate = bYear + '-' + bMonth + '-' + bDay;
+          this.keywordsModelTwo.toDate = eYear + '-' + eMonth + '-' + eDay;
+          this.searchAppReq(true);
+        }
       }
     }
   }
 
-  changeDateRangeCreatedDate(dateRange: any) {
+  changeDateRangeCreatedDate(dateRange: any, tabOptions) {
     if (dateRange) {
       let bYear = dateRange.beginDate.year;
       let bMonth = dateRange.beginDate.month;
@@ -166,15 +215,29 @@ export class WidgetRequestListComponent implements OnInit {
       eMonth = Number(eMonth) < 10 ? '0' + eMonth : eMonth;
       let eDay = dateRange.endDate.day;
       eDay = Number(eDay) < 10 ? '0' + eDay : eDay;
-      this.keywordsModel.createFrom = bYear + '-' + bMonth + '-' + bDay;
-      this.keywordsModel.createTo = eYear + '-' + eMonth + '-' + eDay;
-      if(this.keywordsModel.createFrom === '0-00-00' 
-        && this.keywordsModel.createTo === '0-00-00') {
-          this.keywordsModel.createFrom = '';
-          this.keywordsModel.createTo = '';
+
+      if(tabOptions === 'reqList'){
+        this.keywordsModel.createFrom = bYear + '-' + bMonth + '-' + bDay;
+        this.keywordsModel.createTo = eYear + '-' + eMonth + '-' + eDay;
+        if(this.keywordsModel.createFrom === '0-00-00' 
+          && this.keywordsModel.createTo === '0-00-00') {
+            this.keywordsModel.createFrom = '';
+            this.keywordsModel.createTo = '';
+            this.getAppointmentBpjs();
+        } else {
           this.getAppointmentBpjs();
+        }
       } else {
-        this.getAppointmentBpjs();
+        this.keywordsModelTwo.createFrom = bYear + '-' + bMonth + '-' + bDay;
+        this.keywordsModelTwo.createTo = eYear + '-' + eMonth + '-' + eDay;
+        if(this.keywordsModelTwo.createFrom === '0-00-00' 
+          && this.keywordsModelTwo.createTo === '0-00-00') {
+            this.keywordsModelTwo.createFrom = '';
+            this.keywordsModelTwo.createTo = '';
+            this.searchAppReq(true);
+        } else {
+          this.searchAppReq(true);
+        }
       }
     }
   }
@@ -235,7 +298,8 @@ export class WidgetRequestListComponent implements OnInit {
       offsetTemp,
       limit,
       createFrom,
-      createTo
+      createTo,
+      reqBpjs.REQLIST
     ).subscribe(
       data => {
         if (data.data.length !== 0) {
@@ -265,10 +329,65 @@ export class WidgetRequestListComponent implements OnInit {
     );
   }
 
+  async searchAppReq(search?: boolean) {
+    if(search) {this.offset = 0, this.pageTwo = 0};
+    let { patientName, birthDate, noBpjs, specialtyId, fromDate, toDate, 
+            createFrom, createTo } = await this.keywordsModelTwo;
+
+    const arrBirth = birthDate ? birthDate.split('-') : '';
+
+    patientName = patientName ? patientName.toLowerCase() : '';
+    birthDate = arrBirth ? arrBirth[2] + '-' + arrBirth[1] + '-' + arrBirth[0] : '';
+
+    if ( patientName || birthDate || noBpjs || specialtyId || fromDate || toDate || 
+        createFrom || createTo ) {
+        this.getAppointmentReqCompleted(patientName, birthDate, noBpjs, specialtyId, fromDate, 
+          toDate, createFrom, createTo);
+    } else {
+        this.getAppointmentReqCompleted();
+    }
+  }
+
+  async getAppointmentReqCompleted(patientName = '', birthDate = '', noBpjs = '', specialtyId = '',
+    fromDate = '', toDate = '', createFrom = '', createTo = '') {
+    this.showWaitMsg = true;
+    this.showNotFoundMsg = false;
+
+    this.appReqCompleted = await this.bpjsService.getListAppointmentBpjs(this.hospital.id, fromDate, toDate, patientName, birthDate, 
+      noBpjs, specialtyId, this.offset, this.limit, createFrom, createTo, reqBpjs.REQCOMPLETED).toPromise().then(res => {
+        if (res.status === 'OK') {
+          this.isCanNextPageTwo = res.data.length >= 10 ? true : false;
+          this.isCanPrevPageTwo = this.offset === 0 ? false : true;
+
+          let fixDate;
+          for (let i = 0, { length } = res.data; i < length; i += 1) {
+            res.data[i].fix_patient_birth_date = moment(res.data[i].patient_birth_date).format('DD-MM-YYYY');
+            res.data[i].fix_appointment_date = moment(res.data[i].appointment_date).format('DD-MM-YYYY');
+            
+            fixDate = res.data[i].created_date.substr(0, 10);
+            res.data[i].fix_created_date = moment(fixDate).format('DD-MM-YYYY');
+          }
+
+          this.showWaitMsg = false;
+          this.showNotFoundMsg = false;
+        } else {
+          this.showWaitMsg = false;
+          this.showNotFoundMsg = true;
+        }
+        return res.data;
+      }).catch(err => {
+        this.showWaitMsg = false;
+        this.showNotFoundMsg = true;
+        this.alertService.error(err.error.message, false, 3000);
+        return [];
+      });
+  }
+
   cancelRequestBpjs() {
     const appointmentId = this.selectedPat.appointment_bpjs_id;
     const body = { 
       userNameFromToken: 'siloam',
+      notes: this.reasonCancel,
       userId: this.user.id,
       userName: this.user.fullname,
       source: sourceApps
@@ -307,6 +426,7 @@ export class WidgetRequestListComponent implements OnInit {
   }
 
   private page: number = 0;
+  private pageTwo: number = 0;
   nextPage() {
     this.page += 1;
     this.keywordsModel.offset = this.page * 10;
@@ -318,6 +438,18 @@ export class WidgetRequestListComponent implements OnInit {
     this.keywordsModel.offset = this.page * 10;
     this.isCanPrevPage = this.keywordsModel.offset === 0 ? false : true;
     this.getAppointmentBpjs();
+  }
+  nextPageTwo() {
+    this.pageTwo += 1;
+    this.offset = this.pageTwo * 10;
+    this.isCanPrevPageTwo = this.offset === 0 ? false : true;
+    this.searchAppReq(false);
+  }
+  prevPageTwo() {
+    this.pageTwo -= 1;
+    this.offset = this.pageTwo * 10;
+    this.isCanPrevPageTwo = this.offset === 0 ? false : true;
+    this.searchAppReq(false);
   }
 
   async getCollectionAlert() {

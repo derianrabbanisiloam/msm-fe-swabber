@@ -264,11 +264,20 @@
               </span>
             </td>
             <td style="min-width: 5em">
-              <a popoverTitle="Created by: {{r.modified_name}}"
+              <a *ngIf="r.appointment_id === null" popoverTitle="Created by: {{r.modified_name}}"
                 ngbPopover="Cancellation reason: {{r.notes}}"
                 triggers="mouseenter:mouseleave">
-                <span *ngIf="r.appointment_id === null">Cancelled</span>
-                <span *ngIf="r.appointment_id !== null">Completed</span>
+                <span>Cancelled</span>
+              </a>
+              <ng-template #detailApp>
+                App Date: {{r.fix_actual_app_date}} / {{r.actual_appointment_from_time.substr(0, 5)}} - {{r.actual_appointment_to_time.substr(0, 5)}}
+                <br>
+                Doctor: {{r.actual_appointment_doctor_name}}
+              </ng-template>
+              <a *ngIf="r.appointment_id !== null" popoverTitle="Created by: {{r.actual_appointment_created_name}}"
+                [ngbPopover]="detailApp"
+                triggers="mouseenter:mouseleave">
+                <span>Completed</span>
               </a>
             </td>
           </tr>
@@ -304,7 +313,7 @@
   </div>
   <div class="modal-footer">
     <button class="btn ms_btn_green" [ngClass]="{'disable': confirmBut}"
-      [disabled]="!reasonCancel" (click)="cancelRequestBpjs()">Save</button>
+      [disabled]="!reasonCancel" (click)="modal.close()" (click)="cancelRequestBpjs()">Save</button>
     <button type="button" class="btn ms_btn_red" (click)="modal.close()">Cancel</button>
   </div>
 </ng-template>

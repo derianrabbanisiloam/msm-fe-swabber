@@ -363,6 +363,7 @@ export class WidgetRequestListComponent implements OnInit {
           for (let i = 0, { length } = res.data; i < length; i += 1) {
             res.data[i].fix_patient_birth_date = moment(res.data[i].patient_birth_date).format('DD-MM-YYYY');
             res.data[i].fix_appointment_date = moment(res.data[i].appointment_date).format('DD-MM-YYYY');
+            res.data[i].fix_actual_app_date = moment(res.data[i].actual_appointment_date).format('DD-MM-YYYY');
             
             fixDate = res.data[i].created_date.substr(0, 10);
             res.data[i].fix_created_date = moment(fixDate).format('DD-MM-YYYY');

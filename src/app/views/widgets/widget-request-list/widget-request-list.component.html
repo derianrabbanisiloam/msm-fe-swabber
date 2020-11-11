@@ -10,152 +10,310 @@
   </div>
 </div>
 
-<div class="fo_container_list shadow-4">
-  <table class="table table-bordered">
-    <thead class="fo_color_blue foot-note" style="text-align: center">
-      <th>No.</th>
-      <th style="min-width: 2em">Request ID</th>
-      <th style="min-width: 2em">Request Date</th>
-      <th style="min-width: 14em">Patient Name</th>
-      <th style="white-space: nowrap; text-align: center; min-width: 11em">Date of Birth</th>
-      <th>Mobile No.</th>
-      <th>BPJS Number</th>
-      <th style="min-width: 5em">Preferred Appointment Date</th>
-      <th>Control No.</th>
-      <th>Document</th>
-      <th>Action</th>
-    </thead>
-
-    <tbody>
-      <tr class="fo_header_grey filter-row">
-        <td></td>
-        <td></td>
-        <td>
-          <my-date-range-picker name="mydaterange" [options]="myDateRangeCreatedDate" [(ngModel)]="datePickerCreatedDate"
-            (dateRangeChanged)="changeDateRangeCreatedDate($event)" #date>
-          </my-date-range-picker>
-        </td>
-        <td>
-          <div class="inner-addon right-addon">
-            <i class="glyphicon fa fa-search"></i>
-            <input type="text" class="form-control" placeholder="Search name" [(ngModel)]="keywordsModel.patientName"
-              (change)="getAppointmentBpjs()" />
-          </div>
-        </td>
-        <td>
-          <div class="inner-addon right-addon">
-            <i class="glyphicon fa fa-search"></i>
-            <input [textMask]="{mask: maskBirth}" type="text" placeholder="Search dob" class="form-control"
-              [(ngModel)]="keywordsModel.birthDate" (change)="getAppointmentBpjs()" placeholder="dd-mm-yyyy" />
-          </div>
-        </td>
-        <td></td>
-        <td>
-          <div class="inner-addon right-addon">
-            <i class="glyphicon fa fa-search"></i>
-            <input type="text" class="form-control" placeholder="Search no bpjs" [(ngModel)]="keywordsModel.noBpjs"
-              (change)="getAppointmentBpjs()" />
-          </div>
-        </td>
-        <td></td>
-        <td></td>
-        <td></td>
-        <td></td>
-      </tr>
-
-      <tr *ngFor="let r of appRequestList; let i = index">
-        <td>
-          {{i+1}}
-          <input type="checkbox" style="margin-top: 0.7vw" [(ngModel)]="r.checked" [value]="r.checked" hidden>
-        </td>
-        <td>{{r.booking_code}}</td>
-        <td>{{r.created_date}}</td>
-        <td style="text-transform: uppercase; min-width: 8em">
-          <a ngbPopover="{{r.patient_name}}" popoverTitle=""
-            triggers="mouseenter:mouseleave">{{r.patient_name && r.patient_name.length > 30 ?
-               r.patient_name.substr(0,30)+"..." : r.patient_name}}</a>
-        </td>
-        <td style="width: 1%;">{{ r.patient_birth_date }}</td>
-        <td style="text-align: center; white-space: nowrap; width: 1%">
-          {{r.phone_number_1}}
-        </td>
-        <td style="text-align: center">{{ r.bpjs_card_number }}</td>
-        <td style="min-width: 8em">{{ r.appointment_date }}</td>
-        <td>{{r.control_number}}</td>
-        <td>
-          <span *ngIf="r.bpjs_card_file">
-            <a href=":javascript"
-            (click)="getImage(r.bpjs_card_file)"
-            target="_blank">{{r.bpjs_card_file}}<br></a>
-          </span>
-          <span *ngIf="r.family_card_file">
-            <a href=":javascript"
-            (click)="getImage(r.family_card_file)"
-            target="_blank">{{r.family_card_file}}<br></a>
-          </span>
-          <span *ngIf="r.identity_card_file">
-            <a href=":javascript"
-            (click)="getImage(r.identity_card_file)"
-            target="_blank">{{r.identity_card_file}}<br></a>
-          </span>
-          <span *ngIf="r.refference_letter_file">
-            <a href=":javascript"
-            (click)="getImage(r.refference_letter_file)"
-            target="_blank">{{r.refference_letter_file}}<br></a>
-          </span>
-          <span *ngIf="r.selfie_with_identity_file">
-            <a href=":javascript"
-          (click)="getImage(r.selfie_with_identity_file)"
-          target="_blank">{{r.selfie_with_identity_file}}<br></a>
-          </span>
-          <span *ngIf="r.control_letter_file">
-            <a href=":javascript"
-          (click)="getImage(r.control_letter_file)"
-          target="_blank">{{r.control_letter_file}}<br></a>
-          </span>
-        </td>
-        <td style="min-width: 5em">
-          <div class="cell-img-nav d-flex justify-content-center">
-            <div (click)="searchSchedule2(r)">
-              <img src="{{assetPath}}icons/ic_Check@2x.png">
-            </div>
-            <span style="opacity: 0; max-width: 1em; overflow: hidden">filler</span>
-            <div (click)="openModalCancel(cancel_modal, r)">
-              <img src="{{assetPath}}icons/ic_Cancel@2x.png">
-            </div>
-          </div>
-        </td>
-      </tr>
-      <tr>
-        <td *ngIf="showNotFoundMsg" colspan="15" style="text-align: center;">Displaying no data</td>
-        <td *ngIf="showWaitMsg" colspan="15">
-          <ngb-progressbar value="1000">Loading...</ngb-progressbar>
-        </td>
-      </tr>
-    </tbody>
-  </table>
+<div class="middle">
+  <div class="button-layout">
+    <div class="button-custom" [ngClass]="{'button-active': isReqList}" (click)="changeTab('reqList')">
+      <span>Request List</span>
+    </div>
+    <div class="button-custom" [ngClass]="{'button-active': isReqCompleted}" (click)="changeTab('reqCompleted')">
+      Request Completed
+    </div>
+  </div>
 </div>
+
+<div class="bottom">
+  <div class="request-list" *ngIf="isReqList">
+    <div class="fo_container_list shadow-4">
+      <table class="table table-bordered">
+        <thead class="fo_color_blue foot-note" style="text-align: center">
+          <th>No.</th>
+          <th style="min-width: 2em">Request ID</th>
+          <th style="min-width: 2em">Request Date</th>
+          <th style="min-width: 14em">Patient Name</th>
+          <th style="white-space: nowrap; text-align: center; min-width: 11em">Date of Birth</th>
+          <th>Mobile No.</th>
+          <th>BPJS Number</th>
+          <th style="min-width: 5em">Preferred Appointment Date</th>
+          <th>Control No.</th>
+          <th>Document</th>
+          <th>Action</th>
+        </thead>
+    
+        <tbody>
+          <tr class="fo_header_grey filter-row">
+            <td></td>
+            <td></td>
+            <td>
+              <my-date-range-picker name="mydaterange" [options]="myDateRangeCreatedDate" [(ngModel)]="datePickerCreatedDate"
+                (dateRangeChanged)="changeDateRangeCreatedDate($event, 'reqList')" #date>
+              </my-date-range-picker>
+            </td>
+            <td>
+              <div class="inner-addon right-addon">
+                <i class="glyphicon fa fa-search"></i>
+                <input type="text" class="form-control" placeholder="Search name" [(ngModel)]="keywordsModel.patientName"
+                  (change)="getAppointmentBpjs()" />
+              </div>
+            </td>
+            <td>
+              <div class="inner-addon right-addon">
+                <i class="glyphicon fa fa-search"></i>
+                <input [textMask]="{mask: maskBirth}" type="text" placeholder="Search dob" class="form-control"
+                  [(ngModel)]="keywordsModel.birthDate" (change)="getAppointmentBpjs()" placeholder="dd-mm-yyyy" />
+              </div>
+            </td>
+            <td></td>
+            <td>
+              <div class="inner-addon right-addon">
+                <i class="glyphicon fa fa-search"></i>
+                <input type="text" class="form-control" placeholder="Search no bpjs" [(ngModel)]="keywordsModel.noBpjs"
+                  (change)="getAppointmentBpjs()" />
+              </div>
+            </td>
+            <td></td>
+            <td></td>
+            <td></td>
+            <td></td>
+          </tr>
+    
+          <tr *ngFor="let r of appRequestList; let i = index">
+            <td>
+              {{i+1}}
+            </td>
+            <td>{{r.booking_code}}</td>
+            <td>{{r.created_date}}</td>
+            <td style="text-transform: uppercase; min-width: 8em">
+              <a ngbPopover="{{r.patient_name}}" popoverTitle=""
+                triggers="mouseenter:mouseleave">{{r.patient_name && r.patient_name.length > 30 ?
+                   r.patient_name.substr(0,30)+"..." : r.patient_name}}</a>
+            </td>
+            <td style="width: 1%;">{{ r.patient_birth_date }}</td>
+            <td style="text-align: center; white-space: nowrap; width: 1%">
+              {{r.phone_number_1}}
+            </td>
+            <td style="text-align: center">{{ r.bpjs_card_number }}</td>
+            <td style="min-width: 8em">{{ r.appointment_date }}</td>
+            <td>{{r.control_number}}</td>
+            <td>
+              <span *ngIf="r.bpjs_card_file">
+                <a href=":javascript"
+                (click)="getImage(r.bpjs_card_file)"
+                target="_blank">{{r.bpjs_card_file}}<br></a>
+              </span>
+              <span *ngIf="r.family_card_file">
+                <a href=":javascript"
+                (click)="getImage(r.family_card_file)"
+                target="_blank">{{r.family_card_file}}<br></a>
+              </span>
+              <span *ngIf="r.identity_card_file">
+                <a href=":javascript"
+                (click)="getImage(r.identity_card_file)"
+                target="_blank">{{r.identity_card_file}}<br></a>
+              </span>
+              <span *ngIf="r.refference_letter_file">
+                <a href=":javascript"
+                (click)="getImage(r.refference_letter_file)"
+                target="_blank">{{r.refference_letter_file}}<br></a>
+              </span>
+              <span *ngIf="r.selfie_with_identity_file">
+                <a href=":javascript"
+              (click)="getImage(r.selfie_with_identity_file)"
+              target="_blank">{{r.selfie_with_identity_file}}<br></a>
+              </span>
+              <span *ngIf="r.control_letter_file">
+                <a href=":javascript"
+              (click)="getImage(r.control_letter_file)"
+              target="_blank">{{r.control_letter_file}}<br></a>
+              </span>
+            </td>
+            <td style="min-width: 5em">
+              <div class="cell-img-nav d-flex justify-content-center">
+                <div (click)="searchSchedule2(r)">
+                  <img src="{{assetPath}}icons/ic_Check@2x.png">
+                </div>
+                <span style="opacity: 0; max-width: 1em; overflow: hidden">filler</span>
+                <div (click)="openModalCancel(cancel_modal, r)">
+                  <img src="{{assetPath}}icons/ic_Cancel@2x.png">
+                </div>
+              </div>
+            </td>
+          </tr>
+          <tr>
+            <td *ngIf="showNotFoundMsg" colspan="15" style="text-align: center;">Displaying no data</td>
+            <td *ngIf="showWaitMsg" colspan="15">
+              <ngb-progressbar value="1000">Loading...</ngb-progressbar>
+            </td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+    
+    <section class="full-width" id="group-list-appointment">
+      <button *ngIf="isCanPrevPage" (click)="prevPage()" class="btn ms_btn_blue">
+        <img src="{{assetPath}}icons/ic_ArrowRight_White.png"> Prev
+      </button>
+      <span style="width:10px">&nbsp;</span>
+      <button *ngIf="isCanNextPage" (click)="nextPage()" class="btn ms_btn_blue">
+        Next <img src="{{assetPath}}icons/ic_ArrowLeft_White.png">
+      </button>
+    </section>
+  </div>
+
+  <div class="request-completed" *ngIf="isReqCompleted">
+    <div class="fo_container_list shadow-4">
+      <table class="table table-bordered">
+        <thead class="fo_color_blue foot-note" style="text-align: center">
+          <th>No.</th>
+          <th style="min-width: 2em">Request ID</th>
+          <th style="min-width: 2em">Request Date</th>
+          <th style="min-width: 14em">Patient Name</th>
+          <th style="white-space: nowrap; text-align: center; min-width: 11em">Date of Birth</th>
+          <th>Mobile No.</th>
+          <th>BPJS Number</th>
+          <th style="min-width: 5em">Preferred Appointment Date</th>
+          <th>Control No.</th>
+          <th>Document</th>
+          <th>Status</th>
+        </thead>
+    
+        <tbody>
+          <tr class="fo_header_grey filter-row">
+            <td></td>
+            <td></td>
+            <td>
+              <my-date-range-picker name="mydaterange" [options]="myDateRangeCreatedDate" [(ngModel)]="datePickerCreatedDateTwo"
+                (dateRangeChanged)="changeDateRangeCreatedDate($event, 'isReqCompleted')" #date>
+              </my-date-range-picker>
+            </td>
+            <td>
+              <div class="inner-addon right-addon">
+                <i class="glyphicon fa fa-search"></i>
+                <input type="text" class="form-control" placeholder="Search name" [(ngModel)]="keywordsModelTwo.patientName"
+                (change)="searchAppReq(true)" />
+              </div>
+            </td>
+            <td>
+              <div class="inner-addon right-addon">
+                <i class="glyphicon fa fa-search"></i>
+                <input [textMask]="{mask: maskBirth}" type="text" placeholder="Search dob" class="form-control"
+                  [(ngModel)]="keywordsModelTwo.birthDate" (change)="searchAppReq(true)" placeholder="dd-mm-yyyy" />
+              </div>
+            </td>
+            <td></td>
+            <td>
+              <div class="inner-addon right-addon">
+                <i class="glyphicon fa fa-search"></i>
+                <input type="text" class="form-control" placeholder="Search no bpjs" [(ngModel)]="keywordsModelTwo.noBpjs"
+                (change)="searchAppReq(true)" />
+              </div>
+            </td>
+            <td></td>
+            <td></td>
+            <td></td>
+            <td></td>
+          </tr>
+    
+          <tr *ngFor="let r of appReqCompleted; let i = index">
+            <td>
+              {{i+1}}
+            </td>
+            <td>{{r.booking_code}}</td>
+            <td>{{r.fix_created_date}}</td>
+            <td style="text-transform: uppercase; min-width: 8em">
+              <a ngbPopover="{{r.patient_name}}" popoverTitle=""
+                triggers="mouseenter:mouseleave">{{r.patient_name && r.patient_name.length > 30 ?
+                   r.patient_name.substr(0,30)+"..." : r.patient_name}}</a>
+            </td>
+            <td style="width: 1%;">{{ r.fix_patient_birth_date }}</td>
+            <td style="text-align: center; white-space: nowrap; width: 1%">
+              {{r.phone_number_1}}
+            </td>
+            <td style="text-align: center">{{ r.bpjs_card_number }}</td>
+            <td style="min-width: 8em">{{ r.fix_appointment_date }}</td>
+            <td>{{r.control_number}}</td>
+            <td>
+              <span *ngIf="r.bpjs_card_file">
+                <a href=":javascript"
+                (click)="getImage(r.bpjs_card_file)"
+                target="_blank">{{r.bpjs_card_file}}<br></a>
+              </span>
+              <span *ngIf="r.family_card_file">
+                <a href=":javascript"
+                (click)="getImage(r.family_card_file)"
+                target="_blank">{{r.family_card_file}}<br></a>
+              </span>
+              <span *ngIf="r.identity_card_file">
+                <a href=":javascript"
+                (click)="getImage(r.identity_card_file)"
+                target="_blank">{{r.identity_card_file}}<br></a>
+              </span>
+              <span *ngIf="r.refference_letter_file">
+                <a href=":javascript"
+                (click)="getImage(r.refference_letter_file)"
+                target="_blank">{{r.refference_letter_file}}<br></a>
+              </span>
+              <span *ngIf="r.selfie_with_identity_file">
+                <a href=":javascript"
+              (click)="getImage(r.selfie_with_identity_file)"
+              target="_blank">{{r.selfie_with_identity_file}}<br></a>
+              </span>
+              <span *ngIf="r.control_letter_file">
+                <a href=":javascript"
+              (click)="getImage(r.control_letter_file)"
+              target="_blank">{{r.control_letter_file}}<br></a>
+              </span>
+            </td>
+            <td style="min-width: 5em">
+              <a *ngIf="r.appointment_id === null" popoverTitle="Created by: {{r.modified_name}}"
+                ngbPopover="Cancellation reason: {{r.notes}}"
+                triggers="mouseenter:mouseleave">
+                <span>Cancelled</span>
+              </a>
+              <ng-template #detailApp>
+                App Date: {{r.fix_actual_app_date}} / {{r.actual_appointment_from_time.substr(0, 5)}} - {{r.actual_appointment_to_time.substr(0, 5)}}
+                <br>
+                Doctor: {{r.actual_appointment_doctor_name}}
+              </ng-template>
+              <a *ngIf="r.appointment_id !== null" popoverTitle="Created by: {{r.actual_appointment_created_name}}"
+                [ngbPopover]="detailApp"
+                triggers="mouseenter:mouseleave">
+                <span>Completed</span>
+              </a>
+            </td>
+          </tr>
+          <tr>
+            <td *ngIf="showNotFoundMsg" colspan="15" style="text-align: center;">Displaying no data</td>
+            <td *ngIf="showWaitMsg" colspan="15">
+              <ngb-progressbar value="1000">Loading...</ngb-progressbar>
+            </td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+    
+    <section class="full-width" id="group-list-appointment">
+      <button *ngIf="isCanPrevPageTwo" (click)="prevPageTwo()" class="btn ms_btn_blue">
+        <img src="{{assetPath}}icons/ic_ArrowRight_White.png"> Prev
+      </button>
+      <span style="width:10px">&nbsp;</span>
+      <button *ngIf="isCanNextPageTwo" (click)="nextPageTwo()" class="btn ms_btn_blue">
+        Next <img src="{{assetPath}}icons/ic_ArrowLeft_White.png">
+      </button>
+    </section>
+  </div>
+</div>
+
 
 <ng-template #cancel_modal let-modal>
   <div class="modal-header">
-    <div class="header-2 modal-padding">Cancel Request BPJS</div>
+    <div class="header-2 modal-padding">Cancellation Reason:</div>
   </div>
   <div class="modal-body">
-    Are you sure?
+    <textarea class="form-control" rows="5" name="reason" [(ngModel)]="reasonCancel"></textarea>
   </div>
   <div class="modal-footer">
-    <button type="button" class="btn ms_btn_black" (click)="modal.close()">Cancel</button>
-    <button class="btn ms_btn_green" [ngClass]="{'disable': confirmBut}" (click)="cancelRequestBpjs()">Confirm</button>
+    <button class="btn ms_btn_green" [ngClass]="{'disable': confirmBut}"
+      [disabled]="!reasonCancel" (click)="modal.close()" (click)="cancelRequestBpjs()">Save</button>
+    <button type="button" class="btn ms_btn_red" (click)="modal.close()">Cancel</button>
   </div>
 </ng-template>
-
-<section class="full-width" id="group-list-appointment">
-  <button *ngIf="isCanPrevPage" (click)="prevPage()" class="btn ms_btn_blue">
-    <img src="{{assetPath}}icons/ic_ArrowRight_White.png"> Prev
-  </button>
-  <span style="width:10px">&nbsp;</span>
-  <button *ngIf="isCanNextPage" (click)="nextPage()" class="btn ms_btn_blue">
-    Next <img src="{{assetPath}}icons/ic_ArrowLeft_White.png">
-  </button>
-
-</section>

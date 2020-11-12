@@ -56,6 +56,8 @@ export class WidgetAidoWorklistComponent implements OnInit {
   public arrChannel: any = channelId;
   public payStatus: any = paymentStatus;
   public selectedCancel: any;
+  public isEligible: any = null;
+  public closeModal: any;
 
   constructor(
     private appointmentService: AppointmentService,
@@ -140,6 +142,7 @@ export class WidgetAidoWorklistComponent implements OnInit {
     } = await this.keywordsModel;
     offsetTemp = offset;
     
+    console.log('this.count', this.count)
     if(this.count === 0) {
       this.bodyKeyword.valueOne = hospitalId, this.bodyKeyword.valueTwo = fromDate, this.bodyKeyword.valueThree = toDate;
       this.bodyKeyword.valueFour = patientName, this.bodyKeyword.valueFive = doctorId ? doctorId.doctor_id : '';
@@ -147,7 +150,7 @@ export class WidgetAidoWorklistComponent implements OnInit {
 
       this.bodyKeywordTwo.valueOne = hospitalId, this.bodyKeywordTwo.valueTwo = fromDate, this.bodyKeywordTwo.valueThree = toDate;
       this.bodyKeywordTwo.valueFour = patientName, this.bodyKeywordTwo.valueFive = doctorId ? doctorId.doctor_id : '';
-      this.bodyKeywordTwo.valueSix = isDoubleMr, this.bodyKeywordTwo.valueSeven = admStatus, this.bodyKeyword.valueEight = payStatus;
+      this.bodyKeywordTwo.valueSix = isDoubleMr, this.bodyKeywordTwo.valueSeven = admStatus, this.bodyKeywordTwo.valueEight = payStatus;
     } else if(this.count > 0) {
       this.bodyKeyword.valueOne = hospitalId, this.bodyKeyword.valueTwo = fromDate, this.bodyKeyword.valueThree = toDate;
       this.bodyKeyword.valueFour = patientName, this.bodyKeyword.valueFive = doctorId ? doctorId.doctor_id : '';
@@ -156,7 +159,7 @@ export class WidgetAidoWorklistComponent implements OnInit {
       if(this.bodyKeyword.valueOne !== this.bodyKeywordTwo.valueOne || this.bodyKeyword.valueTwo !== this.bodyKeywordTwo.valueTwo ||
         this.bodyKeyword.valueThree !== this.bodyKeywordTwo.valueThree || this.bodyKeyword.valueFour !== this.bodyKeywordTwo.valueFour ||
         this.bodyKeyword.valueFive !== this.bodyKeywordTwo.valueFive || this.bodyKeyword.valueSix !== this.bodyKeywordTwo.valueSix ||
-        this.bodyKeyword.valueSeven !== this.bodyKeywordTwo.valueSeven || this.bodyKeyword.valueEight !== this.bodyKeywordTwo.valueEight) {    
+        this.bodyKeyword.valueSeven !== this.bodyKeywordTwo.valueSeven || this.bodyKeyword.valueEight !== this.bodyKeywordTwo.valueEight) {
           this.bodyKeywordTwo.valueOne = hospitalId, this.bodyKeywordTwo.valueTwo = fromDate, this.bodyKeywordTwo.valueThree = toDate;
           this.bodyKeywordTwo.valueFour = patientName, this.bodyKeywordTwo.valueFive = doctorId ? doctorId.doctor_id : '';
           this.bodyKeywordTwo.valueSix = isDoubleMr, this.bodyKeywordTwo.valueSeven = admStatus, this.bodyKeywordTwo.valueEight = payStatus;
@@ -262,6 +265,48 @@ export class WidgetAidoWorklistComponent implements OnInit {
     );
   }
 
+  eligibleModal(content) {
+    this.open(content);
+  }
+
+  clear() {
+    this.isEligible = null;
+  }
+
+  eligibleCheck(value, closeModal) {
+    this.closeModal = closeModal;
+    this.isEligible = value;
+    if(this.isEligible === false) {
+    this.eligibleUpdate();
+    }
+  }
+
+  eligibleUpdate() {
+    let body = {
+      isEligible: this.isEligible,
+      fullCover: null
+    }
+
+    setTimeout(() => {
+      this.closeModal.click();
+      this.isEligible = null;
+      this.getAidoWorklist();
+      this.alertService.success('Success', false, 3000);
+      }, 4000);
+
+    
+
+    // this.appointmentService.deleteAppointment(null, body, false, true)
+    // .toPromise().then(res => {
+    //   this.closeModal.click();
+    //   this.isEligible = null;
+    //   this.getAidoWorklist();
+    //   this.alertService.success(res.message, false, 3000);
+    // }).catch(err => {
+    //   this.alertService.error(err.error.message, false, 3000);
+    // })
+  }
+
   cancelAppointment(val, content) {
     this.selectedCancel = val;
     this.open(content);
@@ -302,6 +347,7 @@ export class WidgetAidoWorklistComponent implements OnInit {
   nextPage() {
     this.page += 1;
     this.keywordsModel.offset = this.page * 10;
+    console.log('keyword.offset', this.keywordsModel.offset)
     this.isCanPrevPage = this.keywordsModel.offset === 0 ? false : true;
     this.getAidoWorklist();
   }

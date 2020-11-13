@@ -66,7 +66,9 @@ export const channelId = {
   CALL_CENTER: '1',
   FRONT_OFFICE: '2',
   AIDO: '18',
-  BPJS: '15'
+  BPJS: '15',
+  MOBILE: '5',
+  MOBILE_OTHER: '9'
 };
 
 export const appointmentStatusId = {

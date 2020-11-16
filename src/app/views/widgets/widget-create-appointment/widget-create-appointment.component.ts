@@ -2378,11 +2378,12 @@ export class WidgetCreateAppointmentComponent implements OnInit {
         this.alertService.success('Patient Eligible', false, 5000)
         this.payerEligibility = res.data.eligibility_no
         this.txtPayerEligibility = false;
-        this.patientEligible = res.data
+        this.patientEligible = res.data;
+        this.txtPayerEligibility = false;
       }
     )
     .catch(err => {
-      this.txtPayerEligibility = false;
+     
       this.alertService.error(err.error.message,false,5000)
     })
 

@@ -13,7 +13,8 @@ export class PayerService {
     private http: HttpClient
   ) { }
   
-  private payerUrl = environment.FRONT_OFFICE_SERVICE
+  private payerUrl = 'http://localhost:1738/api/v2'
+  // private payerUrl = environment.FRONT_OFFICE_SERVICE
   
   
   checkEligible(payload: any){

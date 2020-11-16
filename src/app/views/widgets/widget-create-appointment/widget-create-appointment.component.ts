@@ -107,8 +107,6 @@ export class WidgetCreateAppointmentComponent implements OnInit {
   public keyword: any;
   public listReferralSource: any = [];
   public listDiagnose: any = [];
-  public inputList: boolean = true;
-  public inputList2: boolean = false
 
   public listActiveAdmission: any = [];
 
@@ -133,7 +131,7 @@ export class WidgetCreateAppointmentComponent implements OnInit {
   public diagnose: any;
   public referralNo: any;
   public refferalDate: any;
-  public refferalSource: any;
+  public referralSource: any;
   public diagnoseCode: any;
   public patientEligible: any;
 
@@ -861,8 +859,6 @@ export class WidgetCreateAppointmentComponent implements OnInit {
           return []
         })
   }
-
-
 
   async getDiagnose(){
     let payload = {
@@ -1886,12 +1882,11 @@ export class WidgetCreateAppointmentComponent implements OnInit {
           payerEligibility = this.payerEligibility;
           procedureRoomId = this.roomHope;
           referralNo = this.referralNo
-          referralSource = this.refferalSource
-          referralDate = this.referralDateModel
+          referralSource = this.referralSource.code
+          referralDate = `${this.referralDateModel.year}-${this.referralDateModel.month}-${this.referralDateModel.day}`;
           diseaseClassificationId= this.diagnose.disease_classification_id
         }
       }
-      
       const body = {
         appointmentId: val.appointment_id,
         organizationId: Number(this.hospital.orgId),
@@ -2361,9 +2356,9 @@ export class WidgetCreateAppointmentComponent implements OnInit {
     );
   }
 
-  async checkEligible(){
+  checkEligible(){
     let payload = {
-      organizationId: this.payer.organization_id,
+      organizationId: this.hospital.orgId,
       payerId: this.payer.payer_id,
       payerIdNo:this.payerNo,
       doctorId: this.selectedCheckIn.doctor_id,
@@ -2372,18 +2367,17 @@ export class WidgetCreateAppointmentComponent implements OnInit {
       appointmentId: this.selectedCheckIn.appointment_id
     }
 
-    let data = await this.payerService.checkEligible(payload)
+    let data = this.payerService.checkEligible(payload)
     .toPromise().then(
       res => {
-        this.alertService.success('Patient Eligible', false, 5000)
         this.payerEligibility = res.data.eligibility_no
         this.txtPayerEligibility = false;
         this.patientEligible = res.data;
         this.txtPayerEligibility = false;
+        this.alertService.success('Patient Eligible', false, 5000)        
       }
     )
     .catch(err => {
-     
       this.alertService.error(err.error.message,false,5000)
     })
 
@@ -2399,23 +2393,8 @@ export class WidgetCreateAppointmentComponent implements OnInit {
  async onReferralKey(event: any){
     this.keyword = event.target.value
     if (this.keyword.length >= 3 && this.payer){
-      // let input1 = document.querySelector('#input1')
           this.getReferralSource();
-          // this.inputList = false;
-          // if (input1 !== null){
-          //   input1.remove()
-          // }
-          
-    // } else if (this.keyword.length < 1) {
-    //     this.inputList = true;
-    //     let input2 = document.querySelector('#input2')
-    //     if (input2 !== null){
-    //       input2.remove()
-    //     }
-       
     }
-
-
   }
 
   printSjp(){

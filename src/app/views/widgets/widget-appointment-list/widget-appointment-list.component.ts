@@ -1,6 +1,6 @@
 import { Component, OnInit } from '@angular/core';
 import { IMyDpOptions } from 'mydatepicker';
-import { NgbModal, ModalDismissReasons } from '@ng-bootstrap/ng-bootstrap';
+import { NgbModal, ModalDismissReasons, NgbDateStruct } from '@ng-bootstrap/ng-bootstrap';
 import { DoctorService } from '../../../services/doctor.service';
 import { AppointmentService } from '../../../services/appointment.service';
 import { AdmissionService } from '../../../services/admission.service';
@@ -32,6 +32,7 @@ import {
 } from '../../../variables/common.variable';
 import Security from 'msm-kadapat';
 import { environment } from '../../../../environments/environment';
+import { PayerService } from '../../../services/payer.service'
 
 @Component({
   selector: 'app-widget-appointment-list',
@@ -82,6 +83,8 @@ export class WidgetAppointmentListComponent implements OnInit {
   public selectedCheckIn: any;
   public selectedCancel: any;
 
+  public keyword: any;
+
   public limit = 10;
   public offset = 0;
   private page: number = 0;
@@ -98,6 +101,7 @@ export class WidgetAppointmentListComponent implements OnInit {
   public listReferral: General[];
   public selectedReferral: General;
   public dateAdmission: any = dateFormatter(new Date, true);
+  public listReferralSource: any = [];
 
   public late: any;
 
@@ -122,7 +126,11 @@ export class WidgetAppointmentListComponent implements OnInit {
   public referralNo: any;
   public refferalDate: any;
   public refferalSource: any;
+  public referralSource: any;
+  public diagnoseCode: any;
+  public patientEligible: any;
 
+  public referralDateModel: NgbDateStruct;;
 
   public isLoadingCreateAdmission: boolean = false;
 
@@ -156,6 +164,7 @@ export class WidgetAppointmentListComponent implements OnInit {
     private generalService: GeneralService,
     private appointmentService: AppointmentService,
     private admissionService: AdmissionService,
+    private payerService: PayerService,
     private modalService: NgbModal,
     private queueService: QueueService,
     private scheduleService: ScheduleService,
@@ -327,7 +336,17 @@ export class WidgetAppointmentListComponent implements OnInit {
   }
 
   async getDiagnose(){
-    //add service to
+    let payload = {
+      patientId: this.selectedCheckIn.patient_hope_id,
+      keyword: this.keyword
+    }
+
+    this.listDiagnose = await this.payerService.getDeaseClasification(payload)
+    .toPromise().then(res => {
+      return res.data
+    }).catch(err => {
+      return []
+    })
     
   }
 
@@ -731,6 +750,10 @@ export class WidgetAppointmentListComponent implements OnInit {
     let payer = null;
     let payerNo = null;
     let payerEligibility = null;
+    let referralNo = null;
+    let referralDate = null;
+    let referralSource = null;
+    let diseaseClassificationId = null;
     let procedureRoomId = this.roomHope ? this.roomHope.procedureRoomId : null;
 
     //check condition in checkin validate
@@ -746,6 +769,11 @@ export class WidgetAppointmentListComponent implements OnInit {
           payer = this.payer.payer_id;
           payerNo = this.payerNo;
           payerEligibility = this.payerEligibility;
+          procedureRoomId = this.roomHope;
+          referralNo = this.referralNo
+          referralSource = this.referralSource.code
+          referralDate = `${this.referralDateModel.year}-${this.referralDateModel.month}-${this.referralDateModel.day}`;
+          diseaseClassificationId= this.diagnose.disease_classification_id
         }
       }
 
@@ -1138,6 +1166,61 @@ export class WidgetAppointmentListComponent implements OnInit {
     }, (reason) => {
       this.closeResult = `Dismissed ${this.getDismissReason(reason)}`;
     });
+  }
+
+    checkEligible(){
+      let payload = {
+        organizationId: this.hospital.orgId,
+        payerId: this.payer.payer_id,
+        payerIdNo:this.payerNo,
+        doctorId: this.selectedCheckIn.doctor_id,
+        userName: this.user.username,
+        userId: this.user.id,
+        appointmentId: this.selectedCheckIn.appointment_id
+      }
+  
+      let data = this.payerService.checkEligible(payload)
+      .toPromise().then(
+        res => {
+          this.payerEligibility = res.data.eligibility_no
+          this.txtPayerEligibility = false;
+          this.patientEligible = res.data;
+          this.txtPayerEligibility = false;
+          this.alertService.success('Patient Eligible', false, 5000)        
+        }
+      )
+      .catch(err => {
+        this.alertService.error(err.error.message,false,5000)
+      })
+  }
+
+  async onKeyDiagnose(event: any){
+    this.keyword = event.target.value
+    if (this.keyword.length >= 3){
+      this.getDiagnose()
+    }
+   }
+  
+   async onReferralKey(event: any){
+      this.keyword = event.target.value
+      if (this.keyword.length >= 3 && this.payer){
+            this.getReferralSource();
+      }
+    }
+
+    async getReferralSource(){
+      let payload = {
+        payerId: this.payer.payer_id,
+        organizationId: this.hospital.orgId,
+        keyword: this.keyword
+      }
+
+      this.listReferralSource = await this.payerService.getListRefferal(payload)
+        .toPromise().then(res => {
+          return res.data
+        }).catch(err => {
+          return []
+        })
   }
 
   private getDismissReason(reason: any): string {

@@ -399,9 +399,8 @@
               <div style="width: 40%">
               </div>
           </div>
-        
-          <div class="payer-wrap" *ngIf="!txtPayer">
 
+          <div class="payer-wrap" *ngIf="!txtPayer">
             <div class="d-flex justify-content-between">
               <div style="width: 40%; margin-top: 5px;">
                 <label class="">Payer</label>
@@ -420,43 +419,66 @@
               <div style="width: 30%; margin-top: 5px;">
                 <label class="">Payer Eligibility No</label>
                 <div class="input-group">
-                  <input type="text" class="form-control" name="payerEligibility" [(ngModel)]="payerEligibility"
-                    [disabled]="txtPayerEligibility">
+                  <input type="text" class="form-control" name="payerEligibility" [(ngModel)]="payerEligibility" [value]="payerEligibility"
+                    [disabled]="txtPayer">
                 </div>
               </div>
             </div>
             <div class="d-flex justify-content-between">
-              <div style="width: 40%; margin-top: 5px;">
-                <label class="">Diagnosa</label>
-                <div class="">
-                  <input class="form-control" ngui-auto-complete auto-select-first-item="true" max-num-list="20"
-                    value-formatter="name" list-formatter="name" [match-formatted]="true" min-chars="3"
-                    [source]="listDiagnose" name="diagnose" [(ngModel)]="diagnose" [disabled]="txtPayer">
+              <div style="width: 10%; margin-top: 5px; margin-right: 2px;">
+                <label class="">Diagnose</label>
+                <div class="input-group">
+                  <input class="form-control"  [value]="diagnose ? diagnose.code  ? diagnose.code : '' : ''" readonly>
                 </div>
               </div>
+              <div style="width: 30%; margin-top: 10px;">
+                <label class=""></label>
+                <div class="">
+                  <input class="form-control"  placeholder="Click to search" ngui-auto-complete auto-select-first-item="true" max-num-list="20"
+                    value-formatter="name" list-formatter="name" [match-formatted]="true" min-chars="1"
+                    [source]="listDiagnose" name="diagnose" [(ngModel)]="diagnose" [disabled]="txtPayerEligibility" (keyup)="onKeyDiagnose($event)">
+                </div>
+              </div>
+
               <div style="width: 30%; margin-top: 5px;">
                 <label class="">Referral No</label>
                 <div class="input-group">
-                  <input type="text" class="form-control" name="referralNo" [(ngModel)]="referralNo" [disabled]="txtPayerNo">
+                  <input type="text"  class="form-control"  placeholder="Refferal Number" name="referralNo" [(ngModel)]="referralNo" [disabled]="txtPayerEligibility">
                 </div>
               </div>
               <div style="width: 30%; margin-top: 5px;">
                 <label class="">Referral Date</label>
                 <div class="input-group">
-                  <input type="text" class="form-control" name="referralDate" [(ngModel)]="refferalDate" [disabled]="txtPayerNo">
+                  <input class="form-control" 
+                    placeholder="Refferal Date"
+                    name="referralDate"
+                    [(ngModel)]="referralDateModel"
+                    ngbDatepicker #d="ngbDatepicker"
+                    [disabled] = "txtPayerEligibility"
+                  >
+                  <div class="input-group-append">
+                    <button class="btn btn-outline-secondary calendar" (click)="d.toggle()" type="button">
+                      <i class="fa fa-calendar" aria-hidden="true"></i>
+                    </button>
+                  </div>
                 </div>
               </div> 
             </div>
-            <div class="d-flex">
+            <div class="d-flex justify-content-between">
               <div style="width: 30%; margin-top: 5px;">
                 <label class="">Referral Source</label>
                 <div class="input-group">
-                  <input type="text" class="form-control" name="referralSource" [(ngModel)]="payerEligibility"
-                    [disabled]="txtPayerEligibility">
+                     <input class="form-control"  ngui-auto-complete auto-select-first-item="true" max-num-list="20"
+                     value-formatter="referralName" list-formatter="referralName" [match-formatted]="true" min-chars="3"
+                     [source]="listReferralSource" name="referralSource" [(ngModel)]="referralSource" [disabled]="txtPayerEligibility" 
+                     placeholder="Referral Source" (keyup)="onReferralKey($event)">
                 </div>
+
               </div>
             </div> 
           </div>
+          <br>
+
           <br>
           
           <div class="d-flex">
@@ -485,10 +507,14 @@
             <button *ngIf="!selectedCheckIn.admission_id" class="fo_btn_admission fo_btn_save"
               [disabled]="buttonCreateAdmission || isLoadingCreateAdmission"
               (click)="createAdmission(selectedCheckIn, confirmCreateAdmissionProcess)">Create Admission</button>
-            <button class="fo_btn_admission fo_btn_save"
+              <button style="width: 120px;" type="button" class="fo_btn_admission button btn-primary"
               [disabled]="buttonCheckEligible"
-              (click)="CheckEligible()"
+              (click)="checkEligible()"
             > Check Eligibility </button>
+            <button style="width: 80px;" type="button" class="fo_btn_admission button btn-warning"
+            [disabled]="txtPayerEligibility"
+            (click)="printSjp()"
+            > Print SJP </button>
             <button class="fo_btn_admission fo_btn_blue"
               [disabled]="buttonPatientLabel && !selectedCheckIn.admission_id"
               (click)="printPatientLabel(selectedCheckIn)">Print Patient</button>

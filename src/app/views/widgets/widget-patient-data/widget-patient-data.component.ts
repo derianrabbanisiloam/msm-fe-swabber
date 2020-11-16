@@ -15,7 +15,7 @@ import { AlertService } from '../../../services/alert.service';
 import { Alert, AlertType } from '../../../models/alerts/alert';
 import { dateFormatter } from '../../../utils/helpers.util';
 import { channelId, sourceApps, queueType, typeFile } from '../../../variables/common.variable';
-import { NgbModal, ModalDismissReasons } from '@ng-bootstrap/ng-bootstrap';
+import { NgbModal, ModalDismissReasons, NgbDateStruct } from '@ng-bootstrap/ng-bootstrap';
 import * as pdfMake from 'pdfmake/build/pdfmake';
 import * as pdfFonts from 'pdfmake/build/vfs_fonts';
 import * as $ from 'jquery';
@@ -28,6 +28,7 @@ import { localSpliter } from '../../../../app/utils/helpers.util';
 import { isEmpty } from 'lodash';
 import Swal from 'sweetalert2';
 import { FormBuilder, FormGroup, FormControl } from '@angular/forms';
+import { PayerService } from '../../../services/payer.service';
 
 @Component({
   selector: 'app-widget-patient-data',
@@ -49,6 +50,10 @@ export class WidgetPatientDataComponent implements OnInit {
   public listNationalIdType: General[];
   public listCountry: Country[];
   public listPayer: any = [];
+
+  public listReferralSource: any = [];
+  public listDiagnose: any = [];
+
 
   public listCity: City[];
   public listDistrict: District[];
@@ -117,7 +122,12 @@ export class WidgetPatientDataComponent implements OnInit {
   public diagnose: any;
   public referralNo: any;
   public refferalDate: any;
-  public refferalSource: any;
+  public referralSource: any;
+  public diagnoseCode: any;
+  public patientEligible: any;
+  public keyword: any;
+
+  public referralDateModel: NgbDateStruct;
 
   public dateAdmission: any = dateFormatter(new Date, true);
 
@@ -176,6 +186,7 @@ export class WidgetPatientDataComponent implements OnInit {
     private generalService: GeneralService,
     private alertService: AlertService,
     private patientService: PatientService,
+    private payerService: PayerService,
     private modalService: NgbModal,
     private modalTwoService: NgbModal,
     private admissionService: AdmissionService,
@@ -1561,8 +1572,11 @@ export class WidgetPatientDataComponent implements OnInit {
     let payer = null;
     let payerNo = null;
     let payerEligibility = null;
+    let referralNo = null;
+    let referralDate = null;
+    let referralSource = null;
+    let diseaseClassificationId = null;
     let procedureRoomId = this.roomHope ? this.roomHope.procedureRoomId : null;
-
     //check condition in checkin validate
     let params = this.checkInValidate();
 
@@ -1576,6 +1590,11 @@ export class WidgetPatientDataComponent implements OnInit {
           payer = this.payer.payer_id;
           payerNo = this.payerNo;
           payerEligibility = this.payerEligibility;
+          procedureRoomId = this.roomHope;
+          referralNo = this.referralNo
+          referralSource = this.referralSource.code
+          referralDate = `${this.referralDateModel.year}-${this.referralDateModel.month}-${this.referralDateModel.day}`;
+          diseaseClassificationId= this.diagnose.disease_classification_id
         }
       }
   
@@ -2076,6 +2095,51 @@ export class WidgetPatientDataComponent implements OnInit {
     this.listSubdistrict = [];
   }
 
+
+    async getReferralSource(){
+      let payload = {
+        payerId: this.payer.payer_id,
+        organizationId: this.hospital.orgId,
+        keyword: this.keyword
+      }
+
+      this.listReferralSource = await this.payerService.getListRefferal(payload)
+        .toPromise().then(res => {
+          return res.data
+        }).catch(err => {
+          return []
+        })
+      }
+
+
+
+    async getDiagnose(){
+      let payload = {
+        patientId: this.selectedCheckIn.patient_hope_id,
+        keyword: this.keyword
+      }
+
+      this.listDiagnose = await this.payerService.getDeaseClasification(payload)
+      .toPromise().then(res => {
+        return res.data
+      }).catch(err => {
+        return []
+      })
+    } 
+
+    async onKeyDiagnose(event: any){
+      this.keyword = event.target.value
+      if (this.keyword.length >= 3){
+        this.getDiagnose()
+      }
+     }
+    
+     async onReferralKey(event: any){
+        this.keyword = event.target.value
+        if (this.keyword.length >= 3 && this.payer){
+              this.getReferralSource();
+        }
+      }
   private getDismissReason(reason: any): string {
 
     if (reason === ModalDismissReasons.ESC) {

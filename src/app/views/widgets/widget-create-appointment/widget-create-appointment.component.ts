@@ -862,20 +862,6 @@ export class WidgetCreateAppointmentComponent implements OnInit {
         })
   }
 
-  async createAdmissionPayer(){
-    let payload = {
-      payerNo: this.payerNo,
-      payerEligibility: this.payerEligibility,
-      procedureRoomId: this.selectedCheckIn,
-      diseaseClassificationId: this.diagnose.disease_classification_id,
-      referralNo: this.referralNo,
-      referralSource: this.refferalSource,
-      referralDate: this.referralDateModel,
-      userId: this.userId,
-      source: this.source,
-      userName: this.user.fullname
-    }
-  }
 
 
   async getDiagnose(){
@@ -891,7 +877,7 @@ export class WidgetCreateAppointmentComponent implements OnInit {
       return []
     })
   } 
-  
+
   getQueryParams() {
     if (this.appointmentPayloadInput) { //from modal reschedule appointment
       this.appointmentPayload.doctorId = this.appointmentPayloadInput.doctorId;
@@ -1879,6 +1865,10 @@ export class WidgetCreateAppointmentComponent implements OnInit {
     let payer = null;
     let payerNo = null;
     let payerEligibility = null;
+    let referralNo = null;
+    let referralDate = null;
+    let referralSource = null;
+    let diseaseClassificationId = null;
     let procedureRoomId = this.roomHope ? this.roomHope.procedureRoomId : null;
 
     //check condition in checkin validate
@@ -1893,10 +1883,15 @@ export class WidgetCreateAppointmentComponent implements OnInit {
         if (this.payer && this.payer.payer_id) {
           payer = this.payer.payer_id;
           payerNo = this.payerNo;
-          payerEligibility = this.payerEligibility
+          payerEligibility = this.payerEligibility;
+          procedureRoomId = this.roomHope;
+          referralNo = this.referralNo
+          referralSource = this.refferalSource
+          referralDate = this.referralDateModel
+          diseaseClassificationId= this.diagnose.disease_classification_id
         }
       }
-  
+      
       const body = {
         appointmentId: val.appointment_id,
         organizationId: Number(this.hospital.orgId),
@@ -1906,6 +1901,10 @@ export class WidgetCreateAppointmentComponent implements OnInit {
         payerNo: payerNo,
         payerEligibility: payerEligibility,
         procedureRoomId: procedureRoomId,
+        referralNo: referralNo,
+        referralSource: referralSource,
+        referralDate: referralDate,
+        diseaseClassificationId : diseaseClassificationId,
         userId: this.user.id,
         source: sourceApps,
         userName: this.user.fullname,

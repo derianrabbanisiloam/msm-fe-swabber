@@ -14,19 +14,20 @@ export class PayerService {
   ) { }
   
   private payerUrl = environment.FRONT_OFFICE_SERVICE
-
+  
+  
   checkEligible(payload: any){
-    const url = `${this.payerUrl}payer-portal`
+    const url = `${this.payerUrl}/payer-portal`
     return this.http.post<any>(url, payload, httpOptions)
   }
 
   getListRefferal(payload: any){
-    const url = `${this.payerUrl}payer-portal/list-referral`
+    const url = `${this.payerUrl}/payer-portal/list-referral`
     return this.http.post<any>(url, payload, httpOptions)
   }
 
   getDeaseClasification(payload: any){
-    const url = `${this.payerUrl}generals/disease-classification`
+    const url = `${this.payerUrl}/generals/disease-classification`
     return this.http.post<any>(url, payload, httpOptions)
   }
 }

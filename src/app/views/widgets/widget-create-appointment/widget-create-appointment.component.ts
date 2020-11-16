@@ -832,7 +832,6 @@ export class WidgetCreateAppointmentComponent implements OnInit {
         if (res.status === 'OK' && res.data.length === 0) {
           this.alertService.success('No List Doctor in This Hospital', false, 3000);
         }
-
         return res.data;
       }).catch(err => {
         return [];
@@ -851,7 +850,7 @@ export class WidgetCreateAppointmentComponent implements OnInit {
   async getReferralSource(){
       let payload = {
         payerId: this.payer.payer_id,
-        organizationId: this.payer.organization_id,
+        organizationId: this.hospital.orgId,
         keyword: this.keyword
       }
 
@@ -862,6 +861,22 @@ export class WidgetCreateAppointmentComponent implements OnInit {
           return []
         })
   }
+
+  async createAdmissionPayer(){
+    let payload = {
+      payerNo: this.payerNo,
+      payerEligibility: this.payerEligibility,
+      procedureRoomId: this.selectedCheckIn,
+      diseaseClassificationId: this.diagnose.disease_classification_id,
+      referralNo: this.referralNo,
+      referralSource: this.refferalSource,
+      referralDate: this.referralDateModel,
+      userId: this.userId,
+      source: this.source,
+      userName: this.user.fullname
+    }
+  }
+
 
   async getDiagnose(){
     let payload = {
@@ -875,12 +890,8 @@ export class WidgetCreateAppointmentComponent implements OnInit {
     }).catch(err => {
       return []
     })
-
-
-  }
-
-
-
+  } 
+  
   getQueryParams() {
     if (this.appointmentPayloadInput) { //from modal reschedule appointment
       this.appointmentPayload.doctorId = this.appointmentPayloadInput.doctorId;
@@ -2373,7 +2384,6 @@ export class WidgetCreateAppointmentComponent implements OnInit {
     )
     .catch(err => {
       this.txtPayerEligibility = false;
-      this.payerEligibility = '92910232983'
       this.alertService.error(err.error.message,false,5000)
     })
 

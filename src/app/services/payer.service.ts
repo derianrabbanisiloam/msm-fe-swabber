@@ -2,6 +2,7 @@ import { HttpClient } from '@angular/common/http';
 import { Injectable } from '@angular/core';
 import { Observable } from 'rxjs';
 import { httpOptions } from '../utils/http.util';
+import { environment } from '../../environments/environment';
 
 @Injectable({
   providedIn: 'root'
@@ -12,9 +13,8 @@ export class PayerService {
     private http: HttpClient
   ) { }
   
-  private payerUrl = 'http://localhost:1738/api/v2/'
-  
-  
+  private payerUrl = environment.FRONT_OFFICE_SERVICE
+
   checkEligible(payload: any){
     const url = `${this.payerUrl}payer-portal`
     return this.http.post<any>(url, payload, httpOptions)

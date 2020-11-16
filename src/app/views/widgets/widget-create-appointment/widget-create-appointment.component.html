@@ -1062,7 +1062,7 @@
             (click)="checkEligible()"
           > Check Eligibility </button>
           <button style="width: 80px;" type="button" class="fo_btn_admission button btn-warning"
-          [disabled]="false"
+          [disabled]="txtPayerEligibility"
           (click)="printSjp()"
           > Print SJP </button>
           <button style="width: 120px;" class="fo_btn_admission fo_btn_blue" [disabled]="buttonPatientLabel && !selectedCheckIn.admission_id"

@@ -61,7 +61,7 @@ import {
 import { BpjsService } from '../../../services/bpjs.service';
 import Swal from 'sweetalert2';
 import { FormBuilder, FormGroup, FormControl } from '@angular/forms';
-import { PayerService } from 'src/app/services/payer.service';
+import { PayerService } from '../../../services/payer.service';
 import { debounceTime } from 'rxjs/operators';
 import { Observable, Subject } from 'rxjs';
 

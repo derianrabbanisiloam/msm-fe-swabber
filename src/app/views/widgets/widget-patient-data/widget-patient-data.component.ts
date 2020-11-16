@@ -94,6 +94,7 @@ export class WidgetPatientDataComponent implements OnInit {
   public buttonCloseAdm: boolean = true;
   public buttonVIP: boolean = false;
   public buttonReguler: boolean = false;
+  public buttonCheckEligible:boolean = true;
 
   public nationalIdTypeId: any;
 
@@ -112,6 +113,11 @@ export class WidgetPatientDataComponent implements OnInit {
   public txtPayer: boolean = true;
   public txtPayerNo: boolean = true;
   public txtPayerEligibility: boolean = true;
+
+  public diagnose: any;
+  public referralNo: any;
+  public refferalDate: any;
+  public refferalSource: any;
 
   public dateAdmission: any = dateFormatter(new Date, true);
 
@@ -1647,6 +1653,7 @@ export class WidgetPatientDataComponent implements OnInit {
       this.txtPayer = true;
       this.txtPayerNo = true;
       this.txtPayerEligibility = true;
+      this.buttonCheckEligible = true;
 
       this.payer = null;
       this.payerNo = null;
@@ -1669,7 +1676,7 @@ export class WidgetPatientDataComponent implements OnInit {
       this.txtPayer = false;
       this.txtPayerNo = false;
       this.txtPayerEligibility = false;
-
+      this.buttonCheckEligible = false;
       idx = this.patientTypeList.findIndex((a) => {
         return a.description == "PAYER";
       })

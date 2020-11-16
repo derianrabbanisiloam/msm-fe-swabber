@@ -885,7 +885,65 @@
           <div style="width: 40%">
           </div>
         </div>
-        <div class="d-flex justify-content-between">
+
+        <div class="payer-wrap" *ngIf="!txtPayer">
+
+          <div class="d-flex justify-content-between">
+            <div style="width: 40%; margin-top: 5px;">
+              <label class="">Payer</label>
+              <div class="">
+                <input class="form-control" ngui-auto-complete auto-select-first-item="true" max-num-list="20"
+                  value-formatter="name" list-formatter="name" [match-formatted]="true" min-chars="3"
+                  [source]="listPayer" name="payer" [(ngModel)]="payer" [disabled]="txtPayer">
+              </div>
+            </div>
+            <div style="width: 30%; margin-top: 5px;">
+              <label class="">Payer No</label>
+              <div class="input-group">
+                <input type="text" class="form-control" name="payerNo" [(ngModel)]="payerNo" [disabled]="txtPayerNo">
+              </div>
+            </div>
+            <div style="width: 30%; margin-top: 5px;">
+              <label class="">Payer Eligibility No</label>
+              <div class="input-group">
+                <input type="text" class="form-control" name="payerEligibility" [(ngModel)]="payerEligibility"
+                  [disabled]="txtPayerEligibility">
+              </div>
+            </div>
+          </div>
+          <div class="d-flex justify-content-between">
+            <div style="width: 40%; margin-top: 5px;">
+              <label class="">Diagnosa</label>
+              <div class="">
+                <input class="form-control" ngui-auto-complete auto-select-first-item="true" max-num-list="20"
+                  value-formatter="name" list-formatter="name" [match-formatted]="true" min-chars="3"
+                  [source]="listDiagnose" name="diagnose" [(ngModel)]="diagnose" [disabled]="txtPayer">
+              </div>
+            </div>
+            <div style="width: 30%; margin-top: 5px;">
+              <label class="">Referral No</label>
+              <div class="input-group">
+                <input type="text" class="form-control" name="referralNo" [(ngModel)]="referralNo" [disabled]="txtPayerNo">
+              </div>
+            </div>
+            <div style="width: 30%; margin-top: 5px;">
+              <label class="">Referral Date</label>
+              <div class="input-group">
+                <input type="text" class="form-control" name="referralDate" [(ngModel)]="refferalDate" [disabled]="txtPayerNo">
+              </div>
+            </div> 
+          </div>
+          <div class="d-flex">
+            <div style="width: 30%; margin-top: 5px;">
+              <label class="">Referral Source</label>
+              <div class="input-group">
+                <input type="text" class="form-control" name="referralSource" [(ngModel)]="payerEligibility"
+                  [disabled]="txtPayerEligibility">
+              </div>
+            </div>
+          </div> 
+        </div>
+        <!-- <div class="d-flex justify-content-between">
           <div style="width: 40%">
             <label class="">Payer</label>
             <div class="">
@@ -907,7 +965,7 @@
                 [disabled]="txtPayerEligibility">
             </div>
           </div>
-        </div>
+        </div> -->
         <div class="d-flex">
           <div style="width: 10%">
             <label class="">Form Signed</label>
@@ -934,6 +992,10 @@
           <button *ngIf="!selectedCheckIn.admission_id" class="fo_btn_admission fo_btn_save"
             [disabled]="buttonCreateAdmission || isLoadingCreateAdmission"
             (click)="actionAdmission(confirmCreateAdmissionProcess)">Create Admission</button>
+            <button class="fo_btn_admission fo_btn_save"
+            [disabled]="buttonCheckEligible"
+            (click)="CheckEligible()"
+          > Check Eligibility </button>
           <button class="fo_btn_admission fo_btn_blue" [disabled]="buttonPatientLabel && !selectedCheckIn.admission_id"
             (click)="printPatientLabel(selectedCheckIn)">Print Patient</button>
           <button class="fo_btn_admission fo_btn_black" [disabled]="buttonPrintQueue && !selectedCheckIn.admission_id"

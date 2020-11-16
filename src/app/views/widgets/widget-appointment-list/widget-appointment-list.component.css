@@ -112,3 +112,7 @@ thead th a{ color: #1A2269; text-decoration: none}
 .filter-row td {
   padding: 0.2EM;
 }
+
+.payer-wrap {
+  height: 100%;
+}

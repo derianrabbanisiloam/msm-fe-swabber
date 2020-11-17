@@ -14,7 +14,7 @@ export class PayerService {
   ) { }
   
   private payerUrl = environment.FRONT_OFFICE_SERVICE
-  
+
   checkEligible(payload: any){
     const url = `${this.payerUrl}/payer-portal`
     return this.http.post<any>(url, payload, httpOptions)
@@ -27,6 +27,11 @@ export class PayerService {
 
   getDeaseClasification(payload: any){
     const url = `${this.payerUrl}/generals/disease-classification`
+    return this.http.post<any>(url, payload, httpOptions)
+  }
+
+  getPrint(payload: any){
+    const url = `${this.payerUrl}/payer-portal/reprint`
     return this.http.post<any>(url, payload, httpOptions)
   }
 }

@@ -168,6 +168,7 @@ export class WidgetPatientDataComponent implements OnInit {
   public emailTemp: string = '';
   public notes: string = '';
   public notesTemp: string = '';
+  public registNotes: string = '';
   public isSigned: boolean = false;
   public isSignedTemp: boolean = false;
   public checkListModel: any = {
@@ -1575,6 +1576,8 @@ export class WidgetPatientDataComponent implements OnInit {
     let referralNo = null;
     let referralDate = null;
     let referralSource = null;
+    let referralName = null;
+    let registrationNotes = null;
     let diseaseClassificationId = null;
     let procedureRoomId = this.roomHope ? this.roomHope.procedureRoomId : null;
     //check condition in checkin validate
@@ -1593,7 +1596,9 @@ export class WidgetPatientDataComponent implements OnInit {
           procedureRoomId = this.roomHope;
           referralNo = this.referralNo
           referralSource = this.referralSource.code
+          referralName = this.referralSource.referralName
           referralDate = `${this.referralDateModel.year}-${this.referralDateModel.month}-${this.referralDateModel.day}`;
+          registrationNotes = this.registNotes
           diseaseClassificationId= this.diagnose.disease_classification_id
         }
       }
@@ -1607,6 +1612,12 @@ export class WidgetPatientDataComponent implements OnInit {
         payerNo: payerNo,
         payerEligibility: payerEligibility,
         procedureRoomId: procedureRoomId,
+        referralNo: referralNo,
+        referralName: referralName,
+        referralSource: referralSource,
+        referralDate: referralDate,
+        diseaseClassificationId : diseaseClassificationId,
+        registrationNotes : registrationNotes,
         userId: this.user.id,
         source: sourceApps,
         userName: this.user.fullname,

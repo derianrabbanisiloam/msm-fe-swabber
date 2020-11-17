@@ -7,7 +7,7 @@ import { AdmissionService } from '../../../services/admission.service';
 import { Doctor } from '../../../models/doctors/doctor';
 import { General } from '../../../models/generals/general';
 import { Appointment } from '../../../models/appointments/appointment';
-import { dateFormatter } from '../../../utils/helpers.util';
+import { dateFormatter, printPreview } from '../../../utils/helpers.util';
 import { AlertService } from '../../../services/alert.service';
 import { GeneralService } from '../../../services/general.service';
 import { QueueService } from '../../../services/queue.service';
@@ -133,6 +133,7 @@ export class WidgetAppointmentListComponent implements OnInit {
   public referralDateModel: NgbDateStruct;;
 
   public isLoadingCreateAdmission: boolean = false;
+  public isLoadingCheckEligible: boolean = false;
 
   public listActiveAdmission: any = [];
 
@@ -154,6 +155,7 @@ export class WidgetAppointmentListComponent implements OnInit {
   public email: string = '';
   public emailTemp: string = '';
   public notes: string = '';
+  public registNotes: string = '';
   public notesTemp: string = '';
   public isSigned: boolean = false;
   public isSignedTemp: boolean = false;
@@ -199,7 +201,6 @@ export class WidgetAppointmentListComponent implements OnInit {
     this.emitUpdateNotes();
     this.emitUpdateContact();
     this.getCollectionAlert();
-    this.getDiagnose();
 
     this.socket.on(CANCEL_APP+'/'+this.hospital.id, (call) => {
       if (call.data.hospital_id == this.hospital.id
@@ -702,7 +703,7 @@ export class WidgetAppointmentListComponent implements OnInit {
     } else {
       this.txtPayer = false;
       this.txtPayerNo = false;
-      this.txtPayerEligibility = false;
+      // this.txtPayerEligibility = false;
       this.buttonCheckEligible = false;
 
       idx = this.patientTypeList.findIndex((a) => {
@@ -753,6 +754,8 @@ export class WidgetAppointmentListComponent implements OnInit {
     let referralNo = null;
     let referralDate = null;
     let referralSource = null;
+    let referralName = null;
+    let registrationNotes = null
     let diseaseClassificationId = null;
     let procedureRoomId = this.roomHope ? this.roomHope.procedureRoomId : null;
 
@@ -772,7 +775,9 @@ export class WidgetAppointmentListComponent implements OnInit {
           procedureRoomId = this.roomHope;
           referralNo = this.referralNo
           referralSource = this.referralSource.code
+          referralName = this.referralSource.referralName
           referralDate = `${this.referralDateModel.year}-${this.referralDateModel.month}-${this.referralDateModel.day}`;
+          registrationNotes = this.registNotes
           diseaseClassificationId= this.diagnose.disease_classification_id
         }
       }
@@ -786,6 +791,12 @@ export class WidgetAppointmentListComponent implements OnInit {
         payerNo: payerNo,
         payerEligibility: payerEligibility,
         procedureRoomId: procedureRoomId,
+        referralNo: referralNo,
+        referralSource: referralSource,
+        referralDate: referralDate,
+        referralName: referralName,
+        registrationNotes: registrationNotes,
+        diseaseClassificationId : diseaseClassificationId,
         userId: this.user.id,
         source: sourceApps,
         userName: this.user.fullname,
@@ -1169,6 +1180,7 @@ export class WidgetAppointmentListComponent implements OnInit {
   }
 
     checkEligible(){
+      this.isLoadingCheckEligible = true;
       let payload = {
         organizationId: this.hospital.orgId,
         payerId: this.payer.payer_id,
@@ -1183,13 +1195,14 @@ export class WidgetAppointmentListComponent implements OnInit {
       .toPromise().then(
         res => {
           this.payerEligibility = res.data.eligibility_no
-          this.txtPayerEligibility = false;
           this.patientEligible = res.data;
           this.txtPayerEligibility = false;
+          this.isLoadingCheckEligible = false;
           this.alertService.success('Patient Eligible', false, 5000)        
         }
       )
       .catch(err => {
+        this.isLoadingCheckEligible = false;
         this.alertService.error(err.error.message,false,5000)
       })
   }
@@ -1221,6 +1234,38 @@ export class WidgetAppointmentListComponent implements OnInit {
         }).catch(err => {
           return []
         })
+  }
+
+  async getFilePdf(){
+    let payload = {
+      payerEligibilityNo: this.payerEligibility,
+      payerId: this.payer.payer_id,
+      organizationId: this.hospital.orgId
+    }
+    let data = await this.payerService.getPrint(payload)
+    .toPromise()
+    .then(res => {
+      return res.data.print;
+    })
+    .catch(err => {
+      this.alertService.error(err.message, false, 5000)
+      return []
+    })
+
+    return data
+  }
+
+  async printSjp(){
+    let filePdf = await this.getFilePdf() 
+     printPreview(filePdf)
+  }
+
+ async updateAdmission(val, content){
+    this.selectedCheckIn = val;
+    await this.getPatientType()
+    await this.defaultPatientType(val.patient_hope_id)
+    await this.getNotesAndEmail(val.contact_id)
+    this.open(content)
   }
 
   private getDismissReason(reason: any): string {

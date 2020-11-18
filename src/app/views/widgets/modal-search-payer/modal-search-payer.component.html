@@ -1,0 +1,67 @@
+<div class="modal-header">
+  <div class="header-2 modal-padding">{{ title }}</div>
+  <button type="button" class="close" aria-label="Close" (click)="close()">
+    <span aria-hidden="true">&times;</span>
+  </button>
+</div>
+<div class="modal-body search-patient-modal">
+  <div style="padding: 10px;">
+    <div class="col-md-12" style="background: #F4F4F4">
+      <div class="col-md-8"></div>
+    </div>
+    <div class="col-md-12" style="padding: 0">
+      
+      <div class="input-group mb-3" id="inputSearch">
+        <input type="text" class="form-control" placeholder="Search code or Referral Name" aria-label="Search Code or Referral Name" aria-describedby="basic-addon2" [(ngModel)]="keyword" (keyup.enter)="searchReference()">
+        <div class="input-group-append">
+          <button class="btn btn-primary" type="button" (click)="searchReference()"><i class="fa fa-search" aria-hidden="true"></i></button>
+        </div>
+      </div>
+      <div class="table-wrap">
+        <table *ngIf="isReferralModal else tableDiagnose" class="table table-bordered">
+          <thead class="foot-note blue">
+          <tr class="table-title" style="background-color: white;">
+            <th>Referral Code</th>
+            <th>Refferal Name</th>
+          </tr>
+          <tr  *ngIf="searchLoader">
+            <th colspan="2">
+              <ngb-progressbar value="1000">Loading...</ngb-progressbar>
+            </th>
+          </tr>
+          </thead>
+          <tbody class="body-text">
+          <tr *ngFor="let p of listReferralSource" (click)="chooseReferral(p)" (click)="close()">
+            <td>{{ p.code}}</td>
+            <td>{{ p.referralName }}</td>
+          </tr>
+          </tbody>
+        </table>
+      </div>
+
+      <ng-template #tableDiagnose>
+        <div class="table-wrap">
+          <table class="table table-bordered">
+            <thead class="foot-note blue">
+            <tr class="table-title" style="background-color: white;">
+              <th>Diagnosis Code</th>
+              <th>Diagnosis Name</th>
+            </tr>
+            <tr  *ngIf="searchLoader">
+              <th colspan="2">
+                <ngb-progressbar value="1000">Loading...</ngb-progressbar>
+              </th>
+            </tr>
+            </thead>
+            <tbody class="body-text">
+            <tr *ngFor="let p of listDiagnose" (click)="chooseDiagnose(p)" (click)="close()">
+              <td>{{ p.code}}</td>
+              <td>{{ p.name }}</td>
+            </tr>
+            </tbody>
+          </table>
+        </div>
+      </ng-template>
+    </div>
+  </div>
+</div>

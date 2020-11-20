@@ -193,6 +193,11 @@ export class AppointmentService {
     return this.http.get<any>(url, httpOptions);
   }
 
+  submitEligibleAido(payload: any, appId: string): Observable<any>{
+    const url = `${this.aidoWorklistUrl}/${appId}`;
+    return this.http.put<any>(url, payload, httpOptions);
+  }
+
   addRescheduleAppointment(addReschedulePayload: any): Observable<any> {
     return this.http.post<any>(this.rescheduleUrl, addReschedulePayload, httpOptions);
   }

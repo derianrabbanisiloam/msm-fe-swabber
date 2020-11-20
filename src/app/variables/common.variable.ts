@@ -17,6 +17,13 @@ export const reqBpjs = {
   REQLIST: true,
   REQCOMPLETED: false
 }
+
+export const eligibleStatus = {
+  ELIGIBLE: '1',
+  NOT_ELIGIBLE: '2',
+  NOT_YET_ELIGIBLE: '3'
+}
+
 export const keySocket = {
   APPOINTMENT: '/appointments',
   QUEUE: '/queues',

@@ -29,7 +29,9 @@
       <th>Admission Status</th>
       <th>Channel</th>
       <th>Verify MR</th>
+      <th>Eligible Status</th>
       <th hidden>App. Manage</th>
+      <th>Document</th>
       <th style="min-width: 9em">Modified By</th>
       <th width="90px" style="text-align: center">Action</th>
     </thead>
@@ -104,6 +106,8 @@
         <td></td>
         <td></td>
         <td></td>
+        <td></td>
+        <td></td>
       </tr>
 
       <tr *ngFor="let r of aidoAppointments; let i = index" [ngClass]="{
@@ -173,6 +177,16 @@
             <span>Verified</span>
           </div>
         </td>
+        <td>
+          <div style="color: white; text-align: center;">
+            <div style="background:green; border-radius: 1em; padding: 0.2em" *ngIf="r.eligible_status_id === eligibleVal.ELIGIBLE">
+              <span>Eligible</span>
+            </div>
+            <div style="background: red; border-radius: 1em; padding: 0.2em" *ngIf="r.eligible_status_id === eligibleVal.NOT_ELIGIBLE">
+              <span>Not Eligible</span>
+            </div>
+          </div>
+        </td>
         <td hidden>
           <div *ngIf="r.appointment_status_id !== appStatusId.INACTIVE && r.admission_status_id != 2">
 
@@ -187,6 +201,23 @@
             </div>
             </div>
         </td>
+        <td>
+          <span *ngIf="r.identity_card_file">
+            <a href=":javascript"
+            (click)="getImage(r.identity_card_file)"
+            target="_blank">{{r.identity_card_file}}<br></a>
+          </span>
+          <span *ngIf="r.employee_card_file">
+            <a href=":javascript"
+            (click)="getImage(r.employee_card_file)"
+            target="_blank">{{r.employee_card_file}}<br></a>
+          </span>
+          <span *ngIf="r.insurance_card_file">
+            <a href=":javascript"
+            (click)="getImage(r.insurance_card_file)"
+            target="_blank">{{r.insurance_card_file}}<br></a>
+          </span>
+        </td>
         <td style="text-align: center; font-size: 11px;">
           <a ngbPopover="{{r.modified_by}}" popoverTitle=""
             triggers="mouseenter:mouseleave">{{r.modified_by && r.modified_by.length > 15 ?
@@ -195,17 +226,25 @@
         <td style="text-align: center; min-width: 12em">
         <div *ngIf="r.admission_status_id != 2 && r.appointment_status_id !== appStatusId.INACTIVE && r.payment_status_id === payStatus.PAID">
           <div *ngIf="r.patient_hope_id !== 0 && r.patient_organization_id !== 0 && r.is_double_mr === false">
-            <button (click)="createAdmModal(r, confirmAdmission)" class="btn ms_btn_green" style="font-size: 11px;">Check In</button>
+            <button (click)="createAdmModal(r, confirmAdmission)" class="btn ms_btn_green" style="font-size: 11px; width: 7.5rem">Check In</button>
           </div>
           <div *ngIf="(r.patient_hope_id === 0 && r.patient_organization_id === 0 && r.is_double_mr === true)
           || (r.patient_hope_id !== 0 && r.patient_organization_id === 0 && r.is_double_mr === true)
           || (r.patient_hope_id === 0 && r.patient_organization_id === 0 && r.is_double_mr === false)
           || (r.patient_hope_id !== 0 && r.patient_organization_id === 0 && r.is_double_mr === false)">
-            <button (click)="verifyAppointment(r)" class="btn ms_btn_blue" style="font-size: 10px;">Verify MR</button>
+            <button (click)="verifyAppointment(r)" class="btn ms_btn_blue" style="font-size: 10px; width: 7.5rem">Verify MR</button>
           </div>
         </div>
+        
+        <div *ngIf="r.admission_status_id != 2 && r.appointment_status_id !== appStatusId.INACTIVE
+        && ((r.identity_card_file && r.employee_card_file) || (r.identity_card_file && r.insurance_card_file))
+        && r.eligible_status_id === eligibleVal.NOT_YET_ELIGIBLE">
+          <button (click)="eligibleModal(confirmEligible, r)" class="btn ms_btn_green_light" style="font-size: 10px; margin-top: 0.5rem; width: 7.5rem">Check Eligibility</button>
+        </div>
+
         <div class="span-canceled" *ngIf="r.appointment_status_id === appStatusId.INACTIVE">
-          Cancelled</div>
+          Cancelled
+        </div>
         </td>
       </tr>
       <tr>
@@ -259,6 +298,52 @@
           (click)="c('Cross click')">Ok</button>
         <button type="button" class="btn fo_btn_green" (click)="c('Cross click')">Cancel</button>
       </div>
+    </div>
+  </ng-template>
+
+  <ng-template #confirmEligible let-c="close" let-d="dismiss">
+    <div class="modal-header">
+      <h4 class="modal-title">Confirmation</h4>
+      <button #close_button type="button" [disabled]="loadingButton === true" class="close" aria-label="Close" (click)="d('Cross click')">
+        <span aria-hidden="true">&times;</span>
+      </button>
+    </div>
+    <div class="modal-body">
+      <div style="text-align: left">
+        <table>
+          <tr>
+            <td>Patient Name</td>
+            <td>:</td>
+            <td>{{appResult.contact_name}}</td></tr>
+          <tr>
+            <td>Identity No</td>
+            <td>:</td>
+            <td *ngIf="appResult.identity_number">{{appResult.identity_number}}</td></tr>
+          <tr>
+            <td>Insurance no / Employee no</td>
+            <td>:</td>
+            <td *ngIf="appResult.employee_number">{{appResult.employee_number}}</td>
+            <td *ngIf="appResult.insurance_number">{{appResult.insurance_number}}</td>
+          </tr>
+        </table>
+      </div>
+      <div class="fo_confirmation_button d-flex justify-content-center">
+        <button type="button" class="btn fo_btn_green" [disabled]="loadingButton === true" (click)="eligibleCheck('1', confirm_submit, close_button)">Eligible</button>
+        <button type="button" class="btn fo_btn_red" [disabled]="loadingButton === true" (click)="eligibleCheck('2', confirm_submit, close_button)">Not Eligible</button>
+      </div>
+    </div>
+  </ng-template>
+
+  <ng-template #confirm_submit let-modal>
+    <div class="modal-header">
+      <div class="header-2 modal-padding">Confirmation</div>
+    </div>
+    <div class="modal-body">
+      Are you sure?
+    </div>
+    <div class="modal-footer">
+      <button class="btn ms_btn_green" [ngClass]="{'disable': flagConfirm}" (click)="onSubmitEligible()" (click)="modal.close()">Confirm</button>
+      <button type="button" class="btn ms_btn_red" (click)="modal.close()">Cancel</button>
     </div>
   </ng-template>
 

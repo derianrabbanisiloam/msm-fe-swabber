@@ -277,13 +277,13 @@ export class WidgetAidoWorklistComponent implements OnInit {
 
   eligibleModal(content, value) {
     this.appResult = value;
-    this.open(content);
+    this.openTwo(content);
   }
 
   eligibleCheck(value, content, closeModal) {
     this.eligibleRes = value;
     this.closeModal = closeModal;
-    this.open(content);
+    this.openTwo(content);
   }
 
   onSubmitEligible() {
@@ -328,6 +328,14 @@ export class WidgetAidoWorklistComponent implements OnInit {
   }
 
   open(content) {
+    this.modalService.open(content).result.then((result) => {
+      this.closeResult = `Closed with: ${result}`;
+    }, (reason) => {
+      this.closeResult = `Dismissed ${this.getDismissReason(reason)}`;
+    });
+  }
+
+  openTwo(content) {
     this.modalService.open(content, { windowClass: 'modal_eligible' }).result.then((result) => {
       this.closeResult = `Closed with: ${result}`;
     }, (reason) => {

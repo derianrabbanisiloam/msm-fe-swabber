@@ -4,6 +4,12 @@
   margin-top: 7vw;
 }
 
+::ng-deep .modal_eligible .modal-dialog {
+  max-width: 40%;
+  width: 40%;
+  margin-top: 14rem;
+}
+
 :host(app-widget-appointment-list) { width:100% }
 .fo_appointment_date{ width: 15%;}
 .fo_container_input_date{ margin-bottom: 2rem}

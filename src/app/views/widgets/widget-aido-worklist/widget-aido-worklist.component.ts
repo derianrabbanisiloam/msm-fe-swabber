@@ -13,7 +13,8 @@ import { environment } from '../../../../environments/environment';
 import {
   ModalVerificationAidoComponent
 } from '../../widgets/modal-verification-aido/modal-verification-aido.component';
-import { sourceApps, channelId, appointmentStatusId, paymentStatus } from '../../../variables/common.variable';
+import { sourceApps, channelId, appointmentStatusId, paymentStatus,
+          eligibleStatus } from '../../../variables/common.variable';
 
 @Component({
   selector: 'app-widget-aido-worklist',
@@ -56,8 +57,12 @@ export class WidgetAidoWorklistComponent implements OnInit {
   public arrChannel: any = channelId;
   public payStatus: any = paymentStatus;
   public selectedCancel: any;
-  public isEligible: any = null;
+  public loadingButton: boolean = false;
   public closeModal: any;
+  public urlDocument = environment.GET_IMAGE;
+  public eligibleVal: any = eligibleStatus;
+  public eligibleRes: string;
+  public appResult: any = null;
 
   constructor(
     private appointmentService: AppointmentService,
@@ -142,7 +147,6 @@ export class WidgetAidoWorklistComponent implements OnInit {
     } = await this.keywordsModel;
     offsetTemp = offset;
     
-    console.log('this.count', this.count)
     if(this.count === 0) {
       this.bodyKeyword.valueOne = hospitalId, this.bodyKeyword.valueTwo = fromDate, this.bodyKeyword.valueThree = toDate;
       this.bodyKeyword.valueFour = patientName, this.bodyKeyword.valueFive = doctorId ? doctorId.doctor_id : '';
@@ -211,6 +215,12 @@ export class WidgetAidoWorklistComponent implements OnInit {
     );
   }
 
+  getImage(fileName) {
+    let split = fileName.split('-');
+    let pathFile = split[0];
+    window.open(this.urlDocument +'/'+ pathFile +'/'+ fileName, '_blank', "status=1");
+  }
+
   async verifyAppointment(data) {
     const parameter = {
       from_worklist: true,
@@ -265,46 +275,38 @@ export class WidgetAidoWorklistComponent implements OnInit {
     );
   }
 
-  eligibleModal(content) {
+  eligibleModal(content, value) {
+    this.appResult = value;
     this.open(content);
   }
 
-  clear() {
-    this.isEligible = null;
-  }
-
-  eligibleCheck(value, closeModal) {
+  eligibleCheck(value, content, closeModal) {
+    this.eligibleRes = value;
     this.closeModal = closeModal;
-    this.isEligible = value;
-    if(this.isEligible === false) {
-    this.eligibleUpdate();
-    }
+    this.open(content);
   }
 
-  eligibleUpdate() {
+  onSubmitEligible() {
+    this.loadingButton = true;
     let body = {
-      isEligible: this.isEligible,
-      fullCover: null
+      eligibleStatusId: this.eligibleRes,
+      userId: this.user.id,
+      userName: this.user.fullname,
+      source: sourceApps
     }
 
-    setTimeout(() => {
+    this.appointmentService.submitEligibleAido(body, this.appResult.appointment_id)
+    .toPromise().then(res => {
       this.closeModal.click();
-      this.isEligible = null;
+      this.loadingButton = false;
       this.getAidoWorklist();
-      this.alertService.success('Success', false, 3000);
-      }, 4000);
-
-    
-
-    // this.appointmentService.deleteAppointment(null, body, false, true)
-    // .toPromise().then(res => {
-    //   this.closeModal.click();
-    //   this.isEligible = null;
-    //   this.getAidoWorklist();
-    //   this.alertService.success(res.message, false, 3000);
-    // }).catch(err => {
-    //   this.alertService.error(err.error.message, false, 3000);
-    // })
+      this.appResult = null;
+      this.eligibleRes = '';
+      this.alertService.success(res.message, false, 3000);
+    }).catch(err => {
+      this.loadingButton = false;
+      this.alertService.error(err.error.message, false, 3000);
+    })
   }
 
   cancelAppointment(val, content) {
@@ -326,7 +328,7 @@ export class WidgetAidoWorklistComponent implements OnInit {
   }
 
   open(content) {
-    this.modalService.open(content).result.then((result) => {
+    this.modalService.open(content, { windowClass: 'modal_eligible' }).result.then((result) => {
       this.closeResult = `Closed with: ${result}`;
     }, (reason) => {
       this.closeResult = `Dismissed ${this.getDismissReason(reason)}`;
@@ -347,7 +349,6 @@ export class WidgetAidoWorklistComponent implements OnInit {
   nextPage() {
     this.page += 1;
     this.keywordsModel.offset = this.page * 10;
-    console.log('keyword.offset', this.keywordsModel.offset)
     this.isCanPrevPage = this.keywordsModel.offset === 0 ? false : true;
     this.getAidoWorklist();
   }

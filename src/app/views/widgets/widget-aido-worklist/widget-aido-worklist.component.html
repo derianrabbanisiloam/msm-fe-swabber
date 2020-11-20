@@ -304,7 +304,7 @@
   <ng-template #confirmEligible let-c="close" let-d="dismiss">
     <div class="modal-header">
       <h4 class="modal-title">Confirmation</h4>
-      <button #close_button type="button" [disabled]="isEligible === false" class="close" aria-label="Close" (click)="d('Cross click')" (click)="clear()">
+      <button #close_button type="button" [disabled]="loadingButton === true" class="close" aria-label="Close" (click)="d('Cross click')">
         <span aria-hidden="true">&times;</span>
       </button>
     </div>

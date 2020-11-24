@@ -15,6 +15,8 @@ import { NguiAutoCompleteModule } from '@ngui/auto-complete';
 
 import { ModalRescheduleAppointmentModule } from '../../widgets/modal-reschedule-appointment/modal-reschedule-appointment.module';
 import { ModalRescheduleAppointmentComponent } from '../../widgets/modal-reschedule-appointment/modal-reschedule-appointment.component';
+import { ModalSearchPayerComponent } from '../../widgets/modal-search-payer/modal-search-payer.component';
+import { ModalSearchPayerModule } from '../../widgets/modal-search-payer/modal-search-payer.module';
 
 @NgModule({
   declarations: [
@@ -39,12 +41,14 @@ import { ModalRescheduleAppointmentComponent } from '../../widgets/modal-resched
     AutocompleteLibModule,
     NguiAutoCompleteModule,
     ModalRescheduleAppointmentModule,
+    ModalSearchPayerModule
   ],
   exports: [
     PageAppointmentListComponent,
   ],
   entryComponents: [
-    ModalRescheduleAppointmentComponent
+    ModalRescheduleAppointmentComponent,
+    ModalSearchPayerComponent
   ]
 })
 export class PageAppointmentListModule { }

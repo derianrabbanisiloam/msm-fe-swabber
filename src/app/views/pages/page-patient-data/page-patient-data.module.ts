@@ -15,6 +15,8 @@ import { NgbAlertModule, NgbPopoverModule, NgbProgressbarModule,
   NgbModalModule, NgbTabsetModule, NgbDatepickerModule } from '@ng-bootstrap/ng-bootstrap';
 import { AutocompleteLibModule } from 'angular-ng-autocomplete';
 import { NguiAutoCompleteModule } from '@ngui/auto-complete';
+import { ModalSearchPayerModule } from '../../widgets/modal-search-payer/modal-search-payer.module';
+import { ModalSearchPayerComponent } from '../../widgets/modal-search-payer/modal-search-payer.component';
 
 @NgModule({
   declarations: [
@@ -38,9 +40,13 @@ import { NguiAutoCompleteModule } from '@ngui/auto-complete';
     NgbProgressbarModule,
     NgbModalModule,
     NgbTabsetModule,
+    ModalSearchPayerModule
   ],
   exports: [
     PagePatientDataComponent,
+  ],
+  entryComponents: [
+    ModalSearchPayerComponent
   ]
 })
 export class PagePatientDataModule { }

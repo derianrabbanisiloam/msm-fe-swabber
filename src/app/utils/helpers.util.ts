@@ -41,7 +41,7 @@ export function regionTime(timeZone = 7, data = new Date()) {
  export async function  printPreview(data){
     var type = 'application/pdf';
     let blob = null;
-
+    
     const blobURL = URL.createObjectURL(pdfBlobConversion(data, 'application/pdf'));
     const theWindow = window.open(blobURL, 'targetWindow', 'toolbar=no,location=1,status=no,menubar=no,scrollbars=yes,resizable=yes,width=800,height=600');
     const theDoc = theWindow.document;

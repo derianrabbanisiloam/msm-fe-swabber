@@ -259,6 +259,7 @@ export class AppointmentService {
     return this.http.put<any>(url, body, httpOptions);
   }
 
+
   getTempAppointment(tempId: any){
     const url = `${this.ccAppointmentUrl}/temporary/${tempId}`;
     // return of(APPOINTMENT);

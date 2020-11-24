@@ -1,6 +1,6 @@
 import { HttpClient } from '@angular/common/http';
 import { Injectable } from '@angular/core';
-import { Observable } from 'rxjs';
+import { Observable, Subject } from 'rxjs';
 import { httpOptions } from '../utils/http.util';
 import { environment } from '../../environments/environment';
 
@@ -14,6 +14,13 @@ export class PayerService {
   ) { }
   
   private payerUrl = environment.FRONT_OFFICE_SERVICE
+  private urlInhealth =  environment.INHEALTH + '/reprint'
+
+  public searchReferralSource = new Subject<any>()
+  public searchReferralSource$ = this.searchReferralSource.asObservable()
+  
+  public searchDiagnose = new Subject<any>()
+  public searchDiagnose$ = this.searchDiagnose.asObservable()
 
   checkEligible(payload: any){
     const url = `${this.payerUrl}/payer-portal`
@@ -31,9 +38,22 @@ export class PayerService {
   }
 
   getPrint(payload: any){
-    const url = `${this.payerUrl}/payer-portal/reprint`
-    return this.http.post<any>(url, payload, httpOptions)
+    // const url = `${this.payerUrl}/payer-portal/reprint`
+    return this.http.post<any>(this.urlInhealth, payload, httpOptions)
   }
-}
 
+  changeReferralSource(params: any){
+    this.searchReferralSource.next(params)
+  }
+
+  changeDiagnose(params: any){
+    this.searchDiagnose.next(params)
+  }
+
+  updateAdmission(payload: any){
+    const url = `${this.payerUrl}/payer-portal/update`
+    return this.http.put<any>(url, payload, httpOptions)
+  }
+
+}
 

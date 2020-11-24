@@ -11,4 +11,3 @@ export const httpOptions = {
     'Access-Control-Max-Age': '1728000'
   })
 };
-

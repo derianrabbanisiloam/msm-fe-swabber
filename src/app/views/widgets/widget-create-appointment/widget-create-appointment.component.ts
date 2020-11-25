@@ -1549,17 +1549,12 @@ export class WidgetCreateAppointmentComponent implements OnInit {
             this.txtPayer = false;
             
             //get payer
-            let { payer_eligibility, payer_name, payer_id, payer_no, registration_notes,
+            let { payer_eligibility, payer_id, payer_no, registration_notes,payer_name_app,
                 referral_source, referral_name, referral_date, referral_no, disease_classification_code,disease_classification_name, disease_classification_id
             } = this.selectedCheckIn
             
 
-            if (!payer_name && payer_id){
-                  this.searchPayer(payer_id, this.listPayer)
-            } else {
-              this.payer = { name: payer_name, payer_id: payer_id }
-            }
-            
+            this.payer = { name: payer_name_app, payer_id: payer_id }
             this.referralSource =  referral_name && referral_no ?  { referralName: referral_name, code: referral_source } : null;
             this.referralNo = referral_no ? referral_no : null;
             this.payerNo = payer_no
@@ -2463,16 +2458,7 @@ export class WidgetCreateAppointmentComponent implements OnInit {
       this.isCreatedEligibility = false;
       this.alertService.error(err.error.message,false,5000)
     })
-
-  }
-
-  async searchPayer(key, array){
-    for (let i = 0; i < array.length; i++){
-      if (array[i].payer_id === key){
-          this.payer = array[i];
-          break;
-      }
-    }
+    
   }
 
   async searchReferralSource(){

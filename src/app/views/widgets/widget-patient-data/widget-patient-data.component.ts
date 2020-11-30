@@ -24,7 +24,7 @@ import socket from 'socket.io-client';
 import { SecretKey, Jwt, QUEUE_NUMBER, CHECK_IN, keySocket, pathImage } from '../../../variables/common.variable';
 import Security from 'msm-kadapat';
 import { environment } from '../../../../environments/environment';
-import { localSpliter } from '../../../../app/utils/helpers.util';
+import { localSpliter, regionTime } from '../../../../app/utils/helpers.util';
 import { isEmpty } from 'lodash';
 import Swal from 'sweetalert2';
 import { FormBuilder, FormGroup, FormControl } from '@angular/forms';
@@ -1912,12 +1912,19 @@ export class WidgetPatientDataComponent implements OnInit {
       });
   }
 
-  printQueueTicket(val) {
+  async printQueueTicket(val) {
     this.closeQue.click();
     this.closeAdm.click();
     if(this.fromBpjs === true) {
       this.closeDocument.click();
     }
+
+    const convertDate = await regionTime(this.hospital.zone, this.resQueue.created_date);
+    const dateTimeNow = new Date(convertDate).toISOString();
+    const split = dateTimeNow.split('T');
+    const date = split[0].split('-');
+    const dateNow = date[2]+'-'+date[1]+'-'+date[0];
+    const timeNow = split[1].substr(0, 5);
 
     const queueNo = this.resQueue.name;
     const isWalkin = this.selectedCheckIn.is_walkin ? 'WALK IN' : 'APPOINTMENT';
@@ -1956,20 +1963,26 @@ export class WidgetPatientDataComponent implements OnInit {
           text: 'Floor : ' + floor + ' , Wing : ' + wing + ' , Room : ' + room,
           margin: [0, 0, 0, 0],
           alignment: 'center',
-          fontSize: 10,
+          fontSize: 8,
           bold: true
         },
         {
           text: 'Patient Name : ' + patientName,
           margin: [0, 5, 0, 5],
           alignment: 'center',
-          fontSize: 10
+          fontSize: 8
         },
         {
           text: 'Doctor Name : ' + doctorName,
           margin: [0, 0, 0, 5],
           alignment: 'center',
-          fontSize: 10
+          fontSize: 8
+        },
+        {
+          text: 'Adm Date : ' + dateNow +' | '+timeNow,
+          margin: [0, 0, 0, 5],
+          alignment: 'center',
+          fontSize: 8
         },
         {
           text: isWalkin,

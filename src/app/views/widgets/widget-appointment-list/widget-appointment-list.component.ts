@@ -7,7 +7,7 @@ import { AdmissionService } from '../../../services/admission.service';
 import { Doctor } from '../../../models/doctors/doctor';
 import { General } from '../../../models/generals/general';
 import { Appointment } from '../../../models/appointments/appointment';
-import { dateFormatter } from '../../../utils/helpers.util';
+import { dateFormatter, regionTime } from '../../../utils/helpers.util';
 import { AlertService } from '../../../services/alert.service';
 import { GeneralService } from '../../../services/general.service';
 import { QueueService } from '../../../services/queue.service';
@@ -948,7 +948,14 @@ export class WidgetAppointmentListComponent implements OnInit {
     });
   }
 
-  printQueueTicket(val) {
+  async printQueueTicket(val) {
+
+    const convertDate = await regionTime(this.hospital.zone, this.resQueue.created_date);
+    const dateTimeNow = new Date(convertDate).toISOString();
+    const split = dateTimeNow.split('T');
+    const date = split[0].split('-');
+    const dateNow = date[2]+'-'+date[1]+'-'+date[0];
+    const timeNow = split[1].substr(0, 5);
 
     const queueNo = this.resQueue.name;
     const isWalkin = this.selectedCheckIn.is_walkin ? 'WALK IN' : 'APPOINTMENT';
@@ -987,20 +994,26 @@ export class WidgetAppointmentListComponent implements OnInit {
           text: 'Floor : ' + floor + ' , Wing : ' + wing + ' , Room : ' + room,
           margin: [0, 0, 0, 0],
           alignment: 'center',
-          fontSize: 10,
+          fontSize: 8,
           bold: true
         },
         {
           text: 'Patient Name : ' + patientName,
           margin: [0, 5, 0, 5],
           alignment: 'center',
-          fontSize: 10
+          fontSize: 8
         },
         {
           text: 'Doctor Name : ' + doctorName,
           margin: [0, 0, 0, 5],
           alignment: 'center',
-          fontSize: 10
+          fontSize: 8
+        },
+        {
+          text: 'Adm Date : ' + dateNow +' | '+timeNow,
+          margin: [0, 0, 0, 5],
+          alignment: 'center',
+          fontSize: 8
         },
         {
           text: isWalkin,

@@ -236,8 +236,7 @@
           </div>
         </div>
         
-        <div *ngIf="r.admission_status_id != 2 && r.appointment_status_id !== appStatusId.INACTIVE
-        && ((r.identity_card_file && r.employee_card_file) || (r.identity_card_file && r.insurance_card_file))
+        <div *ngIf="r.appointment_status_id !== appStatusId.INACTIVE && ((r.identity_card_file && r.employee_card_file) || (r.identity_card_file && r.insurance_card_file))
         && r.eligible_status_id === eligibleVal.NOT_YET_ELIGIBLE">
           <button (click)="eligibleModal(confirmEligible, r)" class="btn ms_btn_green_light" style="font-size: 10px; margin-top: 0.5rem; width: 7.5rem">Check Eligibility</button>
         </div>
@@ -304,7 +303,7 @@
   <ng-template #confirmEligible let-c="close" let-d="dismiss">
     <div class="modal-header">
       <h4 class="modal-title">Confirmation</h4>
-      <button #close_button type="button" [disabled]="loadingButton === true" class="close" aria-label="Close" (click)="d('Cross click')">
+      <button #close_button type="button" class="close" aria-label="Close" (click)="d('Cross click')">
         <span aria-hidden="true">&times;</span>
       </button>
     </div>
@@ -314,22 +313,25 @@
           <tr>
             <td>Patient Name</td>
             <td>:</td>
-            <td>{{appResult.contact_name}}</td></tr>
+            <td *ngIf="appResult && appResult.contact_name">{{appResult.contact_name}}</td></tr>
           <tr>
             <td>Identity No</td>
             <td>:</td>
-            <td *ngIf="appResult.identity_number">{{appResult.identity_number}}</td></tr>
+            <td *ngIf="appResult && appResult.identity_number">{{appResult.identity_number}}</td></tr>
           <tr>
             <td>Insurance no / Employee no</td>
             <td>:</td>
-            <td *ngIf="appResult.employee_number">{{appResult.employee_number}}</td>
-            <td *ngIf="appResult.insurance_number">{{appResult.insurance_number}}</td>
+            <td *ngIf="appResult && appResult.employee_number">{{appResult.employee_number}}</td>
+            <td *ngIf="appResult && appResult.insurance_number">{{appResult.insurance_number}}</td>
           </tr>
         </table>
       </div>
       <div class="fo_confirmation_button d-flex justify-content-center">
         <button type="button" class="btn fo_btn_green" [disabled]="loadingButton === true" (click)="eligibleCheck('1', confirm_submit, close_button)">Eligible</button>
         <button type="button" class="btn fo_btn_red" [disabled]="loadingButton === true" (click)="eligibleCheck('2', confirm_submit, close_button)">Not Eligible</button>
+      </div>
+      <div *ngFor="let alert of alerts">
+        <ngb-alert *ngIf="alert" type="{{cssAlertType(alert)}}" (close)="removeAlert(alert)">{{ alert.message }}</ngb-alert>
       </div>
     </div>
   </ng-template>

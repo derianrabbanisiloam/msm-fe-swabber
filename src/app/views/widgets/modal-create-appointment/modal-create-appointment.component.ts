@@ -23,7 +23,6 @@ export class ModalCreateAppointmentComponent implements OnInit {
   @Input() appointmentInfo: any;
   public assetPath = environment.ASSET_PATH;
   public key: any = JSON.parse(localStorage.getItem('key'));
-  // public isBridging = this.key.hospital.isBridging
   public hospital = this.key.hospital;
   public user = this.key.user;
   public choosedPatient: PatientHope;

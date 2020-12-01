@@ -100,6 +100,11 @@
                 </ngb-alert>
               </div>
             </div>
+
+            <div style="margin-left: 2em; margin-top: -2px; font-weight: bold;">
+              <span>Appointment tidak bisa dibuat dari mobile <br/>
+                dan website, hanya via call center  </span>
+              </div>
           </form>
         </div>
       </div>
@@ -187,6 +192,10 @@
                 {{ successMessageTwo }}</ngb-alert>
               <ngb-alert *ngIf="errorMessage" type="danger" (close)="errorMessage = null">{{ errorMessage }}</ngb-alert>
             </div>
+          </div>
+          <div style="margin-left: 2em; margin-top: -2px; font-weight: bold;">
+            <span><b>Appointment tidak bisa dibuat dari mobile <br/>
+            dan website, hanya via call center</b> </span>
           </div>
         </div>
       </div>

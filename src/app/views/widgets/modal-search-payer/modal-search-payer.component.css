@@ -1,8 +1,8 @@
 ::ng-deep .modal-searchPatient .modal-dialog { max-width: 100%; width: 60vw}
-::ng-deep .modal-searchPatient .modal-dialog .modal-body { max-height:80vh; overflow-y: scroll}
+::ng-deep .modal-searchPatient .modal-dialog .modal-body { max-height:20vh; overflow-y: scroll}
 
 .search-patient-modal {
-  width: 50vw;
+  width: 100%;
   min-height: 40rem!important;
   height: inherit;
   max-height: 80vh;

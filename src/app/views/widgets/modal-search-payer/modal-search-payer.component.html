@@ -14,29 +14,31 @@
       <div class="input-group mb-3" id="inputSearch">
         <input type="text" class="form-control" placeholder="Search code or Referral Name" aria-label="Search Code or Referral Name" aria-describedby="basic-addon2" [(ngModel)]="keyword" (keyup.enter)="searchReference()">
         <div class="input-group-append">
-          <button class="btn btn-primary" type="button" (click)="searchReference()"><i class="fa fa-search" aria-hidden="true"></i></button>
+          <button class="btn btn-outline-primary" type="button" (click)="searchReference()"><i class="fa fa-search" aria-hidden="true"></i></button>
         </div>
       </div>
-      <div class="table-wrap">
-        <table *ngIf="isReferralModal else tableDiagnose" class="table table-bordered">
-          <thead class="foot-note blue">
-          <tr class="table-title" style="background-color: white;">
-            <th>Referral Code</th>
-            <th>Refferal Name</th>
-          </tr>
-          <tr  *ngIf="searchLoader">
-            <th colspan="2">
-              <ngb-progressbar value="1000">Loading...</ngb-progressbar>
-            </th>
-          </tr>
-          </thead>
-          <tbody class="body-text">
-          <tr *ngFor="let p of listReferralSource" (click)="chooseReferral(p)" (click)="close()">
-            <td>{{ p.code}}</td>
-            <td>{{ p.referralName }}</td>
-          </tr>
-          </tbody>
-        </table>
+      <div *ngIf="isReferralModal else tableDiagnose">
+        <div class="table-wrap">
+          <table class="table table-bordered">
+            <thead class="foot-note blue">
+            <tr class="table-title" style="background-color: white;">
+              <th>Referral Code</th>
+              <th style="width: 100vw;">Referral Name</th>
+            </tr>
+            <tr  *ngIf="searchLoader">
+              <th colspan="2">
+                <ngb-progressbar value="1000">Loading...</ngb-progressbar>
+              </th>
+            </tr>
+            </thead>
+            <tbody class="body-text">
+            <tr *ngFor="let p of listReferralSource" (click)="chooseReferral(p)" (click)="close()">
+              <td>{{ p.code}}</td>
+              <td>{{ p.referralName }}</td>
+            </tr>
+            </tbody>
+          </table>
+        </div>
       </div>
 
       <ng-template #tableDiagnose>
@@ -45,7 +47,7 @@
             <thead class="foot-note blue">
             <tr class="table-title" style="background-color: white;">
               <th>Diagnosis Code</th>
-              <th>Diagnosis Name</th>
+              <th style="width: 100vw;">Diagnosis Name</th>
             </tr>
             <tr  *ngIf="searchLoader">
               <th colspan="2">

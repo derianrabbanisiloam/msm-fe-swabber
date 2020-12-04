@@ -14,3 +14,5 @@ export const environment = {
   MOBILE_SERVICE: 'http://10.85.139.13/msm-be-mobile-master/api/v2',
   INHEALTH:'http://10.85.129.63:8803'
 };
+
+

@@ -1711,7 +1711,7 @@ export class WidgetPatientDataComponent implements OnInit {
       this.txtPayerNo = true;
       this.txtPayerEligibility = true;
       this.buttonCheckEligible = true;
-
+      this.buttonCreateAdmission = false;
       this.payer = null;
       this.payerNo = null;
       this.payerEligibility = null;
@@ -1734,6 +1734,7 @@ export class WidgetPatientDataComponent implements OnInit {
       this.txtPayerNo = false;
       // this.txtPayerEligibility = false;
       this.buttonCheckEligible = false;
+      this.buttonCreateAdmission = true;
       idx = this.patientTypeList.findIndex((a) => {
         return a.description == "PAYER";
       })
@@ -2230,6 +2231,7 @@ export class WidgetPatientDataComponent implements OnInit {
           this.txtPayerEligibility = false;
           this.isLoadingCheckEligible = false;
           this.isCreatedEligibility = true;
+          this.buttonCreateAdmission = false;
           this.alertService.success('Patient Eligible', false, 5000)        
         }
       )
@@ -2252,17 +2254,19 @@ export class WidgetPatientDataComponent implements OnInit {
       let data = await this.payerService.getPrint(payload)
       .toPromise()
       .then(res => {
+        this.isLoadingCheckEligible = false
         return res.data;
       })
       .catch(err => {
+        this.isLoadingCheckEligible = false
         this.alertService.error(err.message, false, 5000)
         return null
       })
-  
       return data
     }
 
     async printSjp(){
+      this.isLoadingCheckEligible = true;
       let filePdf = await this.getFilePdf() 
       if (filePdf){
         printPreview(filePdf)

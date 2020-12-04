@@ -1076,7 +1076,7 @@
         (click)="printSjp()"
         > Print Eligibility </button>
           <button *ngIf="!selectedCheckIn.admission_id" class="fo_btn_admission fo_btn_save"
-            [disabled]="buttonCreateAdmission || isLoadingCreateAdmission"
+            [disabled]="buttonCreateAdmission || isLoadingCreateAdmission "
             (click)="createAdmission(selectedCheckIn, confirmCreateAdmissionProcess)">Create Admission</button>
           <button style="width: 120px;" class="fo_btn_admission fo_btn_blue" [disabled]="buttonPatientLabel && !selectedCheckIn.admission_id"
             (click)="printPatientLabel(selectedCheckIn)">Print Patient</button>

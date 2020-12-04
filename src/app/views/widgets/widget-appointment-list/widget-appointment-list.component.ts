@@ -752,6 +752,7 @@ export class WidgetAppointmentListComponent implements OnInit {
       this.txtPayerNo = true;
       this.txtPayerEligibility = true;
       this.buttonCheckEligible = true;
+      this.buttonCreateAdmission = false;
 
       this.payer = null;
       this.payerNo = null;
@@ -775,7 +776,7 @@ export class WidgetAppointmentListComponent implements OnInit {
       this.txtPayerNo = false;
       // this.txtPayerEligibility = false;
       this.buttonCheckEligible = false;
-
+      this.buttonCreateAdmission = true;
       idx = this.patientTypeList.findIndex((a) => {
         return a.description == "PAYER";
       })
@@ -1287,6 +1288,7 @@ export class WidgetAppointmentListComponent implements OnInit {
           this.txtPayerEligibility = false;
           this.isLoadingCheckEligible = false;
           this.isCreatedEligibility = true;
+          this.buttonCreateAdmission = false;
           this.alertService.success('Patient Eligible', false, 5000)        
         }
       )
@@ -1381,9 +1383,11 @@ export class WidgetAppointmentListComponent implements OnInit {
     let data = await this.payerService.getPrint(payload)
     .toPromise()
     .then(res => {
+      this.isLoadingCheckEligible = false
       return res.data;
     })
     .catch(err => {
+      this.isLoadingCheckEligible = false
       this.alertService.error(err.message, false, 5000)
       return []
     })
@@ -1391,6 +1395,7 @@ export class WidgetAppointmentListComponent implements OnInit {
   }
 
   async printSjp(str){
+    this.isLoadingCheckEligible = true;
     let filePdf = null
     if (str === 'update'){
       filePdf = await this.getFilePdfUpdate() 
@@ -1520,9 +1525,16 @@ async  searchDiagnose(){
     `${isNumber(date.year) ? date.year : ''}-${isNumber(date.month ) ? date.month : ''}-${date.day}` : ''
   }
 
+  
+
   checkUpdate(){
 
-    if (this.diagnose || this.referralSource || this.selectedUpdate.referral_date !== this.formatDateModel(this.referralDateModel) || this.registNotes !== this.selectedUpdate.registration_notes || this.selectedUpdate.referral_no !== this.referralNo){
+    let dateToStr;
+    if (this.selectedUpdate.referral_date){
+      dateToStr = moment(this.selectedUpdate.referral_date).format('YYYY-MM-D')
+    }
+
+    if (this.diagnose || this.referralSource || dateToStr !== this.formatDateModel(this.referralDateModel) || this.registNotes !== this.selectedUpdate.registration_notes || this.selectedUpdate.referral_no !== this.referralNo){
       return false;
     } else {
       return true;

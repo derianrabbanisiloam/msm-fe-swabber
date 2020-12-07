@@ -9,12 +9,14 @@ import { PageAppointmentListComponent } from './page-appointment-list.component'
 import { WidgetAppointmentListComponent } from '../../widgets/widget-appointment-list/widget-appointment-list.component';
 import { MyDatePickerModule } from 'mydatepicker';
 import { TextMaskModule } from 'angular2-text-mask';
-import { NgbAlertModule, NgbPopoverModule, NgbProgressbarModule, NgbModalModule } from '@ng-bootstrap/ng-bootstrap';
+import { NgbAlertModule, NgbPopoverModule, NgbProgressbarModule, NgbModalModule, NgbDatepickerModule} from '@ng-bootstrap/ng-bootstrap';
 import { AutocompleteLibModule } from 'angular-ng-autocomplete';
 import { NguiAutoCompleteModule } from '@ngui/auto-complete';
 
 import { ModalRescheduleAppointmentModule } from '../../widgets/modal-reschedule-appointment/modal-reschedule-appointment.module';
 import { ModalRescheduleAppointmentComponent } from '../../widgets/modal-reschedule-appointment/modal-reschedule-appointment.component';
+import { ModalSearchPayerComponent } from '../../widgets/modal-search-payer/modal-search-payer.component';
+import { ModalSearchPayerModule } from '../../widgets/modal-search-payer/modal-search-payer.module';
 
 @NgModule({
   declarations: [
@@ -30,6 +32,7 @@ import { ModalRescheduleAppointmentComponent } from '../../widgets/modal-resched
     SectionSidebarModule,
     SectionFooterModule,
     MyDatePickerModule,
+    NgbDatepickerModule,
     TextMaskModule,
     NgbAlertModule,
     NgbPopoverModule,
@@ -38,12 +41,14 @@ import { ModalRescheduleAppointmentComponent } from '../../widgets/modal-resched
     AutocompleteLibModule,
     NguiAutoCompleteModule,
     ModalRescheduleAppointmentModule,
+    ModalSearchPayerModule
   ],
   exports: [
     PageAppointmentListComponent,
   ],
   entryComponents: [
-    ModalRescheduleAppointmentComponent
+    ModalRescheduleAppointmentComponent,
+    ModalSearchPayerComponent
   ]
 })
 export class PageAppointmentListModule { }

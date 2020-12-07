@@ -776,7 +776,7 @@ export class WidgetAppointmentListComponent implements OnInit {
       this.txtPayerNo = false;
       // this.txtPayerEligibility = false;
       this.buttonCheckEligible = false;
-      this.buttonCreateAdmission = true;
+      this.buttonCreateAdmission = this.isBridging ? true : false;
       idx = this.patientTypeList.findIndex((a) => {
         return a.description == "PAYER";
       })
@@ -1365,9 +1365,11 @@ export class WidgetAppointmentListComponent implements OnInit {
     let data = await this.payerService.getPrint(payload)
     .toPromise()
     .then(res => {
+      this.isLoadingCheckEligible = false
       return res.data;
     })
     .catch(err => {
+      this.isLoadingCheckEligible = false
       this.alertService.error(err.message, false, 5000)
       return []
     })

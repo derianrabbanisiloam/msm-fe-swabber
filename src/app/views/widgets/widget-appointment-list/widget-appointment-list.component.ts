@@ -1365,9 +1365,11 @@ export class WidgetAppointmentListComponent implements OnInit {
     let data = await this.payerService.getPrint(payload)
     .toPromise()
     .then(res => {
+      this.isLoadingCheckEligible = false
       return res.data;
     })
     .catch(err => {
+      this.isLoadingCheckEligible = false
       this.alertService.error(err.message, false, 5000)
       return []
     })

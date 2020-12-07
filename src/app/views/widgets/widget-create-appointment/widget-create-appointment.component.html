@@ -132,7 +132,7 @@
                 triggers="mouseenter:mouseleave">{{app.modified_name && app.modified_name.length > 10 ? app.modified_name.substr(0,10)+"..." : app.modified_name}}</a>
             </td>
             <td>
-              <div *ngIf="app.channel_id != aidoChannel">
+              <div *ngIf="app.channel_id != aidoChannel && app.zoom_url == null">
                 <div *ngIf="!app.appointment_temp_id">
                   <div *ngIf="app.is_can_cancel && isOriginal && !app.admission_id && app.channel_id != 15"
                     class="cell-img-nav d-flex justify-content-center">
@@ -160,7 +160,9 @@
               </div>
 
               <!-- button action for teleconsultation -->
-              <div *ngIf="app.channel_id == aidoChannel" style="width: 4em;">
+              <div *ngIf="app.channel_id == aidoChannel 
+                || (app.channel_id == mobileChannel && app.zoom_url != null)
+                || (app.channel_id == mobileOtherChannel && app.zoom_url != null)" style="width: auto; text-align: center">
                 <div *ngIf="app.payment_status_id === payStatusId.UNPAID">
                   <span class="flag-payment">Waiting Payment</span>
                 </div>
@@ -316,7 +318,7 @@
                 triggers="mouseenter:mouseleave">{{app.modified_name && app.modified_name.length > 10 ? app.modified_name.substr(0,10)+"..." : app.modified_name}}</a>
             </td>
             <td>
-              <div *ngIf="app.channel_id != aidoChannel">
+              <div *ngIf="app.channel_id != aidoChannel && app.zoom_url == null">
                 <div *ngIf="!app.appointment_temp_id && isOpen == true">
                   <div *ngIf="app.is_can_cancel && isOriginal && !app.admission_id"
                     class="cell-img-nav d-flex justify-content-center">
@@ -344,7 +346,9 @@
               </div>
 
               <!-- button action for teleconsultation -->
-              <div *ngIf="app.channel_id == aidoChannel" style="width: 4em;">
+              <div *ngIf="app.channel_id == aidoChannel 
+              || (app.channel_id == mobileChannel && app.zoom_url != null)
+              || (app.channel_id == mobileOtherChannel && app.zoom_url != null)" style="width: auto; text-align: center">
                 <div *ngIf="app.payment_status_id === payStatusId.UNPAID">
                   <span class="flag-payment">Waiting Payment</span>
                 </div>
@@ -424,7 +428,7 @@
                 triggers="mouseenter:mouseleave">{{app.modified_name && app.modified_name.length > 10 ? app.modified_name.substr(0,10)+"..." : app.modified_name}}</a>
             </td>
             <td>
-              <div *ngIf="app.channel_id != aidoChannel">
+              <div *ngIf="app.channel_id != aidoChannel && app.zoom_url == null">
                 <div *ngIf="!app.appointment_temp_id">
                   <div *ngIf="app.is_can_cancel && isOriginal && !app.admission_id"
                     class="cell-img-nav d-flex justify-content-center">
@@ -452,7 +456,9 @@
               </div>
 
               <!-- button action for teleconsultation -->
-              <div *ngIf="app.channel_id == aidoChannel" style="width: 4em;">
+              <div *ngIf="app.channel_id == aidoChannel 
+              || (app.channel_id == mobileChannel && app.zoom_url != null)
+              || (app.channel_id == mobileOtherChannel && app.zoom_url != null)" style="width: auto; text-align: center">
                 <div *ngIf="app.payment_status_id === payStatusId.UNPAID">
                   <span class="flag-payment">Waiting Payment</span>
                 </div>

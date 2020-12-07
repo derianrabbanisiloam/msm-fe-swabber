@@ -13,7 +13,8 @@ import { environment } from '../../../../environments/environment';
 import {
   ModalVerificationAidoComponent
 } from '../../widgets/modal-verification-aido/modal-verification-aido.component';
-import { sourceApps, channelId, appointmentStatusId, paymentStatus } from '../../../variables/common.variable';
+import { sourceApps, channelId, appointmentStatusId, paymentStatus,
+          eligibleStatus } from '../../../variables/common.variable';
 
 @Component({
   selector: 'app-widget-aido-worklist',
@@ -56,6 +57,12 @@ export class WidgetAidoWorklistComponent implements OnInit {
   public arrChannel: any = channelId;
   public payStatus: any = paymentStatus;
   public selectedCancel: any;
+  public loadingButton: boolean = false;
+  public closeModal: any;
+  public urlDocument = environment.GET_IMAGE;
+  public eligibleVal: any = eligibleStatus;
+  public eligibleRes: string;
+  public appResult: any = null;
 
   constructor(
     private appointmentService: AppointmentService,
@@ -147,7 +154,7 @@ export class WidgetAidoWorklistComponent implements OnInit {
 
       this.bodyKeywordTwo.valueOne = hospitalId, this.bodyKeywordTwo.valueTwo = fromDate, this.bodyKeywordTwo.valueThree = toDate;
       this.bodyKeywordTwo.valueFour = patientName, this.bodyKeywordTwo.valueFive = doctorId ? doctorId.doctor_id : '';
-      this.bodyKeywordTwo.valueSix = isDoubleMr, this.bodyKeywordTwo.valueSeven = admStatus, this.bodyKeyword.valueEight = payStatus;
+      this.bodyKeywordTwo.valueSix = isDoubleMr, this.bodyKeywordTwo.valueSeven = admStatus, this.bodyKeywordTwo.valueEight = payStatus;
     } else if(this.count > 0) {
       this.bodyKeyword.valueOne = hospitalId, this.bodyKeyword.valueTwo = fromDate, this.bodyKeyword.valueThree = toDate;
       this.bodyKeyword.valueFour = patientName, this.bodyKeyword.valueFive = doctorId ? doctorId.doctor_id : '';
@@ -156,7 +163,7 @@ export class WidgetAidoWorklistComponent implements OnInit {
       if(this.bodyKeyword.valueOne !== this.bodyKeywordTwo.valueOne || this.bodyKeyword.valueTwo !== this.bodyKeywordTwo.valueTwo ||
         this.bodyKeyword.valueThree !== this.bodyKeywordTwo.valueThree || this.bodyKeyword.valueFour !== this.bodyKeywordTwo.valueFour ||
         this.bodyKeyword.valueFive !== this.bodyKeywordTwo.valueFive || this.bodyKeyword.valueSix !== this.bodyKeywordTwo.valueSix ||
-        this.bodyKeyword.valueSeven !== this.bodyKeywordTwo.valueSeven || this.bodyKeyword.valueEight !== this.bodyKeywordTwo.valueEight) {    
+        this.bodyKeyword.valueSeven !== this.bodyKeywordTwo.valueSeven || this.bodyKeyword.valueEight !== this.bodyKeywordTwo.valueEight) {
           this.bodyKeywordTwo.valueOne = hospitalId, this.bodyKeywordTwo.valueTwo = fromDate, this.bodyKeywordTwo.valueThree = toDate;
           this.bodyKeywordTwo.valueFour = patientName, this.bodyKeywordTwo.valueFive = doctorId ? doctorId.doctor_id : '';
           this.bodyKeywordTwo.valueSix = isDoubleMr, this.bodyKeywordTwo.valueSeven = admStatus, this.bodyKeywordTwo.valueEight = payStatus;
@@ -206,6 +213,12 @@ export class WidgetAidoWorklistComponent implements OnInit {
        this.alertService.error(error.error.message, false, 3000);
      }
     );
+  }
+
+  getImage(fileName) {
+    let split = fileName.split('-');
+    let pathFile = split[0];
+    window.open(this.urlDocument +'/'+ pathFile +'/'+ fileName, '_blank', "status=1");
   }
 
   async verifyAppointment(data) {
@@ -262,6 +275,40 @@ export class WidgetAidoWorklistComponent implements OnInit {
     );
   }
 
+  eligibleModal(content, value) {
+    this.appResult = value;
+    this.openTwo(content);
+  }
+
+  eligibleCheck(value, content, closeModal) {
+    this.eligibleRes = value;
+    this.closeModal = closeModal;
+    this.openTwo(content);
+  }
+
+  onSubmitEligible() {
+    this.loadingButton = true;
+    let body = {
+      eligibleStatusId: this.eligibleRes,
+      userId: this.user.id,
+      userName: this.user.fullname,
+      source: sourceApps
+    }
+
+    this.appointmentService.submitEligibleAido(body, this.appResult.appointment_id)
+    .toPromise().then(res => {
+      this.closeModal.click();
+      this.loadingButton = false;
+      this.getAidoWorklist();
+      this.appResult = null;
+      this.eligibleRes = '';
+      this.alertService.success(res.message, false, 3000);
+    }).catch(err => {
+      this.loadingButton = false;
+      this.alertService.error(err.error.message, false, 3000);
+    })
+  }
+
   cancelAppointment(val, content) {
     this.selectedCancel = val;
     this.open(content);
@@ -282,6 +329,14 @@ export class WidgetAidoWorklistComponent implements OnInit {
 
   open(content) {
     this.modalService.open(content).result.then((result) => {
+      this.closeResult = `Closed with: ${result}`;
+    }, (reason) => {
+      this.closeResult = `Dismissed ${this.getDismissReason(reason)}`;
+    });
+  }
+
+  openTwo(content) {
+    this.modalService.open(content, { windowClass: 'modal_eligible' }).result.then((result) => {
       this.closeResult = `Closed with: ${result}`;
     }, (reason) => {
       this.closeResult = `Dismissed ${this.getDismissReason(reason)}`;

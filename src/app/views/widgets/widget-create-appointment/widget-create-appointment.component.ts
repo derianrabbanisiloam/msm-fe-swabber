@@ -166,7 +166,9 @@ export class WidgetCreateAppointmentComponent implements OnInit {
   public scheduleTemp: string;
   public doctorName: string;
   public hospitalName: string;
-  public aidoChannel: any = channelId.AIDO;
+  public aidoChannel: string = channelId.AIDO;
+  public mobileChannel: string = channelId.MOBILE;
+  public mobileOtherChannel: string = channelId.MOBILE_OTHER;
   public appStatusId = appointmentStatusId;
   public payStatusId = paymentStatus;
   public selectedApp: any;
@@ -958,7 +960,10 @@ export class WidgetCreateAppointmentComponent implements OnInit {
                     && this.appointments[j].is_waiting_list === false) ||
                   ((this.appointments[j].from_time.substr(0,5) === this.slotList[i].schedule_from_time) &&
                   (this.appointments[j].to_time.substr(0,5) === this.slotList[i].schedule_to_time) &&
-                  (this.appointments[j].channel_id === channelId.AIDO))) {
+                  (this.appointments[j].channel_id === channelId.AIDO)) ||  
+                  ((Number(this.appointments[j].appointment_no) === this.slotList[i].appointment_no)) &&
+                  (this.appointments[j].channel_id === channelId.MOBILE || 
+                    this.appointments[j].channel_id === channelId.MOBILE_OTHER)) {
                 found = true; //appointment slot already taken
                 idx = j;
               }
@@ -1011,7 +1016,8 @@ export class WidgetCreateAppointmentComponent implements OnInit {
               identity_card_file: this.appointments[idx].identity_card_file ? this.appointments[idx].identity_card_file : '',
               family_card_file: this.appointments[idx].family_card_file ? this.appointments[idx].family_card_file : '',
               refference_letter_file: this.appointments[idx].refference_letter_file ? this.appointments[idx].refference_letter_file : '',
-              selfie_with_identity_file: this.appointments[idx].selfie_with_identity_file ? this.appointments[idx].selfie_with_identity_file : ''
+              selfie_with_identity_file: this.appointments[idx].selfie_with_identity_file ? this.appointments[idx].selfie_with_identity_file : '',
+              zoom_url: this.appointments[idx].zoom_url ? this.appointments[idx].zoom_url : null
             });
           } else {
             this.appList[k].appointment.push({
@@ -1059,7 +1065,8 @@ export class WidgetCreateAppointmentComponent implements OnInit {
               identity_card_file: '',
               family_card_file: '',
               refference_letter_file: '',
-              selfie_with_identity_file: ''
+              selfie_with_identity_file: '',
+              zoom_url: null
             });
           }
         }
@@ -1121,7 +1128,8 @@ export class WidgetCreateAppointmentComponent implements OnInit {
             identity_card_file: x.identity_card_file? x.identity_card_file : '',
             family_card_file: x.family_card_file? x.family_card_file : '',
             refference_letter_file: x.refference_letter_file? x.refference_letter_file : '',
-            selfie_with_identity_file: x.selfie_with_identity_file? x.selfie_with_identity_file : ''
+            selfie_with_identity_file: x.selfie_with_identity_file? x.selfie_with_identity_file : '',
+            zoom_url: x.zoom_url ? x.zoom_url : null
           });
         }
       });
@@ -1170,7 +1178,8 @@ export class WidgetCreateAppointmentComponent implements OnInit {
           identity_card_file: '',
           family_card_file: '',
           refference_letter_file: '',
-          selfie_with_identity_file: ''
+          selfie_with_identity_file: '',
+          zoom_url: null
         });  
       } else {
         for (let i = 0, { length } = this.appointments; i < length; i++) {
@@ -1219,6 +1228,7 @@ export class WidgetCreateAppointmentComponent implements OnInit {
               family_card_file: this.appointments[i].family_card_file ? this.appointments[i].family_card_file : '',
               refference_letter_file: this.appointments[i].refference_letter_file ? this.appointments[i].refference_letter_file : '',
               selfie_with_identity_file: this.appointments[i].selfie_with_identity_file ? this.appointments[i].selfie_with_identity_file : '',
+              zoom_url: this.appointments[i].zoom_url ? this.appointments[i].zoom_url : null
             });
           }
         }
@@ -1271,7 +1281,8 @@ export class WidgetCreateAppointmentComponent implements OnInit {
           identity_card_file: '',
           family_card_file: '',
           refference_letter_file: '',
-          selfie_with_identity_file: ''
+          selfie_with_identity_file: '',
+          zoom_url: null
         });
       } 
     }
@@ -2195,7 +2206,14 @@ export class WidgetCreateAppointmentComponent implements OnInit {
     this.router.navigate(['./patient-data'], { queryParams: params });
   }
 
-  printQueueTicket(val) {
+  async printQueueTicket(val) {
+
+    const convertDate = await regionTime(this.hospital.zone, this.resQueue.created_date);
+    const dateTimeNow = new Date(convertDate).toISOString();
+    const split = dateTimeNow.split('T');
+    const date = split[0].split('-');
+    const dateNow = date[2]+'-'+date[1]+'-'+date[0];
+    const timeNow = split[1].substr(0, 5);
 
     const queueNo = this.resQueue.name;
     const isWalkin = this.selectedCheckIn.is_walkin ? 'WALK IN' : 'APPOINTMENT';
@@ -2234,20 +2252,26 @@ export class WidgetCreateAppointmentComponent implements OnInit {
           text: 'Floor : ' + floor + ' , Wing : ' + wing + ' , Room : ' + room,
           margin: [0, 0, 0, 0],
           alignment: 'center',
-          fontSize: 10,
+          fontSize: 8,
           bold: true
         },
         {
           text: 'Patient Name : ' + patientName,
           margin: [0, 5, 0, 5],
           alignment: 'center',
-          fontSize: 10
+          fontSize: 8
         },
         {
           text: 'Doctor Name : ' + doctorName,
           margin: [0, 0, 0, 5],
           alignment: 'center',
-          fontSize: 10
+          fontSize: 8
+        },
+        {
+          text: 'Adm Date : ' + dateNow +' | '+timeNow,
+          margin: [0, 0, 0, 5],
+          alignment: 'center',
+          fontSize: 8
         },
         {
           text: isWalkin,

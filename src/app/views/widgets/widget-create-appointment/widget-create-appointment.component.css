@@ -163,11 +163,6 @@ th {
   padding: 0;
 }
 
-tbody td:last-child{
-  padding-left: 0;
-  text-align: center;
-}
-
 .content-appointment-02-group-col {
   /*padding: 15px;*/
   background: white;

@@ -79,6 +79,12 @@ export class AppointmentService {
     const url = `${this.ccAppointmentUrl}/history/${appointment}`;
     return this.http.get<any>(url, httpOptions);
   }
+
+  countAidoAppointment(hospital: string, fromDate: any, toDate: any): Observable<any> {
+    const url = `${this.ccAppointmentUrl}/aido/count?hospitalId=${hospital}&from=${fromDate}&to=${toDate}`;
+    return this.http.get<any>(url, httpOptions);
+  }
+
   getCountAppReschedule(hospital: string, channel?: string, exclude?: boolean) {
     let url = `${this.appointmentRescheduleCount}?hospitalId=${hospital}`;
     url = channel ? `${url}&channelId=${channel}` : url;
@@ -191,6 +197,11 @@ export class AppointmentService {
     
     // return of(APPOINTMENT)
     return this.http.get<any>(url, httpOptions);
+  }
+
+  submitEligibleAido(payload: any, appId: string): Observable<any>{
+    const url = `${this.aidoWorklistUrl}/${appId}`;
+    return this.http.put<any>(url, payload, httpOptions);
   }
 
   addRescheduleAppointment(addReschedulePayload: any): Observable<any> {

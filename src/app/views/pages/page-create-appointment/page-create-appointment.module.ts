@@ -29,6 +29,10 @@ import { ModalAppointmentBpjsComponent } from '../../widgets/modal-appointment-b
 import { ModalSearchPatientModule } from '../../widgets/modal-search-patient/modal-search-patient.module';
 import { ModalSearchPatientComponent } from '../../widgets/modal-search-patient/modal-search-patient.component';
 
+import { ModalSearchPayerModule } from '../../widgets/modal-search-payer/modal-search-payer.module';
+import { ModalSearchPayerComponent } from '../../widgets/modal-search-payer/modal-search-payer.component';
+
+
 import { ModalPatientVerificationModule } from '../../widgets/modal-patient-verification/modal-patient-verification.module';
 import { ModalPatientVerificationComponent } from '../../widgets/modal-patient-verification/modal-patient-verification.component';
 
@@ -56,6 +60,7 @@ import { ModalCreateAppBpjsModule } from '../../widgets/modal-create-app-bpjs/mo
     ModalCreateAppointmentModule,
     ModalCancelAppointmentModule,
     ModalSearchPatientModule,
+    ModalSearchPayerModule,
     ModalPatientVerificationModule,
     WidgetCreateAppointmentModule,
     ModalRescheduleAppointmentModule,
@@ -70,6 +75,7 @@ import { ModalCreateAppBpjsModule } from '../../widgets/modal-create-app-bpjs/mo
     ModalScheduleBlockComponent,
     ModalCreateAppointmentComponent,
     ModalSearchPatientComponent,
+    ModalSearchPayerComponent,
     ModalCancelAppointmentComponent,
     ModalPatientVerificationComponent,
     ModalRescheduleAppointmentComponent,

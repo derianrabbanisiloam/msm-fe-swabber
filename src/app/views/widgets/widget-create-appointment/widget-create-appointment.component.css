@@ -773,6 +773,10 @@ tbody tr:last-child {
   float: right;
 }
 
+.payer-wrap {
+  height: 100%;
+}
+
 @-webkit-keyframes twinkle {
   0% { opacity: 1}
   50% { opacity: 0}

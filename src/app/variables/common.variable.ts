@@ -6,6 +6,7 @@ export const CANCEL_APP = 'APPOINTMENT__CANCEL';
 export const RESCHEDULE_APP = 'APPOINTMENT__RESCHEDULE';
 export const QUEUE_NUMBER = 'QUEUE__CREATE_QUEUE';
 export const APP_TEMP = 'APPOINTMENT_TEMPORARY__COUNT';
+export const APP_TELE_AIDO = 'APPOINTMENT_AIDO__COUNT';
 export const APP_RESCHEDULE = 'APPOINTMENT_RESCHEDULE__COUNT';
 export const REQUEST_LIST = 'BPJS__APPOINTMENT_COUNT';
 export const SCHEDULE_BLOCK = 'SCHEDULE__BLOCK';
@@ -17,6 +18,13 @@ export const reqBpjs = {
   REQLIST: true,
   REQCOMPLETED: false
 }
+
+export const eligibleStatus = {
+  ELIGIBLE: '1',
+  NOT_ELIGIBLE: '2',
+  NOT_YET_ELIGIBLE: '3'
+}
+
 export const keySocket = {
   APPOINTMENT: '/appointments',
   QUEUE: '/queues',
@@ -66,7 +74,9 @@ export const channelId = {
   CALL_CENTER: '1',
   FRONT_OFFICE: '2',
   AIDO: '18',
-  BPJS: '15'
+  BPJS: '15',
+  MOBILE: '5',
+  MOBILE_OTHER: '9'
 };
 
 export const appointmentStatusId = {

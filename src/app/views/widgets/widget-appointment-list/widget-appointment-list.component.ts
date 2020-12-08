@@ -776,7 +776,6 @@ export class WidgetAppointmentListComponent implements OnInit {
       this.txtPayerNo = false;
       // this.txtPayerEligibility = false;
       this.buttonCheckEligible = false;
-      this.buttonCreateAdmission = this.isBridging ? true : false;
       idx = this.patientTypeList.findIndex((a) => {
         return a.description == "PAYER";
       })
@@ -1410,14 +1409,18 @@ export class WidgetAppointmentListComponent implements OnInit {
   }
 
   async printSjp(str){
-    this.isLoadingCheckEligible = true;
-    let filePdf = null
-    if (str === 'update'){
-      filePdf = await this.getFilePdfUpdate() 
+    if(this.patientType.description == 'PAYER'){
+      this.isLoadingCheckEligible = true;
+      let filePdf = null
+      if (str === 'update'){
+        filePdf = await this.getFilePdfUpdate() 
+      } else {
+        filePdf = await this.getFilePdf() 
+      }
+      printPreview(filePdf)
     } else {
-      filePdf = await this.getFilePdf() 
+      this.alertService.error('cannot print eligibility', false, 3000)
     }
-    printPreview(filePdf)
   }
 
  async updateAdmission(val, content){

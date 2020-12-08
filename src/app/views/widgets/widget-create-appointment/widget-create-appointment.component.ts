@@ -2074,7 +2074,6 @@ export class WidgetCreateAppointmentComponent implements OnInit {
       this.txtPayerNo = false;
       // this.txtPayerEligibility = false;
       this.buttonCheckEligible = false;
-      this.buttonCreateAdmission = this.isBridging ? true : false;
       idx = this.patientTypeList.findIndex((a) => {
         return a.description == "PAYER";
       })

@@ -2278,11 +2278,15 @@ export class WidgetPatientDataComponent implements OnInit {
     }
 
     async printSjp(){
+     if(this.patientType.description == 'PAYER'){
       this.isLoadingCheckEligible = true;
       let filePdf = await this.getFilePdf() 
       if (filePdf){
         printPreview(filePdf)
-     }
+      } 
+    } else {
+      this.alertService.error('cannot print eligibility', false, 3000)
+    }
 
   }
 

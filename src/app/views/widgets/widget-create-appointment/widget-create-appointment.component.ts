@@ -2548,7 +2548,7 @@ export class WidgetCreateAppointmentComponent implements OnInit {
   }
 
   async printSjp(){
-    if(this.patientType.description == 'PAYER'){
+    if(this.patientType.description == 'PAYER' || this.selectedCheckIn.patient_type_name == 'PAYER'){
       this.isLoadingCheckEligible = true;
       let filePdf = await this.getFilePdf() 
       if (filePdf){

@@ -2321,7 +2321,7 @@ export class WidgetPatientDataComponent implements OnInit {
         this.payerNo == '') || 
         this.isCreatedEligibility ){
         return true;
-    } else if (this.payer && this.payer.isBridging){
+    } else if (this.payer && this.payer.is_bridging){
         return false;
     } else {
       return true;

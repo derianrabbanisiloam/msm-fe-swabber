@@ -1037,7 +1037,7 @@
                   <input class="form-control"  placeholder="Click to search"
                   (click)="searchDiagnose()"
                    name="diagnose"  [value]="diagnose ? diagnose.code  + ' - ' + diagnose.name : ''"
-                   [disabled]="isCreatedEligibility" >
+                   [disabled]="isCreatedEligibility">
                 </div>
               </div>
               <div style="width: 30%; margin-top: 5px; margin-left: 20px;">
@@ -1074,7 +1074,7 @@
       <div>
         <div class="d-flex justify-content-end">
           <button *ngIf="isBridging" style="width: 120px;" type="button" class="fo_btn_admission button btn-primary"
-          [disabled]="(this.payer == null || this.payer == '') || (this.payerNo == null || this.payerNo == '') || isCreatedEligibility"
+          [disabled]="checkIfBridging()"
           (click)="checkEligible()"
         > Create Eligibility </button>
         <button *ngIf="isBridging" style="width: 120px;" type="button" class="fo_btn_admission button btn-warning"

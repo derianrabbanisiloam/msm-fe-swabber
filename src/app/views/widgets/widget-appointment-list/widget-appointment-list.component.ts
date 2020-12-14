@@ -1543,6 +1543,19 @@ async  searchDiagnose(){
     `${isNumber(date.year) ? date.year : ''}-${isNumber(date.month ) ? date.month : ''}-${date.day}` : ''
   }
 
+  checkIfBridging(){
+    if ((this.payer == null || 
+        this.payer == '') || 
+        (this.payerNo == null || 
+        this.payerNo == '') || 
+        this.isCreatedEligibility ){
+        return true;
+    } else if (this.payer && this.payer.isBridging){
+        return false;
+    } else {
+      return true;
+    }   
+  }
   
 
   checkUpdate(){

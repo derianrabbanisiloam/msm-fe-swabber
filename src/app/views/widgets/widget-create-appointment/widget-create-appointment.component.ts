@@ -299,7 +299,6 @@ export class WidgetCreateAppointmentComponent implements OnInit {
     this.getCollectionAlert();
     this.setReferralSource()
     this.setDiagnose();
-
     //socket reserve slot
     this.socketTwo.on(RESERVE_SLOT+'/'+this.hospital.id, (call) => {
       for(let k = 0, { length } = this.slotList; k < length; k += 1) {
@@ -2569,6 +2568,20 @@ export class WidgetCreateAppointmentComponent implements OnInit {
       // add alert to array
       this.alerts.push(alert);
     });
+  }
+
+  checkIfBridging(){
+    if ((this.payer == null || 
+        this.payer == '') || 
+        (this.payerNo == null || 
+        this.payerNo == '') || 
+        this.isCreatedEligibility ){
+        return true;
+    } else if (this.payer && this.payer.isBridging){
+        return false;
+    } else {
+      return true;
+    }   
   }
 
   cssAlertType(alert: Alert) {

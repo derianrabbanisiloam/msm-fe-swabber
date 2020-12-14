@@ -2314,6 +2314,20 @@ export class WidgetPatientDataComponent implements OnInit {
     });
   }
 
+  checkIfBridging(){
+    if ((this.payer == null || 
+        this.payer == '') || 
+        (this.payerNo == null || 
+        this.payerNo == '') || 
+        this.isCreatedEligibility ){
+        return true;
+    } else if (this.payer && this.payer.isBridging){
+        return false;
+    } else {
+      return true;
+    }   
+  }
+
   cssAlertType(alert: Alert) {
     if (!alert) {
       return;

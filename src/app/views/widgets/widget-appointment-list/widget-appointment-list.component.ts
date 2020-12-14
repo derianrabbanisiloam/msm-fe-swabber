@@ -340,8 +340,6 @@ export class WidgetAppointmentListComponent implements OnInit {
   async getPayer() {
     this.listPayer = await this.generalService.getPayer(this.hospital.orgId)
       .toPromise().then(res => {
-        console.log(res.data);
-        
         return res.data;
       }).catch(err => {
         return [];

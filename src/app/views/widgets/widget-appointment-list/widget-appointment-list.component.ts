@@ -922,7 +922,8 @@ export class WidgetAppointmentListComponent implements OnInit {
             this.buttonCloseAdm = true;
             this.buttonPatientLabel = false;
             this.isLoadingCreateAdmission = false;
-            this.txtPayerEligibility = false
+            this.txtPayerEligibility = false;
+            this.isCreatedEligibility = false;
             this.alertService.success(res.message, false, 3000);
           }).catch(err => {
             this.buttonCreateAdmission = false;
@@ -1408,8 +1409,11 @@ export class WidgetAppointmentListComponent implements OnInit {
     return data
   }
 
-  async printSjp(str){            
-    if(this.patientType.description == 'PAYER' || this.selectedCheckIn.patient_type_name == 'PAYER'){
+  async printSjp(str){  
+    if(this.patientType.description == 'PAYER' || 
+      this.selectedUpdate.patient_type_name == 'PAYER' || 
+      this.selectedCheckIn.patient_type_name == 'PAYER'){
+
       this.isLoadingCheckEligible = true;
       let filePdf = null
       if (str === 'update'){
@@ -1544,20 +1548,23 @@ async  searchDiagnose(){
   }
 
   checkIfBridging(){
-    if ((this.payer == null || 
-        this.payer == '') || 
-        (this.payerNo == null || 
-        this.payerNo == '') || 
-        this.isCreatedEligibility ){
+    if (this.patientType.description == 'PAYER'){
+      if ((this.payer == null || 
+          this.payer == '') ||
+          this.isCreatedEligibility){
+          this.buttonCreateAdmission = false;
+          return true;
+      } else if (this.payer && this.payer.is_bridging && this.isBridging){         
+          this.buttonCreateAdmission = true;
+          return this.txtPayerEligibility ? false : true;
+      }else {
         return true;
-    } else if (this.payer && this.payer.isBridging){
-        return false;
+      }
     } else {
       return true;
-    }   
+    }         
   }
   
-
   checkUpdate(){
 
     let dateToStr;

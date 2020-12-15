@@ -1692,6 +1692,7 @@ export class WidgetPatientDataComponent implements OnInit {
            this.buttonPatientLabel = false;
            this.isLoadingCreateAdmission = false;
            this.txtPayerEligibility = false;
+           this.isCreatedEligibility = false;
            this.alertService.success(res.message, false, 3000);
          }).catch(err => {
            this.buttonCreateAdmission = false;
@@ -2315,14 +2316,18 @@ export class WidgetPatientDataComponent implements OnInit {
   }
 
   checkIfBridging(){
-    if ((this.payer == null || 
-        this.payer == '') || 
-        (this.payerNo == null || 
-        this.payerNo == '') || 
-        this.isCreatedEligibility ){
+    if (this.patientType.description == 'PAYER'){
+      if ((this.payer == null || 
+          this.payer == '') ||
+          this.isCreatedEligibility){
+          this.buttonCreateAdmission = false;
+          return true;
+      } else if (this.payer && this.payer.is_bridging && this.isBridging){         
+          this.buttonCreateAdmission = true;
+          return this.txtPayerEligibility ? false : true;
+      }else {
         return true;
-    } else if (this.payer && this.payer.is_bridging){
-        return false;
+      }
     } else {
       return true;
     }   

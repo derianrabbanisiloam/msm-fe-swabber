@@ -136,6 +136,7 @@ export class WidgetCreateAppointmentComponent implements OnInit {
   public diagnoseCode: any;
   public patientEligible: any;
   public isCreatedEligibility: boolean = false;
+  public isError: boolean = false;
 
   public referralDateModel: NgbDateStruct;
 
@@ -794,6 +795,8 @@ export class WidgetCreateAppointmentComponent implements OnInit {
     this.referralDateModel = null;
     this.referralNo = null;
     this.payerEligibility = null;
+
+    this.isError = false;
   }
 
   async getListRoomHope() {
@@ -2482,6 +2485,8 @@ export class WidgetCreateAppointmentComponent implements OnInit {
     .catch(err => {
       this.isLoadingCheckEligible = false;
       this.isCreatedEligibility = false;
+      this.buttonCreateAdmission = false;
+      this.isError = true;
       this.alertService.error(err.error.message,false,5000)
     })
     
@@ -2572,15 +2577,15 @@ export class WidgetCreateAppointmentComponent implements OnInit {
   }
 
   checkIfBridging(){
-
     if (this.patientType.description == 'PAYER'){
       if ((this.payer == null || 
           this.payer == '') ||
           this.isCreatedEligibility){
           this.buttonCreateAdmission = false;
           return true;
-      } else if (this.payer && this.payer.is_bridging && this.isBridging){         
-          this.buttonCreateAdmission = true;
+      } else if (this.payer && this.payer.is_bridging && this.isBridging){    
+
+          this.buttonCreateAdmission = this.isError ? false : true;
           return this.txtPayerEligibility ? false : true;
       }else {
         return true;

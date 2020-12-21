@@ -141,7 +141,7 @@ export class WidgetAppointmentListComponent implements OnInit {
   public isLoadingCreateAdmission: boolean = false;
   public isLoadingCheckEligible: boolean = false;
   public isCreatedEligibility: boolean = false;
-
+  public isError: boolean = false;
 
   public listActiveAdmission: any = [];
 
@@ -407,6 +407,8 @@ export class WidgetAppointmentListComponent implements OnInit {
     this.referralDateModel = null;
     this.referralNo = null;
     this.payerEligibility = null;
+
+    this.isError = false;
   }
 
   clearSearch() {
@@ -1308,6 +1310,8 @@ export class WidgetAppointmentListComponent implements OnInit {
       .catch(err => {
         this.isLoadingCheckEligible = false;
         this.isCreatedEligibility = false;
+        this.buttonCreateAdmission = false;
+        this.isError = true;
         this.alertService.error(err.error.message,false,5000)
       })
       
@@ -1555,7 +1559,7 @@ async  searchDiagnose(){
           this.buttonCreateAdmission = false;
           return true;
       } else if (this.payer && this.payer.is_bridging && this.isBridging){         
-          this.buttonCreateAdmission = true;
+          this.buttonCreateAdmission = this.isError ? false : true;
           return this.txtPayerEligibility ? false : true;
       }else {
         return true;

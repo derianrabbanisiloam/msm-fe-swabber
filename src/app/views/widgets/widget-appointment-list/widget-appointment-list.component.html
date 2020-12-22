@@ -468,6 +468,7 @@
                       <input class="form-control"
                         name="referralDate"
                         [(ngModel)]="referralDateModel"
+                        [maxDate]="getMaxDate()"
                         ngbDatepicker #d="ngbDatepicker"
                         [disabled] = "isCreatedEligibility"
                       >
@@ -534,7 +535,7 @@
           > Create Eligibility </button>
           <button *ngIf="isBridging" style="width: 120px;" type="button" class="fo_btn_admission button btn-warning"
           [disabled]="txtPayerEligibility"
-          (click)="printSjp('checkIn')"
+          (click)="printSjp()"
           > Print Eligibility </button>
             <button *ngIf="!selectedCheckIn.admission_id" class="fo_btn_admission fo_btn_save"
               [disabled]="buttonCreateAdmission || isLoadingCreateAdmission"
@@ -772,7 +773,7 @@
               (click)="processUpdateAdmission()">Update</button>
             <button style="width: 120px;" type="button" class="fo_btn_admission button btn-warning"
             [disabled]="false"
-            (click)="printSjp('update')"
+            (click)="printSjpUpdate()"
             > Print Eligibility </button>
             <button style="width: 120px;" class="fo_btn_admission fo_btn_blue" [disabled]="true"
               (click)="printPatientLabel(selectedCheckIn)">Print Patient</button>

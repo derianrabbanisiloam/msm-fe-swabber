@@ -1274,6 +1274,16 @@ export class WidgetAppointmentListComponent implements OnInit {
     });
   }
 
+  getMaxDate(){
+    let currentDate = new Date();
+     let maxDate = {
+        year: currentDate.getFullYear(),
+        month: currentDate.getMonth() + 1,
+        day: currentDate.getDate()
+      }
+      return maxDate
+  }
+
   checkEligible(){
       
       this.isLoadingCheckEligible = true;
@@ -1294,7 +1304,11 @@ export class WidgetAppointmentListComponent implements OnInit {
         userName: this.user.username,
         userId: this.user.id,
       }    
-    
+      
+      if (!this.referralDateModel){
+        this.alertService.error('Tanggal Rujukan Tidak Boleh Kosong', false, 5000)
+        this.isLoadingCheckEligible = false;
+    } else {
       let data = this.payerService.checkEligible(payload)
       .toPromise().then(
         res => {
@@ -1308,14 +1322,13 @@ export class WidgetAppointmentListComponent implements OnInit {
         }
       )
       .catch(err => {
-        if (err.error.message !== 'Tanggal Rujukan Tidak Boleh Kosong'){
-          this.isError = true;
-        }
+        this.isError = true;
         this.isLoadingCheckEligible = false;
         this.isCreatedEligibility = false;
         this.buttonCreateAdmission = false;
         this.alertService.error(err.error.message,false,5000)
       })
+    }
       
   }
 
@@ -1415,20 +1428,28 @@ export class WidgetAppointmentListComponent implements OnInit {
     return data
   }
 
-  async printSjp(str){  
-    if(this.patientType.description == 'PAYER' || 
-      this.selectedUpdate.patient_type_name == 'PAYER' || 
-      this.selectedCheckIn.patient_type_name == 'PAYER'){
+  async printSjpUpdate(){
+    this.isLoadingCheckEligible = true;
+    if (this.patientType.description === 'PAYER' || this.selectedUpdate.patient_type_name == 'PAYER') {
+      let filePdf = null;
+      filePdf = await this.getFilePdfUpdate()
 
-      this.isLoadingCheckEligible = true;
-      let filePdf = null
-      if (str === 'update'){
-        filePdf = await this.getFilePdfUpdate() 
-      } else {
-        filePdf = await this.getFilePdf() 
-      }
       printPreview(filePdf)
     } else {
+      this.isLoadingCheckEligible = false;
+      this.alertService.error('cannot print eligibility', false, 3000)
+    }
+  }
+
+  async printSjp(){  
+    if(this.patientType.description == 'PAYER' ||  
+      this.selectedCheckIn.patient_type_name == 'PAYER'){      
+      this.isLoadingCheckEligible = true;
+      let filePdf = null
+      filePdf = await this.getFilePdf() 
+      printPreview(filePdf)
+    } else {
+      this.isLoadingCheckEligible = false;
       this.alertService.error('cannot print eligibility', false, 3000)
     }
   }

@@ -1013,6 +1013,7 @@
                     <input class="form-control"
                       name="referralDate"
                       [(ngModel)]="referralDateModel"
+                      [maxDate]="getMaxDate()"
                       ngbDatepicker #d="ngbDatepicker"
                       [disabled] = "isCreatedEligibility"
                     >

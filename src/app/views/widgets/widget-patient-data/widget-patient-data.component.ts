@@ -2213,7 +2213,15 @@ export class WidgetPatientDataComponent implements OnInit {
       })
     } 
 
-    
+    getMaxDate(){
+      let currentDate = new Date();
+       let maxDate = {
+          year: currentDate.getFullYear(),
+          month: currentDate.getMonth() + 1,
+          day: currentDate.getDate()
+        }
+        return maxDate
+    }
 
     checkEligible(){
       this.isLoadingCheckEligible = true;
@@ -2236,6 +2244,10 @@ export class WidgetPatientDataComponent implements OnInit {
   
       }    
     
+    if (!this.referralDateModel){
+        this.alertService.error('Tanggal Rujukan Tidak Boleh Kosong', false, 5000)
+        this.isLoadingCheckEligible = false;
+    } else {
       let data = this.payerService.checkEligible(payload)
       .toPromise().then(
         res => {
@@ -2249,16 +2261,13 @@ export class WidgetPatientDataComponent implements OnInit {
         }
       )
       .catch(err => {
-
-        if (err.error.message !== 'Tanggal Rujukan Tidak Boleh Kosong'){
-          this.isError = true;
-        }
-
+        this.isError = true;
         this.isLoadingCheckEligible = false;
         this.isCreatedEligibility = false;
         this.buttonCreateAdmission = false;
         this.alertService.error(err.error.message,false,5000)
       })
+    }
       
     }
 

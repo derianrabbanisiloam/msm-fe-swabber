@@ -2449,6 +2449,16 @@ export class WidgetCreateAppointmentComponent implements OnInit {
     `${isNumber(date.year) ? date.year : ''}-${isNumber(date.month ) ? date.month : ''}-${date.day}` : ''
   }
 
+  getMaxDate(){
+    let currentDate = new Date();
+     let maxDate = {
+        year: currentDate.getFullYear(),
+        month: currentDate.getMonth() + 1,
+        day: currentDate.getDate()
+      }
+      return maxDate
+  }
+
   checkEligible(){
     this.isLoadingCheckEligible = true;
     let payload = {
@@ -2468,31 +2478,32 @@ export class WidgetCreateAppointmentComponent implements OnInit {
       userName: this.user.username,
       userId: this.userId,
 
-    }    
-  
-    let data = this.payerService.checkEligible(payload)
-    .toPromise().then(
-      res => {
-        this.payerEligibility = res.data.eligibility_no;
-        this.patientEligible = res.data;
-        this.txtPayerEligibility = false;
-        this.isLoadingCheckEligible = false;
-        this.isCreatedEligibility = true;
-        this.buttonCreateAdmission = false;
-        this.alertService.success('Patient Eligible', false, 5000)        
-      }
-    )
-    .catch(err => {
-      if (err.error.message !== 'Tanggal Rujukan Tidak Boleh Kosong'){
-        this.isError = true;
-      }
-      
-      this.isLoadingCheckEligible = false;
-      this.isCreatedEligibility = false;
-      this.buttonCreateAdmission = false;
-      this.alertService.error(err.error.message,false,5000)
-    })
+    }
     
+    if (!this.referralDateModel){
+        this.alertService.error('Tanggal Rujukan Tidak Boleh Kosong', false, 5000)
+        this.isLoadingCheckEligible = false;
+    } else {
+      let data = this.payerService.checkEligible(payload)
+      .toPromise().then(
+        res => {
+          this.payerEligibility = res.data.eligibility_no;
+          this.patientEligible = res.data;
+          this.txtPayerEligibility = false;
+          this.isLoadingCheckEligible = false;
+          this.isCreatedEligibility = true;
+          this.buttonCreateAdmission = false;
+          this.alertService.success('Patient Eligible', false, 5000)        
+        }
+      )
+      .catch(err => {
+        this.isError = true;
+        this.isLoadingCheckEligible = false;
+        this.isCreatedEligibility = false;
+        this.buttonCreateAdmission = false;
+        this.alertService.error(err.error.message,false,5000)
+      })
+    }  
   }
 
   async searchReferralSource(){

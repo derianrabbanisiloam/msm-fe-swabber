@@ -2249,10 +2249,14 @@ export class WidgetPatientDataComponent implements OnInit {
         }
       )
       .catch(err => {
+
+        if (err.error.message !== 'Tanggal Rujukan Tidak Boleh Kosong'){
+          this.isError = true;
+        }
+
         this.isLoadingCheckEligible = false;
         this.isCreatedEligibility = false;
         this.buttonCreateAdmission = false;
-        this.isError = true;
         this.alertService.error(err.error.message,false,5000)
       })
       

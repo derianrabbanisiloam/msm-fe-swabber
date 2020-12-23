@@ -139,7 +139,7 @@
             <span class="" style="background: black; color: white; padding: 0px 5px">NO</span>
           </div>
         </td>
-        <td style="text-align: center">
+        <td style="text-align: center; white-space: nowrap;">
           <div *ngIf="itr.queue_number && itr.queue_type === qType.VIP">
             <span class="" style="background: #F2C22C; color: white; padding: 0px 5px">{{itr.queue_number}}</span>
           </div>
@@ -147,12 +147,25 @@
             <span class="" style="background: #1A2269; color: white; padding: 0px 5px">{{itr.queue_number}}</span>
           </div>
         </td>
-        <td style="text-align: center; width: 4vw">
-          <div *ngIf="itr.admission_id && itr.queue_number" class="cell-img-nav-single d-flex justify-content-center">
+        <td style="text-align: center; width: fit-content;">
+          <div *ngIf="itr.admission_id && itr.queue_number" class="cell-img-nav-single d-flex justify-content-center" >
             <div (click)="printPatientLabel(itr)">
-              <img src="{{assetPath}}icons/ic_Print_Yellow@2x.png">
+              <img 
+              src="{{assetPath}}icons/ic_Print_Yellow@2x.png">
             </div>
+              <button
+              style="margin-left: 10px;"
+              *ngIf="itr.payer_name && isBridging" type="button" class="btn btn-primary"
+                 (click)="updateAdmission(itr, updateAdmissionPayer)" 
+                 ngbPopover="Update Admission Data"
+                  triggers="mouseenter:mouseleave"
+                  popoverTitle="">
+                Update
+              </button>
+          
           </div>
+
+        
 
           <div class="span-canceled" *ngIf="itr.appointment_status_id === appStatusId.INACTIVE && !itr.expired">
             <span class="">Canceled</span>
@@ -717,6 +730,7 @@
                            placeholder="Refferal Date"
                            name="referralDate"
                            [(ngModel)]="referralDateModel"
+                           [maxDate]="getMaxDate()"
                            ngbDatepicker #d="ngbDatepicker"
                            [disabled] = "false"
                          >

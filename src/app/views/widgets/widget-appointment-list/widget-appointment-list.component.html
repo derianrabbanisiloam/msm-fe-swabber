@@ -155,14 +155,13 @@
             </div>
               <button
               style="margin-left: 10px;"
-              *ngIf="itr.payer_name && isBridging" type="button" class="btn btn-primary"
+              *ngIf="itr.payer_name && isBridging && checkUpdatePayer(itr)" type="button" class="btn btn-primary"
                  (click)="updateAdmission(itr, updateAdmissionPayer)" 
                  ngbPopover="Update Admission Data"
                   triggers="mouseenter:mouseleave"
                   popoverTitle="">
                 Update
               </button>
-          
           </div>
 
         
@@ -182,7 +181,7 @@
               popoverTitle=""
               [disabled]="itr.admission_id && itr.expired">Complete
             </button>
-            <button *ngIf="itr.payer_name && isBridging" type="button" class="btn btn-primary"
+            <button *ngIf="itr.payer_name && isBridging && checkUpdatePayer(itr)" type="button" class="btn btn-primary"
             (click)="updateAdmission(itr, updateAdmissionPayer)" 
             ngbPopover="Update Admission Data"
             triggers="mouseenter:mouseleave"

@@ -1600,9 +1600,19 @@ async  searchDiagnose(){
       return true;
     }    
   }
-  
-  checkUpdate(){
 
+
+  checkUpdatePayer(app){
+    let results;
+    if (app.payer_name){
+      results = this.listPayer.find(el => el.name === app.payer_name)
+      return results.is_bridging  ? true : false
+    }
+    return false;
+  }
+
+
+  checkUpdate(){
     let dateToStr;
     if (this.selectedUpdate.referral_date){
       dateToStr = moment(this.selectedUpdate.referral_date).format('YYYY-MM-D')

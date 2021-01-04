@@ -1566,8 +1566,11 @@ export class WidgetCreateAppointmentComponent implements OnInit {
                 referral_source, referral_name, referral_date, referral_no, disease_classification_code,disease_classification_name, disease_classification_id
             } = this.selectedCheckIn
             
+            this.payer = this.listPayer.find(el => {
+              return el.payer_id === payer_id && el.name === payer_name_app
+            })
 
-            this.payer = { name: payer_name_app, payer_id: payer_id }
+            // this.payer = { name: payer_name_app, payer_id: payer_id }
             this.referralSource =  referral_name && referral_no ?  { referralName: referral_name, code: referral_source } : null;
             this.referralNo = referral_no ? referral_no : null;
             this.payerNo = payer_no
@@ -2016,8 +2019,14 @@ export class WidgetCreateAppointmentComponent implements OnInit {
           this.buttonCloseAdm = true;
           this.buttonPatientLabel = false;
           this.isLoadingCreateAdmission = false;
-          this.txtPayerEligibility = false;
           this.isCreatedEligibility = false;
+          
+          if (this.payer){
+            this.txtPayerEligibility = this.payer.is_bridging && this.isError === false ? false : true;
+          } else {
+            this.txtPayerEligibility = true;
+          }
+          this.isError = false;
           this.alertService.success(res.message, false, 3000);
         }).catch(err => {
           this.buttonCreateAdmission = false;
@@ -2481,8 +2490,11 @@ export class WidgetCreateAppointmentComponent implements OnInit {
     }
     
     if (!this.referralDateModel){
-        this.alertService.error('Tanggal Rujukan Tidak Boleh Kosong', false, 5000)
+        this.alertService.error('Tanggal Rujukan Tidak Boleh Kosong', false, 2000)
         this.isLoadingCheckEligible = false;
+    } else if (!this.payerNo) {
+      this.alertService.error('Payer Number Tidak boleh kosong', false, 2000)
+      this.isLoadingCheckEligible = false;
     } else {
       let data = this.payerService.checkEligible(payload)
       .toPromise().then(
@@ -2591,14 +2603,14 @@ export class WidgetCreateAppointmentComponent implements OnInit {
   }
 
   checkIfBridging(){
-    if (this.patientType.description == 'PAYER'){
+    if (this.patientType.description === 'PAYER'){
       if ((this.payer == null || 
           this.payer == '') ||
           this.isCreatedEligibility){
           this.buttonCreateAdmission = false;
           return true;
-      } else if (this.payer && this.payer.is_bridging && this.isBridging){    
-
+      } else if (this.payer && this.payer.is_bridging && this.isBridging){   
+          if (!this.buttonPatientLabel) return true;
           this.buttonCreateAdmission = this.isError ? false : true;
           return this.txtPayerEligibility ? false : true;
       }else {

@@ -47,6 +47,7 @@ export class BpjsService {
     limit?: number,
     createFrom?: string,
     createTo?: string,
+    isActive?: boolean
   ): Observable<any> {
       let url = `${this.appointmentBpjsUrl}?`;
       url = fromDate ? `${url}&from=${fromDate}` : url;
@@ -59,6 +60,7 @@ export class BpjsService {
       url = `${url}&limit=${limit}&offset=${offset}`;
       url = createFrom ? `${url}&createdDateFrom=${createFrom}` : url;
       url = createTo ? `${url}&createdDateTo=${createTo}` : url;
+      url = `${url}&isActive=${isActive}`;
       
       return this.http.get<any>(url, httpOptions);
     }

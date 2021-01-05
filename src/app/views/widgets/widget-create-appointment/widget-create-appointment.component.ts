@@ -2019,13 +2019,18 @@ export class WidgetCreateAppointmentComponent implements OnInit {
           this.buttonCloseAdm = true;
           this.buttonPatientLabel = false;
           this.isLoadingCreateAdmission = false;
-          this.isCreatedEligibility = false;
           
           if (this.payer){
-            this.txtPayerEligibility = this.payer.is_bridging && this.isError === false ? false : true;
+            if (this.isCreatedEligibility) {
+              this.txtPayerEligibility = this.payer.is_bridging === true ? false : true;
+            } else {
+              this.txtPayerEligibility = this.payer.is_bridging && this.isError === false ? false : true;
+            }
+
           } else {
             this.txtPayerEligibility = true;
           }
+          this.isCreatedEligibility = false;
           this.isError = false;
           this.alertService.success(res.message, false, 3000);
         }).catch(err => {
@@ -2496,7 +2501,7 @@ export class WidgetCreateAppointmentComponent implements OnInit {
       this.alertService.error('Payer Number Tidak boleh kosong', false, 2000)
       this.isLoadingCheckEligible = false;
     } else {
-      let data = this.payerService.checkEligible(payload)
+      this.payerService.checkEligible(payload)
       .toPromise().then(
         res => {
           this.payerEligibility = res.data.eligibility_no;

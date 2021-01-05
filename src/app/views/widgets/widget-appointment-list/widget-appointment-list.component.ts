@@ -924,13 +924,17 @@ export class WidgetAppointmentListComponent implements OnInit {
           this.buttonCloseAdm = true;
           this.buttonPatientLabel = false;
           this.isLoadingCreateAdmission = false;
-          this.isCreatedEligibility = false;
-          
           if (this.payer){
-            this.txtPayerEligibility = this.payer.is_bridging && this.isError === false ? false : true;
+            if (this.isCreatedEligibility) {
+              this.txtPayerEligibility = this.payer.is_bridging === true ? false : true;
+            } else {
+              this.txtPayerEligibility = this.payer.is_bridging && this.isError === false ? false : true;
+            }
+
           } else {
             this.txtPayerEligibility = true;
           }
+          this.isCreatedEligibility = false;
           this.isError = false;
           this.alertService.success(res.message, false, 3000);
         }).catch(err => {

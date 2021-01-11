@@ -74,7 +74,7 @@ export class WidgetPatientDataComponent implements OnInit {
   public isButtonSave: boolean = false;
 
   public isLoadingCheckEligible: boolean = false;
-
+  public isError: boolean = false;
   public listActiveAdmission: any;
 
   public showWaitMsg: boolean = true;
@@ -1666,38 +1666,48 @@ export class WidgetPatientDataComponent implements OnInit {
        }
  
        var dataPatient;
-       this.admissionService.createAdmission(body).toPromise()
-         .then(res => {
-           dataPatient = {
-             schedule_id: val.schedule_id,
-             admission_id: res.data.admission_id,
-             admission_hope_id: res.data.admission_hope_id,
-             admission_no: res.data.admission_no,
-             payer_name: res.data.payer_name,
-             appointment_id: val.appointment_id,
-             appointment_date: val.appointment_date,
-             hospital_id: val.hospital_id,
-             doctor_id: val.doctor_id,
-             modified_name: res.data.modified_name,
-             modified_date: res.data.modified_date,
-             modified_from: res.data.modified_from,
-             modified_by: res.data.modified_by
-           }
-           // broadcast check-in
-           dataPatient.hospitalId = this.hospital.id;
-           this.socket.emit(CHECK_IN, dataPatient);
-           this.buttonCreateAdmission = true;
-           this.buttonPrintQueue = false;
-           this.buttonCloseAdm = true;
-           this.buttonPatientLabel = false;
-           this.isLoadingCreateAdmission = false;
-           this.txtPayerEligibility = false;
-           this.alertService.success(res.message, false, 3000);
-         }).catch(err => {
-           this.buttonCreateAdmission = false;
-           this.isLoadingCreateAdmission = false;
-           this.alertService.error(err.error.message, false, 3000);
-         })
+        this.admissionService.createAdmission(body).toPromise()
+        .then(res => {
+          dataPatient = {
+            schedule_id: val.schedule_id,
+            admission_id: res.data.admission_id,
+            admission_hope_id: res.data.admission_hope_id,
+            admission_no: res.data.admission_no,
+            payer_name: res.data.payer_name,
+            appointment_id: val.appointment_id,
+            appointment_date: val.appointment_date,
+            hospital_id: val.hospital_id,
+            doctor_id: val.doctor_id,
+            modified_name: res.data.modified_name,
+            modified_date: res.data.modified_date,
+            modified_from: res.data.modified_from,
+            modified_by: res.data.modified_by
+          }
+          // broadcast check-in
+          dataPatient.hospitalId = this.hospital.id;
+          this.socket.emit(CHECK_IN, dataPatient);
+          this.buttonCreateAdmission = true;
+          this.buttonPrintQueue = false;
+          this.buttonCloseAdm = true;
+          this.buttonPatientLabel = false;
+          this.isLoadingCreateAdmission = false;
+          if (this.payer){
+            if (this.isCreatedEligibility) {
+              this.txtPayerEligibility = this.payer.is_bridging === true ? false : true;
+            } else {
+              this.txtPayerEligibility = this.payer.is_bridging && this.isError === false ? false : true;
+            }
+          } else {
+            this.txtPayerEligibility = true;
+          }
+          this.isCreatedEligibility = false;
+          this.isError = false;
+          this.alertService.success(res.message, false, 3000);
+        }).catch(err => {
+          this.buttonCreateAdmission = false;
+          this.isLoadingCreateAdmission = false;
+          this.alertService.error(err.error.message, false, 3000);
+        })
      }
 
   }
@@ -2212,7 +2222,15 @@ export class WidgetPatientDataComponent implements OnInit {
       })
     } 
 
-    
+    getMaxDate(){
+      let currentDate = new Date();
+       let maxDate = {
+          year: currentDate.getFullYear(),
+          month: currentDate.getMonth() + 1,
+          day: currentDate.getDate()
+        }
+        return maxDate
+    }
 
     checkEligible(){
       this.isLoadingCheckEligible = true;
@@ -2231,28 +2249,37 @@ export class WidgetPatientDataComponent implements OnInit {
         registrationNotes: this.registNotes,
         diseaseClassificationId: this.diagnose ? this.diagnose.disease_classification_id : null,
         userName: this.user.username,
-        userId: this.userId,
+        userId: this.user.id,
   
-      }    
-    
-      let data = this.payerService.checkEligible(payload)
-      .toPromise().then(
-        res => {
-          this.payerEligibility = res.data.eligibility_no;
-          this.patientEligible = res.data;
-          this.txtPayerEligibility = false;
+      }
+      
+      if (!this.referralDateModel){
+          this.alertService.error('Tanggal Rujukan Tidak Boleh Kosong', false, 2000)
           this.isLoadingCheckEligible = false;
-          this.isCreatedEligibility = true;
-          this.buttonCreateAdmission = false;
-          this.alertService.success('Patient Eligible', false, 5000)        
-        }
-      )
-      .catch(err => {
+      } else if (!this.payerNo) {
+        this.alertService.error('Payer Number Tidak boleh kosong', false, 2000)
         this.isLoadingCheckEligible = false;
-        this.isCreatedEligibility = false;
-        this.alertService.error(err.error.message,false,5000)
-      })
-  
+      } else {
+        let data = this.payerService.checkEligible(payload)
+        .toPromise().then(
+          res => {
+            this.payerEligibility = res.data.eligibility_no;
+            this.patientEligible = res.data;
+            this.txtPayerEligibility = false;
+            this.isLoadingCheckEligible = false;
+            this.isCreatedEligibility = true;
+            this.buttonCreateAdmission = false;
+            this.alertService.success('Patient Eligible', false, 5000)        
+          }
+        )
+        .catch(err => {
+          this.isError = true;
+          this.isLoadingCheckEligible = false;
+          this.isCreatedEligibility = false;
+          this.buttonCreateAdmission = false;
+          this.alertService.error(err.error.message,false,5000)
+        })
+      }  
     }
 
     async getFilePdf(){
@@ -2278,7 +2305,7 @@ export class WidgetPatientDataComponent implements OnInit {
     }
 
     async printSjp(){
-     if(this.patientType.description == 'PAYER'){
+     if(this.patientType.description == 'PAYER' || this.selectedCheckIn.patient_type_name == 'PAYER'){
       this.isLoadingCheckEligible = true;
       let filePdf = await this.getFilePdf() 
       if (filePdf){
@@ -2312,6 +2339,25 @@ export class WidgetPatientDataComponent implements OnInit {
       // add alert to array
       this.alerts.push(alert);
     });
+  }
+
+  checkIfBridging(){
+    if (this.patientType.description === 'PAYER'){
+      if ((this.payer == null || 
+          this.payer == '') ||
+          this.isCreatedEligibility){
+          this.buttonCreateAdmission = false;
+          return true;
+      } else if (this.payer && this.payer.is_bridging && this.isBridging){   
+          if (!this.buttonPatientLabel) return true;
+          this.buttonCreateAdmission = this.isError ? false : true;
+          return this.txtPayerEligibility ? false : true;
+      }else {
+        return true;
+      }
+    } else {
+      return true;
+    }    
   }
 
   cssAlertType(alert: Alert) {

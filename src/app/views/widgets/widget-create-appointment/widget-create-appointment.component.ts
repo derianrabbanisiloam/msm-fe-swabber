@@ -136,6 +136,7 @@ export class WidgetCreateAppointmentComponent implements OnInit {
   public diagnoseCode: any;
   public patientEligible: any;
   public isCreatedEligibility: boolean = false;
+  public isError: boolean = false;
 
   public referralDateModel: NgbDateStruct;
 
@@ -299,7 +300,6 @@ export class WidgetCreateAppointmentComponent implements OnInit {
     this.getCollectionAlert();
     this.setReferralSource()
     this.setDiagnose();
-
     //socket reserve slot
     this.socketTwo.on(RESERVE_SLOT+'/'+this.hospital.id, (call) => {
       for(let k = 0, { length } = this.slotList; k < length; k += 1) {
@@ -795,6 +795,8 @@ export class WidgetCreateAppointmentComponent implements OnInit {
     this.referralDateModel = null;
     this.referralNo = null;
     this.payerEligibility = null;
+
+    this.isError = false;
   }
 
   async getListRoomHope() {
@@ -1564,8 +1566,11 @@ export class WidgetCreateAppointmentComponent implements OnInit {
                 referral_source, referral_name, referral_date, referral_no, disease_classification_code,disease_classification_name, disease_classification_id
             } = this.selectedCheckIn
             
+            this.payer = this.listPayer.find(el => {
+              return el.payer_id === payer_id && el.name === payer_name_app
+            })
 
-            this.payer = { name: payer_name_app, payer_id: payer_id }
+            // this.payer = { name: payer_name_app, payer_id: payer_id }
             this.referralSource =  referral_name && referral_no ?  { referralName: referral_name, code: referral_source } : null;
             this.referralNo = referral_no ? referral_no : null;
             this.payerNo = payer_no
@@ -2014,7 +2019,19 @@ export class WidgetCreateAppointmentComponent implements OnInit {
           this.buttonCloseAdm = true;
           this.buttonPatientLabel = false;
           this.isLoadingCreateAdmission = false;
-          this.txtPayerEligibility = false;
+          
+          if (this.payer){
+            if (this.isCreatedEligibility) {
+              this.txtPayerEligibility = this.payer.is_bridging === true ? false : true;
+            } else {
+              this.txtPayerEligibility = this.payer.is_bridging && this.isError === false ? false : true;
+            }
+
+          } else {
+            this.txtPayerEligibility = true;
+          }
+          this.isCreatedEligibility = false;
+          this.isError = false;
           this.alertService.success(res.message, false, 3000);
         }).catch(err => {
           this.buttonCreateAdmission = false;
@@ -2446,6 +2463,16 @@ export class WidgetCreateAppointmentComponent implements OnInit {
     `${isNumber(date.year) ? date.year : ''}-${isNumber(date.month ) ? date.month : ''}-${date.day}` : ''
   }
 
+  getMaxDate(){
+    let currentDate = new Date();
+     let maxDate = {
+        year: currentDate.getFullYear(),
+        month: currentDate.getMonth() + 1,
+        day: currentDate.getDate()
+      }
+      return maxDate
+  }
+
   checkEligible(){
     this.isLoadingCheckEligible = true;
     let payload = {
@@ -2465,26 +2492,35 @@ export class WidgetCreateAppointmentComponent implements OnInit {
       userName: this.user.username,
       userId: this.userId,
 
-    }    
-  
-    let data = this.payerService.checkEligible(payload)
-    .toPromise().then(
-      res => {
-        this.payerEligibility = res.data.eligibility_no;
-        this.patientEligible = res.data;
-        this.txtPayerEligibility = false;
-        this.isLoadingCheckEligible = false;
-        this.isCreatedEligibility = true;
-        this.buttonCreateAdmission = false;
-        this.alertService.success('Patient Eligible', false, 5000)        
-      }
-    )
-    .catch(err => {
-      this.isLoadingCheckEligible = false;
-      this.isCreatedEligibility = false;
-      this.alertService.error(err.error.message,false,5000)
-    })
+    }
     
+    if (!this.referralDateModel){
+        this.alertService.error('Tanggal Rujukan Tidak Boleh Kosong', false, 2000)
+        this.isLoadingCheckEligible = false;
+    } else if (!this.payerNo) {
+      this.alertService.error('Payer Number Tidak boleh kosong', false, 2000)
+      this.isLoadingCheckEligible = false;
+    } else {
+      this.payerService.checkEligible(payload)
+      .toPromise().then(
+        res => {
+          this.payerEligibility = res.data.eligibility_no;
+          this.patientEligible = res.data;
+          this.txtPayerEligibility = false;
+          this.isLoadingCheckEligible = false;
+          this.isCreatedEligibility = true;
+          this.buttonCreateAdmission = false;
+          this.alertService.success('Patient Eligible', false, 5000)        
+        }
+      )
+      .catch(err => {
+        this.isError = true;
+        this.isLoadingCheckEligible = false;
+        this.isCreatedEligibility = false;
+        this.buttonCreateAdmission = false;
+        this.alertService.error(err.error.message,false,5000)
+      })
+    }  
   }
 
   async searchReferralSource(){
@@ -2548,7 +2584,7 @@ export class WidgetCreateAppointmentComponent implements OnInit {
   }
 
   async printSjp(){
-    if(this.patientType.description == 'PAYER'){
+    if(this.patientType.description == 'PAYER' || this.selectedCheckIn.patient_type_name == 'PAYER'){
       this.isLoadingCheckEligible = true;
       let filePdf = await this.getFilePdf() 
       if (filePdf){
@@ -2569,6 +2605,25 @@ export class WidgetCreateAppointmentComponent implements OnInit {
       // add alert to array
       this.alerts.push(alert);
     });
+  }
+
+  checkIfBridging(){
+    if (this.patientType.description === 'PAYER'){
+      if ((this.payer == null || 
+          this.payer == '') ||
+          this.isCreatedEligibility){
+          this.buttonCreateAdmission = false;
+          return true;
+      } else if (this.payer && this.payer.is_bridging && this.isBridging){   
+          if (!this.buttonPatientLabel) return true;
+          this.buttonCreateAdmission = this.isError ? false : true;
+          return this.txtPayerEligibility ? false : true;
+      }else {
+        return true;
+      }
+    } else {
+      return true;
+    }    
   }
 
   cssAlertType(alert: Alert) {

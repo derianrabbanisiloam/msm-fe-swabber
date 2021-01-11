@@ -141,7 +141,7 @@ export class WidgetAppointmentListComponent implements OnInit {
   public isLoadingCreateAdmission: boolean = false;
   public isLoadingCheckEligible: boolean = false;
   public isCreatedEligibility: boolean = false;
-
+  public isError: boolean = false;
 
   public listActiveAdmission: any = [];
 
@@ -407,6 +407,8 @@ export class WidgetAppointmentListComponent implements OnInit {
     this.referralDateModel = null;
     this.referralNo = null;
     this.payerEligibility = null;
+
+    this.isError = false;
   }
 
   clearSearch() {
@@ -898,37 +900,48 @@ export class WidgetAppointmentListComponent implements OnInit {
   
         var dataPatient;
         this.admissionService.createAdmission(body).toPromise()
-          .then(res => {
-            dataPatient = {
-              schedule_id: val.schedule_id,
-              admission_id: res.data.admission_id,
-              admission_hope_id: res.data.admission_hope_id,
-              admission_no: res.data.admission_no,
-              payer_name: res.data.payer_name,
-              appointment_id: val.appointment_id,
-              appointment_date: val.appointment_date,
-              hospital_id: val.hospital_id,
-              doctor_id: val.doctor_id,
-              modified_name: res.data.modified_name,
-              modified_date: res.data.modified_date,
-              modified_from: res.data.modified_from,
-              modified_by: res.data.modified_by
+        .then(res => {
+          dataPatient = {
+            schedule_id: val.schedule_id,
+            admission_id: res.data.admission_id,
+            admission_hope_id: res.data.admission_hope_id,
+            admission_no: res.data.admission_no,
+            payer_name: res.data.payer_name,
+            appointment_id: val.appointment_id,
+            appointment_date: val.appointment_date,
+            hospital_id: val.hospital_id,
+            doctor_id: val.doctor_id,
+            modified_name: res.data.modified_name,
+            modified_date: res.data.modified_date,
+            modified_from: res.data.modified_from,
+            modified_by: res.data.modified_by
+          }
+          // broadcast check-in
+          dataPatient.hospitalId = this.hospital.id;
+          this.socket.emit(CHECK_IN, dataPatient);
+          this.buttonCreateAdmission = true;
+          this.buttonPrintQueue = false;
+          this.buttonCloseAdm = true;
+          this.buttonPatientLabel = false;
+          this.isLoadingCreateAdmission = false;
+          if (this.payer){
+            if (this.isCreatedEligibility) {
+              this.txtPayerEligibility = this.payer.is_bridging === true ? false : true;
+            } else {
+              this.txtPayerEligibility = this.payer.is_bridging && this.isError === false ? false : true;
             }
-            // broadcast check-in
-            dataPatient.hospitalId = this.hospital.id;
-            this.socket.emit(CHECK_IN, dataPatient);
-            this.buttonCreateAdmission = true;
-            this.buttonPrintQueue = false;
-            this.buttonCloseAdm = true;
-            this.buttonPatientLabel = false;
-            this.isLoadingCreateAdmission = false;
-            this.txtPayerEligibility = false
-            this.alertService.success(res.message, false, 3000);
-          }).catch(err => {
-            this.buttonCreateAdmission = false;
-            this.isLoadingCreateAdmission = false;
-            this.alertService.error(err.error.message, false, 3000);
-          })
+
+          } else {
+            this.txtPayerEligibility = true;
+          }
+          this.isCreatedEligibility = false;
+          this.isError = false;
+          this.alertService.success(res.message, false, 3000);
+        }).catch(err => {
+          this.buttonCreateAdmission = false;
+          this.isLoadingCreateAdmission = false;
+          this.alertService.error(err.error.message, false, 3000);
+        })
     }
   }
 
@@ -1271,27 +1284,44 @@ export class WidgetAppointmentListComponent implements OnInit {
     });
   }
 
+  getMaxDate(){
+    let currentDate = new Date();
+     let maxDate = {
+        year: currentDate.getFullYear(),
+        month: currentDate.getMonth() + 1,
+        day: currentDate.getDate()
+      }
+      return maxDate
+  }
+
   checkEligible(){
-      
-      this.isLoadingCheckEligible = true;
-      let payload = {
-        appointmentId: this.selectedCheckIn.appointment_id,
-        organizationId: this.hospital.orgId,
-        payerId: this.payer.payer_id,
-        payerNo:this.payerNo,
-        payerName: this.payer.name,
-        patientTypeId: this.patientType.value,
-        patientTypeName: this.patientType.description, 
-        referralNo: this.referralNo,
-        referralSource: this.referralSource ? this.referralSource.code : null,
-        referralDate: this.referralDateModel ? this.formatDateModel(this.referralDateModel)  : null,
-        referralName: this.referralSource ? this.referralSource.referralName : null,
-        registrationNotes: this.registNotes,
-        diseaseClassificationId: this.diagnose ? this.diagnose.disease_classification_id : null,
-        userName: this.user.username,
-        userId: this.user.id,
-      }    
+    this.isLoadingCheckEligible = true;
+    let payload = {
+      appointmentId: this.selectedCheckIn.appointment_id,
+      organizationId: this.hospital.orgId,
+      payerId: this.payer.payer_id,
+      payerNo:this.payerNo,
+      payerName: this.payer.name,
+      patientTypeId: this.patientType.value,
+      patientTypeName: this.patientType.description, 
+      referralNo: this.referralNo,
+      referralSource: this.referralSource ? this.referralSource.code : null,
+      referralDate: this.referralDateModel ? this.formatDateModel(this.referralDateModel)  : null,
+      referralName: this.referralSource ? this.referralSource.referralName : null,
+      registrationNotes: this.registNotes,
+      diseaseClassificationId: this.diagnose ? this.diagnose.disease_classification_id : null,
+      userName: this.user.username,
+      userId: this.user.id,
+
+    }
     
+    if (!this.referralDateModel){
+        this.alertService.error('Tanggal Rujukan Tidak Boleh Kosong', false, 2000)
+        this.isLoadingCheckEligible = false;
+    } else if (!this.payerNo) {
+      this.alertService.error('Payer Number Tidak boleh kosong', false, 2000)
+      this.isLoadingCheckEligible = false;
+    } else {
       let data = this.payerService.checkEligible(payload)
       .toPromise().then(
         res => {
@@ -1305,11 +1335,13 @@ export class WidgetAppointmentListComponent implements OnInit {
         }
       )
       .catch(err => {
+        this.isError = true;
         this.isLoadingCheckEligible = false;
         this.isCreatedEligibility = false;
+        this.buttonCreateAdmission = false;
         this.alertService.error(err.error.message,false,5000)
       })
-      
+    }  
   }
 
   async onKeyDiagnose(event: any){
@@ -1408,17 +1440,28 @@ export class WidgetAppointmentListComponent implements OnInit {
     return data
   }
 
-  async printSjp(str){
-    if(this.patientType.description == 'PAYER'){
-      this.isLoadingCheckEligible = true;
-      let filePdf = null
-      if (str === 'update'){
-        filePdf = await this.getFilePdfUpdate() 
-      } else {
-        filePdf = await this.getFilePdf() 
-      }
+  async printSjpUpdate(){
+    this.isLoadingCheckEligible = true;
+    if (this.patientType.description === 'PAYER' || this.selectedUpdate.patient_type_name == 'PAYER') {
+      let filePdf = null;
+      filePdf = await this.getFilePdfUpdate()
+
       printPreview(filePdf)
     } else {
+      this.isLoadingCheckEligible = false;
+      this.alertService.error('cannot print eligibility', false, 3000)
+    }
+  }
+
+  async printSjp(){  
+    if(this.patientType.description == 'PAYER' ||  
+      this.selectedCheckIn.patient_type_name == 'PAYER'){      
+      this.isLoadingCheckEligible = true;
+      let filePdf = null
+      filePdf = await this.getFilePdf() 
+      printPreview(filePdf)
+    } else {
+      this.isLoadingCheckEligible = false;
       this.alertService.error('cannot print eligibility', false, 3000)
     }
   }
@@ -1543,10 +1586,37 @@ async  searchDiagnose(){
     `${isNumber(date.year) ? date.year : ''}-${isNumber(date.month ) ? date.month : ''}-${date.day}` : ''
   }
 
-  
+  checkIfBridging(){
+    if (this.patientType.description === 'PAYER'){
+      if ((this.payer == null || 
+          this.payer == '') ||
+          this.isCreatedEligibility){
+          this.buttonCreateAdmission = false;
+          return true;
+      } else if (this.payer && this.payer.is_bridging && this.isBridging){   
+          if (!this.buttonPatientLabel) return true;
+          this.buttonCreateAdmission = this.isError ? false : true;
+          return this.txtPayerEligibility ? false : true;
+      }else {
+        return true;
+      }
+    } else {
+      return true;
+    }    
+  }
+
+
+  checkUpdatePayer(app){
+    let results;
+    if (app.payer_name){
+      results = this.listPayer.find(el => el.name === app.payer_name)
+      return results.is_bridging  ? true : false
+    }
+    return false;
+  }
+
 
   checkUpdate(){
-
     let dateToStr;
     if (this.selectedUpdate.referral_date){
       dateToStr = moment(this.selectedUpdate.referral_date).format('YYYY-MM-D')

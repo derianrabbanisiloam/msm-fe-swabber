@@ -10,6 +10,7 @@ export class PageAppointmentListComponent implements OnInit {
   constructor() { }
 
   ngOnInit() {
+    
   }
 
 }

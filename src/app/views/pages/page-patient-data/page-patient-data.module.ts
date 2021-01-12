@@ -12,9 +12,11 @@ import { WidgetPatientDataComponent } from '../../widgets/widget-patient-data/wi
 
 import { TextMaskModule } from 'angular2-text-mask';
 import { NgbAlertModule, NgbPopoverModule, NgbProgressbarModule, 
-  NgbModalModule, NgbTabsetModule } from '@ng-bootstrap/ng-bootstrap';
+  NgbModalModule, NgbTabsetModule, NgbDatepickerModule } from '@ng-bootstrap/ng-bootstrap';
 import { AutocompleteLibModule } from 'angular-ng-autocomplete';
 import { NguiAutoCompleteModule } from '@ngui/auto-complete';
+import { ModalSearchPayerModule } from '../../widgets/modal-search-payer/modal-search-payer.module';
+import { ModalSearchPayerComponent } from '../../widgets/modal-search-payer/modal-search-payer.component';
 
 @NgModule({
   declarations: [
@@ -32,14 +34,19 @@ import { NguiAutoCompleteModule } from '@ngui/auto-complete';
     NgbAlertModule,
     TextMaskModule,
     AutocompleteLibModule,
+    NgbDatepickerModule,
     NguiAutoCompleteModule,
     NgbPopoverModule,
     NgbProgressbarModule,
     NgbModalModule,
     NgbTabsetModule,
+    ModalSearchPayerModule
   ],
   exports: [
     PagePatientDataComponent,
+  ],
+  entryComponents: [
+    ModalSearchPayerComponent
   ]
 })
 export class PagePatientDataModule { }

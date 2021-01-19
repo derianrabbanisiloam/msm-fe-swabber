@@ -212,3 +212,17 @@
     </div>
   </a>
 </div>
+<div *ngIf="isBpjs === true" class="container-button shadow-4 unprintable">
+  <a class="side_button shadow-4" aria-expanded="false"
+    [routerLink]="['/vaccine-list']" [routerLinkActive]="['active']">
+
+    <div>
+      <!-- <img class="icon" src="{{assetPath}}icons/bpjs_logo.png"> -->
+      <!-- <img class="icon" src="{{assetPath}}icons/bpjs_logo.png"> -->
+    </div>
+    <div class="header-3 collapse show width fo_minimized" popoverTitle="Vaccine Consent Form" ngbPopover="Persetujuan vaksinasi COVID-19"
+      triggers="mouseenter:mouseleave" placement="right" container="body">
+      <div class="fo_minimized_text_long">Vaccine Consent Form</div>
+    </div>
+  </a>
+</div>

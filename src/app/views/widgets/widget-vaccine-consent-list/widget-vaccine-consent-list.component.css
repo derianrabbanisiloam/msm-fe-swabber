@@ -29,7 +29,8 @@ label {
 
 .consent-detail {
   background-color: #fff;
-  padding: 6px;
+  padding: 16px;
+  margin-bottom: 12px;
   border-radius: 4px;
 }
 
@@ -47,4 +48,77 @@ label {
   color: #ff4040;
   margin-bottom: 0;
   margin-left: 6px;
+}
+
+.header-print {
+  text-align: center;
+}
+
+.bordered-box-left {
+  border: 1px solid black;
+  margin-right: 4px;
+  padding: 8px;
+  width: 94%;
+}
+
+.bordered-box-right {
+  border: 1px solid black;
+  margin-left: 4px;
+  padding: 8px;
+  width: 94%;
+  float: right;
+}
+
+.p-hospital-name,
+.p-title-1,
+.p-title-2 {
+  font-weight: 700;
+}
+
+.p-title-2 {
+  font-style: italic;
+}
+
+.p-subtitle {
+  font-weight: 400;
+}
+
+.fo_vaccine_container_print {
+  margin-right: 4em;
+}
+
+.bordered-content {
+  border: 1px solid black;
+  width: 100%;
+  padding: 10px;
+}
+
+table,
+th,
+td {
+  border: 1px solid black;
+}
+
+th {
+  text-align: center;
+  background-color: #dddddd;
+}
+
+th,
+td {
+  padding: 2px;
+}
+
+table {
+  width: 100%;
+  margin-left: auto;
+  margin-right: auto;
+}
+
+ol {
+  padding-inline-start: 20px;
+}
+
+.signature {
+  text-align: right;
 }

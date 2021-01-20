@@ -108,7 +108,6 @@ export class WidgetVaccineConsentListComponent implements OnInit {
           ),
           detail: this.consentAnswer,
         };
-        console.log(this.consentInfo)
       },
       (err) => {
         this.showDetailConsent = false;

@@ -21,5 +21,15 @@ export class ConsentService {
     return this.http.get<Consent[]>(uri, httpOptions)
   }
 
+  getByNameDob(name: string, dob: string, orgId: number): Observable<any> {
+    const uri = `${this.consentUrl}/consent/2/${orgId}/${name}/${dob}`
+    return this.http.get<Consent[]>(uri, httpOptions)
+  }
+
+  getDetailAnswer(id: number): Observable<any> {
+    const uri = `${this.consentUrl}/consentdetail/${id}`
+    return this.http.get<Consent[]>(uri, httpOptions)
+  }
+
 
 }

@@ -1,4 +1,4 @@
-<div class="search-form">
+<!-- <div class="search-form">
   <form (ngSubmit)="searchByCode()">
     <input id="myInput" name="uniqueCode" class="form-control" placeholder="Search by unique code" ngbTooltip="Press 'Enter' to Search"
       [(ngModel)]="uniqueCode" autocomplete="off">
@@ -40,5 +40,60 @@
 <div *ngIf="consents.length > 0">
   <div *ngFor="let consent of consents">
     <p>{{ consent.patient_name }}</p>
+  </div>
+</div> -->
+
+<div class="fo_vaccine_container">
+  <div class="row">
+    <div class="col-3">
+      <div class="search-form">
+        <ngb-tabset type="pills">
+          <ngb-tab title="By Code" (click)="tabChange($event, 'code')">
+            <ng-template ngbTabContent>
+              <form (ngSubmit)="searchByCode()" class="mt-2">
+                <input id="myInput" name="uniqueCode" class="form-control" placeholder="Enter patient unique code"
+                  [(ngModel)]="uniqueCode" autocomplete="off" />
+                <input type="submit" value="Search" class="btn-primary mt-2" />
+              </form>
+            </ng-template>
+          </ngb-tab>
+          <ngb-tab title="By Name" (click)="tabChange($event, 'name')">
+            <ng-template ngbTabContent>
+              <form (ngSubmit)="searchByNameDob()" class="mt-2">
+                <input id="myInput" name="patientName" class="form-control" placeholder="Enter patient name"
+                  [(ngModel)]="patientName" autocomplete="off" />
+                <input id="myInput" name="dob" class="form-control" placeholder="Enter date of birth" [(ngModel)]="dob"
+                  autocomplete="off" [textMask]="{mask: maskBirth}" />
+                <input type="submit" value="Search" class="btn-primary mt-2" />
+              </form>
+            </ng-template>
+          </ngb-tab>
+        </ngb-tabset>
+      </div>
+      <div class="consent-result mt-4">
+        <div *ngIf="consents.length > 0">
+          <div *ngFor="let consent of consents">
+            <div class="card" (click)='goToDetail(consent.consent_id)'>
+              <div class="card-body">
+                <h5 class="card-title">{{ consent.patient_name }}</h5>
+                <h6 class="card-subtitle mb-2 text-muted">
+                  {{ consent.date_of_birth | date }}
+                </h6>
+                <h6 class="card-subtitle mb-2 text-muted">
+                  {{ consent.mobile_no }}
+                </h6>
+              </div>
+            </div>
+          </div>
+        </div>
+        <div *ngIf="showWaitMsg" class="alert alert-warning" role="alert">
+          Please wait ...
+        </div>
+        <div *ngIf="showNotFoundMsg" class="alert alert-danger" role="alert">
+          No data found
+        </div>
+      </div>
+    </div>
+    <div class="col-9" *ngIf="showDetailConsent">2 of 3 (wider)</div>
   </div>
 </div>

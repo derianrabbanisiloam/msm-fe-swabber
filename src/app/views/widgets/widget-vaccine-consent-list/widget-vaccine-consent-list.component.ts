@@ -8,18 +8,24 @@ import { ConsentService } from "../../../services/consent.service";
   styleUrls: ["./widget-vaccine-consent-list.component.css"],
 })
 export class WidgetVaccineConsentListComponent implements OnInit {
-  public consents: Consent[];
-
+  public consents: Consent[] = [];
+  public maskBirth = [/\d/, /\d/, '-', /\d/, /\d/, '-', /\d/, /\d/, /\d/, /\d/];
   public key: any = JSON.parse(localStorage.getItem("key"));
   public patientName: string = "";
   public dob: string = "";
   public uniqueCode: string = "";
   public showWaitMsg: boolean = false;
   public showNotFoundMsg: boolean = false;
+  public showDetailConsent: boolean = false;
 
   constructor(private consentService: ConsentService) { }
 
   ngOnInit() { }
+
+  tabChange(name: string) {
+    this.showNotFoundMsg = false;
+    this.showWaitMsg = false
+  }
 
   searchByCode() {
     const orgId = this.key.hospital.orgId;
@@ -46,5 +52,37 @@ export class WidgetVaccineConsentListComponent implements OnInit {
         this.consents = [];
       }
     );
+  }
+
+  searchByNameDob() {
+    const orgId = this.key.hospital.orgId;
+    this.showWaitMsg = true;
+    this.showNotFoundMsg = false;
+    this.consentService.getByNameDob(this.patientName, this.dob, orgId).subscribe(
+      (res) => {
+        if (res.status === "Success") {
+          if (res.data.length > 0) {
+            this.consents = res.data;
+          } else {
+            this.showNotFoundMsg = true;
+            this.consents = [];
+          }
+        } else {
+          this.showNotFoundMsg = true;
+          this.consents = [];
+        }
+        this.showWaitMsg = false;
+      },
+      (err) => {
+        this.showWaitMsg = false;
+        this.showNotFoundMsg = true;
+        this.consents = [];
+      }
+    );
+  }
+
+  goToDetail(id: number) {
+    this.showDetailConsent = true
+    console.log(id)
   }
 }

@@ -5,5 +5,6 @@ export class ConsentDetail {
     answer_value: string;
     answer_remarks: string;
     modified_date: string;
-    modified_by: string
+    modified_by: string;
+    is_remarks: boolean;
 }

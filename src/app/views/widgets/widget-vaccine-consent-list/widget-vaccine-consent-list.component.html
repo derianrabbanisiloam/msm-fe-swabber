@@ -63,8 +63,7 @@
             </div>
             <div class="col-6">
               <label for="patient-dob">Date of birth</label>
-              <input id="patient-dob" name="patient-dob" class="form-control" [ngModel]="consentInfo.date_of_birth | date:'dd-MM-yyyy'" (ngModelChange)="consentInfo.date_of_birth=$event"
-                autocomplete="off" />
+              <input id="patient-dob" name="patient-dob" class="form-control" [textMask]="{mask: maskBirth}" [(ngModel)]="consentInfo.date_of_birth" autocomplete="off" />
             </div>
           </div>
           <div class="row">
@@ -81,7 +80,13 @@
           </div>
           <div *ngFor="let q of consentInfo.detail" class="mt-2">
             <div class="mb-4">
-              <label for="question">{{q.consent_question_name}}</label>
+              <label for="question">{{ q.is_remarks ? q.consent_question_name.split('?')[0]+'?' :
+                q.consent_question_name}}</label>
+              <div *ngIf="q.is_remarks && q.answer_value==='Ya' || q.answer_value === 'yes'" class="form-inline">
+                <label>{{q.consent_question_name.split('?')[1].split(separator)[0]}}</label><input
+                  style="width: 64px; margin-left: 4px; margin-right: 4px;" [(ngModel)]="q.answer_remarks"
+                  autocomplete="off" id="answer-remarks" name="answer-remarks" class="form-control" /><label>{{q.consent_question_name.split('?')[1].split(separator)[1]}}</label>
+              </div>
               <div>
                 <div class="form-check form-check-inline">
                   <input class="form-check-input" type="checkbox" id="checkbox-yes" value="Ya"

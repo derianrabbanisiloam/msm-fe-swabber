@@ -1,3 +1,4 @@
+import * as moment from "moment";
 import { Component, OnInit } from "@angular/core";
 import { Consent } from "../../../models/consents/consent";
 import { ConsentDetail } from "../../../models/consents/ConsentDetail";
@@ -26,6 +27,7 @@ export class WidgetVaccineConsentListComponent implements OnInit {
     class: "",
   };
   public updateStatus: string = "Initial";
+  public separator: string = "<answer>";
 
   constructor(private consentService: ConsentService) { }
 
@@ -99,7 +101,14 @@ export class WidgetVaccineConsentListComponent implements OnInit {
       (res) => {
         this.showDetailConsent = true;
         this.consentAnswer = res.data;
-        this.consentInfo = { ...this.consentInfo, detail: this.consentAnswer };
+        this.consentInfo = {
+          ...this.consentInfo,
+          date_of_birth: moment(this.consentInfo.date_of_birth).format(
+            "DD-MM-YYYY"
+          ),
+          detail: this.consentAnswer,
+        };
+        console.log(this.consentInfo)
       },
       (err) => {
         this.showDetailConsent = false;
@@ -108,23 +117,22 @@ export class WidgetVaccineConsentListComponent implements OnInit {
   }
 
   updateConsent() {
-    console.log(this.consentInfo)
-    // this.updateStatus = "Loading";
-    // const orgId = this.key.hospital.orgId;
-    // this.consentService
-    //   .putConsent({
-    //     ...this.consentInfo,
-    //     create_user: "FO",
-    //     organization_id: orgId,
-    //   })
-    //   .subscribe(
-    //     (res) => {
-    //       this.updateStatus = "Success";
-    //     },
-    //     (err) => {
-    //       this.updateStatus = "Failed";
-    //     }
-    //   );
+    this.updateStatus = "Loading";
+    const orgId = this.key.hospital.orgId;
+    this.consentService
+      .putConsent({
+        ...this.consentInfo,
+        create_user: "FO",
+        organization_id: orgId,
+      })
+      .subscribe(
+        (res) => {
+          this.updateStatus = "Success";
+        },
+        (err) => {
+          this.updateStatus = "Failed";
+        }
+      );
   }
 
   fieldsChange(event: any, id: number) {

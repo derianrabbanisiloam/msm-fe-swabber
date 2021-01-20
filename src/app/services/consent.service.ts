@@ -2,6 +2,7 @@ import { Injectable } from '@angular/core';
 import { Observable, of, Subject } from 'rxjs';
 import { HttpClient } from '@angular/common/http';
 import { Consent } from '../models/consents/consent';
+import { ConsentDetail } from '../models/consents/ConsentDetail';
 import { environment } from '../../environments/environment';
 import { httpOptions } from '../utils/http.util';
 
@@ -28,8 +29,13 @@ export class ConsentService {
 
   getDetailAnswer(id: number): Observable<any> {
     const uri = `${this.consentUrl}/consentdetail/${id}`
-    return this.http.get<Consent[]>(uri, httpOptions)
+    return this.http.get<ConsentDetail[]>(uri, httpOptions)
   }
 
+  putConsent(payload: any): Observable<any> {
+    const url = `${this.consentUrl}/updateconsent`;
+    const body = JSON.stringify(payload);
 
+    return this.http.put<any>(url, body, httpOptions);
+  }
 }

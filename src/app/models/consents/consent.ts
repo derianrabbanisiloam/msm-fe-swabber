@@ -1,3 +1,4 @@
+import { ConsentDetail } from './ConsentDetail'
 export class Consent {
   consent_id: number;
   unique_code: string;
@@ -10,4 +11,5 @@ export class Consent {
   created_by: string;
   modified_date: string;
   modified_by: string;
+  detail: ConsentDetail[]
 }

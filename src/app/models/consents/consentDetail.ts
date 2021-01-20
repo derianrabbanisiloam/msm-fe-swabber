@@ -1,4 +1,4 @@
-export class Consent {
+export class ConsentDetail {
     consent_detail_id: number;
     consent_question_id: number;
     consent_question_name: string;

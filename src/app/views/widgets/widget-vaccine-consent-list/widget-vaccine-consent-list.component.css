@@ -2,10 +2,49 @@
   width: 100%;
 }
 
-#myInput {
+.form-control {
   margin-bottom: 4px;
+}
+
+label {
+  font-weight: 700;
 }
 
 .card {
   cursor: pointer;
+  border-radius: 4px;
+  padding: 6px;
+  margin-bottom: 2px;
+}
+
+.card-body {
+  padding: 6px;
+}
+
+.search-form {
+  background-color: #fff;
+  padding: 6px;
+  border-radius: 4px;
+}
+
+.consent-detail {
+  background-color: #fff;
+  padding: 6px;
+  border-radius: 4px;
+}
+
+.alert-none {
+  display: none;
+}
+
+.alert-success {
+  color: #00c781;
+  margin-bottom: 0;
+  margin-left: 6px;
+}
+
+.alert-fail {
+  color: #ff4040;
+  margin-bottom: 0;
+  margin-left: 6px;
 }

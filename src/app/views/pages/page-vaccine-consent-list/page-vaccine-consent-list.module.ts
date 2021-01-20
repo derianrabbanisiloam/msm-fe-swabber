@@ -7,9 +7,7 @@ import { WidgetVaccineConsentListComponent } from '../../widgets/widget-vaccine-
 import { SectionHeaderModule } from '../../sections/section-header/section-header.module';
 import { SectionSidebarModule } from '../../sections/section-sidebar/section-sidebar.module';
 import { SectionFooterModule } from '../../sections/section-footer/section-footer.module';
-import { NgbProgressbarModule, NgbTooltipModule } from '@ng-bootstrap/ng-bootstrap';
-
-
+import { NgbProgressbarModule, NgbTooltipModule, NgbTabsetModule } from '@ng-bootstrap/ng-bootstrap';
 @NgModule({
   declarations: [
     PageVaccineConsentListComponent,
@@ -24,6 +22,7 @@ import { NgbProgressbarModule, NgbTooltipModule } from '@ng-bootstrap/ng-bootstr
     SectionFooterModule,
     NgbProgressbarModule,
     NgbTooltipModule,
+    NgbTabsetModule,
   ],
   exports: [
     PageVaccineConsentListComponent

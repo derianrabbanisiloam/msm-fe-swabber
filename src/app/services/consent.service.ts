@@ -16,5 +16,10 @@ export class ConsentService {
 
   private consentUrl = environment.VACCINE_CONSENT_SERVICE
 
-  
+  getByCode(code: string, orgId: number): Observable<any> {
+    const uri = `${this.consentUrl}/consent/1/${orgId}/${code}/1990-01-01`
+    return this.http.get<Consent[]>(uri, httpOptions)
+  }
+
+
 }

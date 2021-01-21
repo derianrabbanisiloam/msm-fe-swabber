@@ -123,6 +123,8 @@ export class WidgetVaccineConsentListComponent implements OnInit {
         ...this.consentInfo,
         create_user: "FO",
         organization_id: orgId,
+        date_of_birth: `${this.consentInfo.date_of_birth.split("-")[2]}-${this.consentInfo.date_of_birth.split("-")[1]
+          }-${this.consentInfo.date_of_birth.split("-")[0]}`,
       })
       .subscribe(
         (res) => {
@@ -139,6 +141,8 @@ export class WidgetVaccineConsentListComponent implements OnInit {
     const foundIndex = this.consentInfo.detail.findIndex(
       (item) => item.consent_detail_id === id
     );
+    if (event.target.value === "Tidak")
+      this.consentInfo.detail[foundIndex].answer_remarks = "";
     this.consentInfo.detail[foundIndex].answer_value = event.target.value;
   }
 

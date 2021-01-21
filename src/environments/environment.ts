@@ -12,6 +12,6 @@ export const environment = {
   UPLOAD_IMAGE: 'http://10.85.136.23:3333',
   GET_IMAGE: 'http://10.85.136.23/dev',
   MOBILE_SERVICE: 'http://10.85.139.13/msm-be-mobile-master/api/v2',
-  INHEALTH:'http://10.85.129.63:8803',
-  VACCINE_CONSENT_SERVICE: 'http://10.85.139.13/content-covid'
+  INHEALTH: 'http://10.85.129.63:8803',
+  VACCINE_CONSENT_SERVICE: 'http://10.85.139.13/consent-covid'
 };

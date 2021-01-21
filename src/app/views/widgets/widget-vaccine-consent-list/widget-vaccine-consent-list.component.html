@@ -144,10 +144,9 @@
                   q.consent_question_name.split("?")[1].split(separator)[0]
                 }}</label
                 ><input
-                  style="width: 64px; margin-left: 4px; margin-right: 4px"
+                  style="width: 64px; margin-left: 4px; margin-right: 4px; text-align: center;"
                   [(ngModel)]="q.answer_remarks"
                   autocomplete="off"
-                  id="answer-remarks"
                   name="answer-remarks"
                   class="form-control"
                 /><label>{{
@@ -159,7 +158,7 @@
                   <input
                     class="form-check-input"
                     type="checkbox"
-                    id="checkbox-yes"
+                    [id]="'checkbox-yes-'+q.consent_question_id"
                     value="Ya"
                     name="checkbox-answer-yes"
                     [checked]="
@@ -173,7 +172,7 @@
                   <input
                     class="form-check-input"
                     type="checkbox"
-                    id="checkbox-no"
+                    [id]="'checkbox-no-'+q.consent_question_id"
                     value="Tidak"
                     name="checkbox-answer-no"
                     [checked]="
@@ -203,9 +202,11 @@
   *ngIf="showDetailConsent && consentInfo.detail.length > 0"
 >
 <div class="row">
-  <p style="font-size: 20px">
-    {{ consentInfo.unique_code}}
-  </p>
+  <div style="border: 1px solid black; padding: 8px;">
+    <p style="font-size: 20px; font-weight: 700; margin: 0;">
+      Code: {{ consentInfo.unique_code}}
+    </p>
+  </div>
 </div>
   <div class="row">
     <div class="col-print-12 header-print">
@@ -270,7 +271,7 @@
                       ? q.consent_question_name
                       : q.consent_question_name.replace(
                           separator,
-                          q.answer_remarks
+                          q.answer_remarks !== "" ? q.answer_remarks : '...'
                         )
                   }}
                 </td>
@@ -304,7 +305,7 @@
                       "
                     />
                     <label class="form-check-label" for="checkbox-yes"
-                      >Ya</label
+                      >Tidak</label
                     >
                   </div>
                 </td>
@@ -348,7 +349,7 @@
         </p>
       </div>
       <div class="signature">
-        <p>.............., ............................20......</p>
+        <p>.............., .........................20..........</p>
         <br /><br /><br /><br /><br />
         <p>......................................................</p>
         <p>Nama jelas dan tanda tangan</p>

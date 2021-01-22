@@ -1,8 +1,15 @@
 import * as moment from "moment";
+import { NgbModal } from "@ng-bootstrap/ng-bootstrap";
+import { NgbActiveModal } from "@ng-bootstrap/ng-bootstrap";
+import { Router } from "@angular/router";
 import { Component, OnInit } from "@angular/core";
 import { Consent } from "../../../models/consents/consent";
 import { ConsentDetail } from "../../../models/consents/ConsentDetail";
 import { ConsentService } from "../../../services/consent.service";
+import { environment } from "../../../../environments/environment";
+import { PatientService } from "../../../services/patient.service";
+import { ModalSearchPatientComponent } from "../../../views/widgets/modal-search-patient/modal-search-patient.component";
+import { PatientHope } from "../../../models/patients/patient-hope";
 
 @Component({
   selector: "app-widget-vaccine-consent-list",
@@ -10,6 +17,7 @@ import { ConsentService } from "../../../services/consent.service";
   styleUrls: ["./widget-vaccine-consent-list.component.css"],
 })
 export class WidgetVaccineConsentListComponent implements OnInit {
+  public assetPath = environment.ASSET_PATH;
   public consents: Consent[] = [];
   public consentAnswer: ConsentDetail[] = [];
   public consentInfo: Consent;
@@ -28,10 +36,27 @@ export class WidgetVaccineConsentListComponent implements OnInit {
   };
   public updateStatus: string = "Initial";
   public separator: string = "<answer>";
+  public choosedPatient: PatientHope;
 
-  constructor(private consentService: ConsentService) { }
+  constructor(
+    private patientService: PatientService,
+    private modalService: NgbModal,
+    public activeModal: NgbActiveModal,
+    private consentService: ConsentService,
+    private router: Router
+  ) { }
 
-  ngOnInit() { }
+  ngOnInit() {
+    window.scrollTo({
+      left: 0,
+      top: 0,
+      behavior: "auto",
+    });
+    this.patientService.searchPatientHopeSource$.subscribe((x) => {
+      this.choosedPatient = x;
+      console.log(this.choosedPatient);
+    });
+  }
 
   searchByCode() {
     const orgId = this.key.hospital.orgId;
@@ -106,6 +131,9 @@ export class WidgetVaccineConsentListComponent implements OnInit {
           date_of_birth: moment(this.consentInfo.date_of_birth).format(
             "DD-MM-YYYY"
           ),
+          checkin_date: !this.consentInfo.checkin_date ? null : moment(this.consentInfo.checkin_date).format(
+            "DD-MM-YYYY hh:mm"
+          ),
           detail: this.consentAnswer,
         };
       },
@@ -149,14 +177,48 @@ export class WidgetVaccineConsentListComponent implements OnInit {
   getAlertClass() {
     switch (this.updateStatus) {
       case "Loading":
-      case "Initial":
-        return "alert-none";
+        return "alert alert-warning";
       case "Success":
-        return "alert-success";
+        return "alert alert-success";
       case "Failed":
-        return "alert-fail";
+        return "alert alert-fail";
       default:
         return "alert-none";
     }
+  }
+
+  printForm() {
+    document.execCommand("print");
+  }
+
+  goToPatientData() {
+    this.router.navigate(["/patient-data"]);
+  }
+  searchPatientHOPE(e?) {
+    // this.isSubmitting = false;
+    // if (this.checkSearchInput() === false) {
+    //   return false;
+    // }
+    // if (e && Number(e.keyCode) !== 13) {
+    //   return false;
+    // }
+
+    const hospitalId = this.key.hospital.id;
+    // let birthDate = null;
+    // if (!this.model.localMrNo) {
+    //   const dob = this.model.birthDate.split('-');
+    //   birthDate = dob[2] + '-' + dob[1] + '-' + dob[0];
+    // }
+    const params = {
+      patientName: this.consentInfo.patient_name,
+      birthDate: `${this.consentInfo.date_of_birth.split("-")[2]}-${this.consentInfo.date_of_birth.split("-")[1]
+        }-${this.consentInfo.date_of_birth.split("-")[0]}`,
+      localMrNo: "",
+    };
+    const modalRef = this.modalService.open(ModalSearchPatientComponent, {
+      windowClass: "modal-searchPatient",
+      size: "lg",
+    });
+    modalRef.componentInstance.searchKeywords = { ...params, hospitalId };
   }
 }

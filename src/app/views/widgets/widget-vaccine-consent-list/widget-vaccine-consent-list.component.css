@@ -38,18 +38,6 @@ label {
   display: none;
 }
 
-.alert-success {
-  color: #00c781;
-  margin-bottom: 0;
-  margin-left: 6px;
-}
-
-.alert-fail {
-  color: #ff4040;
-  margin-bottom: 0;
-  margin-left: 6px;
-}
-
 .header-print {
   text-align: center;
 }
@@ -121,4 +109,9 @@ ol {
 
 .signature {
   text-align: right;
+}
+
+.consent-detail-header {
+  display: flex;
+  justify-content: space-between;
 }

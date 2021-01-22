@@ -65,7 +65,8 @@
             <h2 style="text-align: center; margin-bottom: 12px">
               PERSETUJUAN VAKSINASI COVID-19
             </h2>
-            <button *ngIf="consentInfo.checkin_date" type="button" disabled class="btn btn-sm btn-warning">Checked-in at {{consentInfo.checkin_date}}</button>
+            <button *ngIf="consentInfo.checkin_date" type="button" disabled class="btn btn-sm btn-warning">Checked-in at
+              {{consentInfo.checkin_date}}</button>
           </div>
           <button class="btn ms_btn_yellow" type="button" (click)="printForm()" style="height: fit-content;">
             <img class="icon" src="{{ assetPath }}icons/ic_Print@2x.png" />
@@ -142,11 +143,13 @@
           <div style="display: flex; justify-content: space-around">
             <input [disabled]="consentInfo.checkin_date !== null" type="submit" value="Save"
               class="btn btn-primary mt-2" />
-            <button [disabled]="consentInfo.checkin_date !== null" type="button" class="btn btn-primary mt-2" (click)="searchPatientHOPE($event)">
+            <button [disabled]="consentInfo.checkin_date !== null" type="button" class="btn btn-primary mt-2"
+              (click)="searchPatientHOPE($event)">
               Search patient data
               <img class="icon" src="{{ assetPath }}icons/ic_Search_white.png" style="width: 1.2em; height: 1.2em" />
             </button>
-            <button [disabled]="consentInfo.checkin_date !== null" type="button" class="btn btn-secondary mt-2" (click)="goToPatientData()">
+            <button [disabled]="consentInfo.checkin_date !== null" type="button" class="btn btn-secondary mt-2"
+              (click)="goToPatientData()">
               New patient
               <img class="icon" src="../../../../assets/icons/question-sign.svg" style="width: 1.2em; height: 1.2em" />
             </button>
@@ -260,36 +263,32 @@
       </div>
       <div class="tnc" style="margin-top: 8px">
         <p>
-          Yang bertanda tangan di bawah ini menyatakan paham dan setuju bahwa:
+          Yang bertanda tangan di bawah ini menyatakan memahami dan menyetujui bahwa:
         </p>
         <ol>
           <li>
-            Vaksinasi COVID-19 terdiri dari dua dosis. Dosis kedua vaksin
-            diberikan di fasilitas kesehatan yang sama dengan dosis pertama.
+            Bersedia untuk dilakukan vaksinasi COVID-19 yang terdiri dari dua dosis. Dosis kedua vaksin akan diberikan
+            di fasilitas kesehatan yang sama dengan pemberian vaksin dosis pertama.</li>
+          <li>
+            Pemberian vaksin saat ini diprioritaskan untuk individu berusia 18-59 tahun.
           </li>
           <li>
-            Pemberian vaksin saat ini diprioritaskan untuk individu berusia
-            18-59 tahun.
+            Risiko yang dapat terjadi sehubungan dengan Vaksinasi COVID-19 antara lain: nyeri dan/atau kemerahan di area
+            suntikan, lemah badan, nyeri kepala, nyeri otot, demam ringan, reaksi alergi, dan risiko lainnya yang
+            mungkin dapat timbul bergantung pada kondisi tubuh masing-masing.
           </li>
           <li>
-            Risiko yang dapat terjadi antara lain: nyeri dan/atau kemerahan di
-            area suntikan, lemah badan, nyeri kepala, nyeri otot, demam ringan,
-            dan reaksi alergi.
+            Setelah pemberian vaksin, perlu dilakukan observasi selama 30 menit di fasilitas kesehatan.
           </li>
           <li>
-            Setelah pemberian vaksin, observasi perlu dilakukan selama 30 menit
-            di fasilitas kesehatan.
-          </li>
-          <li>
-            Pemberian vaksin tidak memberikan kepastian terbebas dari COVID-19.
-            Seseorang yang telah menerima vaksin tetap dapat terinfeksi
-            COVID-19, namun dengan derajat penyakit yang lebih ringan.
+            Pemberian vaksin tidak memberikan kepastian terbebas dari COVID-19. Seseorang yang telah menerima vaksin
+            tetap dapat terinfeksi COVID-19, namun dengan derajat penyakit yang lebih ringan.
           </li>
         </ol>
         <p>
-          Dengan ini saya menyatakan telah memahami dan menyetujui sepenuhnya
-          pernyataan di atas. Saya juga menyatakan bahwa informasi yang saya
-          berikan terkait riwayat penyakit saya benar adanya.
+          Dengan ini saya menyatakan telah memahami dan menyetujui sepenuhnya pernyataan di atas maupun penjelasan yang
+          diberikan. Saya juga menyatakan bahwa informasi yang saya berikan terkait riwayat penyakit saya diatas benar
+          adanya dan bertanggung jawab penuh atas informasi riwayat penyakit yang saya berikan diatas.
         </p>
       </div>
       <div class="signature">

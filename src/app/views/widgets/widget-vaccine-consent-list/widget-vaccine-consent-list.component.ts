@@ -31,11 +31,6 @@ export class WidgetVaccineConsentListComponent implements OnInit {
   public showWaitMsg: boolean = false;
   public showNotFoundMsg: boolean = false;
   public showDetailConsent: boolean = false;
-  public showMessage: { isShow: boolean; message: string; class: string } = {
-    isShow: false,
-    message: "",
-    class: "",
-  };
   public updateStatus: string = "Initial";
   public separator: string = "<answer>";
   public choosedPatient: PatientHope;
@@ -56,10 +51,17 @@ export class WidgetVaccineConsentListComponent implements OnInit {
     window.scrollTo({
       left: 0,
       top: 0,
-      behavior: "auto",
+      behavior: "smooth",
     });
     this.patientService.searchPatientHopeSource$.subscribe((patient) => {
       this.choosedPatient = patient;
+      setTimeout(() => {
+        window.scrollTo({
+          left: 0,
+          top: document.body.scrollHeight,
+          behavior: "smooth",
+        });
+      }, 500)
     });
     this.doctorService.getListDoctor(this.key.hospital.id).subscribe((res) => {
       this.doctorList = res.data;
@@ -203,20 +205,7 @@ export class WidgetVaccineConsentListComponent implements OnInit {
     this.router.navigate(["/patient-data"]);
   }
   searchPatientHOPE(e?) {
-    // this.isSubmitting = false;
-    // if (this.checkSearchInput() === false) {
-    //   return false;
-    // }
-    // if (e && Number(e.keyCode) !== 13) {
-    //   return false;
-    // }
-
     const hospitalId = this.key.hospital.id;
-    // let birthDate = null;
-    // if (!this.model.localMrNo) {
-    //   const dob = this.model.birthDate.split('-');
-    //   birthDate = dob[2] + '-' + dob[1] + '-' + dob[0];
-    // }
     const params = {
       patientName: this.consentInfo.patient_name,
       birthDate: `${this.consentInfo.date_of_birth.split("-")[2]}-${this.consentInfo.date_of_birth.split("-")[1]
@@ -269,6 +258,13 @@ export class WidgetVaccineConsentListComponent implements OnInit {
             showConfirmButton: false,
             timer: 2000,
           });
+          setTimeout(() => {
+            window.scrollTo({
+              left: 0,
+              top: 0,
+              behavior: "smooth",
+            });
+          }, 500)
         });
     });
   }

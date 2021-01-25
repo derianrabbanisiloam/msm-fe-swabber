@@ -16,7 +16,7 @@ export class ConsentService {
   ) { }
 
   private consentUrl = environment.VACCINE_CONSENT_SERVICE
-  private admissionUrl = environment.FRONT_OFFICE_SERVICE_LOCAL + '/admissions';
+  private admissionUrl = environment.FRONT_OFFICE_SERVICE + '/admissions';
 
   getByCode(code: string, orgId: number): Observable<any> {
     const uri = `${this.consentUrl}/consent/1/${orgId}/${code}/1990-01-01`

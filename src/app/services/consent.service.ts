@@ -16,6 +16,7 @@ export class ConsentService {
   ) { }
 
   private consentUrl = environment.VACCINE_CONSENT_SERVICE
+  private admissionUrl = environment.FRONT_OFFICE_SERVICE_LOCAL + '/admissions';
 
   getByCode(code: string, orgId: number): Observable<any> {
     const uri = `${this.consentUrl}/consent/1/${orgId}/${code}/1990-01-01`
@@ -32,10 +33,24 @@ export class ConsentService {
     return this.http.get<ConsentDetail[]>(uri, httpOptions)
   }
 
-  putConsent(payload: any): Observable<any> {
+  updateConsent(payload: any): Observable<any> {
     const url = `${this.consentUrl}/updateconsent`;
     const body = JSON.stringify(payload);
 
     return this.http.put<any>(url, body, httpOptions);
+  }
+
+  checkinconsent(payload: any): Observable<any> {
+    const url = `${this.consentUrl}/updateconsentcheckin`;
+    const body = JSON.stringify(payload);
+
+    return this.http.put<any>(url, body, httpOptions);
+  }
+
+  createAdmissionVaccine(payload: any): Observable<any> {
+    const url = `${this.admissionUrl}/vaccine-admission`;
+    const body = JSON.stringify(payload);
+
+    return this.http.post<any>(url, body, httpOptions);
   }
 }

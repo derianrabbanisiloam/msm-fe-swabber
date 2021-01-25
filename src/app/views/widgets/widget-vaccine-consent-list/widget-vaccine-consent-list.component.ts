@@ -1,4 +1,5 @@
 import * as moment from "moment";
+import Swal from "sweetalert2";
 import { NgbModal } from "@ng-bootstrap/ng-bootstrap";
 import { NgbActiveModal } from "@ng-bootstrap/ng-bootstrap";
 import { Router } from "@angular/router";
@@ -10,7 +11,8 @@ import { environment } from "../../../../environments/environment";
 import { PatientService } from "../../../services/patient.service";
 import { ModalSearchPatientComponent } from "../../../views/widgets/modal-search-patient/modal-search-patient.component";
 import { PatientHope } from "../../../models/patients/patient-hope";
-
+import { DoctorService } from "../../../services/doctor.service";
+import { Doctor } from "../../../models/doctors/doctor";
 @Component({
   selector: "app-widget-vaccine-consent-list",
   templateUrl: "./widget-vaccine-consent-list.component.html",
@@ -37,8 +39,12 @@ export class WidgetVaccineConsentListComponent implements OnInit {
   public updateStatus: string = "Initial";
   public separator: string = "<answer>";
   public choosedPatient: PatientHope;
+  public doctorList: Doctor[];
+  public doctorSelected: any;
+  public isAdmissionCreated: boolean = false;
 
   constructor(
+    private doctorService: DoctorService,
     private patientService: PatientService,
     private modalService: NgbModal,
     public activeModal: NgbActiveModal,
@@ -52,9 +58,11 @@ export class WidgetVaccineConsentListComponent implements OnInit {
       top: 0,
       behavior: "auto",
     });
-    this.patientService.searchPatientHopeSource$.subscribe((x) => {
-      this.choosedPatient = x;
-      console.log(this.choosedPatient);
+    this.patientService.searchPatientHopeSource$.subscribe((patient) => {
+      this.choosedPatient = patient;
+    });
+    this.doctorService.getListDoctor(this.key.hospital.id).subscribe((res) => {
+      this.doctorList = res.data;
     });
   }
 
@@ -131,9 +139,9 @@ export class WidgetVaccineConsentListComponent implements OnInit {
           date_of_birth: moment(this.consentInfo.date_of_birth).format(
             "DD-MM-YYYY"
           ),
-          checkin_date: !this.consentInfo.checkin_date ? null : moment(this.consentInfo.checkin_date).format(
-            "DD-MM-YYYY hh:mm"
-          ),
+          checkin_date: !this.consentInfo.checkin_date
+            ? null
+            : moment(this.consentInfo.checkin_date).format("DD-MM-YYYY hh:mm"),
           detail: this.consentAnswer,
         };
       },
@@ -147,7 +155,7 @@ export class WidgetVaccineConsentListComponent implements OnInit {
     this.updateStatus = "Loading";
     const orgId = this.key.hospital.orgId;
     this.consentService
-      .putConsent({
+      .updateConsent({
         ...this.consentInfo,
         create_user: "FO",
         organization_id: orgId,
@@ -220,5 +228,48 @@ export class WidgetVaccineConsentListComponent implements OnInit {
       size: "lg",
     });
     modalRef.componentInstance.searchKeywords = { ...params, hospitalId };
+  }
+
+  setDoctor(item) {
+    this.doctorSelected = item;
+  }
+
+  createAdmission(): void {
+    const payloadHope: any = {
+      organizationId: this.key.hospital.orgId,
+      patientOrganizationId: this.choosedPatient.patientOrganizationId,
+      primaryDoctorUserId: this.doctorSelected.doctor_hope_id,
+    };
+
+    const payloadCheckin: any = {
+      consent_id: this.consentInfo.consent_id,
+      organization_id: this.key.hospital.orgId,
+      admission_id: 0,
+      patient_id: this.choosedPatient.patientId,
+      create_user: "FO",
+    };
+
+    this.consentService.createAdmissionVaccine(payloadHope).subscribe((res) => {
+      payloadCheckin.admission_id = res.data.ResultEntityId;
+      this.consentService
+        .checkinconsent(payloadCheckin)
+        .subscribe((checkedInRes) => {
+          this.isAdmissionCreated = true;
+          const foundIndex = this.consents.findIndex(
+            (x) => x.consent_id === this.consentInfo.consent_id
+          );
+          this.consents[foundIndex].checkin_date = moment().format(
+            "DD-MM-YYYY hh:mm"
+          );
+          this.consentInfo.checkin_date = moment().format("DD-MM-YYYY hh:mm");
+          Swal.fire({
+            position: "center",
+            type: "success",
+            title: "Admission successfully created",
+            showConfirmButton: false,
+            timer: 2000,
+          });
+        });
+    });
   }
 }

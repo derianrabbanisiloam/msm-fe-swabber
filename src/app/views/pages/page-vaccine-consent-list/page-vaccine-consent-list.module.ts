@@ -17,6 +17,9 @@ import {
   NgbModule,
   NgbModalModule,
 } from "@ng-bootstrap/ng-bootstrap";
+import { AutocompleteLibModule } from 'angular-ng-autocomplete';
+import { NguiAutoCompleteModule } from '@ngui/auto-complete';
+
 @NgModule({
   declarations: [
     PageVaccineConsentListComponent,
@@ -35,6 +38,8 @@ import {
     NgbModule,
     TextMaskModule,
     ModalSearchPatientModule,
+    AutocompleteLibModule,
+    NguiAutoCompleteModule,
   ],
   entryComponents: [ModalSearchPatientComponent],
   exports: [PageVaccineConsentListComponent],

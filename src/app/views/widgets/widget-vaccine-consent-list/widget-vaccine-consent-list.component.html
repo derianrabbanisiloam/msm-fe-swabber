@@ -159,6 +159,99 @@
       <div *ngIf="updateStatus !== 'Initial'" [ngClass]="getAlertClass()" role="alert">
         {{ updateStatus }}
       </div>
+      <div *ngIf="choosedPatient && !isAdmissionCreated" class="consent-detail">
+        <div class="col-12">
+          <div class="row">
+            <div class="col-4">
+              <div class="row">
+                <div class="col-12">
+                  <label>MR No.</label>
+                </div>
+              </div>
+              <div class="row">
+                <div class="col-12">
+                  <input disabled [value]="choosedPatient.mrNoUnit" class="form-control" />
+                </div>
+              </div>
+            </div>
+            <div class="col-4">
+              <div class="row">
+                <div class="col-12">
+                  <label>Name</label>
+                </div>
+              </div>
+              <div class="row">
+                <div class="col-12">
+                  <input disabled [value]="choosedPatient.name" class="form-control" />
+                </div>
+              </div>
+            </div>
+            <div class="col-4">
+              <div class="row">
+                <div class="col-12">
+                  <label>Date of Birth</label>
+                </div>
+              </div>
+              <div class="row">
+                <div class="col-12">
+                  <input disabled [value]="choosedPatient.birthDate" class="form-control" />
+                </div>
+              </div>
+            </div>
+          </div>
+          <div class="row mt-4">
+            <div class="col-4">
+              <div class="row">
+                <div class="col-12">
+                  <label>Mobile Phone</label>
+                </div>
+              </div>
+              <div class="row">
+                <div class="col-12">
+                  <input disabled [value]="choosedPatient.mobileNo1" class="form-control" />
+                </div>
+              </div>
+            </div>
+            <div class="col-4">
+              <div class="row">
+                <div class="col-12">
+                  <label>Address</label>
+                </div>
+              </div>
+              <div class="row">
+                <div class="col-12">
+                  <input disabled [value]="choosedPatient.address" class="form-control" />
+                </div>
+              </div>
+            </div>
+          </div>
+          <div class="row mt-4">
+            <div class="col-8 mb-4">
+              <label>Doctor</label>
+              <div class="ng-autocomplete" class="angular-autocomplete">
+                <ng-autocomplete placeHolder="Doctor name ..." [(ngModel)]="doctorSelected" [data]="doctorList"
+                  searchKeyword="name" (selected)='setDoctor($event)' [itemTemplate]="itemTemplateDoctor"
+                  [notFoundTemplate]="notFoundTemplate">
+                </ng-autocomplete>
+
+                <ng-template #itemTemplateDoctor let-item>
+                  <a [innerHTML]="item.name"></a>
+                </ng-template>
+
+                <ng-template #notFoundTemplate let-notFound>
+                  <div [innerHTML]="notFound"></div>
+                </ng-template>
+              </div>
+            </div>
+          </div>
+          <div class="row mt-4">
+            <div class="col-12">
+              <button type="button" class="btn btn-primary" (click)="createAdmission()"
+                [disabled]="isAdmissionCreated">Create Admission</button>
+            </div>
+          </div>
+        </div>
+      </div>
     </div>
   </div>
 </div>
@@ -179,7 +272,7 @@
   <div class="row" style="margin-top: 8px">
     <div class="col-print-6">
       <div class="bordered-box-left">
-        <p class="p-hospital-name">{{ key.hospital.name }}</p>
+        <p class="p-hospital-name">Rumah Sakit {{ key.hospital.name }}</p>
         <p class="p-title-1">PERSETUJUAN VAKSINASI COVID-19</p>
         <p class="p-title-2">COVID-19 VACCINATION CONSENT FORM</p>
       </div>

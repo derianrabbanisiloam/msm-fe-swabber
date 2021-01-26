@@ -1,4 +1,4 @@
-import { ConsentDetail } from './ConsentDetail'
+import { ConsentDetail } from './consentDetail'
 export class Consent {
   consent_id: number;
   unique_code: string;

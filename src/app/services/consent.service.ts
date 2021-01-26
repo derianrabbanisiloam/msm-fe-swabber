@@ -2,7 +2,7 @@ import { Injectable } from '@angular/core';
 import { Observable, of, Subject } from 'rxjs';
 import { HttpClient } from '@angular/common/http';
 import { Consent } from '../models/consents/consent';
-import { ConsentDetail } from '../models/consents/ConsentDetail';
+import { ConsentDetail } from '../models/consents/consentDetail';
 import { environment } from '../../environments/environment';
 import { httpOptions } from '../utils/http.util';
 

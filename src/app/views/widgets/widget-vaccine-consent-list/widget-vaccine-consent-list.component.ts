@@ -5,7 +5,7 @@ import { NgbActiveModal } from "@ng-bootstrap/ng-bootstrap";
 import { Router } from "@angular/router";
 import { Component, OnInit } from "@angular/core";
 import { Consent } from "../../../models/consents/consent";
-import { ConsentDetail } from "../../../models/consents/ConsentDetail";
+import { ConsentDetail } from "../../../models/consents/consentDetail";
 import { ConsentService } from "../../../services/consent.service";
 import { environment } from "../../../../environments/environment";
 import { PatientService } from "../../../services/patient.service";

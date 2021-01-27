@@ -1,3 +1,6 @@
+<div class="d-print-none" id="overlay" *ngIf="updateStatus === 'loading' || createAdmissionStatus === 'loading' ">
+  <p>Loading..</p>
+</div>
 <div class="fo_vaccine_container d-print-none">
   <div class="row">
     <div class="col-3">
@@ -16,8 +19,8 @@
           <ngb-tab title="By Name">
             <ng-template ngbTabContent>
               <form (ngSubmit)="searchByNameDob()" class="mt-2">
-                <label for="patient-name">Patient name</label>
-                <input id="patient-name" name="patient-name" class="form-control" placeholder="Enter patient name"
+                <label for="patient-name-1">Patient name</label>
+                <input id="patient-name-1" name="patient-name-1" class="form-control" placeholder="Enter patient name"
                   [(ngModel)]="patientName" autocomplete="off" />
                 <label for="dob">Date of birth</label>
                 <input id="dob" name="dob" class="form-control" placeholder="dd-mm-yyyy" [(ngModel)]="dob"
@@ -76,27 +79,30 @@
         <form class="" (ngSubmit)="updateConsent()">
           <div class="row">
             <div class="col-6">
-              <label for="patient-name">Name</label>
-              <input [disabled]="consentInfo.checkin_date !== null" id="patient-name" name="patient-name"
-                class="form-control" [(ngModel)]="consentInfo.patient_name" autocomplete="off" />
+              <label for="patient-name-2">Name</label>
+              <input [disabled]="consentInfo.checkin_date !== null" id="patient-name-2" name="patient-name-2"
+                class="form-control" [(ngModel)]="consentInfo.patient_name" autocomplete="off"
+                (change)="handleformChange()" />
             </div>
             <div class="col-6">
               <label for="patient-dob">Date of birth</label>
               <input [disabled]="consentInfo.checkin_date !== null" id="patient-dob" name="patient-dob"
                 class="form-control" [textMask]="{ mask: maskBirth }" [(ngModel)]="consentInfo.date_of_birth"
-                autocomplete="off" />
+                autocomplete="off" (change)="handleformChange()" />
             </div>
           </div>
           <div class="row">
             <div class="col-6">
               <label for="patient-mobile">Phone</label>
               <input [disabled]="consentInfo.checkin_date !== null" id="patient-mobile" name="patient-mobile"
-                class="form-control" [(ngModel)]="consentInfo.mobile_no" autocomplete="off" />
+                class="form-control" [(ngModel)]="consentInfo.mobile_no" autocomplete="off"
+                (change)="handleformChange()" />
             </div>
             <div class="col-6">
               <label for="patient-email">Email</label>
               <input [disabled]="consentInfo.checkin_date !== null" id="patient-email" name="patient-email"
-                class="form-control" [(ngModel)]="consentInfo.email_address" autocomplete="off" />
+                class="form-control" [(ngModel)]="consentInfo.email_address" autocomplete="off"
+                (change)="handleformChange()" />
             </div>
           </div>
           <div *ngFor="let q of consentInfo.detail" class="mt-2">
@@ -155,9 +161,6 @@
             </button>
           </div>
         </form>
-      </div>
-      <div *ngIf="updateStatus !== 'Initial'" [ngClass]="getAlertClass()" role="alert">
-        {{ updateStatus }}
       </div>
       <div *ngIf="choosedPatient && !isAdmissionCreated" class="consent-detail">
         <div class="col-12">

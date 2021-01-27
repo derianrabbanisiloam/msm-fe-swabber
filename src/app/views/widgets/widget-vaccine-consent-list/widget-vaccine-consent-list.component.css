@@ -34,10 +34,6 @@ label {
   border-radius: 4px;
 }
 
-.alert-none {
-  display: none;
-}
-
 .header-print {
   text-align: center;
 }
@@ -114,4 +110,19 @@ ol {
 .consent-detail-header {
   display: flex;
   justify-content: space-between;
+}
+
+#overlay {
+  width: 100vw;
+  height: 100vh;
+  position: fixed;
+  top: 0;
+  left: 0;
+  background-color: rgba(0, 0, 0, 0.6);
+  color: #fff;
+  z-index: 20;
+  overflow: hidden;
+  display: flex;
+  justify-content: center;
+  align-items: center;
 }

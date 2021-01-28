@@ -105,7 +105,7 @@
                 (change)="handleformChange()" />
             </div>
           </div>
-          <div *ngFor="let q of consentInfo.detail" class="mt-2">
+          <div *ngFor="let q of consentInfo.detail; let i = index" class="mt-2">
             <div class="mb-4">
               <label for="question">{{
                 q.is_remarks
@@ -119,11 +119,11 @@
                 <label>{{
                   q.consent_question_name.split("?")[1].split(separator)[0]
                   }}</label><input [disabled]="consentInfo.checkin_date !== null" style="
-                    width: 64px;
+                    width: 72px;
                     margin-left: 4px;
                     margin-right: 4px;
                     text-align: center;
-                  " [(ngModel)]="q.answer_remarks" autocomplete="off" name="answer-remarks"
+                  " [(ngModel)]="q.answer_remarks" autocomplete="off" name="answer-remarks-{{i}}"
                   class="form-control" /><label>{{
                   q.consent_question_name.split("?")[1].split(separator)[1]
                   }}</label>

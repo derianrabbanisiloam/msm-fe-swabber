@@ -73,6 +73,7 @@ export class WidgetVaccineConsentListComponent implements OnInit {
   searchByCode() {
     const orgId = this.key.hospital.orgId;
     this.updateStatus = "initial";
+    this.choosedPatient = undefined;
     this.consents = [];
     this.showWaitMsg = true;
     this.showNotFoundMsg = false;
@@ -104,6 +105,7 @@ export class WidgetVaccineConsentListComponent implements OnInit {
     this.updateStatus = "initial";
     const orgId = this.key.hospital.orgId;
     this.consents = [];
+    this.choosedPatient = undefined;
     this.showWaitMsg = true;
     this.showNotFoundMsg = false;
     this.isAdmissionCreated = false;
@@ -155,9 +157,9 @@ export class WidgetVaccineConsentListComponent implements OnInit {
           date_of_birth: moment(this.consentInfo.date_of_birth).format(
             "DD-MM-YYYY"
           ),
-          checkin_date: !this.consentInfo.checkin_date
-            ? null
-            : moment(this.consentInfo.checkin_date).format("DD-MM-YYYY hh:mm"),
+          checkin_date: this.consentInfo.checkin_date
+            ? moment(this.consentInfo.checkin_date).format("DD-MM-YYYY hh:mm")
+            : null,
           detail: this.consentAnswer,
         };
       },
@@ -252,7 +254,7 @@ export class WidgetVaccineConsentListComponent implements OnInit {
         timer: 2000,
       });
     } else {
-      document.execCommand("print");
+      window.print();
     }
   }
 
@@ -337,7 +339,7 @@ export class WidgetVaccineConsentListComponent implements OnInit {
               (x) => x.consent_id === this.consentInfo.consent_id
             );
             this.consents[foundIndex].checkin_date = moment().format(
-              "DD-MM-YYYY hh:mm"
+              "YYYY-MM-DDTHH:mm:ss"
             );
             this.consentInfo.checkin_date = moment().format("DD-MM-YYYY hh:mm");
             this.createAdmissionStatus = "loaded";

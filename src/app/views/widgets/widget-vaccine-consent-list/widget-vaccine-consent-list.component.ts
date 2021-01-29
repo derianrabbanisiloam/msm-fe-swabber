@@ -13,6 +13,10 @@ import { ModalSearchPatientComponent } from "../../../views/widgets/modal-search
 import { PatientHope } from "../../../models/patients/patient-hope";
 import { DoctorService } from "../../../services/doctor.service";
 import { Doctor } from "../../../models/doctors/doctor";
+import {
+  sourceApps,
+  channelId,
+} from "../../../variables/common.variable";
 @Component({
   selector: "app-widget-vaccine-consent-list",
   templateUrl: "./widget-vaccine-consent-list.component.html",
@@ -144,6 +148,7 @@ export class WidgetVaccineConsentListComponent implements OnInit {
       payload.consent_id === this.consentInfo.consent_id
     )
       return;
+    this.choosedPatient = undefined;
     this.isConsentDetailChanged = false;
     this.updateStatus = "initial";
     this.consentInfo = payload;
@@ -311,7 +316,73 @@ export class WidgetVaccineConsentListComponent implements OnInit {
     this.doctorSelected = item;
   }
 
-  createAdmission(): void {
+  handlingCreateAdmission() {
+    if (!this.choosedPatient.patientOrganizationId) {
+      Swal.fire({
+        position: "center",
+        type: "warning",
+        title: "Your patient doesn't have MR local",
+        showConfirmButton: true,
+        confirmButtonText: "Yes",
+        showCancelButton: true,
+        text: "Would you like to create MR local?",
+      }).then((res) => {
+        if (res.value) {
+          this.createAdmissionStatus = "loading";
+          document.documentElement.style.overflow = "hidden";
+          this.patientService
+            .createMrLocal({
+              patientHopeId: this.choosedPatient.patientId,
+              organizationId: Number(this.key.hospital.orgId),
+              channelId: channelId.FRONT_OFFICE,
+              userId: this.key.user.id,
+              source: sourceApps,
+              userName: this.key.user.fullname,
+            })
+            .subscribe((res) => {
+              this.patientService
+                .searchPatientAccessMr2(
+                  this.key.hospital.id,
+                  res.data.medical_record_number
+                )
+                .subscribe((patient) => {
+                  this.choosedPatient = patient.data[0];
+                  this.createAdmissionStatus = "loaded";
+                  document.documentElement.style.overflow = "auto";
+                  Swal.fire({
+                    position: "center",
+                    type: "success",
+                    title: "MR local succesfully created",
+                    showConfirmButton: true,
+                    confirmButtonText: "Yes",
+                    showCancelButton: true,
+                    text: "Would you like to continue to create admission?",
+                  }).then((res) => {
+                    if (res.value) {
+                      this.createAdmission();
+                    }
+                  });
+                });
+            },
+              (err) => {
+                this.createAdmissionStatus = "loaded";
+                document.documentElement.style.overflow = "auto";
+                Swal.fire({
+                  position: "center",
+                  type: "error",
+                  title: "Create MR local failed, please try again later",
+                  showConfirmButton: false,
+                  timer: 2000,
+                });
+              });
+        }
+      });
+    } else {
+      this.createAdmission();
+    }
+  }
+
+  createAdmission() {
     const payloadHope: any = {
       organizationId: this.key.hospital.orgId,
       patientOrganizationId: this.choosedPatient.patientOrganizationId,
@@ -328,6 +399,7 @@ export class WidgetVaccineConsentListComponent implements OnInit {
 
     this.createAdmissionStatus = "loading";
     document.documentElement.style.overflow = "hidden";
+
     this.consentService.createAdmissionVaccine(payloadHope).subscribe(
       (res) => {
         payloadCheckin.admission_id = res.data.ResultEntityId;

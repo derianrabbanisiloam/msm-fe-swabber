@@ -1,4 +1,5 @@
-<div class="d-print-none" id="overlay" *ngIf="updateStatus === 'loading' || createAdmissionStatus === 'loading' ">
+<div class="d-print-none" id="overlay"
+  *ngIf="updateStatus === 'loading' || createAdmissionStatus === 'loading' || isFromPatientData ">
   <p>Loading..</p>
 </div>
 <div class="fo_vaccine_container d-print-none">
@@ -147,18 +148,18 @@
             </div>
           </div>
           <div style="display: flex; justify-content: space-around">
-            <input [disabled]="consentInfo.checkin_date !== null" type="submit" value="Save"
-              class="btn btn-primary mt-2" />
+            <button type="submit" class="btn btn-primary mt-2" [disabled]="consentInfo.checkin_date !== null">
+              Save
+            </button>
             <button [disabled]="consentInfo.checkin_date !== null" type="button" class="btn btn-primary mt-2"
               (click)="searchPatientHOPE($event)">
               Search patient data
               <img class="icon" src="{{ assetPath }}icons/ic_Search_white.png" style="width: 1.2em; height: 1.2em" />
             </button>
-            <button [disabled]="consentInfo.checkin_date !== null" type="button" class="btn btn-secondary mt-2"
-              (click)="goToPatientData()">
-              New patient
-              <img class="icon" src="../../../../assets/icons/question-sign.svg" style="width: 1.2em; height: 1.2em" />
-            </button>
+            <!-- <div *ngIf="consentInfo.is_new_patient && !choosedPatient && !consentInfo.checkin_date" class="new-patient-button">
+              <p class="text-left mt-2 my-0 mr-2">This is new patient</p>
+              <button class="btn btn-warning mt-2" (click)="createNewPatientData()" type="button" [disabled]="consentInfo.checkin_date !== null">Create new patient</button>
+            </div> -->
           </div>
         </form>
       </div>
@@ -173,7 +174,8 @@
               </div>
               <div class="row">
                 <div class="col-12">
-                  <input disabled [value]="choosedPatient.mrNoUnit" class="form-control" />
+                  <input disabled [value]="choosedPatient.mrNoUnit ? choosedPatient.mrNoUnit : ''"
+                    class="form-control" />
                 </div>
               </div>
             </div>

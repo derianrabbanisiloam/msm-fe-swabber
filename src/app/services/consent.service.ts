@@ -15,22 +15,23 @@ export class ConsentService {
     private http: HttpClient
   ) { }
 
-  private consentUrl = environment.VACCINE_CONSENT_SERVICE
+  private consentUrl = environment.VACCINE_CONSENT_SERVICE;
   private admissionUrl = environment.FRONT_OFFICE_SERVICE + '/admissions';
+  private preregisUrl = environment.FRONT_OFFICE_SERVICE + '/preregistrations';
 
   getByCode(code: string, orgId: number): Observable<any> {
-    const uri = `${this.consentUrl}/consent/1/${orgId}/${code}/1990-01-01`
-    return this.http.get<Consent[]>(uri, httpOptions)
+    const uri = `${this.consentUrl}/consent/1/${orgId}/${code}/1990-01-01`;
+    return this.http.get<Consent[]>(uri, httpOptions);
   }
 
   getByNameDob(name: string, dob: string, orgId: number): Observable<any> {
-    const uri = `${this.consentUrl}/consent/2/${orgId}/${name}/${dob}`
-    return this.http.get<Consent[]>(uri, httpOptions)
+    const uri = `${this.consentUrl}/consent/2/${orgId}/${name}/${dob}`;
+    return this.http.get<Consent[]>(uri, httpOptions);
   }
 
   getDetailAnswer(id: number): Observable<any> {
-    const uri = `${this.consentUrl}/consentdetail/${id}`
-    return this.http.get<ConsentDetail[]>(uri, httpOptions)
+    const uri = `${this.consentUrl}/consentdetail/${id}`;
+    return this.http.get<ConsentDetail[]>(uri, httpOptions);
   }
 
   updateConsent(payload: any): Observable<any> {
@@ -52,5 +53,10 @@ export class ConsentService {
     const body = JSON.stringify(payload);
 
     return this.http.post<any>(url, body, httpOptions);
+  }
+
+  getPreRegisFormById(id: string): Observable<any> {
+    const uri = `${this.preregisUrl}/form/${id}`;
+    return this.http.get<any>(uri, httpOptions);
   }
 }

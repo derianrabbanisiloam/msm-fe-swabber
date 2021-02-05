@@ -2,7 +2,7 @@ import * as moment from "moment";
 import Swal from "sweetalert2";
 import { NgbModal } from "@ng-bootstrap/ng-bootstrap";
 import { NgbActiveModal } from "@ng-bootstrap/ng-bootstrap";
-import { Router } from "@angular/router";
+import { Router, ActivatedRoute } from "@angular/router";
 import { Component, OnInit } from "@angular/core";
 import { Consent } from "../../../models/consents/consent";
 import { ConsentDetail } from "../../../models/consents/consentDetail";
@@ -40,6 +40,8 @@ export class WidgetVaccineConsentListComponent implements OnInit {
   public isAdmissionCreated: boolean = false;
   public createAdmissionStatus: string = "initial";
   public isConsentDetailChanged: boolean = false;
+  public mrLocal: any;
+  public isFromPatientData: boolean = false;
 
   constructor(
     private doctorService: DoctorService,
@@ -47,8 +49,9 @@ export class WidgetVaccineConsentListComponent implements OnInit {
     private modalService: NgbModal,
     public activeModal: NgbActiveModal,
     private consentService: ConsentService,
-    private router: Router
-  ) { }
+    private router: Router,
+    private route: ActivatedRoute
+  ) {}
 
   ngOnInit() {
     window.scrollTo({
@@ -69,6 +72,17 @@ export class WidgetVaccineConsentListComponent implements OnInit {
     this.doctorService.getListDoctor(this.key.hospital.id).subscribe((res) => {
       this.doctorList = res.data;
     });
+    this.isNewPatient();
+  }
+
+  isNewPatient() {
+    this.mrLocal = this.route.snapshot.queryParams["mrLocal"];
+    this.uniqueCode = this.route.snapshot.queryParams["code"];
+    if (this.mrLocal && this.uniqueCode) {
+      this.isFromPatientData = true;
+      document.documentElement.style.overflow = "hidden";
+      this.searchByCode();
+    }
   }
 
   searchByCode() {
@@ -84,13 +98,23 @@ export class WidgetVaccineConsentListComponent implements OnInit {
         if (res.status === "Success") {
           if (res.data.length > 0) {
             this.consents = res.data;
+            if (this.isFromPatientData) {
+              this.goToDetail(this.consents[0]);
+            } else {
+              this.isFromPatientData = false;
+              document.documentElement.style.overflow = "auto";
+            }
           } else {
             this.showNotFoundMsg = true;
             this.consents = [];
+            this.isFromPatientData = false;
+            document.documentElement.style.overflow = "auto";
           }
         } else {
           this.showNotFoundMsg = true;
           this.consents = [];
+          this.isFromPatientData = false;
+          document.documentElement.style.overflow = "auto";
         }
         this.showWaitMsg = false;
       },
@@ -159,10 +183,33 @@ export class WidgetVaccineConsentListComponent implements OnInit {
             "DD-MM-YYYY"
           ),
           checkin_date: this.consentInfo.checkin_date
-            ? moment(this.consentInfo.checkin_date).format("DD-MM-YYYY hh:mm")
+            ? moment(this.consentInfo.checkin_date).format("DD-MM-YYYY HH:mm")
             : null,
           detail: this.consentAnswer,
         };
+        if (
+          this.isFromPatientData &&
+          this.mrLocal &&
+          !this.consentInfo.checkin_date
+        ) {
+          this.patientService
+            .searchPatientAccessMr2(this.key.hospital.id, this.mrLocal)
+            .subscribe((patient) => {
+              this.choosedPatient = patient.data[0];
+              this.isFromPatientData = false;
+              document.documentElement.style.overflow = "auto";
+              setTimeout(() => {
+                window.scrollTo({
+                  left: 0,
+                  top: document.body.scrollHeight,
+                  behavior: "smooth",
+                });
+              }, 500);
+            });
+        } else {
+          this.isFromPatientData = false;
+          document.documentElement.style.overflow = "auto";
+        }
       },
       (err) => {
         this.showDetailConsent = false;
@@ -205,8 +252,9 @@ export class WidgetVaccineConsentListComponent implements OnInit {
         ...this.consentInfo,
         create_user: "FO",
         organization_id: orgId,
-        date_of_birth: `${this.consentInfo.date_of_birth.split("-")[2]}-${this.consentInfo.date_of_birth.split("-")[1]
-          }-${this.consentInfo.date_of_birth.split("-")[0]}`,
+        date_of_birth: `${this.consentInfo.date_of_birth.split("-")[2]}-${
+          this.consentInfo.date_of_birth.split("-")[1]
+        }-${this.consentInfo.date_of_birth.split("-")[0]}`,
       })
       .subscribe(
         (res) => {
@@ -264,26 +312,6 @@ export class WidgetVaccineConsentListComponent implements OnInit {
     this.isConsentDetailChanged = true;
   }
 
-  goToPatientData() {
-    if (this.isConsentDetailChanged) {
-      Swal.fire({
-        position: "center",
-        type: "warning",
-        title: "Are you sure you want to leave this form?",
-        showConfirmButton: true,
-        confirmButtonText: "Leave",
-        showCancelButton: true,
-        text: "Changes you made will be lost",
-      }).then((res) => {
-        if (res.value) {
-          this.router.navigate(["/patient-data"]);
-        }
-      });
-    } else {
-      this.router.navigate(["/patient-data"]);
-    }
-  }
-
   searchPatientHOPE(e?) {
     if (this.isConsentDetailChanged) {
       Swal.fire({
@@ -297,15 +325,21 @@ export class WidgetVaccineConsentListComponent implements OnInit {
       const hospitalId = this.key.hospital.id;
       const params = {
         patientName: this.consentInfo.patient_name,
-        birthDate: `${this.consentInfo.date_of_birth.split("-")[2]}-${this.consentInfo.date_of_birth.split("-")[1]
-          }-${this.consentInfo.date_of_birth.split("-")[0]}`,
+        birthDate: `${this.consentInfo.date_of_birth.split("-")[2]}-${
+          this.consentInfo.date_of_birth.split("-")[1]
+        }-${this.consentInfo.date_of_birth.split("-")[0]}`,
         localMrNo: "",
       };
       const modalRef = this.modalService.open(ModalSearchPatientComponent, {
         windowClass: "modal-searchPatient",
         size: "lg",
       });
-      modalRef.componentInstance.searchKeywords = { ...params, hospitalId };
+      modalRef.componentInstance.searchKeywords = {
+        ...params,
+        hospitalId,
+        registerFormId: this.consentInfo.registration_form_id,
+        consentCode: this.consentInfo.unique_code,
+      };
     }
   }
 
@@ -413,7 +447,7 @@ export class WidgetVaccineConsentListComponent implements OnInit {
             this.consents[foundIndex].checkin_date = moment().format(
               "YYYY-MM-DDTHH:mm:ss"
             );
-            this.consentInfo.checkin_date = moment().format("DD-MM-YYYY hh:mm");
+            this.consentInfo.checkin_date = moment().format("DD-MM-YYYY HH:mm");
             this.createAdmissionStatus = "loaded";
             document.documentElement.style.overflow = "auto";
             Swal.fire({
@@ -444,5 +478,29 @@ export class WidgetVaccineConsentListComponent implements OnInit {
         });
       }
     );
+  }
+
+  createNewPatientData() {
+    const params = {
+      formId: this.consentInfo.registration_form_id,
+      code: this.consentInfo.unique_code,
+    };
+    if (this.isConsentDetailChanged) {
+      Swal.fire({
+        position: "center",
+        type: "warning",
+        title: "Are you sure you want to leave this form?",
+        showConfirmButton: true,
+        confirmButtonText: "Leave",
+        showCancelButton: true,
+        text: "Changes you made will be lost",
+      }).then((res) => {
+        if (res.value) {
+          this.router.navigate(["./patient-data"], { queryParams: params });
+        }
+      });
+    } else {
+      this.router.navigate(["./patient-data"], { queryParams: params });
+    }
   }
 }

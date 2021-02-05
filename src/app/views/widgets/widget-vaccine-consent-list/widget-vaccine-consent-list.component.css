@@ -126,3 +126,9 @@ ol {
   justify-content: center;
   align-items: center;
 }
+
+
+.new-patient-button {
+  display: flex;
+  align-items: center;
+}

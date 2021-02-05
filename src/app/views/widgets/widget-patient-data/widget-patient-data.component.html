@@ -74,7 +74,6 @@
                 </select>
               </div>
             </div>
-
             <div class="form-pr-sex form-group">
               <label for="centralMrNo" class="">Sex *</label>
               <div>
@@ -99,7 +98,7 @@
               <label for="religion" class="">Religion</label>
               <div>
                 <select id="religion" class="form-control" [(ngModel)]="model.religion" name="religion">
-                  <option *ngFor="let itr of listReligion" [ngValue]="itr">{{itr.description}}</option>
+                  <option *ngFor="let itr of listReligion" [ngValue]="itr" [selected]="itr.value == model.religion.value">{{itr.description}}</option>
                 </select>
               </div>
             </div>
@@ -110,7 +109,7 @@
             <label for="marital" class="">Marital Status</label>
             <div class="form-group" style="width: 40%">
               <select id="marital" class="form-control" [(ngModel)]="model.maritalStatus" name="marital">
-                <option *ngFor="let itr of listMarital" [ngValue]="itr">{{itr.description}}</option>
+                <option *ngFor="let itr of listMarital" [ngValue]="itr" [selected]="itr.value == model.maritalStatus.value">{{itr.description}}</option>
               </select>
             </div>
             <div class="form-group form-pr-birth-place">
@@ -273,7 +272,7 @@
                       <div class="">
                         <select id="subdistrict" class="form-control" [(ngModel)]="model.nationalidType"
                           name="nationalidType">
-                          <option *ngFor="let itr of listNationalIdType" [ngValue]="itr">{{itr.description}}</option>
+                          <option *ngFor="let itr of listNationalIdType" [ngValue]="itr" [selected]="itr.value == model.nationalidType.value">{{itr.description}}</option>
                         </select>
                       </div>
                     </div>
@@ -412,6 +411,11 @@
         <button *ngIf="isSuccessCreatePatient && isFromAppointmentList && !fromBpjs" type="button" [disabled]="buttonCreateAdmission"
           class="fo_btn_registration fo_btn_disabled" [ngClass]="{'fo_btn_create_admission': isFromAppointmentList}"
           (click)="createAdmission(checkInOldPatient)">
+          Create Admission
+        </button>
+        <button *ngIf="isSuccessCreatePatient && isFromVaccineList && !fromBpjs" type="button"
+          [disabled]="buttonCreateAdmission" class="fo_btn_registration fo_btn_disabled"
+          [ngClass]="{'fo_btn_create_admission': isFromVaccineList}" (click)="createVaccineAdmission()">
           Create Admission
         </button>
         <button *ngIf="isSuccessCreatePatient && isFromAppointmentList && fromBpjs" type="button" [disabled]="buttonCreateAdmission"

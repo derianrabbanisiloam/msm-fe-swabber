@@ -1,6 +1,8 @@
 import { ConsentDetail } from './consentDetail'
 export class Consent {
   consent_id: number;
+  is_new_patient: boolean;
+  registration_form_id: string;
   unique_code: string;
   checkin_date: string;
   patient_name: string;

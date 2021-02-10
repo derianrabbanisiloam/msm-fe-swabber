@@ -127,8 +127,11 @@ ol {
   align-items: center;
 }
 
-
 .new-patient-button {
   display: flex;
   align-items: center;
+}
+
+.form-control-error {
+  border: 1px solid red;
 }

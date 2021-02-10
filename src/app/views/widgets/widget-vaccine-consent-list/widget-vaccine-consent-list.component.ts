@@ -42,6 +42,7 @@ export class WidgetVaccineConsentListComponent implements OnInit {
   public isConsentDetailChanged: boolean = false;
   public mrLocal: any;
   public isFromPatientData: boolean = false;
+  public formValidity: any = { remarks: {}, mobile: null };
 
   constructor(
     private doctorService: DoctorService,
@@ -51,7 +52,7 @@ export class WidgetVaccineConsentListComponent implements OnInit {
     private consentService: ConsentService,
     private router: Router,
     private route: ActivatedRoute
-  ) {}
+  ) { }
 
   ngOnInit() {
     window.scrollTo({
@@ -86,6 +87,7 @@ export class WidgetVaccineConsentListComponent implements OnInit {
   }
 
   searchByCode() {
+    this.formValidity = { remarks: {}, mobile: null };
     const orgId = this.key.hospital.orgId;
     this.updateStatus = "initial";
     this.choosedPatient = undefined;
@@ -127,6 +129,7 @@ export class WidgetVaccineConsentListComponent implements OnInit {
   }
 
   searchByNameDob() {
+    this.formValidity = { remarks: {}, mobile: null };
     this.updateStatus = "initial";
     const orgId = this.key.hospital.orgId;
     this.consents = [];
@@ -230,6 +233,7 @@ export class WidgetVaccineConsentListComponent implements OnInit {
         text: "Changes you made will be lost",
       }).then((res) => {
         if (res.value) {
+          this.formValidity = { remarks: {}, mobile: null };
           this.getDetailInformation(payload);
         }
       });
@@ -247,40 +251,51 @@ export class WidgetVaccineConsentListComponent implements OnInit {
     document.documentElement.style.overflow = "hidden";
     this.updateStatus = "loading";
     const orgId = this.key.hospital.orgId;
-    this.consentService
-      .updateConsent({
-        ...this.consentInfo,
-        create_user: "FO",
-        organization_id: orgId,
-        date_of_birth: `${this.consentInfo.date_of_birth.split("-")[2]}-${
-          this.consentInfo.date_of_birth.split("-")[1]
-        }-${this.consentInfo.date_of_birth.split("-")[0]}`,
-      })
-      .subscribe(
-        (res) => {
-          document.documentElement.style.overflow = "auto";
-          this.isConsentDetailChanged = false;
-          this.updateStatus = "loaded";
-          Swal.fire({
-            position: "center",
-            type: "success",
-            title: "Vaccine consent form updated successfully",
-            showConfirmButton: false,
-            timer: 2000,
-          });
-        },
-        (err) => {
-          this.updateStatus = "loaded";
-          document.documentElement.style.overflow = "auto";
-          Swal.fire({
-            position: "center",
-            type: "error",
-            title: "Vaccine consent form failed to update",
-            showConfirmButton: false,
-            timer: 2000,
-          });
-        }
-      );
+    if (this.checkFormValidity()) {
+      this.consentService
+        .updateConsent({
+          ...this.consentInfo,
+          detail: this.consentInfo.detail.filter((el) => {
+            if (el.answer_value === "Tidak") {
+              el.answer_remarks = "";
+            }
+            return el;
+          }),
+          create_user: "FO",
+          organization_id: orgId,
+          date_of_birth: `${this.consentInfo.date_of_birth.split("-")[2]}-${this.consentInfo.date_of_birth.split("-")[1]
+            }-${this.consentInfo.date_of_birth.split("-")[0]}`,
+        })
+        .subscribe(
+          (res) => {
+            this.formValidity = { remarks: {}, mobile: null };
+            document.documentElement.style.overflow = "auto";
+            this.isConsentDetailChanged = false;
+            this.updateStatus = "loaded";
+            Swal.fire({
+              position: "center",
+              type: "success",
+              title: "Vaccine consent form updated successfully",
+              showConfirmButton: false,
+              timer: 2000,
+            });
+          },
+          (err) => {
+            this.updateStatus = "loaded";
+            document.documentElement.style.overflow = "auto";
+            Swal.fire({
+              position: "center",
+              type: "error",
+              title: "Vaccine consent form failed to update",
+              showConfirmButton: false,
+              timer: 2000,
+            });
+          }
+        );
+    } else {
+      document.documentElement.style.overflow = "auto";
+      this.updateStatus = "loaded";
+    }
   }
 
   fieldsChange(event: any, id: number) {
@@ -289,8 +304,6 @@ export class WidgetVaccineConsentListComponent implements OnInit {
     const foundIndex = this.consentInfo.detail.findIndex(
       (item) => item.consent_detail_id === id
     );
-    if (event.target.value === "Tidak")
-      this.consentInfo.detail[foundIndex].answer_remarks = "";
     this.consentInfo.detail[foundIndex].answer_value = event.target.value;
   }
 
@@ -325,9 +338,8 @@ export class WidgetVaccineConsentListComponent implements OnInit {
       const hospitalId = this.key.hospital.id;
       const params = {
         patientName: this.consentInfo.patient_name,
-        birthDate: `${this.consentInfo.date_of_birth.split("-")[2]}-${
-          this.consentInfo.date_of_birth.split("-")[1]
-        }-${this.consentInfo.date_of_birth.split("-")[0]}`,
+        birthDate: `${this.consentInfo.date_of_birth.split("-")[2]}-${this.consentInfo.date_of_birth.split("-")[1]
+          }-${this.consentInfo.date_of_birth.split("-")[0]}`,
         localMrNo: "",
       };
       const modalRef = this.modalService.open(ModalSearchPatientComponent, {
@@ -502,5 +514,47 @@ export class WidgetVaccineConsentListComponent implements OnInit {
     } else {
       this.router.navigate(["./patient-data"], { queryParams: params });
     }
+  }
+
+  checkFormValidity() {
+    let isValid: boolean = true;
+    const isNum = /^\d*$/;
+    const isRemarksValid = /^[0-9.,]*$/;
+
+    const checkRemarks = this.consentInfo.detail.filter((el) => {
+      if (el.answer_remarks !== "" && el.answer_value === "Ya") {
+        if (!isRemarksValid.test(el.answer_remarks)) {
+          return el;
+        } else if (isRemarksValid.test(el.answer_remarks) && this.formValidity.remarks[el.consent_question_id]) {
+          delete this.formValidity.remarks[el.consent_question_id]
+        }
+      }
+    });
+
+    if (checkRemarks.length > 0) {
+      isValid = false;
+      for (let i = 0; i < checkRemarks.length; i++) {
+        this.formValidity.remarks[checkRemarks[i].consent_question_id] =
+          "Invalid format";
+      }
+    }
+
+    const checkPhone = isNum.test(this.consentInfo.mobile_no);
+
+    if (!checkPhone) {
+      isValid = false;
+      this.formValidity.mobile = "Invalid format";
+      window.scrollTo({
+        left: 0,
+        top: 0,
+        behavior: "smooth",
+      });
+    } else {
+      if (this.formValidity.mobile) {
+        this.formValidity.mobile = null
+      }
+    }
+
+    return isValid;
   }
 }

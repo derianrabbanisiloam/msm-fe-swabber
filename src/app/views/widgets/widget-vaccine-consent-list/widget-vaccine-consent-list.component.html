@@ -97,7 +97,9 @@
               <label for="patient-mobile">Phone</label>
               <input [disabled]="consentInfo.checkin_date !== null" id="patient-mobile" name="patient-mobile"
                 class="form-control" [(ngModel)]="consentInfo.mobile_no" autocomplete="off"
-                (change)="handleformChange()" />
+                (change)="handleformChange()" [ngClass]="formValidity.mobile? 'form-control-error' : 'form-control-normal'"/>
+                <span *ngIf="formValidity.mobile"
+                style="color: red; margin-bottom: 4px;">{{formValidity.mobile}}</span>
             </div>
             <div class="col-6">
               <label for="patient-email">Email</label>
@@ -125,28 +127,32 @@
                     margin-right: 4px;
                     text-align: center;
                   " [(ngModel)]="q.answer_remarks" autocomplete="off" name="answer-remarks-{{i}}"
-                  class="form-control" /><label>{{
+                  [ngClass]="formValidity.remarks[q.consent_question_id]? 'form-control-error' : 'form-control-normal'"
+                  (change)="handleformChange()"/><label>{{
                   q.consent_question_name.split("?")[1].split(separator)[1]
                   }}</label>
               </div>
+              <span *ngIf="formValidity.remarks[q.consent_question_id] && q.answer_value === 'Ya'"
+              style="color: red; margin-bottom: 4px;">{{formValidity.remarks[q.consent_question_id]}}</span>
               <div>
                 <div class="form-check form-check-inline">
-                  <input [disabled]="consentInfo.checkin_date !== null" class="form-check-input" type="checkbox"
-                    [id]="'checkbox-yes-' + q.consent_question_id" value="Ya" name="checkbox-answer-yes" [checked]="
+                  <input [disabled]="consentInfo.checkin_date !== null" class="form-check-input" type="radio"
+                    [id]="'checkbox-yes-' + q.consent_question_id" [checked]="
                       q.answer_value === 'Ya' || q.answer_value === 'yes'
-                    " (change)="fieldsChange($event, q.consent_detail_id)" />
-                  <label class="form-check-label" for="checkbox-yes">Ya</label>
+                    " (change)="fieldsChange($event, q.consent_detail_id)" value="Ya" />
+                  <label class="form-check-label" [for]="'checkbox-answer-yes' + q.consent_question_id">Ya</label>
                 </div>
                 <div class="form-check form-check-inline">
-                  <input [disabled]="consentInfo.checkin_date !== null" class="form-check-input" type="checkbox"
-                    [id]="'checkbox-no-' + q.consent_question_id" value="Tidak" name="checkbox-answer-no" [checked]="
+                  <input value="Tidak" [disabled]="consentInfo.checkin_date !== null" class="form-check-input"
+                    type="radio" [id]="'checkbox-no-' + q.consent_question_id" [checked]="
                       q.answer_value === 'Tidak' || q.answer_value === 'no'
                     " (change)="fieldsChange($event, q.consent_detail_id)" />
-                  <label class="form-check-label" for="checkbox-no">Tidak</label>
+                  <label class="form-check-label" [for]="'checkbox-answer-no' + q.consent_question_id">Tidak</label>
                 </div>
               </div>
             </div>
           </div>
+          <span *ngIf="formValidity.mobile || (formValidity.remarks | json) != '{}'" style="color: red;">Please check your form again</span>
           <div style="display: flex; justify-content: space-around">
             <button type="submit" class="btn btn-primary mt-2" [disabled]="consentInfo.checkin_date !== null">
               Save
@@ -156,10 +162,6 @@
               Search patient data
               <img class="icon" src="{{ assetPath }}icons/ic_Search_white.png" style="width: 1.2em; height: 1.2em" />
             </button>
-            <!-- <div *ngIf="consentInfo.is_new_patient && !choosedPatient && !consentInfo.checkin_date" class="new-patient-button">
-              <p class="text-left mt-2 my-0 mr-2">This is new patient</p>
-              <button class="btn btn-warning mt-2" (click)="createNewPatientData()" type="button" [disabled]="consentInfo.checkin_date !== null">Create new patient</button>
-            </div> -->
           </div>
         </form>
       </div>

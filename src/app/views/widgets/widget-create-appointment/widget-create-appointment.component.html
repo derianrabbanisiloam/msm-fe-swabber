@@ -78,9 +78,11 @@
                 <img class="icon_bpjs" src="{{assetPath}}icons/bpjs_logo.png">
               </span>
             </td>
-            <td *ngIf="app.is_can_create && isOriginal && app.is_walkin == false && app.is_reserved_slot == false" class="st-kolom-available"
+            <td *ngIf="app.is_can_create && isOriginal && app.is_walkin == false && app.is_reserved_slot == false && !fromPreRegis" class="st-kolom-available"
               (click)="openCreateAppModal(app)"><a>Available</a></td>
-            <td *ngIf="app.is_can_create && isOriginal && app.is_walkin == true && isOpen == true && app.is_reserved_slot == false"
+            <td *ngIf="app.is_can_create && isOriginal && fromPreRegis" class="st-kolom-available"
+              (click)="openCreateAppModal3(app, confirmSlot)"><a>Available</a></td>
+            <td *ngIf="app.is_can_create && isOriginal && app.is_walkin == true && isOpen == true && app.is_reserved_slot == false" 
               class="st-kolom-available" (click)="openCreateAppModal(app)"><a>Available/Walk In Slot</a></td>
             <td *ngIf="app.is_can_create && isOriginal && app.is_walkin == true && isOpen == false && app.is_reserved_slot == false"
               class="st-kolom-available">
@@ -383,8 +385,10 @@
                 <img class="icon_bpjs" src="{{assetPath}}icons/bpjs_logo.png">
               </span>
             </td>
-            <td *ngIf="app.is_can_create && isOriginal && app.is_walkin == false && app.is_reserved_slot == false" class="st-kolom-available"
+            <td *ngIf="app.is_can_create && isOriginal && app.is_walkin == false && app.is_reserved_slot == false  && !fromPreRegis" class="st-kolom-available"
               (click)="openCreateAppModal(app)"><a>Available</a></td>
+            <td *ngIf="app.is_can_create && isOriginal && app.is_walkin == false && app.is_reserved_slot == false  && fromPreRegis" class="st-kolom-available"
+              (click)="openCreateAppModal3(app, confirmSlot)"><a>Available</a></td>
             <td *ngIf="app.is_can_create && isOriginal && app.is_walkin == true && isOpen == true && app.is_reserved_slot == false"
               class="st-kolom-available" (click)="openCreateAppModal(app)"><a>Available/Walk In Slot</a></td>
             <td *ngIf="app.is_can_create && isOriginal && app.is_walkin == true && isOpen == false && app.is_reserved_slot == false"
@@ -396,8 +400,10 @@
               <span style="color:black;font-weight:bold">Slot temporarily reserved</span>
             </td>
             
-            <td *ngIf="app.is_can_create && !isOriginal && app.is_walkin == false" class="st-kolom-available"
+            <td *ngIf="app.is_can_create && !isOriginal && app.is_walkin == false && !fromPreRegis" class="st-kolom-available"
               (click)="openCreateAppModal2(app)"><a>Available</a></td>
+            <td *ngIf="app.is_can_create && !isOriginal && app.is_walkin == false && fromPreRegis" class="st-kolom-available"
+              (click)="openCreateAppModal3(app, confirmSlot)"><a>Available</a></td>
             <td *ngIf="app.is_can_create && !isOriginal && app.is_walkin == true && isOpen == true"
               class="st-kolom-available" (click)="openCreateAppModal2(app)"><a>Available/Walk In Slot</a></td>
             <td *ngIf="app.is_can_create && !isOriginal && app.is_walkin == true && isOpen == false"
@@ -583,7 +589,6 @@
     
   </div>
 </div>
-
 
 <ng-template #confirmCheckIn let-c="close" let-d="dismiss">
   <div class="modal-header">
@@ -1026,12 +1031,6 @@
                 </div> 
               </div>
             <div class="d-flex justify-content-start">
-              <!-- <div style="width: 8%; margin-top: 5px; margin-right: 2px;">
-                <label class="">Diagnose</label>
-                <div class="">
-                  <input class="form-control"  [value]="diagnose ? diagnose.code  ? diagnose.code : '' : ''" readonly>
-                </div>
-              </div> -->
               <div style="width: 40%; margin-top: 5px;">
                 <label class="">Diagnose</label>
                 <div class="input-group">
@@ -1174,8 +1173,6 @@
         (click)="buildMrLocal(selectedCheckIn, cls_btn_confirm, checkInOldPatient, confirmDocument)" (click)="c('Cross click')">Create MR
         Local
       </button>
-      <!-- <button type="button" class="btn fo_btn_blue" (click)="newPatient()" (click)="c('Cross click')">New Patient
-      </button> -->
       <button type="button" class="btn fo_btn_black" (click)="c('Cross click')">Cancel</button>
     </div>
   </div>
@@ -1385,6 +1382,23 @@
   </div>
 </ng-template>
 
+
+<ng-template #confirmSlot let-c="close" let-d="dismiss">
+  <div *ngIf="preRegLoading" class="spinner"></div>
+  <div class="modal-header">
+    <h4 class="modal-title">Confirmation</h4>
+    <button #close_confirm type="button" class="close" aria-label="Close" (click)="d('Cross click')">
+      <span aria-hidden="true">&times;</span>
+    </button>
+  </div>
+  <div class="modal-body">
+    <p>Are you sure ?</p>
+    <div class="fo_confirmation_button d-flex justify-content-center">
+      <button type="button" class="btn fo_btn_green" [disabled]="disableBut" (click)="createAppFromPatientData(close_confirm)">Ok</button>
+      <button type="button" class="btn fo_btn_black" [disabled]="disableBut" (click)="c('Cross click')">Cancel</button>
+    </div>
+  </div>
+</ng-template>
 <!-- <ng-template #lakaLantas let-modal let-c="close">
   <div class="modal-header">
     <div class="header-2 modal-padding">Jaminan</div>

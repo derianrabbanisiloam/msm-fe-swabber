@@ -19,7 +19,6 @@ import { NgbModal, ModalDismissReasons, NgbDateStruct } from '@ng-bootstrap/ng-b
 import * as pdfMake from 'pdfmake/build/pdfmake';
 import * as pdfFonts from 'pdfmake/build/vfs_fonts';
 import * as $ from 'jquery';
-import { THIS_EXPR } from '@angular/compiler/src/output/output_ast';
 import socket from 'socket.io-client';
 import { SecretKey, Jwt, QUEUE_NUMBER, CHECK_IN, keySocket, pathImage } from '../../../variables/common.variable';
 import Security from 'msm-kadapat';
@@ -183,6 +182,12 @@ export class WidgetPatientDataComponent implements OnInit {
     checkFour: false, checkFive: false
   }
 
+  public bodyPreReg: any;
+  public patientPreReg: any;
+  public orderDetail: any;
+  public fromPreRegis: boolean = false;
+  public fromPatientData: boolean = false;
+
   public flagErrorMobile1: boolean = false;
   public flagErrorMobile2: boolean = false;
   public flagErrorMobile3: boolean = false;
@@ -200,6 +205,7 @@ export class WidgetPatientDataComponent implements OnInit {
     private admissionService: AdmissionService,
     private appointmentService: AppointmentService,
     private route: ActivatedRoute,
+    private activatedRoute: ActivatedRoute,
     private queueService: QueueService,
     private scheduleService: ScheduleService,
     private router: Router,
@@ -252,6 +258,7 @@ export class WidgetPatientDataComponent implements OnInit {
     this.getCollectionAlert();
     this.setDiagnose();
     this.setReferralSource()
+    this.getPreReg()
   }
 
   async changeCheckbox(val) {
@@ -2358,6 +2365,133 @@ export class WidgetPatientDataComponent implements OnInit {
     } else {
       return true;
     }    
+  }
+
+  async getPreReg() {
+    if(this.activatedRoute.snapshot.queryParamMap.get('fromPreRegis') === 'true' &&
+        this.activatedRoute.snapshot.queryParamMap.get('fromPatientData') === 'true') {
+      this.bodyPreReg = JSON.parse(localStorage.getItem('fromPreRegis'));
+      this.patientPreReg = this.bodyPreReg.patientPreReg;
+      this.orderDetail = this.bodyPreReg.orderDetail;
+      this.fromPreRegis = true;
+      this.fromPatientData = true;
+      this.formPatient(this.patientPreReg);
+    }
+  }
+
+  async formPatient(patient) {
+    this.model.identityImageUrl = patient.identity_image_url ? patient.identity_image_url : '';
+    this.model.patientName = patient.name ? patient.name : '';
+    this.model.fatherName = patient.father_name ? patient.father_name : '';
+    this.model.motherName = patient.mother_name ? patient.mother_name : '';
+    this.model.spouseName = patient.spouse_name ? patient.spouse_name : '';
+    this.model.address = patient.identity_address ? patient.identity_address : '';
+    this.model.postCode = patient.post_code ? patient.post_code : '';
+    this.model.notes = patient.notes ? patient.notes : '';
+    this.model.allergy = patient.allergy ? patient.allergy : '';
+    this.model.homePhone = patient.landline_number ? patient.landline_number : '';
+    this.model.officePhone = patient.office_phonenumber ? patient.office_phonenumber : '';
+    this.model.mobileNo1 = patient.phone_number_1 ? patient.phone_number_1 : '';
+    this.model.mobileNo2 = patient.phone_number_2 ? patient.phone_number_2 : '';
+    this.model.email = patient.email ? patient.email : '';
+    this.model.contactEmail = patient.emergency_contact_email ? patient.emergency_contact_email : '';
+    this.model.contactMobile = patient.emergency_contact_mobile ? patient.emergency_contact_mobile : '';
+    this.model.contactAddress = patient.emergency_contact_address ? patient.emergency_contact_address : '';
+    this.model.contactPhone = patient.emergency_contact_phone ? patient.emergency_contact_phone : '';
+    this.model.contactName = patient.emergency_contact_name ? patient.emergency_contact_name : '';
+    this.model.nationalIdNo = patient.identity_number ? patient.identity_number : '';
+    this.model.permanentPostCode = patient.permanent_post_code ? patient.permanent_post_code : '';
+    this.model.permanentAddress = patient.permanent_address ? patient.permanent_address : '';
+    this.model.payerIdNo = patient.payer_id_no ? patient.payer_id_no : '';
+
+    if (patient.district_id) {
+      const district = await this.generalService.getDistrict(null, patient.district_id)
+        .toPromise().then(res => {
+          return res.data;
+        }).catch(err => {
+          return null;
+        })
+
+      this.model.district = district ? district : { district_id: null };
+    } else {
+      this.model.district = { district_id: null };
+    }
+
+    if (patient.sub_district_id) {
+      const subdistrict = await this.generalService.getSubDistrict(null, patient.sub_district_id)
+        .toPromise().then(res => {
+          return res.data;
+        }).catch(err => {
+          return null;
+        });
+
+      this.model.subdistrict = subdistrict ? subdistrict : { sub_district_id: null };
+    } else {
+      this.model.subdistrict = { sub_district_id: null };
+    }
+
+    let idx_sex, idx_city, idx_contact_city, idx_religion,
+    idx_bloodType, idx_nationality, idx_national_id_type, idx_birth_place, idx_title,
+    idx_marital, idx_permanent_city = -1;
+
+    idx_religion = patient.religion_id ? this.listReligion.findIndex((a) => {
+      return Number(a.value) === patient.religion_id;
+    }) : idx_religion;
+
+    idx_sex = patient.gender_id ? this.listSex.findIndex((a) => {
+      return Number(a.value) === Number(patient.gender_id);
+    }) : idx_sex;
+
+    idx_bloodType = patient.blood_type_id ? this.listBloodType.findIndex((a) => {
+      return Number(a.value) === patient.blood_type_id;
+    }) : idx_bloodType;
+
+    idx_nationality = patient.country_id ? this.listCountry.findIndex((a) => {
+      return a.country_id === patient.country_id;
+    }) : idx_nationality;
+
+    idx_city = patient.city_id ? this.listCity.findIndex((a) => {
+      return a.city_id === patient.city_id;
+    }) : idx_city;
+
+    idx_contact_city = patient.contact_city_id ? this.listCity.findIndex((a) => {
+      return a.city_id === patient.contact_city_id;
+    }) : idx_contact_city;
+
+    idx_permanent_city = patient.permanent_city_id ? this.listCity.findIndex((a) => {
+      return a.city_id === patient.permanent_city_id;
+    }) : idx_permanent_city;
+
+    idx_birth_place = patient.birth_place_id ? this.listCity.findIndex((a) => {
+      return a.city_id === patient.birth_place_id;
+    }) : idx_birth_place;
+
+    idx_title = patient.title_id ? this.listTitle.findIndex((a) => {
+      return Number(a.value) === patient.title_id;
+    }) : idx_title;
+
+    idx_marital = patient.marital_status_id ? this.listMarital.findIndex((a) => {
+      return Number(a.value) === patient.marital_status_id;
+    }) : idx_marital;
+
+    idx_national_id_type = patient.identity_type_id ? this.listNationalIdType.findIndex((a) => {
+      return Number(a.value) === Number(patient.identity_type_id);
+    }) : idx_national_id_type;
+    
+    this.model.birth = patient.birth_date ? dateFormatter(patient.birth_date, true) : '';
+    this.model.religion = (idx_religion >= 0) ? this.listReligion[idx_religion] : '';
+    this.model.sex = (idx_sex >= 0) ? this.listSex[idx_sex] : '';
+    this.model.bloodType = (idx_bloodType >= 0) ? this.listBloodType[idx_bloodType] : '';
+    this.model.nationality = (idx_nationality >= 0) ? this.listCountry[idx_nationality] : '';
+    this.model.city = (idx_city >= 0) ? this.listCity[idx_city] : '';
+    this.model.contactCity = (idx_contact_city >= 0) ? this.listCity[idx_contact_city] : '';
+    this.model.permanentCity = (idx_permanent_city >= 0) ? this.listCity[idx_permanent_city] : '';
+    this.model.birthPlace = (idx_birth_place >= 0) ? this.listCity[idx_birth_place] : '';
+    this.model.title = (idx_title >= 0) ? this.listTitle[idx_title] : '';
+    this.model.maritalStatus = (idx_marital >= 0) ? this.listMarital[idx_marital] : '';
+    this.model.nationalidType = (idx_national_id_type >= 0) ? this.listNationalIdType[idx_national_id_type] : '';
+
+    await this.getDetailAddress(true);
   }
 
   cssAlertType(alert: Alert) {

@@ -12,5 +12,6 @@ export const environment = {
   UPLOAD_IMAGE: 'http://10.85.136.23:9999',
   GET_IMAGE: 'http://10.85.136.23/prod',
   MOBILE_SERVICE: 'http://10.85.136.16/mobileinternal/api/v2',
-  INHEALTH:'http://10.85.129.91:8803'
+  INHEALTH: 'http://10.85.129.91:8803',
+  PAYMENT: 'http://10.85.139.13/online-payment'
 };

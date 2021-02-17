@@ -50,6 +50,7 @@ export class WidgetDoctorScheduleComponent implements OnInit {
   public hideLoading: boolean = false;
   public reschBpjs: boolean = false;
 
+  public fromPreRegis: any = JSON.parse(localStorage.getItem('fromPreRegis'))
   public datePickerModel: any = {
     date: {
       year: parseInt(moment().format('YYYY')),
@@ -99,7 +100,7 @@ export class WidgetDoctorScheduleComponent implements OnInit {
         this.fromBpjs = true;
         this.fromRegistration = true;
         this.consulType = this.doctorService.searchDoctorSource2.consulType;
-      }
+      } 
     this.keywords = this.doctorService.searchDoctorSource2;
   } else if(this.activatedRoute.snapshot.queryParamMap.get('fromBpjs') === 'true' &&
       this.activatedRoute.snapshot.queryParamMap.get('fromRegistration') === 'false') {
@@ -116,6 +117,7 @@ export class WidgetDoctorScheduleComponent implements OnInit {
       this.fromRegistration = true;
       this.consulType = this.bodyBpjs.consulType;
       this.keywords = this.bodyBpjs;
+  
   }
 
     var dateFix = null;
@@ -384,11 +386,19 @@ export class WidgetDoctorScheduleComponent implements OnInit {
           fromRegistration: true
         }
       });
+    } else if (this.fromPreRegis){
+      this.router.navigate(['/create-appointment'], {
+        queryParams: {
+          doctorId: item.doctor_id,
+          date: date,
+          fromPreRegis: this.fromPreRegis.fromPreRegis
+        }
+      })
     } else {
       this.router.navigate(['/create-appointment'], {
         queryParams: {
           doctorId: item.doctor_id,
-          date: date
+          date: date,
         }
       });
     }

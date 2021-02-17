@@ -137,6 +137,7 @@ input[type="date" i]::-webkit-inner-spin-button, input[type="date"]::-webkit-cal
 .ms_btn_black:active{ background: #333333; color: white}
 .ms_btn_yellow { background: #F2C22C; color: white}
 .ms_btn_yellow:active{ background: #f0b80f; color: white}
+.ms_btn_green_lime { background: #92D050; color: white}
 
 html, body {
   font-size: 12px;

@@ -85,6 +85,7 @@ export class ModalCreateAppointmentComponent implements OnInit {
   }
 
   async createAppointment() {
+   
     this.isSubmitting = true;
     const isValidForm = this.validateCreateAppointment();
     if (isValidForm === false) {

@@ -2729,9 +2729,9 @@ export class WidgetCreateAppointmentComponent implements OnInit {
       source: this.source,
       isWaitingList: item.is_waiting_list,
       patientHopeId: this.patientPreReg.patient_hope_id,
-      order_id: this.patientPreReg.order_id,
-      registration_form_id: this.patientPreReg.registration_form_id,
-      confirmation_code: this.patientPreReg.confirmation_code
+      orderId: this.patientPreReg.order_id,
+      registrationFormId: this.patientPreReg.registration_form_id,
+      confirmationCode: this.patientPreReg.confirmation_code
     };
 
 

@@ -7,6 +7,7 @@ import {
 } from '@ng-bootstrap/ng-bootstrap';
 import { TextMaskModule } from 'angular2-text-mask';
 import { NguiAutoCompleteModule } from '@ngui/auto-complete';
+import { AutocompleteLibModule } from 'angular-ng-autocomplete'
 
 import { WidgetCreateAppointmentRoutingModule } from './widget-create-appointment-routing.module';
 import { ModalCancelAppointmentModule } from '../modal-cancel-appointment/modal-cancel-appointment.module';
@@ -30,6 +31,7 @@ import { WidgetCreateAppointmentComponent } from './widget-create-appointment.co
     WidgetCreateAppointmentRoutingModule,
     ModalCancelAppointmentModule,
     NguiAutoCompleteModule,
+    AutocompleteLibModule,
     NgbTabsetModule
   ],
   exports: [

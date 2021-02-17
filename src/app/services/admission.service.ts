@@ -16,9 +16,9 @@ export class AdmissionService {
 
   private admissionUrl = environment.FRONT_OFFICE_SERVICE + '/admissions';
 
+
   getActiveAdmission(patientHopeId: any): Observable<any>{
-    const url = `${this.admissionUrl}/active/patient/${patientHopeId}`;
-    
+    const url = `${this.admissionUrl}/active/patient/${patientHopeId}`;    
     return this.http.get<any[]>(url, httpOptions);
   }
 

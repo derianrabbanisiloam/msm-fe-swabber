@@ -19,14 +19,9 @@ export class ConsentService {
   private admissionUrl = environment.FRONT_OFFICE_SERVICE + '/admissions';
   private preregisUrl = environment.FRONT_OFFICE_SERVICE + '/preregistrations';
 
-  getByCode(code: string, orgId: number): Observable<any> {
-    const uri = `${this.consentUrl}/consent/1/${orgId}/${code}/1990-01-01`;
-    return this.http.get<Consent[]>(uri, httpOptions);
-  }
-
-  getByNameDob(name: string, dob: string, orgId: number): Observable<any> {
-    const uri = `${this.consentUrl}/consent/2/${orgId}/${name}/${dob}`;
-    return this.http.get<Consent[]>(uri, httpOptions);
+  searchConsent(searchType: number, orgId: number, searchText: string,dob: string) {
+    const uri = `${this.consentUrl}/consent/${searchType}/${orgId}/${searchText}/${dob}`;
+    return this.http.get<any>(uri, httpOptions);
   }
 
   getDetailAnswer(id: number): Observable<any> {

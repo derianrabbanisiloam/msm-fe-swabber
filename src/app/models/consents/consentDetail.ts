@@ -7,4 +7,10 @@ export class ConsentDetail {
     modified_date: string;
     modified_by: string;
     is_remarks: boolean;
+    seq: number;
+    is_vaccine_seq: number;
+    is_age: number;
+    answer_list: any;
+    option_list: any;
+    remarks: string;
 }

@@ -13,5 +13,6 @@ export class Consent {
   created_by: string;
   modified_date: string;
   modified_by: string;
-  detail: ConsentDetail[]
+  detail: ConsentDetail[];
+  vaccine_no: number;
 }

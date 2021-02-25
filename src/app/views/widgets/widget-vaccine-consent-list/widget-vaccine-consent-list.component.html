@@ -9,7 +9,7 @@
         <ngb-tabset type="pills">
           <ngb-tab title="By Code">
             <ng-template ngbTabContent>
-              <form (ngSubmit)="searchByCode()" class="mt-2">
+              <form (ngSubmit)="searchConsent('code')" class="mt-2">
                 <label for="unique-code">Patient unique code</label>
                 <input id="unique-code" name="unique-code" class="form-control" placeholder="Enter patient unique code"
                   [(ngModel)]="uniqueCode" autocomplete="off" />
@@ -19,13 +19,13 @@
           </ngb-tab>
           <ngb-tab title="By Name">
             <ng-template ngbTabContent>
-              <form (ngSubmit)="searchByNameDob()" class="mt-2">
+              <form (ngSubmit)="searchConsent('name')" class="mt-2">
                 <label for="patient-name-1">Patient name</label>
                 <input id="patient-name-1" name="patient-name-1" class="form-control" placeholder="Enter patient name"
                   [(ngModel)]="patientName" autocomplete="off" />
                 <label for="dob">Date of birth</label>
                 <input id="dob" name="dob" class="form-control" placeholder="dd-mm-yyyy" [(ngModel)]="dob"
-                  autocomplete="off" [textMask]="{ mask: maskBirth }" />
+                  autocomplete="off" [textMask]="{ mask: maskDate }" />
                 <input type="submit" value="Search" class="btn btn-primary mt-2" />
               </form>
             </ng-template>
@@ -36,7 +36,9 @@
         <div *ngIf="consents.length > 0">
           <div *ngFor="let consent of consents">
             <div class="card shadow-sm" (click)="goToDetail(consent)">
-              <div class="card-body">
+              <div class="card-body" style="position: relative;">
+                <span
+                  [ngClass]="consent.vaccine_no === 1? 'badge badge-pill badge-success' : consent.vaccine_no === 2 ? 'badge badge-pill badge-info' : 'hidden-badge'">{{consent.vaccine_no}}</span>
                 <h5 class="card-title">{{ consent.patient_name }}</h5>
                 <h6 class="card-subtitle mb-2 text-muted">
                   {{ consent.date_of_birth | date }}
@@ -88,8 +90,10 @@
             <div class="col-6">
               <label for="patient-dob">Date of birth</label>
               <input [disabled]="consentInfo.checkin_date !== null" id="patient-dob" name="patient-dob"
-                class="form-control" [textMask]="{ mask: maskBirth }" [(ngModel)]="consentInfo.date_of_birth"
-                autocomplete="off" (change)="handleformChange()" />
+                class="form-control" [textMask]="{ mask: maskDate }" [(ngModel)]="consentInfo.date_of_birth"
+                autocomplete="off" (change)="handleformChange()" (blur)="onBirthDateBlur($event)"
+                [ngClass]="formValidity.dob? 'form-control-error' : 'form-control-normal'" />
+              <span *ngIf="formValidity.dob" style="color: red; margin-bottom: 4px;">{{formValidity.dob}}</span>
             </div>
           </div>
           <div class="row">
@@ -97,9 +101,9 @@
               <label for="patient-mobile">Phone</label>
               <input [disabled]="consentInfo.checkin_date !== null" id="patient-mobile" name="patient-mobile"
                 class="form-control" [(ngModel)]="consentInfo.mobile_no" autocomplete="off"
-                (change)="handleformChange()" [ngClass]="formValidity.mobile? 'form-control-error' : 'form-control-normal'"/>
-                <span *ngIf="formValidity.mobile"
-                style="color: red; margin-bottom: 4px;">{{formValidity.mobile}}</span>
+                (change)="handleformChange()"
+                [ngClass]="formValidity.mobile? 'form-control-error' : 'form-control-normal'" />
+              <span *ngIf="formValidity.mobile" style="color: red; margin-bottom: 4px;">{{formValidity.mobile}}</span>
             </div>
             <div class="col-6">
               <label for="patient-email">Email</label>
@@ -108,51 +112,61 @@
                 (change)="handleformChange()" />
             </div>
           </div>
+          <div class="vaccine-no"
+            style="margin-top: 1em;margin-bottom: 1em;border-bottom: 1px solid black; padding-bottom: 0.5em;">
+            <div class="form-check form-check-inline">
+              <input [disabled]="consentInfo.checkin_date !== null" class="form-check-input" type="radio"
+                id="vaccine-no-1" [checked]="consentInfo.vaccine_no === 1" value="1"
+                (change)="vaccineNoChange($event)" />
+              <label class="form-check-label" for="vaccine-no-1">Vaksinasi ke-1</label>
+            </div>
+            <div class="form-check form-check-inline">
+              <input [disabled]="consentInfo.checkin_date !== null" class="form-check-input" type="radio"
+                id="vaccine-no-2" [checked]="consentInfo.vaccine_no === 2" value="2"
+                (change)="vaccineNoChange($event)" />
+              <label class="form-check-label" for="vaccine-no-2">Vaksinasi ke-2</label>
+            </div>
+          </div>
           <div *ngFor="let q of consentInfo.detail; let i = index" class="mt-2">
-            <div class="mb-4">
-              <label for="question">{{
+            <h5 *ngIf="q.consent_question_id === 31 && age > 60"
+              style="border-bottom: 1px solid black; padding-bottom: 0.5em;">Pertanyaan tambahan bagi sasaran lansia (≥
+              60 tahun):</h5>
+            <div class="mb-4"
+              *ngIf="q.is_vaccine_seq === consentInfo.vaccine_no || q.is_vaccine_seq ===  0 && q.is_age < age">
+              <label for="question">{{q.seq}}. {{
                 q.is_remarks
                 ? q.consent_question_name.split("?")[0] + "?"
                 : q.consent_question_name
                 }}</label>
-              <div *ngIf="
-                  (q.is_remarks && q.answer_value === 'Ya') ||
-                  q.answer_value === 'yes'
-                " class="form-inline">
+              <div *ngIf="q.is_remarks && q.answer_value === 'Ya'" class="form-inline">
                 <label>{{
                   q.consent_question_name.split("?")[1].split(separator)[0]
-                  }}</label><input [disabled]="consentInfo.checkin_date !== null" style="
-                    width: 72px;
+                  }}</label>
+                <input [disabled]="consentInfo.checkin_date !== null" style="
+                    width: 120px;
                     margin-left: 4px;
                     margin-right: 4px;
                     text-align: center;
                   " [(ngModel)]="q.answer_remarks" autocomplete="off" name="answer-remarks-{{i}}"
                   [ngClass]="formValidity.remarks[q.consent_question_id]? 'form-control-error' : 'form-control-normal'"
-                  (change)="handleformChange()"/><label>{{
-                  q.consent_question_name.split("?")[1].split(separator)[1]
-                  }}</label>
+                  (change)="handleformChange()" [textMask]="{ mask: maskDate }" placeholder="dd-mm-yyyy" />
               </div>
-              <span *ngIf="formValidity.remarks[q.consent_question_id] && q.answer_value === 'Ya'"
-              style="color: red; margin-bottom: 4px;">{{formValidity.remarks[q.consent_question_id]}}</span>
               <div>
-                <div class="form-check form-check-inline">
+                <div class="form-check form-check-inline" *ngFor="let option of q.answer_list">
                   <input [disabled]="consentInfo.checkin_date !== null" class="form-check-input" type="radio"
-                    [id]="'checkbox-yes-' + q.consent_question_id" [checked]="
-                      q.answer_value === 'Ya' || q.answer_value === 'yes'
-                    " (change)="fieldsChange($event, q.consent_detail_id)" value="Ya" />
-                  <label class="form-check-label" [for]="'checkbox-answer-yes' + q.consent_question_id">Ya</label>
-                </div>
-                <div class="form-check form-check-inline">
-                  <input value="Tidak" [disabled]="consentInfo.checkin_date !== null" class="form-check-input"
-                    type="radio" [id]="'checkbox-no-' + q.consent_question_id" [checked]="
-                      q.answer_value === 'Tidak' || q.answer_value === 'no'
-                    " (change)="fieldsChange($event, q.consent_detail_id)" />
-                  <label class="form-check-label" [for]="'checkbox-answer-no' + q.consent_question_id">Tidak</label>
+                    [id]="'checkbox-'+ option.answer + q.consent_question_id" [checked]="
+                        q.answer_value === option.answer
+                      " (change)="fieldsChange($event, q.consent_detail_id)" [value]="option.answer" />
+                  <label class="form-check-label"
+                    [for]="'checkbox-'+ option.answer + q.consent_question_id">{{option.answer}}</label>
                 </div>
               </div>
             </div>
           </div>
-          <span *ngIf="formValidity.mobile || (formValidity.remarks | json) != '{}'" style="color: red;">Please check your form again</span>
+          <span
+            *ngIf="formValidity.mobile || (formValidity.remarks | json) != '{}' || formValidity.dob || formValidity.answers.length>0"
+            style="color: red;">Please check
+            your form again</span>
           <div style="display: flex; justify-content: space-around">
             <button type="submit" class="btn btn-primary mt-2" [disabled]="consentInfo.checkin_date !== null">
               Save
@@ -266,7 +280,7 @@
 <div class="fo_vaccine_container_print d-none d-print-block" *ngIf="showDetailConsent && consentInfo.detail.length > 0">
   <div class="row">
     <div style="border: 1px solid black; padding: 8px">
-      <p style="font-size: 20px; font-weight: 700; margin: 0">
+      <p style="font-size: 18px; font-weight: 700; margin: 0">
         Code: {{ consentInfo.unique_code }}
       </p>
     </div>
@@ -313,8 +327,18 @@
       </div>
     </div>
   </div>
-  <div class="row" style="margin-top: 20px">
+  <div class="row" style="margin-top: 16px">
     <div class="col-print-12 bordered-content">
+      <div class="form-check form-check-inline">
+        <input class="form-check-input" type="checkbox" id="vaccine-no-1-print" [checked]="consentInfo.vaccine_no === 1"
+          value="1" />
+        <label class="form-check-label" for="vaccine-no-1">Vaksinasi ke-1</label>
+      </div>
+      <div class="form-check form-check-inline">
+        <input class="form-check-input" type="checkbox" id="vaccine-no-2-print" [checked]="consentInfo.vaccine_no === 2"
+          value="2" />
+        <label class="form-check-label" for="vaccine-no-2">Vaksinasi ke-2</label>
+      </div>
       <div class="row" style="margin-top: 8px; margin-left: 0; margin-right: 0">
         <div class="col-print-12">
           <table>
@@ -325,10 +349,15 @@
                 <th colspan="2">Jawaban</th>
               </tr>
             </thead>
-            <tbody *ngFor="let q of consentInfo.detail">
-              <tr>
-                <td style="text-align: center">{{ q.consent_question_id }}</td>
-                <td>
+            <tbody *ngFor="let q of consentInfo.detail; index as i">
+              <tr *ngIf="q.consent_question_id===31">
+                <th>{{q.seq }}</th>
+                <th style="text-align: left;">Pertanyaan tambahan bagi sasaran lansia (≥ 60 tahun ):</th>
+                <th></th>
+              </tr>
+              <tr [id]="'tr-'+i" *ngIf="i===0 || q.seq !== consentInfo.detail[i-1].seq">
+                <td style="text-align: center" [id]="'td-1-'+i">{{q.is_age !== 0 ? '' : q.seq}}</td>
+                <td [id]="'td-2-'+i" *ngIf="q.is_vaccine_seq === 0">
                   {{
                   !q.is_remarks
                   ? q.consent_question_name
@@ -338,23 +367,33 @@
                   )
                   }}
                 </td>
-                <td>
-                  <div class="form-check form-check-inline">
-                    <input class="form-check-input" type="checkbox" id="checkbox-yes" value="Ya"
-                      name="checkbox-answer-yes" [checked]="
-                        q.answer_value === 'Ya' || q.answer_value === 'yes'
-                      " />
-                    <label class="form-check-label" for="checkbox-yes">Ya</label>
-                  </div>
+                <td [id]="'td-3-'+i"
+                  *ngIf="i !== consentInfo.detail.length - 1 && q.seq === consentInfo.detail[i+1].seq">
+                  {{
+                  !q.is_remarks
+                  ? q.consent_question_name
+                  : q.consent_question_name.replace(
+                  separator,
+                  q.answer_remarks !== "" ? q.answer_remarks : "..."
+                  )
+                  }}
+                  <br />
+                  {{
+                  !consentInfo.detail[i+1].is_remarks
+                  ? consentInfo.detail[i+1].consent_question_name
+                  : consentInfo.detail[i+1].consent_question_name.replace(
+                  separator,
+                  consentInfo.detail[i+1].answer_remarks !== "" ? consentInfo.detail[i+1].answer_remarks : "..."
+                  )
+                  }}
                 </td>
-                <td>
-                  <div class="form-check form-check-inline">
-                    <input class="form-check-input" type="checkbox" id="checkbox-yes" value="Tidak"
-                      name="checkbox-answer-yes" [checked]="
-                        q.answer_value === 'Tidak' || q.answer_value === 'no'
-                      " />
-                    <label class="form-check-label" for="checkbox-yes">Tidak</label>
-                  </div>
+                <td style="text-align: center; width: 100px;" [id]="'td-4-'+i" *ngIf="q.is_vaccine_seq === 0">
+                  {{q.answer_value}}
+                </td>
+                <td style="text-align: center; width: 100px;" [id]="'td-5-'+i"
+                  *ngIf="i !== consentInfo.detail.length - 1 &&  q.seq === consentInfo.detail[i+1].seq">
+                  {{q.is_vaccine_seq === consentInfo.vaccine_no ? q.answer_value :
+                  consentInfo.detail[i+1].answer_value}}
                 </td>
               </tr>
             </tbody>
@@ -367,10 +406,21 @@
         </p>
         <ol>
           <li>
-            Bersedia untuk dilakukan vaksinasi COVID-19 yang terdiri dari dua dosis. Dosis kedua vaksin akan diberikan
-            di fasilitas kesehatan yang sama dengan pemberian vaksin dosis pertama.</li>
-          <li>
-            Pemberian vaksin saat ini diprioritaskan untuk individu berusia 18-59 tahun.
+            Bersedia untuk dilakukan vaksinasi COVID-19 yang terdiri dari dua dosis
+            <ol type="a">
+              <li>
+                Untuk penerima vaksin COVID-19 berusia 18-59 tahun, dosis kedua diberikan 14 (empat belas) hari kalender
+                setelah pemberian dosis pertama.
+              </li>
+              <li>
+                Untuk penerima vaksin COVID-19 berusia ≥ 60 tahun, dosis kedua diberikan 28 (dua puluh delapan) hari
+                kalender setelah pemberian dosis pertama.
+              </li>
+              <li>
+                Dosis kedua vaksin COVID-19 akan diberikan di fasilitas Kesehatan yang sama dengan pemberian vaksin
+                dosis pertama
+              </li>
+            </ol>
           </li>
           <li>
             Risiko yang dapat terjadi sehubungan dengan Vaksinasi COVID-19 antara lain: nyeri dan/atau kemerahan di area
@@ -381,8 +431,9 @@
             Setelah pemberian vaksin, perlu dilakukan observasi selama 30 menit di fasilitas kesehatan.
           </li>
           <li>
-            Pemberian vaksin tidak memberikan kepastian terbebas dari COVID-19. Seseorang yang telah menerima vaksin
-            tetap dapat terinfeksi COVID-19, namun dengan derajat penyakit yang lebih ringan.
+            Seseorang yang telah menerima vaksin COVID-19 tetap dapat terinfeksi dan menularkan kepada orang lain.
+            Pemberian vaksin tidak menjamin kekebalan dari infeksi COVID-19, namun meningkatkan imunitas terhadap
+            infeksi COVID-19 sehingga diharapkan derajat penyakit yang dialami lebih ringan.
           </li>
         </ol>
         <p>
@@ -393,7 +444,7 @@
       </div>
       <div class="signature">
         <p>.............., .........................20..........</p>
-        <br /><br /><br /><br /><br />
+        <br /><br /><br />
         <p>......................................................</p>
         <p>Nama jelas dan tanda tangan</p>
       </div>

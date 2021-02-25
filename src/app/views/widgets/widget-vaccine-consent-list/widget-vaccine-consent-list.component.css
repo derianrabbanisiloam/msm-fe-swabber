@@ -57,6 +57,7 @@ label {
 .p-title-1,
 .p-title-2 {
   font-weight: 700;
+  margin-bottom: 0.2rem;
 }
 
 .p-title-2 {
@@ -65,6 +66,7 @@ label {
 
 .p-subtitle {
   font-weight: 400;
+  margin-bottom: 0.2rem;
 }
 
 .fo_vaccine_container_print {
@@ -134,4 +136,13 @@ ol {
 
 .form-control-error {
   border: 1px solid red;
+}
+
+.badge {
+  position: absolute;
+  right: 0.5em;
+}
+
+.hidden-badge {
+  display: none;
 }

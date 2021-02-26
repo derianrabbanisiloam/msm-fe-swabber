@@ -647,4 +647,29 @@ export class WidgetVaccineConsentListComponent implements OnInit {
       return list;
     }
   };
+
+  createMarkupQuestion1 = (rawQuestion: any) => {
+    if (rawQuestion.is_remarks) {
+      console.log(rawQuestion.consent_question_id,1)
+      return `${rawQuestion.consent_question_name.split('?')[0]}?`;
+    } else {
+      console.log(rawQuestion.consent_question_id,2)
+      if (rawQuestion.consent_question_name.indexOf(':') >= 0) {
+        return rawQuestion.consent_question_name.split(':')[0].replace('>=', '≥')
+          + ':'
+      } else {
+        console.log(rawQuestion.consent_question_id,3)
+        return rawQuestion.consent_question_name.replace('>=', '≥');
+      }
+    }
+  }
+  createMarkupQuestion2 = (rawQuestion: any) => {
+    if (!rawQuestion.is_remarks && rawQuestion.consent_question_name.indexOf(':') >= 0) {
+      const splitString = rawQuestion.consent_question_name.split(':');
+      splitString.shift();
+      return splitString.join(':').replace('>=', '≥');
+    } else {
+      return '';
+    }
+  }
 }

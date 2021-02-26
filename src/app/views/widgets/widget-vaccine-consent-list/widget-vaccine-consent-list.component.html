@@ -133,11 +133,8 @@
               60 tahun):</h5>
             <div class="mb-4"
               *ngIf="q.is_vaccine_seq === consentInfo.vaccine_no || q.is_vaccine_seq ===  0 && q.is_age < age">
-              <label for="question">{{q.seq}}. {{
-                q.is_remarks
-                ? q.consent_question_name.split("?")[0] + "?"
-                : q.consent_question_name.replace('>=', '≥')
-                }}</label>
+              <label for="question">{{q.seq}}. {{createMarkupQuestion1(q)}}<br
+                  *ngIf="q.consent_question_name.indexOf(':') >=0" />{{createMarkupQuestion2(q)}}</label>
               <div *ngIf="q.is_remarks && q.answer_value === 'Ya'" class="form-inline">
                 <label>{{
                   q.consent_question_name.split("?")[1].split(separator)[0]

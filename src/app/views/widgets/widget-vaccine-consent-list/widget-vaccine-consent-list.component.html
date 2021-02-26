@@ -150,6 +150,8 @@
                   " [(ngModel)]="q.answer_remarks" autocomplete="off" name="answer-remarks-{{i}}"
                   [ngClass]="formValidity.remarks[q.consent_question_id]? 'form-control-error' : 'form-control-normal'"
                   (change)="handleformChange()" [textMask]="{ mask: maskDate }" placeholder="dd-mm-yyyy" />
+                <span *ngIf="formValidity.remarks[q.consent_question_id] && q.answer_value === 'Ya'"
+                  style="color: red; margin-bottom: 4px;">{{formValidity.remarks[q.consent_question_id]}}</span>
               </div>
               <div>
                 <div class="form-check form-check-inline" *ngFor="let option of q.answer_list">

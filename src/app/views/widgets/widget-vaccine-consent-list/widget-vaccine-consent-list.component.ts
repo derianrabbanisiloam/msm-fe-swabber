@@ -539,8 +539,15 @@ export class WidgetVaccineConsentListComponent implements OnInit {
     const checkRemarks = this.consentInfo.detail.filter((el) => {
       if (el.answer_remarks !== "" && el.answer_value === "Ya") {
         if (!this.isDateValid(el.answer_remarks)) {
+          this.formValidity.remarks[el.consent_question_id] =
+            "Invalid format";
           return el;
-        } else if (
+        } else if (moment(this.formatDate(el.answer_remarks, 'YYYY-MM-DD')).isAfter(moment())) {
+          this.formValidity.remarks[el.consent_question_id] =
+            "Date cannot be after Today";
+          return el;
+        }
+        else if (
           this.isDateValid(el.answer_remarks) &&
           this.formValidity.remarks[el.consent_question_id]
         ) {
@@ -553,10 +560,6 @@ export class WidgetVaccineConsentListComponent implements OnInit {
 
     if (checkRemarks.length > 0) {
       isValid = false;
-      for (let i = 0; i < checkRemarks.length; i++) {
-        this.formValidity.remarks[checkRemarks[i].consent_question_id] =
-          "Invalid format";
-      }
     }
 
 

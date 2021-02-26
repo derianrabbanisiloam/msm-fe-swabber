@@ -136,7 +136,7 @@
               <label for="question">{{q.seq}}. {{
                 q.is_remarks
                 ? q.consent_question_name.split("?")[0] + "?"
-                : q.consent_question_name
+                : q.consent_question_name.replace('>=', '≥')
                 }}</label>
               <div *ngIf="q.is_remarks && q.answer_value === 'Ya'" class="form-inline">
                 <label>{{
@@ -360,7 +360,7 @@
                   <td>
                     {{
                     !q.is_remarks
-                    ? q.consent_question_name
+                    ? q.consent_question_name.replace('>=', '≥')
                     : q.consent_question_name.replace(
                     separator,
                     q.answer_remarks !== "" ? q.answer_remarks : "..."
@@ -385,7 +385,7 @@
                   <td>
                     {{
                     !q.is_remarks
-                    ? q.consent_question_name
+                    ? q.consent_question_name.replace('>=', '≥')
                     : q.consent_question_name.replace(
                     separator,
                     q.answer_remarks !== "" ? q.answer_remarks : "..."

@@ -182,7 +182,7 @@ export class WidgetPatientDataComponent implements OnInit {
     checkOne: false, checkTwo: false, checkThree: false,
     checkFour: false, checkFive: false
   }
-
+  public patDetail: any = null;
   public flagErrorMobile1: boolean = false;
   public flagErrorMobile2: boolean = false;
   public flagErrorMobile3: boolean = false;
@@ -252,6 +252,16 @@ export class WidgetPatientDataComponent implements OnInit {
     this.getCollectionAlert();
     this.setDiagnose();
     this.setReferralSource()
+  }
+
+  async getPatientHopeId(val) {
+    let body = await this.patientService.getPatientHopeDetailTwo(val)
+      .toPromise().then(res => {
+        return res.data;
+      }).catch(err => {
+        return null;
+      });
+    return body
   }
 
   async changeCheckbox(val) {
@@ -1824,7 +1834,7 @@ export class WidgetPatientDataComponent implements OnInit {
 
     this.getNotesAndEmail(this.selectedCheckIn.contact_id);
     this.selectedCheckIn.custome_birth_date = dateFormatter(this.selectedCheckIn.birth_date, true);
-
+    this.patDetail = await this.getPatientHopeId(this.selectedCheckIn.patient_hope_id);
     await this.defaultPatientType(this.selectedCheckIn.patient_hope_id);
     if(this.fromBpjs === true) {
       this.documentModal(content);

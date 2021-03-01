@@ -87,7 +87,6 @@ td {
 
 th {
   text-align: center;
-  background-color: #dddddd;
 }
 
 th,
@@ -145,4 +144,11 @@ ol {
 
 .hidden-badge {
   display: none;
+}
+
+@media print {
+  table tr > th {
+    background-color: #D9D9D9 !important;
+    -webkit-print-color-adjust: exact;
+  }
 }

@@ -650,15 +650,12 @@ export class WidgetVaccineConsentListComponent implements OnInit {
 
   createMarkupQuestion1 = (rawQuestion: any) => {
     if (rawQuestion.is_remarks) {
-      console.log(rawQuestion.consent_question_id,1)
       return `${rawQuestion.consent_question_name.split('?')[0]}?`;
     } else {
-      console.log(rawQuestion.consent_question_id,2)
       if (rawQuestion.consent_question_name.indexOf(':') >= 0) {
         return rawQuestion.consent_question_name.split(':')[0].replace('>=', '≥')
           + ':'
       } else {
-        console.log(rawQuestion.consent_question_id,3)
         return rawQuestion.consent_question_name.replace('>=', '≥');
       }
     }
@@ -670,6 +667,14 @@ export class WidgetVaccineConsentListComponent implements OnInit {
       return splitString.join(':').replace('>=', '≥');
     } else {
       return '';
+    }
+  }
+
+  createPrintOutQuestion1 = (rawQuestion: any) => {
+    if(rawQuestion.is_remarks) {
+      return `${this.createMarkupQuestion1(rawQuestion)} ${rawQuestion.consent_question_name.split("?")[1].split(this.separator)[0]}`
+    } else {
+      return this.createMarkupQuestion1(rawQuestion)
     }
   }
 }

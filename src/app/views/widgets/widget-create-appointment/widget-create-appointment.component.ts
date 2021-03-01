@@ -222,7 +222,7 @@ export class WidgetCreateAppointmentComponent implements OnInit {
     checkOne: false, checkTwo: false, checkThree: false,
     checkFour: false, checkFive: false
   }
-
+  public patDetail: any = null;
 
   constructor(
     private router: Router,
@@ -463,6 +463,16 @@ export class WidgetCreateAppointmentComponent implements OnInit {
           }
       }
     });
+  }
+
+  async getPatientHopeId(val) {
+    let body = await this.patientService.getPatientHopeDetailTwo(val)
+      .toPromise().then(res => {
+        return res.data;
+      }).catch(err => {
+        return null;
+      });
+    return body
   }
 
   async emitBlockSchedule() {
@@ -1728,6 +1738,7 @@ export class WidgetCreateAppointmentComponent implements OnInit {
           this.router.navigate(['./patient-data'], { queryParams: params });
         }
       } else {
+        this.patDetail = await this.getPatientHopeId(detail.patient_hope_id);
         await this.defaultPatientType(detail.patient_hope_id);
         if(this.fromBpjs === true) {
           this.checkListModel = {

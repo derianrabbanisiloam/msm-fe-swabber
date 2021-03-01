@@ -925,6 +925,21 @@
             </div>
           </div>
         </div>
+        <div class="d-flex justify-content-start">
+          <div class="" style="width: 50%; min-width: 100px">
+            <label class="">Payer Name</label>
+            <div class="">
+              <input type="text" class="form-control" name="selfReferal" [(ngModel)]="patDetail.payerName"
+                readonly>
+            </div>
+          </div>
+          <div style="width: 50%; min-width: 100px">
+            <label class="">Payer No</label>
+            <div class="input-group">
+              <input type="text" class="form-control" name="phone" [(ngModel)]="patDetail.payerIdNo" readonly>
+            </div>
+          </div>
+        </div>
       </div>
       <div *ngIf="!selectedCheckIn.admission_id" style="border-top: 0.5px solid #C1C1C1">
         <div class="d-flex justify-content-between">

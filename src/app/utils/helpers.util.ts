@@ -36,3 +36,45 @@ export function regionTime(timeZone = 7, data = new Date()) {
     
     return milisecond;
   }
+
+
+ export async function  printPreview(data){
+    var type = 'application/pdf';
+    let blob = null;
+    
+    const blobURL = URL.createObjectURL(pdfBlobConversion(data, 'application/pdf'));
+    const theWindow = window.open(blobURL, 'targetWindow', 'toolbar=no,location=1,status=no,menubar=no,scrollbars=yes,resizable=yes,width=800,height=600');
+    const theDoc = theWindow.document;
+    const theScript = document.createElement('script');
+
+    function injectThis() {
+        window.print();
+    }
+    theScript.innerHTML = 'window.onload = ${injectThis.toString()};';
+    theDoc.body.appendChild(theScript);
+}
+
+
+function pdfBlobConversion(b64Data, contentType) {
+      contentType = contentType || '';
+      var sliceSize = 512;
+      b64Data = b64Data.replace(/^[^,]+,/, '');
+      b64Data = b64Data.replace(/\s/g, '');
+      var byteCharacters = window.atob(b64Data);
+      var byteArrays = [];
+
+      for ( var offset = 0; offset < byteCharacters.length; offset = offset + sliceSize ) {
+        let slice = byteCharacters.slice(offset, offset + sliceSize);  
+        let byteNumbers = new Array(slice.length);
+        for (var i = 0; i < slice.length; i++) {
+          byteNumbers[i] = slice.charCodeAt(i);
+        }
+
+        let byteArray = new Uint8Array(byteNumbers);
+        byteArrays.push(byteArray);
+      }
+
+      let blob = new Blob(byteArrays, { type: contentType });
+      return blob;
+    }
+

@@ -187,6 +187,7 @@ export class WidgetPatientDataComponent implements OnInit {
   public orderDetail: any;
   public fromPreRegis: boolean = false;
   public fromPatientData: boolean = false;
+  public emailFromPreReg: any;
 
   public flagErrorMobile1: boolean = false;
   public flagErrorMobile2: boolean = false;
@@ -814,7 +815,8 @@ export class WidgetPatientDataComponent implements OnInit {
       this.model.officePhone = this.bucketOne.officePhoneNo;
       this.model.mobileNo1 = this.bucketOne.mobileNo1;
       this.model.mobileNo2 = this.bucketOne.mobileNo2;
-      this.model.email = this.bucketOne.emailAddress;
+      if(this.emailFromPreReg) { this.model.email = this.emailFromPreReg }
+      else{ this.model.email = this.bucketOne.emailAddress; }
 
       this.model.contactEmail = this.bucketOne.contactEmailAddress;
       this.model.contactMobile = this.bucketOne.contactMobileNo;
@@ -824,6 +826,7 @@ export class WidgetPatientDataComponent implements OnInit {
       this.model.contactCity = this.bucketOne.str_contact_city;
 
       this.model.nationality = this.bucketOne.str_nationality;
+
       this.model.nationalidType = this.bucketOne.str_national_id_type;
       this.model.nationalIdNo = this.bucketOne.nationalIdNo;
 
@@ -2403,6 +2406,7 @@ export class WidgetPatientDataComponent implements OnInit {
     this.model.permanentPostCode = patient.permanent_post_code ? patient.permanent_post_code : '';
     this.model.permanentAddress = patient.permanent_address ? patient.permanent_address : '';
     this.model.payerIdNo = patient.payer_id_no ? patient.payer_id_no : '';
+    this.emailFromPreReg = patient.email ? patient.email : null;
 
     if (patient.district_id) {
       const district = await this.generalService.getDistrict(null, patient.district_id)

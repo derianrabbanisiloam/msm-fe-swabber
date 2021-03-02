@@ -43,7 +43,7 @@ export class WidgetVaccineConsentListComponent implements OnInit {
   public isConsentDetailChanged: boolean = false;
   public mrLocal: any;
   public isFromPatientData: boolean = false;
-  public formValidity: any = { remarks: {}, mobile: null, answers: [], dob: null };
+  public formValidity: any = { remarks: {}, name: null, mobile: null, answers: [], dob: null };
 
   constructor(
     private doctorService: DoctorService,
@@ -87,9 +87,13 @@ export class WidgetVaccineConsentListComponent implements OnInit {
     }
   }
 
+  resetFormValidity() {
+    this.formValidity = { remarks: {}, name: null, mobile: null, answers: [], dob: null };
+  }
+
   searchConsent(type: string) {
     // set to initial value
-    this.formValidity = { remarks: {}, mobile: null, answers: [], dob: null };
+    this.resetFormValidity();
     this.updateStatus = "initial";
     this.choosedPatient = undefined;
     this.consents = [];
@@ -223,7 +227,7 @@ export class WidgetVaccineConsentListComponent implements OnInit {
         text: "Changes you made will be lost",
       }).then((res) => {
         if (res.value) {
-          this.formValidity = { remarks: {}, mobile: null, answers: [], dob: null };
+          this.resetFormValidity();
           this.getDetailInformation(payload);
         }
       });
@@ -261,7 +265,7 @@ export class WidgetVaccineConsentListComponent implements OnInit {
         })
         .subscribe(
           (res) => {
-            this.formValidity = { remarks: {}, mobile: null, answers: [], dob: null };
+            this.resetFormValidity();;
             document.documentElement.style.overflow = "auto";
             this.isConsentDetailChanged = false;
             this.updateStatus = "loaded";
@@ -529,10 +533,10 @@ export class WidgetVaccineConsentListComponent implements OnInit {
   }
 
   checkFormValidity() {
-    // initial state
+    // initial parameter
     let isValid: boolean = true;
     const isNum = /^\d*$/;
-    const checkPhone = isNum.test(this.consentInfo.mobile_no);
+    const isNameValid = /^[\w .,]+$/;
     const findEmptyAnswer = this.filterQuestions(this.consentInfo.detail, this.consentInfo.vaccine_no).filter((item) => !item.answer_value)
 
     // check if all reqeuired remarks are filled
@@ -562,8 +566,25 @@ export class WidgetVaccineConsentListComponent implements OnInit {
       isValid = false;
     }
 
+    // check if the name is valid
+    const checkName = isNameValid.test(this.consentInfo.patient_name);
+    if (!checkName) {
+      isValid = false;
+      this.formValidity.name = "Invalid format. Only allows a-z, A-Z, 0-9, (,), (.)";
+      window.scrollTo({
+        left: 0,
+        top: 0,
+        behavior: "smooth",
+      });
+    } else {
+      if (this.formValidity.name) {
+        this.formValidity.name = null;
+      }
+    }
 
-    // check if the phone number format are correct
+
+    // check if the phone number format are correct    
+    const checkPhone = isNum.test(this.consentInfo.mobile_no);
     if (!checkPhone) {
       isValid = false;
       this.formValidity.mobile = "Invalid format";

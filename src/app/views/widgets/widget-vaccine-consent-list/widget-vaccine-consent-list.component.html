@@ -85,7 +85,9 @@
               <label for="patient-name-2">Name</label>
               <input [disabled]="consentInfo.checkin_date !== null" id="patient-name-2" name="patient-name-2"
                 class="form-control" [(ngModel)]="consentInfo.patient_name" autocomplete="off"
-                (change)="handleformChange()" />
+                (change)="handleformChange()"
+                [ngClass]="formValidity.name? 'form-control-error' : 'form-control-normal'" />
+              <span *ngIf="formValidity.name" style="color: red; margin-bottom: 4px;">{{formValidity.name}}</span>
             </div>
             <div class="col-6">
               <label for="patient-dob">Date of birth</label>
@@ -163,7 +165,7 @@
             </div>
           </div>
           <span
-            *ngIf="formValidity.mobile || (formValidity.remarks | json) != '{}' || formValidity.dob || formValidity.answers.length>0"
+            *ngIf="formValidity.mobile || (formValidity.remarks | json) != '{}' || formValidity.dob || formValidity.answers.length>0 || formValidity.name"
             style="color: red;">Please check
             your form again</span>
           <div style="display: flex; justify-content: space-around">

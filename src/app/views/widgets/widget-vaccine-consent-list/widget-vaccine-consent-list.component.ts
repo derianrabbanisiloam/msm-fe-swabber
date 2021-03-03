@@ -26,23 +26,23 @@ export class WidgetVaccineConsentListComponent implements OnInit {
   public consentInfo: Consent;
   public maskDate = [/\d/, /\d/, '-', /\d/, /\d/, '-', /\d/, /\d/, /\d/, /\d/];
   public key: any = JSON.parse(localStorage.getItem('key'));
-  public patientName = '';
-  public dob = '';
-  public age = 0;
-  public uniqueCode = '';
-  public showWaitMsg = false;
-  public showNotFoundMsg = false;
-  public showDetailConsent = false;
-  public updateStatus = 'initial';
-  public separator = '<calendar>';
+  public patientName: string = '';
+  public dob: string = '';
+  public age: number = 0;
+  public uniqueCode: string = '';
+  public showWaitMsg: boolean = false;
+  public showNotFoundMsg: boolean = false;
+  public showDetailConsent: boolean = false;
+  public updateStatus: string = 'initial';
+  public separator: string = '<calendar>';
   public choosedPatient: PatientHope;
   public doctorList: Doctor[];
   public doctorSelected: any;
-  public isAdmissionCreated = false;
-  public createAdmissionStatus = 'initial';
-  public isConsentDetailChanged = false;
+  public isAdmissionCreated: boolean = false;
+  public createAdmissionStatus: string = 'initial';
+  public isConsentDetailChanged: boolean = false;
   public mrLocal: any;
-  public isFromPatientData = false;
+  public isFromPatientData: boolean = false;
   public formValidity: any = { remarks: {}, name: null, mobile: null, answers: [], dob: null };
 
   constructor(
@@ -104,7 +104,7 @@ export class WidgetVaccineConsentListComponent implements OnInit {
     // payload to search consent
     let searchType: number;
     let searchText: string;
-    let formattedDob = '1990-01-01';
+    let formattedDob: string = '1990-01-01';
     const orgId = this.key.hospital.orgId;
 
     if (type === 'code') {
@@ -535,7 +535,7 @@ export class WidgetVaccineConsentListComponent implements OnInit {
 
   checkFormValidity() {
     // initial parameter
-    let isValid = true;
+    let isValid: boolean = true;
     const isNum = /^\d*$/;
     const isNameValid = /^[\w .,]+$/;
     const findEmptyAnswer = this.filterQuestions(this.consentInfo.detail, this.consentInfo.vaccine_no).filter((item) => !item.answer_value);

@@ -1,45 +1,45 @@
-import * as moment from "moment";
-import Swal from "sweetalert2";
-import { NgbModal } from "@ng-bootstrap/ng-bootstrap";
-import { NgbActiveModal } from "@ng-bootstrap/ng-bootstrap";
-import { Router, ActivatedRoute } from "@angular/router";
-import { Component, OnInit } from "@angular/core";
-import { Consent } from "../../../models/consents/consent";
-import { ConsentDetail } from "../../../models/consents/consentDetail";
-import { ConsentService } from "../../../services/consent.service";
-import { environment } from "../../../../environments/environment";
-import { PatientService } from "../../../services/patient.service";
-import { ModalSearchPatientComponent } from "../../../views/widgets/modal-search-patient/modal-search-patient.component";
-import { PatientHope } from "../../../models/patients/patient-hope";
-import { DoctorService } from "../../../services/doctor.service";
-import { Doctor } from "../../../models/doctors/doctor";
-import { sourceApps, channelId } from "../../../variables/common.variable";
+import * as moment from 'moment';
+import Swal from 'sweetalert2';
+import { NgbModal } from '@ng-bootstrap/ng-bootstrap';
+import { NgbActiveModal } from '@ng-bootstrap/ng-bootstrap';
+import { Router, ActivatedRoute } from '@angular/router';
+import { Component, OnInit } from '@angular/core';
+import { Consent } from '../../../models/consents/consent';
+import { ConsentDetail } from '../../../models/consents/consentDetail';
+import { ConsentService } from '../../../services/consent.service';
+import { environment } from '../../../../environments/environment';
+import { PatientService } from '../../../services/patient.service';
+import { ModalSearchPatientComponent } from '../../../views/widgets/modal-search-patient/modal-search-patient.component';
+import { PatientHope } from '../../../models/patients/patient-hope';
+import { DoctorService } from '../../../services/doctor.service';
+import { Doctor } from '../../../models/doctors/doctor';
+import { sourceApps, channelId } from '../../../variables/common.variable';
 @Component({
-  selector: "app-widget-vaccine-consent-list",
-  templateUrl: "./widget-vaccine-consent-list.component.html",
-  styleUrls: ["./widget-vaccine-consent-list.component.css"],
+  selector: 'app-widget-vaccine-consent-list',
+  templateUrl: './widget-vaccine-consent-list.component.html',
+  styleUrls: ['./widget-vaccine-consent-list.component.css'],
 })
 export class WidgetVaccineConsentListComponent implements OnInit {
   public assetPath = environment.ASSET_PATH;
   public consents: Consent[] = [];
   public consentAnswer: ConsentDetail[] = [];
   public consentInfo: Consent;
-  public maskDate = [/\d/, /\d/, "-", /\d/, /\d/, "-", /\d/, /\d/, /\d/, /\d/];
-  public key: any = JSON.parse(localStorage.getItem("key"));
-  public patientName: string = "";
-  public dob: string = "";
+  public maskDate = [/\d/, /\d/, '-', /\d/, /\d/, '-', /\d/, /\d/, /\d/, /\d/];
+  public key: any = JSON.parse(localStorage.getItem('key'));
+  public patientName: string = '';
+  public dob: string = '';
   public age: number = 0;
-  public uniqueCode: string = "";
+  public uniqueCode: string = '';
   public showWaitMsg: boolean = false;
   public showNotFoundMsg: boolean = false;
   public showDetailConsent: boolean = false;
-  public updateStatus: string = "initial";
-  public separator: string = "<calendar>";
+  public updateStatus: string = 'initial';
+  public separator: string = '<calendar>';
   public choosedPatient: PatientHope;
   public doctorList: Doctor[];
   public doctorSelected: any;
   public isAdmissionCreated: boolean = false;
-  public createAdmissionStatus: string = "initial";
+  public createAdmissionStatus: string = 'initial';
   public isConsentDetailChanged: boolean = false;
   public mrLocal: any;
   public isFromPatientData: boolean = false;
@@ -59,7 +59,7 @@ export class WidgetVaccineConsentListComponent implements OnInit {
     window.scrollTo({
       left: 0,
       top: 0,
-      behavior: "smooth",
+      behavior: 'smooth',
     });
     this.patientService.searchPatientHopeSource$.subscribe((patient) => {
       this.choosedPatient = patient;
@@ -67,7 +67,7 @@ export class WidgetVaccineConsentListComponent implements OnInit {
         window.scrollTo({
           left: 0,
           top: document.body.scrollHeight,
-          behavior: "smooth",
+          behavior: 'smooth',
         });
       }, 500);
     });
@@ -78,11 +78,11 @@ export class WidgetVaccineConsentListComponent implements OnInit {
   }
 
   isNewPatient() {
-    this.mrLocal = this.route.snapshot.queryParams["mrLocal"];
-    this.uniqueCode = this.route.snapshot.queryParams["code"];
+    this.mrLocal = this.route.snapshot.queryParams.mrLocal;
+    this.uniqueCode = this.route.snapshot.queryParams.code;
     if (this.mrLocal && this.uniqueCode) {
       this.isFromPatientData = true;
-      document.documentElement.style.overflow = "hidden";
+      document.documentElement.style.overflow = 'hidden';
       this.searchConsent('code');
     }
   }
@@ -94,7 +94,7 @@ export class WidgetVaccineConsentListComponent implements OnInit {
   searchConsent(type: string) {
     // set to initial value
     this.resetFormValidity();
-    this.updateStatus = "initial";
+    this.updateStatus = 'initial';
     this.choosedPatient = undefined;
     this.consents = [];
     this.showWaitMsg = true;
@@ -104,10 +104,10 @@ export class WidgetVaccineConsentListComponent implements OnInit {
     // payload to search consent
     let searchType: number;
     let searchText: string;
-    let formattedDob: string = "1990-01-01";
+    let formattedDob: string = '1990-01-01';
     const orgId = this.key.hospital.orgId;
 
-    if (type === "code") {
+    if (type === 'code') {
       searchType = 1;
       searchText = this.uniqueCode;
     } else {
@@ -120,26 +120,26 @@ export class WidgetVaccineConsentListComponent implements OnInit {
       .searchConsent(searchType, orgId, searchText, formattedDob)
       .subscribe(
         (res) => {
-          if (res.status === "Success") {
+          if (res.status === 'Success') {
             if (res.data.length > 0) {
               this.consents = res.data;
               if (this.isFromPatientData) {
                 this.goToDetail(this.consents[0]);
               } else {
                 this.isFromPatientData = false;
-                document.documentElement.style.overflow = "auto";
+                document.documentElement.style.overflow = 'auto';
               }
             } else {
               this.showNotFoundMsg = true;
               this.consents = [];
               this.isFromPatientData = false;
-              document.documentElement.style.overflow = "auto";
+              document.documentElement.style.overflow = 'auto';
             }
           } else {
             this.showNotFoundMsg = true;
             this.consents = [];
             this.isFromPatientData = false;
-            document.documentElement.style.overflow = "auto";
+            document.documentElement.style.overflow = 'auto';
           }
           this.showWaitMsg = false;
         },
@@ -155,10 +155,11 @@ export class WidgetVaccineConsentListComponent implements OnInit {
     if (
       this.isAdmissionCreated &&
       payload.consent_id === this.consentInfo.consent_id
-    )
+    ) {
       return;
+    }
     this.isConsentDetailChanged = false;
-    this.updateStatus = "initial";
+    this.updateStatus = 'initial';
     this.consentInfo = payload;
     this.showDetailConsent = false;
     this.consentService.getDetailAnswer(payload.consent_id).subscribe(
@@ -168,22 +169,22 @@ export class WidgetVaccineConsentListComponent implements OnInit {
         this.consentInfo = {
           ...this.consentInfo,
           date_of_birth: moment(this.consentInfo.date_of_birth).format(
-            "DD-MM-YYYY"
+            'DD-MM-YYYY'
           ),
           checkin_date: this.consentInfo.checkin_date
-            ? moment(this.consentInfo.checkin_date).format("DD-MM-YYYY HH:mm")
+            ? moment(this.consentInfo.checkin_date).format('DD-MM-YYYY HH:mm')
             : null,
           detail: this.consentAnswer.map((el) => {
             if (el.is_remarks && el.answer_remarks) {
               const date = `${el.answer_remarks[8] + el.answer_remarks[9]}`;
               const month = `${el.answer_remarks[5] + el.answer_remarks[6]}`;
               const year = `${el.answer_remarks[0] + el.answer_remarks[1] + el.answer_remarks[2] + el.answer_remarks[3]}`;
-              el.answer_remarks = `${date}-${month}-${year}`
+              el.answer_remarks = `${date}-${month}-${year}`;
             }
-            return el
+            return el;
           }),
         };
-        this.age = moment().diff(moment(this.formatDate(this.consentInfo.date_of_birth, 'MM-DD-YYYY')), 'years', true)
+        this.age = moment().diff(moment(this.formatDate(this.consentInfo.date_of_birth, 'MM-DD-YYYY')), 'years', true);
         if (
           this.isFromPatientData &&
           this.mrLocal &&
@@ -194,18 +195,18 @@ export class WidgetVaccineConsentListComponent implements OnInit {
             .subscribe((patient) => {
               this.choosedPatient = patient.data[0];
               this.isFromPatientData = false;
-              document.documentElement.style.overflow = "auto";
+              document.documentElement.style.overflow = 'auto';
               setTimeout(() => {
                 window.scrollTo({
                   left: 0,
                   top: document.body.scrollHeight,
-                  behavior: "smooth",
+                  behavior: 'smooth',
                 });
               }, 500);
             });
         } else {
           this.isFromPatientData = false;
-          document.documentElement.style.overflow = "auto";
+          document.documentElement.style.overflow = 'auto';
         }
       },
       (err) => {
@@ -218,13 +219,13 @@ export class WidgetVaccineConsentListComponent implements OnInit {
     this.choosedPatient = undefined;
     if (this.isConsentDetailChanged) {
       Swal.fire({
-        position: "center",
-        type: "warning",
-        title: "Are you sure you want to leave this form?",
+        position: 'center',
+        type: 'warning',
+        title: 'Are you sure you want to leave this form?',
         showConfirmButton: true,
-        confirmButtonText: "Leave",
+        confirmButtonText: 'Leave',
         showCancelButton: true,
-        text: "Changes you made will be lost",
+        text: 'Changes you made will be lost',
       }).then((res) => {
         if (res.value) {
           this.resetFormValidity();
@@ -237,80 +238,80 @@ export class WidgetVaccineConsentListComponent implements OnInit {
     window.scrollTo({
       left: 0,
       top: 0,
-      behavior: "smooth",
+      behavior: 'smooth',
     });
   }
 
   updateConsent() {
-    document.documentElement.style.overflow = "hidden";
-    this.updateStatus = "loading";
+    document.documentElement.style.overflow = 'hidden';
+    this.updateStatus = 'loading';
     const orgId = this.key.hospital.orgId;
     if (this.checkFormValidity()) {
       this.consentService
         .updateConsent({
           ...this.consentInfo,
           detail: this.filterQuestions(this.consentInfo.detail, this.consentInfo.vaccine_no).map((el) => {
-            if (el.answer_value === "Tidak") {
-              el.answer_remarks = "";
+            if (el.answer_value === 'Tidak') {
+              el.answer_remarks = '';
             }
             if (el.answer_remarks) {
               el.answer_remarks = this.formatDate(el.answer_remarks, 'YYYY-MM-DD');
             }
             return el;
           }),
-          create_user: "FO",
+          create_user: 'FO',
           organization_id: orgId,
-          date_of_birth: `${this.consentInfo.date_of_birth.split("-")[2]}-${this.consentInfo.date_of_birth.split("-")[1]
-            }-${this.consentInfo.date_of_birth.split("-")[0]}`,
+          date_of_birth: `${this.consentInfo.date_of_birth.split('-')[2]}-${this.consentInfo.date_of_birth.split('-')[1]
+            }-${this.consentInfo.date_of_birth.split('-')[0]}`,
         })
         .subscribe(
           (res) => {
-            this.resetFormValidity();;
-            document.documentElement.style.overflow = "auto";
+            this.resetFormValidity();
+            document.documentElement.style.overflow = 'auto';
             this.isConsentDetailChanged = false;
-            this.updateStatus = "loaded";
+            this.updateStatus = 'loaded';
             const foundIndex = this.consents.findIndex(
               (item) => item.consent_id === this.consentInfo.consent_id
             );
-            this.consents[foundIndex].vaccine_no = this.consentInfo.vaccine_no
+            this.consents[foundIndex].vaccine_no = this.consentInfo.vaccine_no;
             this.consentInfo.detail = this.consentInfo.detail.map((el) => {
               if (el.is_remarks && el.answer_remarks) {
                 const date = `${el.answer_remarks[8] + el.answer_remarks[9]}`;
                 const month = `${el.answer_remarks[5] + el.answer_remarks[6]}`;
                 const year = `${el.answer_remarks[0] + el.answer_remarks[1] + el.answer_remarks[2] + el.answer_remarks[3]}`;
-                el.answer_remarks = `${date}-${month}-${year}`
+                el.answer_remarks = `${date}-${month}-${year}`;
               }
-              return el
-            })
+              return el;
+            });
             Swal.fire({
-              position: "center",
-              type: "success",
-              title: "Vaccine consent form updated successfully",
+              position: 'center',
+              type: 'success',
+              title: 'Vaccine consent form updated successfully',
               showConfirmButton: false,
               timer: 2000,
             });
           },
           (err) => {
-            this.updateStatus = "loaded";
-            document.documentElement.style.overflow = "auto";
+            this.updateStatus = 'loaded';
+            document.documentElement.style.overflow = 'auto';
             Swal.fire({
-              position: "center",
-              type: "error",
-              title: "Vaccine consent form failed to update",
+              position: 'center',
+              type: 'error',
+              title: 'Vaccine consent form failed to update',
               showConfirmButton: false,
               timer: 2000,
             });
           }
         );
     } else {
-      document.documentElement.style.overflow = "auto";
-      this.updateStatus = "loaded";
+      document.documentElement.style.overflow = 'auto';
+      this.updateStatus = 'loaded';
     }
   }
 
   fieldsChange(event: any, id: number) {
     this.isConsentDetailChanged = true;
-    this.updateStatus = "initial";
+    this.updateStatus = 'initial';
     const foundIndex = this.consentInfo.detail.findIndex(
       (item) => item.consent_detail_id === id
     );
@@ -319,16 +320,16 @@ export class WidgetVaccineConsentListComponent implements OnInit {
 
   vaccineNoChange(event: any) {
     this.isConsentDetailChanged = true;
-    this.updateStatus = "initial";
+    this.updateStatus = 'initial';
     this.consentInfo.vaccine_no = Number(event.target.value);
   }
 
   printForm(): void {
     if (this.isConsentDetailChanged) {
       Swal.fire({
-        position: "center",
-        type: "error",
-        title: "Please save the updated consent form before you print",
+        position: 'center',
+        type: 'error',
+        title: 'Please save the updated consent form before you print',
         showConfirmButton: false,
         timer: 2000,
       });
@@ -344,9 +345,9 @@ export class WidgetVaccineConsentListComponent implements OnInit {
   searchPatientHOPE(e?) {
     if (this.isConsentDetailChanged) {
       Swal.fire({
-        position: "center",
-        type: "error",
-        title: "Please save the updated consent form before admitting patient",
+        position: 'center',
+        type: 'error',
+        title: 'Please save the updated consent form before admitting patient',
         showConfirmButton: false,
         timer: 2000,
       });
@@ -354,13 +355,13 @@ export class WidgetVaccineConsentListComponent implements OnInit {
       const hospitalId = this.key.hospital.id;
       const params = {
         patientName: this.consentInfo.patient_name,
-        birthDate: `${this.consentInfo.date_of_birth.split("-")[2]}-${this.consentInfo.date_of_birth.split("-")[1]
-          }-${this.consentInfo.date_of_birth.split("-")[0]}`,
-        localMrNo: "",
+        birthDate: `${this.consentInfo.date_of_birth.split('-')[2]}-${this.consentInfo.date_of_birth.split('-')[1]
+          }-${this.consentInfo.date_of_birth.split('-')[0]}`,
+        localMrNo: '',
       };
       const modalRef = this.modalService.open(ModalSearchPatientComponent, {
-        windowClass: "modal-searchPatient",
-        size: "lg",
+        windowClass: 'modal-searchPatient',
+        size: 'lg',
       });
       modalRef.componentInstance.searchKeywords = {
         ...params,
@@ -378,17 +379,17 @@ export class WidgetVaccineConsentListComponent implements OnInit {
   handlingCreateAdmission() {
     if (!this.choosedPatient.patientOrganizationId) {
       Swal.fire({
-        position: "center",
-        type: "warning",
-        title: "Your patient doesn't have MR local",
+        position: 'center',
+        type: 'warning',
+        title: 'Your patient doesn\'t have MR local',
         showConfirmButton: true,
-        confirmButtonText: "Yes",
+        confirmButtonText: 'Yes',
         showCancelButton: true,
-        text: "Would you like to create MR local?",
+        text: 'Would you like to create MR local?',
       }).then((res) => {
         if (res.value) {
-          this.createAdmissionStatus = "loading";
-          document.documentElement.style.overflow = "hidden";
+          this.createAdmissionStatus = 'loading';
+          document.documentElement.style.overflow = 'hidden';
           this.patientService
             .createMrLocal({
               patientHopeId: this.choosedPatient.patientId,
@@ -408,16 +409,16 @@ export class WidgetVaccineConsentListComponent implements OnInit {
                   )
                   .subscribe((patient) => {
                     this.choosedPatient = patient.data[0];
-                    this.createAdmissionStatus = "loaded";
-                    document.documentElement.style.overflow = "auto";
+                    this.createAdmissionStatus = 'loaded';
+                    document.documentElement.style.overflow = 'auto';
                     Swal.fire({
-                      position: "center",
-                      type: "success",
-                      title: "MR local succesfully created",
+                      position: 'center',
+                      type: 'success',
+                      title: 'MR local succesfully created',
                       showConfirmButton: true,
-                      confirmButtonText: "Yes",
+                      confirmButtonText: 'Yes',
                       showCancelButton: true,
-                      text: "Would you like to continue to create admission?",
+                      text: 'Would you like to continue to create admission?',
                     }).then((res) => {
                       if (res.value) {
                         this.createAdmission();
@@ -426,12 +427,12 @@ export class WidgetVaccineConsentListComponent implements OnInit {
                   });
               },
               (err) => {
-                this.createAdmissionStatus = "loaded";
-                document.documentElement.style.overflow = "auto";
+                this.createAdmissionStatus = 'loaded';
+                document.documentElement.style.overflow = 'auto';
                 Swal.fire({
-                  position: "center",
-                  type: "error",
-                  title: "Create MR local failed, please try again later",
+                  position: 'center',
+                  type: 'error',
+                  title: 'Create MR local failed, please try again later',
                   showConfirmButton: false,
                   timer: 2000,
                 });
@@ -456,11 +457,11 @@ export class WidgetVaccineConsentListComponent implements OnInit {
       organization_id: this.key.hospital.orgId,
       admission_id: 0,
       patient_id: this.choosedPatient.patientId,
-      create_user: "FO",
+      create_user: 'FO',
     };
 
-    this.createAdmissionStatus = "loading";
-    document.documentElement.style.overflow = "hidden";
+    this.createAdmissionStatus = 'loading';
+    document.documentElement.style.overflow = 'hidden';
 
     this.consentService.createAdmissionVaccine(payloadHope).subscribe(
       (res) => {
@@ -473,15 +474,15 @@ export class WidgetVaccineConsentListComponent implements OnInit {
               (x) => x.consent_id === this.consentInfo.consent_id
             );
             this.consents[foundIndex].checkin_date = moment().format(
-              "YYYY-MM-DDTHH:mm:ss"
+              'YYYY-MM-DDTHH:mm:ss'
             );
-            this.consentInfo.checkin_date = moment().format("DD-MM-YYYY HH:mm");
-            this.createAdmissionStatus = "loaded";
-            document.documentElement.style.overflow = "auto";
+            this.consentInfo.checkin_date = moment().format('DD-MM-YYYY HH:mm');
+            this.createAdmissionStatus = 'loaded';
+            document.documentElement.style.overflow = 'auto';
             Swal.fire({
-              position: "center",
-              type: "success",
-              title: "Admission successfully created",
+              position: 'center',
+              type: 'success',
+              title: 'Admission successfully created',
               showConfirmButton: false,
               timer: 2000,
             });
@@ -489,18 +490,18 @@ export class WidgetVaccineConsentListComponent implements OnInit {
               window.scrollTo({
                 left: 0,
                 top: 0,
-                behavior: "smooth",
+                behavior: 'smooth',
               });
             }, 500);
           });
       },
       (err) => {
-        this.createAdmissionStatus = "loaded";
-        document.documentElement.style.overflow = "auto";
+        this.createAdmissionStatus = 'loaded';
+        document.documentElement.style.overflow = 'auto';
         Swal.fire({
-          position: "center",
-          type: "error",
-          title: "Create admission failed, please try again later",
+          position: 'center',
+          type: 'error',
+          title: 'Create admission failed, please try again later',
           showConfirmButton: false,
           timer: 2000,
         });
@@ -515,20 +516,20 @@ export class WidgetVaccineConsentListComponent implements OnInit {
     };
     if (this.isConsentDetailChanged) {
       Swal.fire({
-        position: "center",
-        type: "warning",
-        title: "Are you sure you want to leave this form?",
+        position: 'center',
+        type: 'warning',
+        title: 'Are you sure you want to leave this form?',
         showConfirmButton: true,
-        confirmButtonText: "Leave",
+        confirmButtonText: 'Leave',
         showCancelButton: true,
-        text: "Changes you made will be lost",
+        text: 'Changes you made will be lost',
       }).then((res) => {
         if (res.value) {
-          this.router.navigate(["./patient-data"], { queryParams: params });
+          this.router.navigate(['./patient-data'], { queryParams: params });
         }
       });
     } else {
-      this.router.navigate(["./patient-data"], { queryParams: params });
+      this.router.navigate(['./patient-data'], { queryParams: params });
     }
   }
 
@@ -537,27 +538,26 @@ export class WidgetVaccineConsentListComponent implements OnInit {
     let isValid: boolean = true;
     const isNum = /^\d*$/;
     const isNameValid = /^[\w .,]+$/;
-    const findEmptyAnswer = this.filterQuestions(this.consentInfo.detail, this.consentInfo.vaccine_no).filter((item) => !item.answer_value)
+    const findEmptyAnswer = this.filterQuestions(this.consentInfo.detail, this.consentInfo.vaccine_no).filter((item) => !item.answer_value);
 
     // check if all reqeuired remarks are filled
     const checkRemarks = this.consentInfo.detail.filter((el) => {
-      if (el.answer_remarks !== "" && el.answer_value === "Ya") {
+      if (el.answer_remarks !== '' && el.answer_value === 'Ya') {
         if (!this.isDateValid(el.answer_remarks)) {
           this.formValidity.remarks[el.consent_question_id] =
-            "Invalid format";
+            'Invalid format';
           return el;
         } else if (moment(this.formatDate(el.answer_remarks, 'YYYY-MM-DD')).isAfter(moment())) {
           this.formValidity.remarks[el.consent_question_id] =
-            "Date cannot be after Today";
+            'Date cannot be after Today';
           return el;
-        }
-        else if (
+        } else if (
           this.isDateValid(el.answer_remarks) &&
           this.formValidity.remarks[el.consent_question_id]
         ) {
           delete this.formValidity.remarks[el.consent_question_id];
         }
-      } else if (el.is_remarks && el.answer_value === "Ya" && !el.answer_remarks) {
+      } else if (el.is_remarks && el.answer_value === 'Ya' && !el.answer_remarks) {
         return el;
       }
     });
@@ -570,11 +570,11 @@ export class WidgetVaccineConsentListComponent implements OnInit {
     const checkName = isNameValid.test(this.consentInfo.patient_name);
     if (!checkName) {
       isValid = false;
-      this.formValidity.name = "Invalid format. Only allows a-z, A-Z, 0-9, (,), (.)";
+      this.formValidity.name = 'Invalid format. Only allows a-z, A-Z, 0-9, (,), (.)';
       window.scrollTo({
         left: 0,
         top: 0,
-        behavior: "smooth",
+        behavior: 'smooth',
       });
     } else {
       if (this.formValidity.name) {
@@ -583,15 +583,15 @@ export class WidgetVaccineConsentListComponent implements OnInit {
     }
 
 
-    // check if the phone number format are correct    
+    // check if the phone number format are correct
     const checkPhone = isNum.test(this.consentInfo.mobile_no);
     if (!checkPhone) {
       isValid = false;
-      this.formValidity.mobile = "Invalid format";
+      this.formValidity.mobile = 'Invalid format';
       window.scrollTo({
         left: 0,
         top: 0,
-        behavior: "smooth",
+        behavior: 'smooth',
       });
     } else {
       if (this.formValidity.mobile) {
@@ -610,11 +610,11 @@ export class WidgetVaccineConsentListComponent implements OnInit {
     // check if the birthdate format are correct
     if (!this.isDateValid(this.consentInfo.date_of_birth)) {
       isValid = false;
-      this.formValidity.dob = "Invalid format";
+      this.formValidity.dob = 'Invalid format';
       window.scrollTo({
         left: 0,
         top: 0,
-        behavior: "smooth",
+        behavior: 'smooth',
       });
     } else {
       if (this.formValidity.dob) {
@@ -626,19 +626,19 @@ export class WidgetVaccineConsentListComponent implements OnInit {
   }
 
   onBirthDateBlur(event: any) {
-    const date = event.target.value
-    const isDateValid = this.isDateValid(date)
+    const date = event.target.value;
+    const isDateValid = this.isDateValid(date);
     if (isDateValid) {
-      this.age = moment().diff(moment(this.formatDate(date, 'MM-DD-YYYY')), 'years', true)
+      this.age = moment().diff(moment(this.formatDate(date, 'MM-DD-YYYY')), 'years', true);
     }
   }
 
   isDateValid(value: string) {
-    const reformatDate = value.split('-').join('').split('_').join('')
+    const reformatDate = value.split('-').join('').split('_').join('');
     if (reformatDate.length !== 8) {
-      return false
+      return false;
     } else {
-      return true
+      return true;
     }
   }
 
@@ -647,9 +647,9 @@ export class WidgetVaccineConsentListComponent implements OnInit {
     const month = `${value[3] + value[4]}`;
     const year = `${value[6] + value[7] + value[8] + value[9]}`;
     if (format === 'YYYY-MM-DD') {
-      return `${year}-${month}-${date}`
+      return `${year}-${month}-${date}`;
     } else {
-      return `${month}-${date}-${year}`
+      return `${month}-${date}-${year}`;
     }
   }
 
@@ -667,7 +667,7 @@ export class WidgetVaccineConsentListComponent implements OnInit {
     } else {
       return list;
     }
-  };
+  }
 
   createMarkupQuestion1 = (rawQuestion: any) => {
     if (rawQuestion.is_remarks) {
@@ -675,7 +675,7 @@ export class WidgetVaccineConsentListComponent implements OnInit {
     } else {
       if (rawQuestion.consent_question_name.indexOf(':') >= 0) {
         return rawQuestion.consent_question_name.split(':')[0].replace('>=', '≥')
-          + ':'
+          + ':';
       } else {
         return rawQuestion.consent_question_name.replace('>=', '≥');
       }
@@ -692,10 +692,10 @@ export class WidgetVaccineConsentListComponent implements OnInit {
   }
 
   createPrintOutQuestion1 = (rawQuestion: any) => {
-    if(rawQuestion.is_remarks) {
-      return `${this.createMarkupQuestion1(rawQuestion)} ${rawQuestion.consent_question_name.split("?")[1].split(this.separator)[0]}`
+    if (rawQuestion.is_remarks) {
+      return `${this.createMarkupQuestion1(rawQuestion)} ${rawQuestion.consent_question_name.split('?')[1].split(this.separator)[0]}`;
     } else {
-      return this.createMarkupQuestion1(rawQuestion)
+      return this.createMarkupQuestion1(rawQuestion);
     }
   }
 }

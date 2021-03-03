@@ -90,6 +90,11 @@ export class PatientService {
     return this.http.get<any>(uri, httpOptions);
   }
 
+  getPatientHopeDetailTwo(patientId: number) {
+    const uri = `${this.patientHopeDetailUrl}/details/${patientId}`;
+    return this.http.get<any>(uri, httpOptions);
+  }
+
   getPatientOrg(patientId: number, orgId: number) {
     const uri = `${this.patientOrganizationUrl}/${patientId}/${orgId}`;
     return this.http.get<any>(uri, httpOptions);

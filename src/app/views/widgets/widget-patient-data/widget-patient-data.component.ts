@@ -31,7 +31,7 @@ import Swal from 'sweetalert2';
 import { FormBuilder, FormGroup, FormControl } from '@angular/forms';
 import { PayerService } from '../../../services/payer.service';
 import { ModalSearchPayerComponent } from '../modal-search-payer/modal-search-payer.component';
-import { isNumber } from 'util';
+import { isNumber } from 'util'
 
 @Component({
   selector: 'app-widget-patient-data',
@@ -67,51 +67,24 @@ export class WidgetPatientDataComponent implements OnInit {
   public consentCode: any;
   public selectedCheckIn: any;
 
-  public isFromAppointmentList = false;
+  public isFromAppointmentList: boolean = false;
 
   // Flag is success or not while save patient and admission
-  public isSuccessCreatePatient = false;
-  public isSuccessCreateAdmission = false;
-  public isLoadingCreateAdmission = false;
-  public isButtonSave = false;
+  public isSuccessCreatePatient: boolean = false;
+  public isSuccessCreateAdmission: boolean = false;
+  public isLoadingCreateAdmission: boolean = false;
+  public isButtonSave: boolean = false;
 
-  public isLoadingCheckEligible = false;
-  public isError = false;
+  public isLoadingCheckEligible: boolean = false;
+  public isError: boolean = false;
   public listActiveAdmission: any;
 
-  public showWaitMsg = true;
-  public showNotFoundMsg = false;
+  public showWaitMsg: boolean = true;
+  public showNotFoundMsg: boolean = false;
 
   // Input mask
-  public mask_birth = [
-    /\d/,
-    /\d/,
-    '-',
-    /\d/,
-    /\d/,
-    '-',
-    /\d/,
-    /\d/,
-    /\d/,
-    /\d/,
-  ];
-  public mask = [
-    /\d/,
-    /\d/,
-    /\d/,
-    /\d/,
-    /\d/,
-    /\d/,
-    /\d/,
-    /\d/,
-    /\d/,
-    /\d/,
-    /\d/,
-    /\d/,
-    /\d/,
-    /\d/,
-    /\d/,
-  ];
+  public mask_birth = [/\d/, /\d/, '-', /\d/, /\d/, '-', /\d/, /\d/, /\d/, /\d/];
+  public mask = [/\d/, /\d/, /\d/, /\d/, /\d/, /\d/, /\d/, /\d/, /\d/, /\d/, /\d/, /\d/, /\d/, /\d/, /\d/];
   public checkEmail = '[a-z0-9._%+-]+@[a-z0-9.-]+\\.[a-z]{2,}$';
   public checkNamed = /[*#!@&^'"/[\]{}()?]/;
 
@@ -124,17 +97,17 @@ export class WidgetPatientDataComponent implements OnInit {
   public contactDetail: any;
 
   // button handler
-  public buttonPrintLabel = true;
-  public buttonPrintPatientLabel = true;
+  public buttonPrintLabel: boolean = true;
+  public buttonPrintPatientLabel: boolean = true;
 
-  public buttonCreateAdmission = true;
-  public buttonPostAdmission = false;
-  public buttonPrintQueue = true;
-  public buttonPatientLabel = true;
-  public buttonCloseAdm = true;
-  public buttonVIP = false;
-  public buttonReguler = false;
-  public buttonCheckEligible = true;
+  public buttonCreateAdmission: boolean = true;
+  public buttonPostAdmission: boolean = false;
+  public buttonPrintQueue: boolean = true;
+  public buttonPatientLabel: boolean = true;
+  public buttonCloseAdm: boolean = true;
+  public buttonVIP: boolean = false;
+  public buttonReguler: boolean = false;
+  public buttonCheckEligible: boolean = true;
 
   public nationalIdTypeId: any;
 
@@ -150,9 +123,9 @@ export class WidgetPatientDataComponent implements OnInit {
   public payer: any;
   public payerNo: any;
   public payerEligibility: any;
-  public txtPayer = true;
-  public txtPayerNo = true;
-  public txtPayerEligibility = true;
+  public txtPayer: boolean = true;
+  public txtPayerNo: boolean = true;
+  public txtPayerEligibility: boolean = true;
 
   public diagnose: any;
   public referralNo: any;
@@ -179,34 +152,34 @@ export class WidgetPatientDataComponent implements OnInit {
   public dataSiloamPatient;
   public resMappingData: any;
   public showCreateMrData: any = {};
-  public flagPoint = false;
+  public flagPoint: boolean = false;
   public bucketOne: any;
   public bucketTwo: any;
-  public validInputNo = false;
-  public validEmail = false;
-  public validInputNoSim = false;
-  public validName = false;
+  public validInputNo: boolean = false;
+  public validEmail: boolean = false;
+  public validInputNoSim: boolean = false;
+  public validName: boolean = false;
   public phoneNumber: any;
-  public fromBpjs = false;
-  public fromRegistration = false;
-  public maxSize10MB = 10485760;
-  public flagFile1 = false;
-  public flagFile2 = false;
-  public flagFile3 = false;
-  public flagFile4 = false;
-  public flagFile5 = false;
+  public fromBpjs: boolean = false;
+  public fromRegistration: boolean = false;
+  public maxSize10MB: number = 10485760;
+  public flagFile1: boolean = false;
+  public flagFile2: boolean = false;
+  public flagFile3: boolean = false;
+  public flagFile4: boolean = false;
+  public flagFile5: boolean = false;
   uploadForm: FormGroup;
   public assetUpload: any = null;
   public bodyUpload: any = {};
   public urlBpjsCard = environment.GET_IMAGE;
-  public email = '';
-  public emailTemp = '';
-  public notes = '';
-  public notesTemp = '';
-  public registNotes = '';
-  public isSigned = false;
-  public isSignedTemp = false;
-  public isCreatedEligibility = false;
+  public email: string = '';
+  public emailTemp: string = '';
+  public notes: string = '';
+  public notesTemp: string = '';
+  public registNotes: string = '';
+  public isSigned: boolean = false;
+  public isSignedTemp: boolean = false;
+  public isCreatedEligibility: boolean = false;
   public checkListModel: any = {
     checkOne: false,
     checkTwo: false,
@@ -215,14 +188,14 @@ export class WidgetPatientDataComponent implements OnInit {
     checkFive: false,
   };
 
-  public isFromVaccineList = false;
+  public isFromVaccineList: boolean = false;
   public patDetail: any = null;
-  public flagErrorMobile1 = false;
-  public flagErrorMobile2 = false;
-  public flagErrorMobile3 = false;
-  public flagErrorMobile4 = false;
-  public flagErrorMobile5 = false;
-  public flagErrorMobile6 = false;
+  public flagErrorMobile1: boolean = false;
+  public flagErrorMobile2: boolean = false;
+  public flagErrorMobile3: boolean = false;
+  public flagErrorMobile4: boolean = false;
+  public flagErrorMobile5: boolean = false;
+  public flagErrorMobile6: boolean = false;
 
   constructor(
     private generalService: GeneralService,
@@ -306,7 +279,7 @@ export class WidgetPatientDataComponent implements OnInit {
       }).catch(err => {
         return null;
       });
-    return body;
+    return body
   }
 
   async changeCheckbox(val) {
@@ -1888,7 +1861,7 @@ export class WidgetPatientDataComponent implements OnInit {
     isValid = this.checkFormCondition(); // return true if valid (there is no empty mandatory)
 
     const x = this;
-    $('.form-error').bind('input click change', function() {
+    $('.form-error').bind('input click change', function () {
       x.checkFormCondition();
     });
 

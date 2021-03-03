@@ -7,6 +7,7 @@ import { District } from '../../../models/generals/district';
 import { Subdistrict } from '../../../models/generals/subdistrict';
 import { GeneralService } from '../../../services/general.service';
 import { PatientService } from '../../../services/patient.service';
+import { ConsentService } from '../../../services/consent.service';
 import { AppointmentService } from '../../../services/appointment.service';
 import { AdmissionService } from '../../../services/admission.service';
 import { QueueService } from '../../../services/queue.service';
@@ -63,6 +64,8 @@ export class WidgetPatientDataComponent implements OnInit {
   public listSubdistrict: Subdistrict[];
 
   public appointmentId: any;
+  public registerFormId: any;
+  public consentCode: any;
   public selectedCheckIn: any;
 
   public isFromAppointmentList: boolean = false;
@@ -182,6 +185,7 @@ export class WidgetPatientDataComponent implements OnInit {
     checkOne: false, checkTwo: false, checkThree: false,
     checkFour: false, checkFive: false
   }
+  public isFromVaccineList: boolean = false;
   public patDetail: any = null;
   public flagErrorMobile1: boolean = false;
   public flagErrorMobile2: boolean = false;
@@ -194,6 +198,7 @@ export class WidgetPatientDataComponent implements OnInit {
     private generalService: GeneralService,
     private alertService: AlertService,
     private patientService: PatientService,
+    private consentService: ConsentService,
     private payerService: PayerService,
     private modalService: NgbModal,
     private modalTwoService: NgbModal,
@@ -206,6 +211,9 @@ export class WidgetPatientDataComponent implements OnInit {
     private formBuilder: FormBuilder,
   ) {
     this.model.sex = {};
+    this.model.maritalStatus = {};
+    this.model.religion = {};
+    this.model.nationalidType = {};
     this.model.CentralRegDate = dateFormatter(new Date(), true);
     this.model.registerDate = this.model.CentralRegDate;
 
@@ -251,7 +259,8 @@ export class WidgetPatientDataComponent implements OnInit {
     this.getBloodType();
     this.getCollectionAlert();
     this.setDiagnose();
-    this.setReferralSource()
+    this.setReferralSource();
+    this.isRegisterForm();
   }
 
   async getPatientHopeId(val) {
@@ -342,6 +351,126 @@ export class WidgetPatientDataComponent implements OnInit {
       this.alertService.error(err.error.message);
       return null;
     });
+  }
+  async isRegisterForm() {
+    this.registerFormId = this.route.snapshot.queryParams.formId;
+    this.consentCode = this.route.snapshot.queryParams.code;
+    if (this.registerFormId) {
+      window.scrollTo({
+        left: 0,
+        top: 0,
+        behavior: 'smooth',
+      });
+      this.isFromVaccineList = true;
+      const contact = await this.consentService
+        .getPreRegisFormById(this.registerFormId)
+        .toPromise()
+        .then((res) => {
+          return res.data[0];
+        })
+        .catch((err) => {
+          return null;
+        });
+
+      if (contact) {
+        // Binding response data into model
+        // This part --must be available both new & existing patient
+        // Basics text binding
+        this.model.patientName = contact.name;
+        this.model.mobileNo1 = contact.phone_number_1;
+        this.model.nationalIdNo = contact.identity_number;
+        this.model.email = contact.email;
+
+        // Date binding
+        this.model.birth = dateFormatter(contact.birth_date, true);
+
+        // Select option binding
+        this.model.nationalidType.value = contact.identity_type_id
+          ? contact.identity_type_id.toString()
+          : this.model.nationalidType;
+
+        // This part --only available both new patient
+        if (contact.is_new) {
+          // Basics text binding
+          this.model.address = contact.current_address
+            ? contact.current_address
+            : contact.identity_address;
+          this.model.permanentAddress = contact.current_address
+            ? contact.identity_address
+            : '';
+          this.model.mobileNo2 = contact.phone_number_2;
+          this.model.homePhone = contact.landline_number;
+          this.model.officePhone = contact.office_phonenumber;
+          this.model.spouseName = contact.spouse_name;
+          this.model.fatherName = contact.father_name;
+          this.model.motherName = contact.mother_name;
+          this.model.contactName = contact.emergency_contact_name;
+          this.model.contactAddress = contact.emergency_contact_address;
+          this.model.contactPhone = contact.emergency_contact_phone;
+
+          // Select option binding
+          const idxBirthCity = this.listCity.findIndex((a) => {
+            return a.city_id === Number(contact.birth_place_id);
+          });
+          const idxCity = this.listCity.findIndex((a) => {
+            return a.city_id === Number(contact.city_id);
+          });
+          const idxCountry = this.listCountry.findIndex((a) => {
+            return a.country_id === contact.country_id;
+          });
+          this.model.city =
+            idxCity >= 0
+              ? {
+                  city_id: this.listCity[idxCity].city_id,
+                  name: this.listCity[idxCity].name,
+                }
+              : { city_id: null, name: '' };
+          await this.getDetailAddress(true);
+          this.model.district.district_id = contact.district_id
+            ? contact.district_id.toString()
+            : this.listDistrict[0].district_id;
+          await this.getDetailAddress(true);
+          this.model.subdistrict.sub_district_id = contact.sub_district_id
+            ? contact.sub_district_id.toString()
+            : this.listSubdistrict[0].sub_district_id;
+          this.model.birthPlace =
+            idxBirthCity >= 0
+              ? {
+                  city_id: this.listCity[idxBirthCity].city_id,
+                  name: this.listCity[idxBirthCity].name,
+                }
+              : { city_id: null, name: '' };
+          this.model.nationality =
+            idxCountry >= 0
+              ? {
+                  country_id: this.listCountry[idxCountry].country_id,
+                  name: this.listCountry[idxCountry].name,
+                }
+              : { country_id: null, name: '' };
+          this.model.sex.value = contact.gender_id
+            ? contact.gender_id.toString()
+            : this.model.sex;
+          this.model.maritalStatus.value = contact.marital_status_id
+            ? contact.marital_status_id.toString()
+            : this.model.maritalStatus;
+          this.model.religion.value = contact.religion_id
+            ? contact.religion_id.toString()
+            : this.model.religion;
+          this.model.religion.value = contact.religion_id
+            ? contact.religion_id.toString()
+            : this.model.religion;
+
+          // TODO identity image?
+        }
+      } else {
+        this.alertService.error('Contact not found', false, 5000);
+      }
+    }
+  }
+
+  createVaccineAdmission() {
+    const params = { mrLocal: this.model.mrlocal, code: this.consentCode };
+    this.router.navigate(['./vaccine-list'], { queryParams: params });
   }
 
   async isAppointment() {
@@ -1252,7 +1381,7 @@ export class WidgetPatientDataComponent implements OnInit {
 
      
       
-      this.buttonCreateAdmission = this.isFromAppointmentList ? false : true;
+      this.buttonCreateAdmission = this.isFromAppointmentList || this.isFromVaccineList ? false : true;;
       this.isSuccessCreatePatient = true;
       this.isButtonSave = true;
     } else {

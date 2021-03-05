@@ -2,7 +2,7 @@
   <div *ngFor="let alert of alerts">
     <ngb-alert *ngIf="alert" type="{{cssAlertType(alert)}}" (close)="removeAlert(alert)">{{ alert.message }}</ngb-alert>
   </div>
-  <form style="" #f="ngForm" novalidate>
+  <form class="fo-form" style="" #f="ngForm" novalidate>
     <div class="fo_personal_detail_container shadow-4">
       <div class="fo_personal_detail_title header-2">
         <div>Personal Detail</div>
@@ -290,9 +290,9 @@
                   <div class="">
                     <input type="file" accept="image/*" class="form-control-file" id="scanKTP"
                       (change)="readUrl($event)">
-                      <span *ngIf="model.identityImageUrl">
-                        <img alt="" src="{{model.identityImageUrl}}" style="width: 400px; height: 220px" />
-                      </span>
+                    <span *ngIf="model.identityImageUrl">
+                      <img src="{{model.identityImageUrl}}" alt="" style="width: 400px; height: 220px;" />
+                    </span>
                   </div>
 
                   <div class="">
@@ -1126,3 +1126,362 @@
     <button class="btn ms_btn_green" (click)="newPatient()">Confirm</button>
   </div>
 </ng-template>
+
+<div class="for-print" style="font-family: Helvetica; margin-left: 3rem; margin-right: 3rem; margin-top: -2rem;">
+  <div class="page">
+    <div style="width: 100%; height: auto; display: flex; flex-direction: row;
+      justify-content: space-between; align-items: center;">
+      <div>
+        <img src="../../../../assets/icons/siloam_logo.png" style="width: 300px; height: auto" />
+      </div>
+      <div style="text-align: right">
+        <p style="font-size: 18px; color: #353957; line-height: 10px; margin-bottom: 2rem;">
+          <span *ngIf="hospital.name">{{hospital.name}}</span>
+          <span *ngIf="!hospital.name"><div style="height: 30px"></div></span>
+        </p>
+        <p style="font-size: 24px; color: #353957; font-weight: bold; letter-spacing: 0.7px; 
+          line-height: 10px; margin-top: 1rem;">
+          Pendaftaran Pasien Baru
+        </p>
+      </div>
+    </div>
+    <hr style="height: 2px; background: transparent; width: 100%; border: none; border-top: solid 2px rgba(161, 174, 183, 0.44);" />
+    <div style="display: flex; flex-direction: row; justify-content: space-between;">
+      <div style="margin-right: 1.5rem;">
+        <div>
+          <p style="color: #8a8da5; font-size: 16px">
+            No. Rekam Medis / <span><i>Medical Record Num</i></span>
+          </p>
+          <p style="color: #353957; font-size: 18px">
+            <span *ngIf="model.mrlocal">{{model.mrlocal}}</span>
+            <span *ngIf="!model.mrlocal"><div style="height: 30px"></div></span>
+          </p>
+        </div>
+        <div>
+          <p style="color: #8a8da5; font-size: 16px">
+            Kartu Identitas yang Digunakan / <span><i>Refer to ID Card</i></span>
+          </p>
+          <p style="color: #353957; font-size: 18px">
+            <span *ngIf="model.nationalidType">{{model.nationalidType.description}}</span>
+            <span *ngIf="!model.nationalidType"><div style="height: 30px"></div></span>
+            <span *ngIf="model.nationalidType || model.nationalIdNo">-</span>
+            <span *ngIf="model.nationalIdNo">{{model.nationalIdNo}}</span>
+            <span *ngIf="!model.nationalIdNo"><div style="height: 30px"></div></span>
+          </p>
+        </div>
+      </div>
+      <div style="margin:0 0 0 100px;">
+        <p style="color: #8a8da5; font-size: 16px">
+          Fotokopi Kartu Identitas / <span><i>Copy of ID Card</i></span>
+        </p>
+        <div style="margin:0 0 0 30px;">
+          <span *ngIf="model.identityImageUrl">
+            <img alt="" src="{{model.identityImageUrl}}" style="width: 240px; height: 130px" />
+          </span>
+          <span *ngIf="!model.identityImageUrl">
+            <div style="height: 130px"></div>
+          </span>
+        </div>
+      </div>
+    </div>
+    <hr style="height: 2px; background: transparent; width: 100%; border: none; border-top: solid 2px rgba(161, 174, 183, 0.44);" />
+    <div>
+      <p style="color: #23246c; font-size: 16px; font-weight: bold">
+        DATA DIRI / PERSONAL DATA
+      </p>
+      <div style="display: flex; flex-direction: row; justify-content: space-between;">
+        <div>
+          <div style="margin: 0 0 10px 0">
+            <p style="color: #8a8da5; font-size: 16px">
+              Nama Lengkap (sesuai ID) / <span><i>Full Name</i></span>
+            </p>
+            <p style="color: #353957; font-size: 18px">
+              <span *ngIf="model.patientName">{{model.patientName}}</span>
+              <span *ngIf="!model.patientName"><div style="height: 30px"></div></span>
+            </p>
+          </div>
+          <div style="margin: 10px 0 0 0">
+            <p style="color: #8a8da5; font-size: 16px">
+              Kebangsaan / <span><i>Nationality</i></span>
+            </p>
+            <p style="color: #353957; font-size: 18px">
+            <span *ngIf="model.nationality && model.nationality.country_id === 1">WNI</span>
+            <span *ngIf="model.nationality && model.nationality.country_id !== 1">WNA</span>
+            </p>
+          </div>
+        </div>
+        <div>
+          <div style="margin: 0 0 10px 0">
+            <p style="color: #8a8da5; font-size: 16px">
+              Tempat/Tanggal Lahir <span><i>Place/Date of Birth</i></span>
+            </p>
+            <p style="color: #353957; font-size: 16px">
+              <span *ngIf="model.birthPlace || model.birth">{{model.birthPlace}} 
+                {{model.birth.substr(0,2)}}/{{model.birth.substr(3,2)}}/{{model.birth.substr(6,4)}}</span>
+              <span *ngIf="!model.birthPlace && !model.birth"><div style="height: 30px"></div></span>
+            </p>
+          </div>
+          <div style="margin: 10px 0 0 0">
+            <p style="color: #8a8da5; font-size: 16px">
+              Status / <span><i>Status</i></span>
+            </p>
+            <p style="color: #353957; font-size: 18px">
+              <span *ngIf="model.maritalStatus">{{model.maritalStatus.description}}</span>
+              <span *ngIf="!model.maritalStatus">
+                <div style="height: 30px"></div>
+              </span>
+            </p>
+          </div>
+        </div>
+        <div>
+          <div style="margin: 0 0 10px 0">
+            <p style="color: #8a8da5; font-size: 16px">
+              Jenis Kelamin / <span><i>Sex</i></span>
+            </p>
+            <p style="color: #353957; font-size: 18px" 
+              *ngIf="model.sex && model.sex.value === '1'">Laki-laki / Male</p>
+            <p style="color: #353957; font-size: 18px"
+              *ngIf="model.sex && model.sex.value === '2'">Perempuan / Female</p>
+            <span *ngIf="!model.sex.value">
+              <div style="height: 30px"></div>
+            </span>
+          </div>
+          <div style="margin: 10px 0 0 0">
+            <p style="color: #8a8da5; font-size: 16px">
+              Agama / <span><i>Religion</i></span>
+            </p>
+            <p style="color: #353957; font-size: 18px">
+              <span *ngIf="model.religion">{{model.religion.description}}</span>
+              <span *ngIf="!model.religion">
+                <div style="height: 30px"></div>
+              </span>
+            </p>
+          </div>
+        </div>
+      </div>
+      <div style="display: flex; flex-direction: row; justify-content: space-between; margin-top: 10px;">
+        <div>
+          <div style="margin: 0 0 10px 0">
+            <p style="color: #8a8da5; font-size: 16px">
+              Email / <span><i>Email</i></span>
+            </p>
+            <p style="color: #353957; font-size: 18px">
+              <span *ngIf="model.email">{{model.email}}</span>
+              <span *ngIf="!model.email"><div style="height: 30px"></div></span>
+            </p>
+          </div>
+          <div style="margin: 10px 0 0 0">
+            <p style="color: #8a8da5; font-size: 16px">
+              Nomor HP 2 / <span><i>Mobile 2</i></span>
+            </p>
+            <p style="color: #353957; font-size: 18px">
+              <span *ngIf="model.mobileNo2">{{model.mobileNo2}}</span>
+              <span *ngIf="!model.mobileNo2"><div style="height: 30px"></div></span>
+            </p>
+          </div>
+        </div>
+        <div>
+          <div style="margin: 0 0 10px 0">
+            <p style="color: #8a8da5; font-size: 16px">
+              Nomor Telepon Rumah / <span><i>Home</i></span>
+            </p>
+            <p style="color: #353957; font-size: 16px">
+              <span *ngIf="model.homePhone">{{model.homePhone}}</span>
+              <span *ngIf="!model.homePhone"><div style="height: 30px"></div></span>
+            </p>
+          </div>
+          <div style="margin: 10px 0 0 0">
+            <p style="color: #8a8da5; font-size: 16px">
+              Nomor Kantor / <span><i>Office</i></span>
+            </p>
+            <p style="color: #353957; font-size: 18px">
+              <span *ngIf="model.officePhone">{{model.officePhone}}</span>
+              <span *ngIf="!model.officePhone"><div style="height: 30px"></div></span>
+            </p>
+          </div>
+        </div>
+        <div>
+          <div style="margin: 0 0 10px 0">
+            <p style="color: #8a8da5; font-size: 16px">
+              Nomor HP 1 / <span><i>Mobile 1</i></span>
+            </p>
+            <p style="color: #353957; font-size: 18px">
+              <span *ngIf="model.mobileNo1">{{model.mobileNo1}}</span>
+              <span *ngIf="!model.mobileNo1"><div style="height: 30px"></div></span>
+            </p>
+          </div>
+          <div style="margin: 10px 0 0 0">
+          </div>
+        </div>
+      </div>
+      <div style="display: flex; flex-direction: row; justify-content: space-between; margin-top: 10px;">
+        <div>
+          <p style="color: #8a8da5; font-size: 16px">
+            Alamat (sesuai ID) / <span><i>Address on ID</i></span>
+          </p>
+          <p style="color: #353957; font-size: 18px">
+            <span *ngIf="model.address">{{model.address}}</span>
+            <span *ngIf="!model.address"><div style="height: 30px"></div></span>
+          </p>
+        </div>
+      </div>
+    </div>
+    <div style="display: flex; flex-direction: row; justify-content: space-between; margin-top: 10px;">
+      <div>
+        <p style="color: #8a8da5; font-size: 16px">
+          Kelurahan / <span><i>Sub-District</i></span>
+        </p>
+        <p style="color: #353957; font-size: 16px">
+          <span *ngIf="model.subdistrict">{{model.subdistrict.name}}</span>
+          <span *ngIf="!model.subdistrict"><div style="height: 30px"></div></span>
+        </p>
+      </div>
+      <div>
+        <p style="color: #8a8da5; font-size: 16px">
+          Kecamatan / <span><i>Districts</i></span>
+        </p>
+        <p style="color: #353957; font-size: 16px">
+          <span *ngIf="model.district">{{model.district.name}}</span>
+          <span *ngIf="!model.district"><div style="height: 30px"></div></span>
+        </p>
+      </div>
+      <div>
+        <p style="color: #8a8da5; font-size: 16px">
+          Kab/Kota / <span><i>City</i></span>
+        </p>
+        <p style="color: #353957; font-size: 16px">
+          <span *ngIf="model.city">{{model.city.name}}</span>
+          <span *ngIf="!model.city"><div style="height: 30px"></div></span>
+        </p>
+      </div>
+      <div>
+        <p style="color: #8a8da5; font-size: 16px">
+          Kode Pos / <span><i>Postal Code</i></span>
+        </p>
+        <p style="color: #353957; font-size: 18px">
+          <span *ngIf="model.postCode">{{model.postCode}}</span>
+          <span *ngIf="!model.postCode"><div style="height: 30px"></div></span>
+        </p>
+      </div>
+    </div>
+    <div style="display: flex; flex-direction: row; justify-content: space-between; margin-top: 10px;">
+      <div>
+        <p style="color: #8a8da5; font-size: 16px">
+          Alamat Domisili / <span><i>A Current Residential Address</i></span>
+        </p>
+        <p style="color: #353957; font-size: 16px">
+          <span *ngIf="model.permanentAddress">{{model.permanentAddress}}</span>
+          <span *ngIf="!model.permanentAddress"><div style="height: 20px"></div></span>
+        </p>
+      </div>
+    </div>
+    <hr style="height: 2px; background: transparent; width: 100%; border: none; border-top: solid 2px rgba(161, 174, 183, 0.44);" />
+    <div>
+      <p style="color: #23246c; font-size: 16px; font-weight: bold">
+      DATA KELUARGA / FAMILY INFORMATION
+      </p>
+      <div style="display: flex; flex-direction: row; justify-content: space-between;">
+        <div>
+          <p style="color: #8a8da5; font-size: 16px">
+            Nama Ibu Kandung / <span><i>Mother’s <br>Name</i></span>
+          </p>
+          <p style="color: #353957; font-size: 18px">
+            <span *ngIf="model.motherName">{{model.motherName}}</span>
+            <span *ngIf="!model.motherName"><div style="height: 30px"></div></span>
+          </p>
+        </div>
+          <div>
+          <p style="color: #8a8da5; font-size: 16px">
+          Nama Ayah Kandung / <span><i>Father’s <br>Name</i></span>
+          </p>
+          <p style="color: #353957; font-size: 18px">
+            <span *ngIf="model.fatherName">{{model.fatherName}}</span>
+            <span *ngIf="!model.fatherName"><div style="height: 30px"></div></span>
+          </p>
+          </div>
+        <div>
+          <p style="color: #8a8da5; font-size: 16px">
+          Nama Suami/Istri / <span><i>Spouse’s <br>Name</i></span>
+          </p>
+          <p style="color: #353957; font-size: 18px">
+            <span *ngIf="model.spouseName">{{model.spouseName}}</span>
+            <span *ngIf="!model.spouseName"><div style="height: 30px"></div></span>
+          </p>
+        </div>
+      </div>
+    </div>
+    <hr style="height: 2px; background: transparent; width: 100%; border: none; border-top: solid 2px rgba(161, 174, 183, 0.44);" />
+    <div>
+      <p style="color: #23246c; font-size: 16px; font-weight: bold">
+        DALAM KEADAAN DARURAT / IN CASE OF EMERGENCY
+      </p>
+      <div style="display: flex; flex-direction: row; justify-content: space-between;">
+        <div>
+          <p style="color: #8a8da5; font-size: 16px">
+            Nama Keluarga / <span><i>Name of Relative</i></span>
+          </p>
+          <p style="color: #353957; font-size: 18px">
+            <span *ngIf="model.contactName">{{model.contactName}}</span>
+            <span *ngIf="!model.contactName"><div style="height: 30px"></div></span>
+          </p>
+        </div>
+        <div>
+          <p style="color: #8a8da5; font-size: 16px">
+            Hubungan / <span><i>Relationship</i></span>
+          </p>
+          <p style="color: #353957; font-size: 18px"></p>
+        </div>
+        <div>
+          <p style="color: #8a8da5; font-size: 16px">
+            Nomor Telepon / <span><i>Mobile/Phone Number</i></span>
+          </p>
+          <p style="color: #353957; font-size: 18px">
+            <span *ngIf="model.contactPhone">{{model.contactPhone}}</span>
+            <span *ngIf="!model.contactPhone"><div style="height: 10px"></div></span>
+            <span *ngIf="model.contactPhone && model.contactMobile">
+              /
+            </span>
+            <span *ngIf="model.contactMobile">{{model.contactMobile}}</span>
+            <span *ngIf="!model.contactMobile"><div style="height: 10px"></div></span>
+          </p>
+        </div>
+      </div>
+      <div>
+        <p style="color: #8a8da5; font-size: 16px">
+          Alamat Lengkap / <span><i>Residential Address</i></span>
+        </p>
+        <p style="color: #353957; font-size: 18px">
+          <span *ngIf="model.contactAddress">{{model.contactAddress}}</span>
+          <span *ngIf="!model.contactAddress"><div style="height: 30px"></div></span>
+        </p>
+      </div>
+    </div>
+    <hr style="height: 2px; background: transparent; width: 100%; border: none; border-top: solid 2px rgba(161, 174, 183, 0.44);" />
+    <div style="margin:10px 0; position: relative;">
+      <p style="line-height: 20px; margin: 0 0 50px 0; font-size: 16px; font-weight: 600;">
+        Dengan ini saya menyatakan bahwa data tersebut adalah yang sebenarnya, dan menyatakan persetujuan untuk penanganan pasien oleh pihak rumah sakit dengan fasilitasnya.
+        <br/><i>Herewith, I declare that the above data is correct and I agree to consent for all the treatment and facility usage, given by Siloam Hospitals.</i>
+      </p>
+      <div style="position: relative; width: 100%; display: flex; flex-direction: row; justify-content: space-between;">
+        <div style="position: relative; width: 37%;">
+          <hr style="height: 2px; background: transparent; width: 52%; border: none; border-top: solid 2px rgba(161, 174, 183, 0.44); margin: 8px 0;" />
+          <p style="color:#8A8DA5; font-size: 16px;">Tanda tangan & nama lengkap / <span><i>Register’s <br>signature and full name</i></span></p>
+        </div>
+        <div style="position: relative; width: 63%;">
+          <hr style="height: 2px; background: transparent; width: 52%; border: none; border-top: solid 2px rgba(161, 174, 183, 0.44); margin: 8px 0;" />
+          <p style="color:#8A8DA5; font-size: 16px;">Paraf Verifikator/FO/<span><i>Verificator Signature</i></span></p>
+        </div>
+      </div>
+      <div style="position: relative; width: 100%; display: flex; flex-direction: row; justify-content: space-between;">
+        <div style="position: relative; width: 37%; display: flex; flex-direction: row; align-items:flex-end">
+          <p style="color:#8A8DA5; font-size: 16px;">Tanggal / Date :</p>
+          <hr style="height: 2px; background: transparent; width: 40%; border: none; border-top: solid 2px rgba(161, 174, 183, 0.44); margin: 8px 0;" />
+        </div>
+        <div style="position: relative; width: 63%; display: flex; flex-direction: row; align-items:flex-end">
+          <p style="color:#8A8DA5; font-size: 16px;">Nama Verifikator/FO/<span><i>Verification by </i></span>:</p>
+          <hr style="height: 2px; background: transparent; width: 40%; border: none; border-top: solid 2px rgba(161, 174, 183, 0.44); margin: 8px 0;" />
+        </div>
+      </div>
+    </div>
+	</div>
+</div>

@@ -17,20 +17,26 @@ export class ScheduleService {
   private scheduleBlockUrl = environment.CALL_CENTER_SERVICE + '/schedules/block';
   private leaveUrl = environment.OPADMIN_SERVICE + '/doctors/leaves';
   private timeSlotUrl = environment.CALL_CENTER_SERVICE + '/schedules/time-slot/hospital';
+  private schedulecovidUrl = environment.OPADMIN_SERVICE + '/checkups';
 
   private scheduleBlockSource = new Subject<boolean>();
   public scheduleBlockSource$ = this.scheduleBlockSource.asObservable();
-  
+
   emitScheduleBlock(params: boolean) {
     this.scheduleBlockSource.next(params);
   }
 
-  getTimeSlotSchedule(hospitalId: string, doctorId: string, scheduleId: string, date: string){
+  getCategoriesTestList(hospitalId: string) {
+    const uri = `${this.schedulecovidUrl}/categories/hospital/${hospitalId}`;
+    return this.http.get<any>(uri, httpOptions);
+  }
+
+  getTimeSlotSchedule(hospitalId: string, doctorId: string, scheduleId: string, date: string) {
     const uri = `${this.timeSlotUrl}/${hospitalId}/doctor/${doctorId}/appointment-date/${date}?scheduleId=${scheduleId}`;
     return this.http.get<any>(uri, httpOptions);
   }
 
-  getTimeSlot(hospitalId: string, doctorId: string, date: string, consulType?: string){
+  getTimeSlot(hospitalId: string, doctorId: string, date: string, consulType?: string) {
     let uri = `${this.timeSlotUrl}/${hospitalId}/doctor/${doctorId}/appointment-date/${date}`;
     if (consulType) {
       uri = `${uri}?consultationTypeId=${consulType}`;
@@ -85,8 +91,8 @@ export class ScheduleService {
   }
 
   getLeaveHeader(
-    year: string, 
-    hospitalId: string, 
+    year: string,
+    hospitalId: string,
     doctorId?: string,
     areaId?: string,
     specialityId?: string

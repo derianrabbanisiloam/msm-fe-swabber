@@ -32,6 +32,10 @@
   display: none;
 }
 
+.for-print {
+  display: none;
+}
+
 .printable-table-schedule-doctor-name {
   text-align:center;
   padding-top: 5px
@@ -137,6 +141,7 @@ input[type="date" i]::-webkit-inner-spin-button, input[type="date"]::-webkit-cal
 .ms_btn_black:active{ background: #333333; color: white}
 .ms_btn_yellow { background: #F2C22C; color: white}
 .ms_btn_yellow:active{ background: #f0b80f; color: white}
+.ms_btn_green_lime { background: #92D050; color: white}
 
 html, body {
   font-size: 12px;
@@ -419,6 +424,14 @@ button:disabled { cursor: not-allowed }
 
 @media print
 {
+   hr { display:block; }
+
+  .fo-form { display: none;}
+  
+  .for-print {
+    display: block;
+  }
+
   .col-print-1 {width:8%;  float:left;}
   .col-print-2 {width:16%; float:left;}
   .col-print-3 {width:25%; float:left;}
@@ -678,7 +691,6 @@ button:disabled { cursor: not-allowed }
     display: inline;
     /*position: fixed;top: 140px;right: 870px;*/
   }
-
 }
 
 .loading-div {
@@ -687,8 +699,6 @@ button:disabled { cursor: not-allowed }
 .loading-div img {
   width: 8vw;
 }
-
-
 
 
 /*Form Error*/
@@ -890,3 +900,4 @@ button:disabled { cursor: not-allowed }
   from {transform: rotate(0deg);}
   to {transform: rotate(359deg);}
 }
+

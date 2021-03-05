@@ -223,7 +223,6 @@ export class WidgetCreateAppointmentComponent implements OnInit {
     checkOne: false, checkTwo: false, checkThree: false,
     checkFour: false, checkFive: false
   }
-
   public patientPreReg: any;
   public orderDetail: any;
   public fromPreRegis: boolean = false;
@@ -235,6 +234,8 @@ export class WidgetCreateAppointmentComponent implements OnInit {
   public disableBut: boolean = false;
   public preRegLoading: boolean = false;
   public addAppPayload: appointmentPayload = new appointmentPayload;
+  public patDetail: any = null;
+
 
   constructor(
     private router: Router,
@@ -476,6 +477,16 @@ export class WidgetCreateAppointmentComponent implements OnInit {
           }
       }
     });
+  }
+
+  async getPatientHopeId(val) {
+    let body = await this.patientService.getPatientHopeDetailTwo(val)
+      .toPromise().then(res => {
+        return res.data;
+      }).catch(err => {
+        return null;
+      });
+    return body
   }
 
   async emitBlockSchedule() {
@@ -1802,6 +1813,7 @@ export class WidgetCreateAppointmentComponent implements OnInit {
           this.router.navigate(['./patient-data'], { queryParams: params });
         }
       } else {
+        this.patDetail = await this.getPatientHopeId(detail.patient_hope_id);
         await this.defaultPatientType(detail.patient_hope_id);
         if(this.fromBpjs === true) {
           this.checkListModel = {
@@ -1888,6 +1900,7 @@ export class WidgetCreateAppointmentComponent implements OnInit {
     if (this.resMrLocal) {
       this.selectedCheckIn.medical_record_number = this.resMrLocal.medical_record_number;
       this.selectedCheckIn.patient_organization_id = this.resMrLocal.patient_organization_id;
+      this.patDetail = await this.getPatientHopeId(detail.patient_hope_id);
       await this.defaultPatientType(detail.patient_hope_id);
       await this.getAppointmentList();
       await this.dataProcessing();

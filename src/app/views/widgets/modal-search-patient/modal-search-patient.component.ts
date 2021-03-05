@@ -52,6 +52,13 @@ export class ModalSearchPatientComponent implements OnInit {
     const birthDate = this.searchKeywords.birthDate;
     this.patientService.searchPatientHope1(hospitalId, patientName, birthDate).subscribe(
       data => {
+        console.log(this.router.url)
+        /*
+          issue found, below validation won't valid because
+          there is a case where user comes from patient data which has query
+          e.g. /vaccine-list?code=9CCF9817
+          need regexp to match the router URL
+        */
         if (this.router.url === '/vaccine-list') {
           this.showCreateNew = true
         }
@@ -78,11 +85,6 @@ export class ModalSearchPatientComponent implements OnInit {
     const localMrNo = this.searchKeywords.localMrNo;
     this.patientService.searchPatientHope2(hospitalId, localMrNo).subscribe(
       data => {
-        /* possible fix create new patient button issue
-          if (this.router.url === '/vaccine-list') {
-            this.showCreateNew = true
-          }
-        */
         this.searchLoader = false;
         this.patientHope = data.data;
       }

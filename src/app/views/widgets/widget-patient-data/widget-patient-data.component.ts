@@ -469,6 +469,7 @@ export class WidgetPatientDataComponent implements OnInit {
   }
 
   createVaccineAdmission() {
+    console.log(this.model.mrlocal)
     const params = { mrLocal: this.model.mrlocal, code: this.consentCode };
     this.router.navigate(['./vaccine-list'], { queryParams: params });
   }
@@ -1586,10 +1587,10 @@ export class WidgetPatientDataComponent implements OnInit {
           this.model.mrlocal = this.resMappingData.medical_record_number;
           this.model.patientOrganizationId = this.resMappingData.patient_organization_id;
     
-          this.buttonCreateAdmission = this.isFromAppointmentList ? false : true;
-          /* possible fix disabled button create admission
+          // this.buttonCreateAdmission = this.isFromAppointmentList ? false : true;
+          /* possible fix disabled button create admission */
             this.buttonCreateAdmission = this.isFromAppointmentList || this.isFromVaccineList ? false : true;
-          */
+          
           this.isSuccessCreatePatient = true;
           this.isButtonSave = false;
         }
@@ -1668,10 +1669,10 @@ export class WidgetPatientDataComponent implements OnInit {
         this.model.mrlocal = this.resMappingData.medical_record_number;
         this.model.patientOrganizationId = this.resMappingData.patient_organization_id;
   
-        this.buttonCreateAdmission = this.isFromAppointmentList ? false : true;
-        /* possible fix disabled button create admission
+        // this.buttonCreateAdmission = this.isFromAppointmentList ? false : true;
+        /* possible fix disabled button create admission */
           this.buttonCreateAdmission = this.isFromAppointmentList || this.isFromVaccineList ? false : true;
-        */
+        
         this.isSuccessCreatePatient = true;
         this.isButtonSave = true;
       }

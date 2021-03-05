@@ -167,6 +167,7 @@ export class WidgetAppointmentListComponent implements OnInit {
   public notesTemp: string = '';
   public isSigned: boolean = false;
   public isSignedTemp: boolean = false;
+  public patDetail: any = null;
 
   constructor(
     private doctorService: DoctorService,
@@ -251,6 +252,16 @@ export class WidgetAppointmentListComponent implements OnInit {
       }
     });
 
+  }
+
+  async getPatientHopeId(val) {
+    let body = await this.patientService.getPatientHopeDetailTwo(val)
+      .toPromise().then(res => {
+        return res.data;
+      }).catch(err => {
+        return null;
+      });
+    return body
   }
 
   emitUpdateNotes() {
@@ -677,6 +688,7 @@ export class WidgetAppointmentListComponent implements OnInit {
           this.router.navigate(['./patient-data'], { queryParams: params });
         }
       } else {
+        this.patDetail = await this.getPatientHopeId(detail.patient_hope_id);
         await this.defaultPatientType(detail.patient_hope_id);
         this.open50(checkInModal);
       }
@@ -716,6 +728,7 @@ export class WidgetAppointmentListComponent implements OnInit {
     if (this.resMrLocal) {
       this.selectedCheckIn.medical_record_number = this.resMrLocal.medical_record_number;
       this.selectedCheckIn.patient_organization_id = this.resMrLocal.patient_organization_id;
+      this.patDetail = await this.getPatientHopeId(detail.patient_hope_id);
       await this.defaultPatientType(detail.patient_hope_id);
       close.click();
       this.open50(modal);

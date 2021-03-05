@@ -3,6 +3,7 @@ import { NgbActiveModal, NgbProgressbarConfig } from '@ng-bootstrap/ng-bootstrap
 import { PatientService } from '../../../services/patient.service';
 import { PatientHope } from '../../../models/patients/patient-hope';
 import { environment } from '../../../../environments/environment';
+import { Router } from '@angular/router'
 
 @Component({
   selector: 'app-modal-search-patient',
@@ -14,8 +15,12 @@ export class ModalSearchPatientComponent implements OnInit {
   @Input() searchKeywords: any;
   public patientHope: PatientHope[];
   public searchLoader: boolean = false;
+  public showCreateNew: boolean = false;
+  public registerFormId: any;
+  public consentCode: any;
 
   constructor(
+    private router: Router,
     private patientService: PatientService,
     public activeModal: NgbActiveModal,
     public ngbProgressbarConfig: NgbProgressbarConfig
@@ -47,11 +52,25 @@ export class ModalSearchPatientComponent implements OnInit {
     const birthDate = this.searchKeywords.birthDate;
     this.patientService.searchPatientHope1(hospitalId, patientName, birthDate).subscribe(
       data => {
+        if (this.router.url === '/vaccine-list') {
+          this.showCreateNew = true
+        }
         this.searchLoader = false;
         this.patientHope = data.data;
       }
     )
   }
+
+
+  createNewPatientFromVaccine() {
+    const params = {
+      formId: this.searchKeywords.registerFormId,
+      code: this.searchKeywords.consentCode,
+    };
+    this.router.navigate(['./patient-data'], { queryParams: params });
+    this.close();
+  }
+
 
   getSearchedPatient2() {
     this.searchLoader = true;

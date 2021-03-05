@@ -166,6 +166,7 @@ export class WidgetAppointmentListBpjsComponent implements OnInit {
     checkOne: false, checkTwo: false, checkThree: false,
     checkFour: false, checkFive: false
   }
+  public patDetail: any = null;
 
   constructor(
     private doctorService: DoctorService,
@@ -255,6 +256,16 @@ export class WidgetAppointmentListBpjsComponent implements OnInit {
         });
       }
     });
+  }
+
+  async getPatientHopeId(val) {
+    let body = await this.patientService.getPatientHopeDetailTwo(val)
+      .toPromise().then(res => {
+        return res.data;
+      }).catch(err => {
+        return null;
+      });
+    return body
   }
 
   async changeCheckbox(val) {
@@ -877,6 +888,7 @@ export class WidgetAppointmentListBpjsComponent implements OnInit {
           this.router.navigate(['./patient-data'], { queryParams: params });
         }
       } else {
+        this.patDetail = await this.getPatientHopeId(detail.patient_hope_id);
         await this.defaultPatientType(detail.patient_hope_id);
         if(this.fromBpjs === true) {
           this.checkListModel = {
@@ -925,6 +937,7 @@ export class WidgetAppointmentListBpjsComponent implements OnInit {
     if (this.resMrLocal) {
       this.selectedCheckIn.medical_record_number = this.resMrLocal.medical_record_number;
       this.selectedCheckIn.patient_organization_id = this.resMrLocal.patient_organization_id;
+      this.patDetail = await this.getPatientHopeId(detail.patient_hope_id);
       await this.defaultPatientType(detail.patient_hope_id);
       close.click();
       if(this.selectedCheckIn.channel_id === channelId.BPJS) {

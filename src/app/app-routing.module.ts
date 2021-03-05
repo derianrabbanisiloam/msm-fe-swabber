@@ -53,6 +53,11 @@ const routes: Routes = [
     loadChildren: './views/pages/page-view-quota/page-view-quota.module#PageViewQuotaModule',
   },
   {
+    path: 'vaccine-list',
+    canActivate: [AuthGuard],
+    loadChildren: './views/pages/page-vaccine-consent-list/page-vaccine-consent-list.module#PageVaccineConsentListModule',
+  },
+  {
     path: 'reschedule-worklist',
     canActivate: [AuthGuard],
     loadChildren: './views/pages/page-reschedule-worklist/page-reschedule-worklist.module#PageRescheduleWorklistModule',

@@ -52,14 +52,11 @@ export class ModalSearchPatientComponent implements OnInit {
     const birthDate = this.searchKeywords.birthDate;
     this.patientService.searchPatientHope1(hospitalId, patientName, birthDate).subscribe(
       data => {
-        console.log(this.router.url)
         /*
-          issue found, below validation won't valid because
-          there is a case where user comes from patient data which has query
-          e.g. /vaccine-list?code=9CCF9817
-          need regexp to match the router URL
+          there is possibility where user comes from patient data
+          hence the url will still have query
         */
-        if (this.router.url === '/vaccine-list') {
+        if (this.router.url.indexOf('/vaccine-list') >= 0) {
           this.showCreateNew = true
         }
         this.searchLoader = false;

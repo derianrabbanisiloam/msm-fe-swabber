@@ -186,6 +186,8 @@ export class WidgetPatientDataComponent implements OnInit {
     checkFour: false, checkFive: false
   }
   public isFromVaccineList: boolean = false;
+  public nameToBring: string;
+  public dobToBring: string;
   public patDetail: any = null;
   public flagErrorMobile1: boolean = false;
   public flagErrorMobile2: boolean = false;
@@ -469,8 +471,12 @@ export class WidgetPatientDataComponent implements OnInit {
   }
 
   createVaccineAdmission() {
-    console.log(this.model.mrlocal)
-    const params = { mrLocal: this.model.mrlocal, code: this.consentCode };
+    const params = {
+      mrLocal: this.model.mrlocal,
+      code: this.consentCode,
+      name: this.nameToBring,
+      dob: this.dobToBring
+    };
     this.router.navigate(['./vaccine-list'], { queryParams: params });
   }
 
@@ -1381,7 +1387,6 @@ export class WidgetPatientDataComponent implements OnInit {
       this.model.patientOrganizationId = result.patient_organization_id;
 
      
-      
       this.buttonCreateAdmission = this.isFromAppointmentList || this.isFromVaccineList ? false : true;;
       this.isSuccessCreatePatient = true;
       this.isButtonSave = true;
@@ -1569,7 +1574,7 @@ export class WidgetPatientDataComponent implements OnInit {
         this.isButtonSave = true;
         const payload = this.loadPayload();
         let body;
-        if(this.isFromAppointmentList) {
+        if (this.isFromAppointmentList) {
           body = {
             ...payload,
             patientHopeId: this.model.patientId,
@@ -1583,14 +1588,19 @@ export class WidgetPatientDataComponent implements OnInit {
         }
         this.resMappingData = null;
         this.resMappingData = await this.mappingProcess(body);
-        if(this.resMappingData) {
+        if (this.resMappingData) {
           this.model.mrlocal = this.resMappingData.medical_record_number;
           this.model.patientOrganizationId = this.resMappingData.patient_organization_id;
-    
-          // this.buttonCreateAdmission = this.isFromAppointmentList ? false : true;
-          /* possible fix disabled button create admission */
-            this.buttonCreateAdmission = this.isFromAppointmentList || this.isFromVaccineList ? false : true;
-          
+          this.nameToBring = this.resMappingData.name;
+          this.dobToBring = `${this.resMappingData.birthDate[8] + this.resMappingData.birthDate[9]
+            + '-'
+            + this.resMappingData.birthDate[5] + this.resMappingData.birthDate[6]
+            + '-'
+            + this.resMappingData.birthDate[0] + this.resMappingData.birthDate[1] + this.resMappingData.birthDate[2] + this.resMappingData.birthDate[3]
+            }`
+
+          this.buttonCreateAdmission = this.isFromAppointmentList || this.isFromVaccineList ? false : true;
+
           this.isSuccessCreatePatient = true;
           this.isButtonSave = false;
         }
@@ -1665,14 +1675,11 @@ export class WidgetPatientDataComponent implements OnInit {
       this.resMappingData = null;
       this.isButtonSave = true;
       this.resMappingData = await this.mappingProcess(body);
-      if(this.resMappingData) {
+      if (this.resMappingData) {
         this.model.mrlocal = this.resMappingData.medical_record_number;
         this.model.patientOrganizationId = this.resMappingData.patient_organization_id;
-  
-        // this.buttonCreateAdmission = this.isFromAppointmentList ? false : true;
-        /* possible fix disabled button create admission */
-          this.buttonCreateAdmission = this.isFromAppointmentList || this.isFromVaccineList ? false : true;
-        
+        this.buttonCreateAdmission = this.isFromAppointmentList || this.isFromVaccineList ? false : true;
+
         this.isSuccessCreatePatient = true;
         this.isButtonSave = true;
       }

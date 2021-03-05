@@ -2156,7 +2156,7 @@ export class WidgetPatientDataComponent implements OnInit {
 
   
   printForm() {
-
+    window.print();
   }
 
   reset() {

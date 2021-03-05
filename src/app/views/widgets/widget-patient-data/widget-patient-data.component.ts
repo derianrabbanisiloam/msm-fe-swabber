@@ -1587,6 +1587,9 @@ export class WidgetPatientDataComponent implements OnInit {
           this.model.patientOrganizationId = this.resMappingData.patient_organization_id;
     
           this.buttonCreateAdmission = this.isFromAppointmentList ? false : true;
+          /* possible fix disabled button create admission
+            this.buttonCreateAdmission = this.isFromAppointmentList || this.isFromVaccineList ? false : true;
+          */
           this.isSuccessCreatePatient = true;
           this.isButtonSave = false;
         }
@@ -1666,6 +1669,9 @@ export class WidgetPatientDataComponent implements OnInit {
         this.model.patientOrganizationId = this.resMappingData.patient_organization_id;
   
         this.buttonCreateAdmission = this.isFromAppointmentList ? false : true;
+        /* possible fix disabled button create admission
+          this.buttonCreateAdmission = this.isFromAppointmentList || this.isFromVaccineList ? false : true;
+        */
         this.isSuccessCreatePatient = true;
         this.isButtonSave = true;
       }

@@ -290,7 +290,9 @@
                   <div class="">
                     <input type="file" accept="image/*" class="form-control-file" id="scanKTP"
                       (change)="readUrl($event)">
-                    <!-- <img [src]="url" > -->
+                      <span *ngIf="model.identityImageUrl">
+                        <img alt="" src="{{model.identityImageUrl}}" style="width: 400px; height: 220px" />
+                      </span>
                   </div>
 
                   <div class="">

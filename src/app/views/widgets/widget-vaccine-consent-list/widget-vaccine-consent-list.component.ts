@@ -42,6 +42,8 @@ export class WidgetVaccineConsentListComponent implements OnInit {
   public createAdmissionStatus: string = 'initial';
   public isConsentDetailChanged: boolean = false;
   public mrLocal: any;
+  public nameFromPatientData: string;
+  public dobFromPatientData: string;
   public isFromPatientData: boolean = false;
   public formValidity: any = { remarks: {}, name: null, mobile: null, answers: [], dob: null };
 
@@ -80,7 +82,9 @@ export class WidgetVaccineConsentListComponent implements OnInit {
   isNewPatient() {
     this.mrLocal = this.route.snapshot.queryParams.mrLocal;
     this.uniqueCode = this.route.snapshot.queryParams.code;
-    if (this.mrLocal && this.uniqueCode) {
+    this.nameFromPatientData = this.route.snapshot.queryParams.name;
+    this.dobFromPatientData = this.route.snapshot.queryParams.dob;
+    if (this.uniqueCode) {
       this.isFromPatientData = true;
       document.documentElement.style.overflow = 'hidden';
       this.searchConsent('code');
@@ -184,7 +188,7 @@ export class WidgetVaccineConsentListComponent implements OnInit {
             return el;
           }),
         };
-        this.age = moment().diff(moment(this.formatDate(this.consentInfo.date_of_birth, 'MM-DD-YYYY')), 'years', true);
+        this.age = moment().diff(moment(this.formatDate(this.consentInfo.date_of_birth, 'YYYY-MM-DD')), 'years', true);
         if (
           this.isFromPatientData &&
           this.mrLocal &&
@@ -204,6 +208,12 @@ export class WidgetVaccineConsentListComponent implements OnInit {
                 });
               }, 500);
             });
+        } else if (this.isFromPatientData && this.nameFromPatientData && this.dobFromPatientData) {
+          this.consentInfo.patient_name = this.nameFromPatientData;
+          this.consentInfo.date_of_birth = this.dobFromPatientData
+          this.isFromPatientData = false;
+          document.documentElement.style.overflow = 'auto';
+          this.isConsentDetailChanged = true;
         } else {
           this.isFromPatientData = false;
           document.documentElement.style.overflow = 'auto';
@@ -629,7 +639,7 @@ export class WidgetVaccineConsentListComponent implements OnInit {
     const date = event.target.value;
     const isDateValid = this.isDateValid(date);
     if (isDateValid) {
-      this.age = moment().diff(moment(this.formatDate(date, 'MM-DD-YYYY')), 'years', true);
+      this.age = moment().diff(moment(this.formatDate(date, 'YYYY-MM-DD')), 'years', true);
     }
   }
 

@@ -78,6 +78,11 @@ export class ModalSearchPatientComponent implements OnInit {
     const localMrNo = this.searchKeywords.localMrNo;
     this.patientService.searchPatientHope2(hospitalId, localMrNo).subscribe(
       data => {
+        /* possible fix create new patient button issue
+          if (this.router.url === '/vaccine-list') {
+            this.showCreateNew = true
+          }
+        */
         this.searchLoader = false;
         this.patientHope = data.data;
       }

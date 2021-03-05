@@ -382,6 +382,7 @@ export class WidgetPatientDataComponent implements OnInit {
         this.model.mobileNo1 = contact.phone_number_1;
         this.model.nationalIdNo = contact.identity_number;
         this.model.email = contact.email;
+        this.model.identityImageUrl = contact.identity_image_url ? contact.identity_image_url : '';
 
         // Date binding
         this.model.birth = dateFormatter(contact.birth_date, true);
@@ -390,6 +391,9 @@ export class WidgetPatientDataComponent implements OnInit {
         this.model.nationalidType.value = contact.identity_type_id
           ? contact.identity_type_id.toString()
           : this.model.nationalidType;
+        this.model.nationalidType.description = this.model.nationalidType.value
+          ? this.listNationalIdType.filter((el) => el.value === contact.identity_type_id)[0].description
+          : ''
 
         // This part --only available both new patient
         if (contact.is_new) {
@@ -462,7 +466,6 @@ export class WidgetPatientDataComponent implements OnInit {
             ? contact.religion_id.toString()
             : this.model.religion;
 
-          // TODO identity image?
         }
       } else {
         this.alertService.error('Contact not found', false, 5000);

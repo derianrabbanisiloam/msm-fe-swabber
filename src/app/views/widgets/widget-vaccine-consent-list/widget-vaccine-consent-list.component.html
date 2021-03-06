@@ -157,7 +157,7 @@
                   <input [disabled]="consentInfo.checkin_date !== null" class="form-check-input" type="radio"
                     [id]="'checkbox-'+ option.answer + q.consent_question_id" [checked]="
                         q.answer_value === option.answer
-                      " (change)="fieldsChange($event, q.consent_detail_id)" [value]="option.answer" />
+                      " (change)="fieldsChange($event, q.consent_question_id)" [value]="option.answer" />
                   <label class="form-check-label"
                     [for]="'checkbox-'+ option.answer + q.consent_question_id">{{option.answer}}</label>
                 </div>

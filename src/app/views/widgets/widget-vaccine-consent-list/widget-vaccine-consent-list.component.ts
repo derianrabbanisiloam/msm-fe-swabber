@@ -189,6 +189,7 @@ export class WidgetVaccineConsentListComponent implements OnInit {
           }),
         };
         this.age = moment().diff(moment(this.formatDate(this.consentInfo.date_of_birth, 'YYYY-MM-DD')), 'years', true);
+        console.log(this.consentInfo)
         if (
           this.isFromPatientData &&
           this.mrLocal &&
@@ -323,7 +324,7 @@ export class WidgetVaccineConsentListComponent implements OnInit {
     this.isConsentDetailChanged = true;
     this.updateStatus = 'initial';
     const foundIndex = this.consentInfo.detail.findIndex(
-      (item) => item.consent_detail_id === id
+      (item) => item.consent_question_id === id
     );
     this.consentInfo.detail[foundIndex].answer_value = event.target.value;
   }

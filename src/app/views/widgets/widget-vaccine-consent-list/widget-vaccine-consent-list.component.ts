@@ -198,6 +198,13 @@ export class WidgetVaccineConsentListComponent implements OnInit {
             .searchPatientAccessMr2(this.key.hospital.id, this.mrLocal)
             .subscribe((patient) => {
               this.choosedPatient = patient.data[0];
+              this.consentInfo.patient_name = this.choosedPatient.name;
+              const date = `${this.choosedPatient.birthDate[8] + this.choosedPatient.birthDate[9]}`;
+              const month = `${this.choosedPatient.birthDate[5] + this.choosedPatient.birthDate[6]}`;
+              const year = `${this.choosedPatient.birthDate[0] + this.choosedPatient.birthDate[1] + this.choosedPatient.birthDate[2] + this.choosedPatient.birthDate[3]}`;
+              this.consentInfo.date_of_birth = `${date}-${month}-${year}`;
+              this.consentInfo.mobile_no = this.choosedPatient.mobileNo1;
+              this.updateConsent();
               this.isFromPatientData = false;
               document.documentElement.style.overflow = 'auto';
               setTimeout(() => {
@@ -213,7 +220,7 @@ export class WidgetVaccineConsentListComponent implements OnInit {
           this.consentInfo.date_of_birth = this.dobFromPatientData
           this.isFromPatientData = false;
           document.documentElement.style.overflow = 'auto';
-          this.isConsentDetailChanged = true;
+          this.updateConsent()
         } else {
           this.isFromPatientData = false;
           document.documentElement.style.overflow = 'auto';

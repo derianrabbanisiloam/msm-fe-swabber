@@ -73,6 +73,7 @@
             </h2>
             <button *ngIf="consentInfo.checkin_date" type="button" disabled class="btn btn-sm btn-warning">Checked-in at
               {{consentInfo.checkin_date}}</button>
+            <button *ngIf="consentInfo.checkin_date" type="button" class="btn btn-sm ms_btn_blue" (click)="printPatientLabel()">Print Patient Label</button>
           </div>
           <button class="btn ms_btn_yellow" type="button" (click)="printForm()" style="height: fit-content;">
             <img class="icon" src="{{ assetPath }}icons/ic_Print@2x.png" />

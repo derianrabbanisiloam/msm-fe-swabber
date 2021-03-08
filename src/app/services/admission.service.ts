@@ -33,6 +33,11 @@ export class AdmissionService {
     return this.http.get<any>(url, httpOptions);
   }
 
+  getPatientLabelVaccine(consentId: any): Observable<any>{
+    const url = `${this.admissionUrl}/label/vaccine/${consentId}`;
+    return this.http.get<any>(url, httpOptions);
+  }
+
   createAdmissionAido(payload: any): Observable<any> {
     const url = `${this.admissionUrl}/aido`;
     const body = JSON.stringify(payload);

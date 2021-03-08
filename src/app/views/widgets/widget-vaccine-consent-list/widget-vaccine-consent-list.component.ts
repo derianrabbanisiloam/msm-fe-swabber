@@ -12,8 +12,12 @@ import { PatientService } from '../../../services/patient.service';
 import { ModalSearchPatientComponent } from '../../../views/widgets/modal-search-patient/modal-search-patient.component';
 import { PatientHope } from '../../../models/patients/patient-hope';
 import { DoctorService } from '../../../services/doctor.service';
+import { AdmissionService } from '../../../services/admission.service';
 import { Doctor } from '../../../models/doctors/doctor';
 import { sourceApps, channelId } from '../../../variables/common.variable';
+import * as pdfMake from 'pdfmake/build/pdfmake';
+import * as pdfFonts from 'pdfmake/build/vfs_fonts';
+
 @Component({
   selector: 'app-widget-vaccine-consent-list',
   templateUrl: './widget-vaccine-consent-list.component.html',
@@ -26,6 +30,8 @@ export class WidgetVaccineConsentListComponent implements OnInit {
   public consentInfo: Consent;
   public maskDate = [/\d/, /\d/, '-', /\d/, /\d/, '-', /\d/, /\d/, /\d/, /\d/];
   public key: any = JSON.parse(localStorage.getItem('key'));
+  public hospital = this.key.hospital;
+  public user = this.key.user;
   public patientName: string = '';
   public dob: string = '';
   public age: number = 0;
@@ -48,6 +54,7 @@ export class WidgetVaccineConsentListComponent implements OnInit {
   constructor(
     private doctorService: DoctorService,
     private patientService: PatientService,
+    private admissionService: AdmissionService, 
     private modalService: NgbModal,
     public activeModal: NgbActiveModal,
     private consentService: ConsentService,
@@ -376,7 +383,7 @@ export class WidgetVaccineConsentListComponent implements OnInit {
     this.doctorSelected = item;
   }
 
-  handlingCreateAdmission() {
+  async handlingCreateAdmission() {
     if (!this.choosedPatient.patientOrganizationId) {
       Swal.fire({
         position: 'center',
@@ -419,9 +426,12 @@ export class WidgetVaccineConsentListComponent implements OnInit {
                       confirmButtonText: 'Yes',
                       showCancelButton: true,
                       text: 'Would you like to continue to create admission?',
-                    }).then((res) => {
+                    }).then(async (res) => {
                       if (res.value) {
-                        this.createAdmission();
+                        let isSuccess = await this.editPatientHope(this.choosedPatient.patientId, this.consentInfo.email_address);
+                        if(isSuccess) {
+                          this.createAdmission();
+                        }
                       }
                     });
                   });
@@ -441,8 +451,136 @@ export class WidgetVaccineConsentListComponent implements OnInit {
         }
       });
     } else {
-      this.createAdmission();
+      let isSuccess = await this.editPatientHope(this.choosedPatient.patientId, this.consentInfo.email_address);
+      if(isSuccess) {
+        this.createAdmission();
+      }
     }
+  }
+
+  async getPatientHope(patientHopeId) {
+    let body = await this.patientService.getPatientHopeDetail(patientHopeId)
+      .toPromise().then(res => {
+        if (res.data) {
+          return res.data;
+        } else {
+          return null;
+        }
+      }).catch(err => {
+        return null;
+      });
+
+    return body
+  }
+
+  async editPatientHope(patient_Hope_Id, email?) {
+    let isSuccess = false;
+    let body = await this.getPatientHope(patient_Hope_Id);
+    if(body) {
+      const { patientId, name, sexId, birthPlaceId, birthDate, titleId, maritalStatusId, address, cityId, districtId, 
+              subDistrictId, postCode, homePhoneNo, officePhoneNo, mobileNo1, mobileNo2, emailAddress,
+              permanentAddress, permanentCityId, permanentPostCode, nationalIdTypeId, nationalIdNo,
+              nationalityId, religionId, bloodTypeId, fatherName, motherName, spouseName, contactName,
+              contactAddress, contactCityId, contactPhoneNo, contactMobileNo, contactEmailAddress, allergy,
+              payerId, payerIdNo, notes } = body;
+
+      let payload = {
+        address, allergy, birthDate, birthPlaceId, bloodTypeId, channelId: channelId.FRONT_OFFICE, cityId,
+        contactAddress, contactCityId, contactEmailAddress, contactMobileNo, contactName, contactPhoneNo,
+        districtId, emailAddress, fatherName, homePhoneNo, hospitalId: this.hospital.id, maritalStatusId,
+        mobileNo1, mobileNo2, motherName, name, nationalIdNo, nationalIdTypeId, nationalityId, notes,
+        officePhoneNo, organizationId: this.hospital.orgId, patientHopeId: patientId, payerId, payerIdNo,
+        permanentAddress, permanentCityId, permanentPostCode, postCode, religionId, sexId, source: sourceApps, 
+        spouseName, subDistrictId, titleId, userId: this.user.id, userName: this.user.fullname
+      }
+
+      if(email) {
+        payload.emailAddress = email; //replace email from preregistration
+        isSuccess = await this.mappingProcess(payload);
+      }
+    }
+
+    return isSuccess;
+  }
+
+  async printPatientLabel() {
+    let consentId = this.consentInfo.consent_id;
+    const contentPdf = await this.admissionService.getPatientLabelVaccine(consentId).toPromise()
+      .then(res => {
+        return res.data;
+      }).catch(err => {
+        return null;
+      })
+
+    if (contentPdf) {
+      await this.filePdfCreated(contentPdf);
+    } else {
+      Swal.fire({
+        position: 'center',
+        type: 'error',
+        title: 'Cannot print patient label',
+        showConfirmButton: false,
+        timer: 2000,
+      });
+    }
+  }
+
+  filePdfCreated(val) {
+    const {
+      patientName, sex, phone, admissionNo, admissionDate,
+      alias, mrNoFormatted, barcode, age, admissionTime,
+      doctorName, payer, patientType, labelBirth,
+    } = val;
+
+    const detailPayer = payer ? payer : patientType;
+    const strName = patientName.toUpperCase();
+    const strAge = age.toLowerCase();
+    let doctorPayer = doctorName + ' / ' + detailPayer;
+    doctorPayer = doctorPayer.substr(0, 55);
+    pdfMake.vfs = pdfFonts.pdfMake.vfs;
+
+    const docDefinition = {
+      pageSize: { width: 292.283, height: 98.031 },
+      pageMargins: [0, 0, 0, 0],
+      content: [
+        { text: strName, style: 'header', bold: true, fontSize: 10, noWrap: true },
+        { text: 'Sex: ' + sex + ' / Ph: ' + phone, style: 'header', bold: true, fontSize: 10, noWrap: true },
+        { text: 'MR No: ' + alias + '.' + mrNoFormatted + ' / DOB: ' + labelBirth + ' (' + strAge + ') ', style: 'header', bold: true, fontSize: 10 },
+        { text: admissionNo + ' ' + admissionDate + ' ' + admissionTime, style: 'header', fontSize: 9 },
+        { text: doctorPayer, style: 'header', fontSize: 9 },
+        {
+          image: barcode,
+          width: 100,
+          height: 20,
+          alignment: 'right'
+        }
+      ],
+      styles: {
+        header: {
+          fontSize: 9
+        }
+      }
+
+    };
+    pdfMake.defaultFileName = 'report registration';
+    pdfMake.createPdf(docDefinition).print();
+  }
+
+  async mappingProcess(payload: any) {
+    const patient = this.patientService.postMappingPatient(payload)
+      .toPromise().then(res => {
+        return true;
+      }).catch(err => {
+        Swal.fire({
+          position: 'center',
+          type: 'error',
+          title: 'Data patient di HOPE tidak lengkap',
+          showConfirmButton: false,
+          timer: 2000,
+        });
+        return false;
+      })
+    return patient;
   }
 
   createAdmission() {
@@ -450,6 +588,7 @@ export class WidgetVaccineConsentListComponent implements OnInit {
       organizationId: this.key.hospital.orgId,
       patientOrganizationId: this.choosedPatient.patientOrganizationId,
       primaryDoctorUserId: this.doctorSelected.doctor_hope_id,
+      consentId: this.consentInfo.consent_id
     };
 
     const payloadCheckin: any = {

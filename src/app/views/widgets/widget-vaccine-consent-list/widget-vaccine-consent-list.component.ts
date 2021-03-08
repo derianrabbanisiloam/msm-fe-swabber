@@ -467,6 +467,7 @@ export class WidgetVaccineConsentListComponent implements OnInit {
       organizationId: this.key.hospital.orgId,
       patientOrganizationId: this.choosedPatient.patientOrganizationId,
       primaryDoctorUserId: this.doctorSelected.doctor_hope_id,
+      consentId: this.consentInfo.consent_id
     };
 
     const payloadCheckin: any = {
@@ -482,7 +483,7 @@ export class WidgetVaccineConsentListComponent implements OnInit {
 
     this.consentService.createAdmissionVaccine(payloadHope).subscribe(
       (res) => {
-        payloadCheckin.admission_id = res.data.ResultEntityId;
+        payloadCheckin.admission_id = res.data.admission_hope_id;
         this.consentService
           .checkinconsent(payloadCheckin)
           .subscribe((checkedInRes) => {

@@ -1,8 +1,8 @@
-<div class="" style="width: 100%">
+<div class="unprintable" style="width: 100%">
   <div *ngFor="let alert of alerts">
     <ngb-alert *ngIf="alert" type="{{cssAlertType(alert)}}" (close)="removeAlert(alert)">{{ alert.message }}</ngb-alert>
   </div>
-  <form class="fo-form" style="" #f="ngForm" novalidate>
+  <form #f="ngForm" novalidate>
     <div class="fo_personal_detail_container shadow-4">
       <div class="fo_personal_detail_title header-2">
         <div>Personal Detail</div>

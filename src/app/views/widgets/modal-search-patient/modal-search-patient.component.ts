@@ -52,7 +52,11 @@ export class ModalSearchPatientComponent implements OnInit {
     const birthDate = this.searchKeywords.birthDate;
     this.patientService.searchPatientHope1(hospitalId, patientName, birthDate).subscribe(
       data => {
-        if (this.router.url === '/vaccine-list') {
+        /*
+          there is possibility where user comes from patient data
+          hence the url will still have query
+        */
+        if (this.router.url.indexOf('/vaccine-list') >= 0) {
           this.showCreateNew = true
         }
         this.searchLoader = false;

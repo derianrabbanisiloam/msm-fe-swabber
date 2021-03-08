@@ -48,6 +48,8 @@ export class WidgetVaccineConsentListComponent implements OnInit {
   public createAdmissionStatus: string = 'initial';
   public isConsentDetailChanged: boolean = false;
   public mrLocal: any;
+  public nameFromPatientData: string;
+  public dobFromPatientData: string;
   public isFromPatientData: boolean = false;
   public formValidity: any = { remarks: {}, name: null, mobile: null, answers: [], dob: null };
 
@@ -87,7 +89,9 @@ export class WidgetVaccineConsentListComponent implements OnInit {
   isNewPatient() {
     this.mrLocal = this.route.snapshot.queryParams.mrLocal;
     this.uniqueCode = this.route.snapshot.queryParams.code;
-    if (this.mrLocal && this.uniqueCode) {
+    this.nameFromPatientData = this.route.snapshot.queryParams.name;
+    this.dobFromPatientData = this.route.snapshot.queryParams.dob;
+    if (this.uniqueCode) {
       this.isFromPatientData = true;
       document.documentElement.style.overflow = 'hidden';
       this.searchConsent('code');
@@ -191,7 +195,7 @@ export class WidgetVaccineConsentListComponent implements OnInit {
             return el;
           }),
         };
-        this.age = moment().diff(moment(this.formatDate(this.consentInfo.date_of_birth, 'MM-DD-YYYY')), 'years', true);
+        this.age = moment().diff(moment(this.formatDate(this.consentInfo.date_of_birth, 'YYYY-MM-DD')), 'years', true);
         if (
           this.isFromPatientData &&
           this.mrLocal &&
@@ -201,6 +205,13 @@ export class WidgetVaccineConsentListComponent implements OnInit {
             .searchPatientAccessMr2(this.key.hospital.id, this.mrLocal)
             .subscribe((patient) => {
               this.choosedPatient = patient.data[0];
+              this.consentInfo.patient_name = this.choosedPatient.name;
+              const date = `${this.choosedPatient.birthDate[8] + this.choosedPatient.birthDate[9]}`;
+              const month = `${this.choosedPatient.birthDate[5] + this.choosedPatient.birthDate[6]}`;
+              const year = `${this.choosedPatient.birthDate[0] + this.choosedPatient.birthDate[1] + this.choosedPatient.birthDate[2] + this.choosedPatient.birthDate[3]}`;
+              this.consentInfo.date_of_birth = `${date}-${month}-${year}`;
+              this.consentInfo.mobile_no = this.choosedPatient.mobileNo1;
+              this.updateConsent();
               this.isFromPatientData = false;
               document.documentElement.style.overflow = 'auto';
               setTimeout(() => {
@@ -211,6 +222,12 @@ export class WidgetVaccineConsentListComponent implements OnInit {
                 });
               }, 500);
             });
+        } else if (this.isFromPatientData && this.nameFromPatientData && this.dobFromPatientData) {
+          this.consentInfo.patient_name = this.nameFromPatientData;
+          this.consentInfo.date_of_birth = this.dobFromPatientData
+          this.isFromPatientData = false;
+          document.documentElement.style.overflow = 'auto';
+          this.updateConsent()
         } else {
           this.isFromPatientData = false;
           document.documentElement.style.overflow = 'auto';
@@ -320,7 +337,7 @@ export class WidgetVaccineConsentListComponent implements OnInit {
     this.isConsentDetailChanged = true;
     this.updateStatus = 'initial';
     const foundIndex = this.consentInfo.detail.findIndex(
-      (item) => item.consent_detail_id === id
+      (item) => item.consent_question_id === id
     );
     this.consentInfo.detail[foundIndex].answer_value = event.target.value;
   }
@@ -604,7 +621,7 @@ export class WidgetVaccineConsentListComponent implements OnInit {
 
     this.consentService.createAdmissionVaccine(payloadHope).subscribe(
       (res) => {
-        payloadCheckin.admission_id = res.data.ResultEntityId;
+        payloadCheckin.admission_id = res.data.admission_hope_id;
         this.consentService
           .checkinconsent(payloadCheckin)
           .subscribe((checkedInRes) => {
@@ -768,7 +785,7 @@ export class WidgetVaccineConsentListComponent implements OnInit {
     const date = event.target.value;
     const isDateValid = this.isDateValid(date);
     if (isDateValid) {
-      this.age = moment().diff(moment(this.formatDate(date, 'MM-DD-YYYY')), 'years', true);
+      this.age = moment().diff(moment(this.formatDate(date, 'YYYY-MM-DD')), 'years', true);
     }
   }
 

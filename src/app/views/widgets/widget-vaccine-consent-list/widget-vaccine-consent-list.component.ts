@@ -72,6 +72,8 @@ export class WidgetVaccineConsentListComponent implements OnInit {
     });
     this.patientService.searchPatientHopeSource$.subscribe((patient) => {
       this.choosedPatient = patient;
+      this.consentInfo.patient_name = this.choosedPatient.name;
+      this.updateConsent();
       setTimeout(() => {
         window.scrollTo({
           left: 0,
@@ -107,6 +109,7 @@ export class WidgetVaccineConsentListComponent implements OnInit {
     this.resetFormValidity();
     this.updateStatus = 'initial';
     this.choosedPatient = undefined;
+    this.doctorSelected = undefined;
     this.consents = [];
     this.showWaitMsg = true;
     this.showNotFoundMsg = false;
@@ -169,6 +172,8 @@ export class WidgetVaccineConsentListComponent implements OnInit {
     ) {
       return;
     }
+    this.doctorSelected = undefined;
+    this.isAdmissionCreated = false;
     this.isConsentDetailChanged = false;
     this.updateStatus = 'initial';
     this.consentInfo = payload;

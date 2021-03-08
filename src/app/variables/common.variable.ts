@@ -126,8 +126,9 @@ export const activityType = {
 
 export const paymentStatus = {
   PAID: '1',
-  UNPAID: '2',
-  NOTPAID: '3',
+  NOTPAID: '2',
+  PAYMENTEXPIRED: '3',
+  PAYLATER: '4'
 };
 
 export const pathImage = {

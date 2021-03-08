@@ -445,9 +445,19 @@ export class WidgetVaccineConsentListComponent implements OnInit {
                       text: 'Would you like to continue to create admission?',
                     }).then(async (res) => {
                       if (res.value) {
-                        let isSuccess = await this.editPatientHope(this.choosedPatient.patientId, this.consentInfo.email_address);
-                        if(isSuccess) {
-                          this.createAdmission();
+                        if(this.consentInfo.email_address === null || this.consentInfo.email_address === '') {
+                          Swal.fire({
+                            position: 'center',
+                            type: 'error',
+                            title: 'Create admission failed, email cannot be empty',
+                            showConfirmButton: false,
+                            timer: 2000,
+                          });
+                        } else {
+                          let isSuccess = await this.editPatientHope(this.choosedPatient.patientId, this.consentInfo.email_address);
+                          if(isSuccess) {
+                            this.createAdmission();
+                          }
                         }
                       }
                     });
@@ -468,9 +478,19 @@ export class WidgetVaccineConsentListComponent implements OnInit {
         }
       });
     } else {
-      let isSuccess = await this.editPatientHope(this.choosedPatient.patientId, this.consentInfo.email_address);
-      if(isSuccess) {
-        this.createAdmission();
+      if(this.consentInfo.email_address === null || this.consentInfo.email_address === '') {
+        Swal.fire({
+          position: 'center',
+          type: 'error',
+          title: 'Create admission failed, email cannot be empty',
+          showConfirmButton: false,
+          timer: 2000,
+        });
+      } else {
+        let isSuccess = await this.editPatientHope(this.choosedPatient.patientId, this.consentInfo.email_address);
+        if(isSuccess) {
+          this.createAdmission();
+        }
       }
     }
   }

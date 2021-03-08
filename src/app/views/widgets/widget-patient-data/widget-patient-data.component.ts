@@ -390,6 +390,7 @@ export class WidgetPatientDataComponent implements OnInit {
         this.model.mobileNo1 = contact.phone_number_1;
         this.model.nationalIdNo = contact.identity_number;
         this.model.email = contact.email;
+        this.emailFromPreReg = contact.email ? contact.email : null;
         this.model.identityImageUrl = contact.identity_image_url ? contact.identity_image_url : '';
 
         // Date binding
@@ -1050,7 +1051,8 @@ export class WidgetPatientDataComponent implements OnInit {
         this.model.officePhone = val.officePhoneNo;
         this.model.mobileNo1 = val.mobileNo1;
         this.model.mobileNo2 = val.mobileNo2;
-        this.model.email = val.emailAddress;
+        if(this.emailFromPreReg) { this.model.email = this.emailFromPreReg }
+        else {this.model.email = val.emailAddress; }
   
         this.model.contactEmail = val.contactEmailAddress;
         this.model.contactMobile = val.contactMobileNo;
@@ -2553,6 +2555,7 @@ export class WidgetPatientDataComponent implements OnInit {
     this.model.mobileNo1 = patient.phone_number_1 ? patient.phone_number_1 : '';
     this.model.mobileNo2 = patient.phone_number_2 ? patient.phone_number_2 : '';
     this.model.email = patient.email ? patient.email : '';
+    this.emailFromPreReg = patient.email ? patient.email : null;
     this.model.contactEmail = patient.emergency_contact_email ? patient.emergency_contact_email : '';
     this.model.contactMobile = patient.emergency_contact_mobile ? patient.emergency_contact_mobile : '';
     this.model.contactAddress = patient.emergency_contact_address ? patient.emergency_contact_address : '';
@@ -2562,7 +2565,6 @@ export class WidgetPatientDataComponent implements OnInit {
     this.model.permanentPostCode = patient.permanent_post_code ? patient.permanent_post_code : '';
     this.model.permanentAddress = patient.permanent_address ? patient.permanent_address : '';
     this.model.payerIdNo = patient.payer_id_no ? patient.payer_id_no : '';
-    this.emailFromPreReg = patient.email ? patient.email : null;
 
     if (patient.district_id) {
       const district = await this.generalService.getDistrict(null, patient.district_id)

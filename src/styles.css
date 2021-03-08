@@ -424,6 +424,12 @@ button:disabled { cursor: not-allowed }
 
 @media print
 {
+
+   html, body {
+    width: 210mm;
+    height: 297mm;
+   }
+
    hr { display:block; }
 
   .fo-form { display: none;}
@@ -777,7 +783,7 @@ button:disabled { cursor: not-allowed }
   }
 }
 @page {
-  size: auto;   /* auto is the initial value */
+  size: Legal;   /* auto is the initial value */
   margin: 0;  /* this affects the margin in the printer settings */
 }
 

@@ -323,7 +323,7 @@ export class WidgetVaccineConsentListComponent implements OnInit {
     this.isConsentDetailChanged = true;
     this.updateStatus = 'initial';
     const foundIndex = this.consentInfo.detail.findIndex(
-      (item) => item.consent_detail_id === id
+      (item) => item.consent_question_id === id
     );
     this.consentInfo.detail[foundIndex].answer_value = event.target.value;
   }

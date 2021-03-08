@@ -189,7 +189,6 @@ export class WidgetVaccineConsentListComponent implements OnInit {
           }),
         };
         this.age = moment().diff(moment(this.formatDate(this.consentInfo.date_of_birth, 'YYYY-MM-DD')), 'years', true);
-        console.log(this.consentInfo)
         if (
           this.isFromPatientData &&
           this.mrLocal &&

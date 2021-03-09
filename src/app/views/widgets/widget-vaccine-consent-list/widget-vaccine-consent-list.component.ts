@@ -72,8 +72,6 @@ export class WidgetVaccineConsentListComponent implements OnInit {
     });
     this.patientService.searchPatientHopeSource$.subscribe((patient) => {
       this.choosedPatient = patient;
-      this.consentInfo.patient_name = this.choosedPatient.name;
-      this.updateConsent();
       setTimeout(() => {
         window.scrollTo({
           left: 0,
@@ -102,6 +100,14 @@ export class WidgetVaccineConsentListComponent implements OnInit {
 
   resetFormValidity() {
     this.formValidity = { remarks: {}, name: null, mobile: null, answers: [], dob: null };
+  }
+
+  clearQueryParams() {
+    this.mrLocal = "";
+    this.nameFromPatientData = "";
+    this.dobFromPatientData = "";
+    this.isFromPatientData = false;
+    this.router.navigate(['./vaccine-list']);
   }
 
   searchConsent(type: string) {
@@ -246,6 +252,7 @@ export class WidgetVaccineConsentListComponent implements OnInit {
 
   goToDetail(payload: any) {
     this.choosedPatient = undefined;
+    this.consentInfo = undefined
     if (this.isConsentDetailChanged) {
       Swal.fire({
         position: 'center',
@@ -659,6 +666,11 @@ export class WidgetVaccineConsentListComponent implements OnInit {
             );
             this.consentInfo.checkin_date = moment().format('DD-MM-YYYY HH:mm');
             this.createAdmissionStatus = 'loaded';
+            if(!this.isFromPatientData){
+              this.consentInfo.patient_name = this.choosedPatient.name;
+              this.updateConsent();
+            }
+            this.clearQueryParams()
             document.documentElement.style.overflow = 'auto';
             Swal.fire({
               position: 'center',

@@ -12,7 +12,7 @@
               <form (ngSubmit)="searchConsent('code')" class="mt-2">
                 <label for="unique-code">Patient unique code</label>
                 <input id="unique-code" name="unique-code" class="form-control" placeholder="Enter patient unique code"
-                  [(ngModel)]="uniqueCode" autocomplete="off" />
+                  [(ngModel)]="uniqueCode" (change)="searchConsent('code')" autocomplete="off" />
                 <input type="submit" value="Search" class="btn btn-primary mt-2" />
               </form>
             </ng-template>

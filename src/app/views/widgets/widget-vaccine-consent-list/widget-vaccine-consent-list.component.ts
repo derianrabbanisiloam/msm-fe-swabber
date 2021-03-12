@@ -361,16 +361,20 @@ export class WidgetVaccineConsentListComponent implements OnInit {
   }
 
   printForm(): void {
-    if (this.isConsentDetailChanged) {
-      Swal.fire({
-        position: 'center',
-        type: 'error',
-        title: 'Please save the updated consent form before you print',
-        showConfirmButton: false,
-        timer: 2000,
-      });
-    } else {
+    if(this.consentInfo.checkin_date){
       window.print();
+    } else {
+      if (this.isConsentDetailChanged || !this.checkFormValidity()) {
+        Swal.fire({
+          position: 'center',
+          type: 'error',
+          title: 'Please make sure data are corrent and all the questions have been answered',
+          showConfirmButton: false,
+          timer: 3000,
+        });
+      } else {
+        window.print();
+      }
     }
   }
 
@@ -379,32 +383,42 @@ export class WidgetVaccineConsentListComponent implements OnInit {
   }
 
   searchPatientHOPE(e?) {
-    if (this.isConsentDetailChanged) {
+    if (this.checkFormValidity()) {
+      if (this.isConsentDetailChanged) {
+        Swal.fire({
+          position: 'center',
+          type: 'error',
+          title: 'Please save the updated consent form before admitting patient',
+          showConfirmButton: false,
+          timer: 2000,
+        });
+      } else {
+        const hospitalId = this.key.hospital.id;
+        const params = {
+          patientName: this.consentInfo.patient_name,
+          birthDate: `${this.consentInfo.date_of_birth.split('-')[2]}-${this.consentInfo.date_of_birth.split('-')[1]
+            }-${this.consentInfo.date_of_birth.split('-')[0]}`,
+          localMrNo: '',
+        };
+        const modalRef = this.modalService.open(ModalSearchPatientComponent, {
+          windowClass: 'modal-searchPatient',
+          size: 'lg',
+        });
+        modalRef.componentInstance.searchKeywords = {
+          ...params,
+          hospitalId,
+          registerFormId: this.consentInfo.registration_form_id,
+          consentCode: this.consentInfo.unique_code,
+        };
+      }
+    } else {
       Swal.fire({
         position: 'center',
         type: 'error',
-        title: 'Please save the updated consent form before admitting patient',
+        title: 'Please make sure data are corrent and all the questions have been answered',
         showConfirmButton: false,
-        timer: 2000,
+        timer: 3000,
       });
-    } else {
-      const hospitalId = this.key.hospital.id;
-      const params = {
-        patientName: this.consentInfo.patient_name,
-        birthDate: `${this.consentInfo.date_of_birth.split('-')[2]}-${this.consentInfo.date_of_birth.split('-')[1]
-          }-${this.consentInfo.date_of_birth.split('-')[0]}`,
-        localMrNo: '',
-      };
-      const modalRef = this.modalService.open(ModalSearchPatientComponent, {
-        windowClass: 'modal-searchPatient',
-        size: 'lg',
-      });
-      modalRef.componentInstance.searchKeywords = {
-        ...params,
-        hospitalId,
-        registerFormId: this.consentInfo.registration_form_id,
-        consentCode: this.consentInfo.unique_code,
-      };
     }
   }
 
@@ -633,30 +647,19 @@ export class WidgetVaccineConsentListComponent implements OnInit {
   }
 
   createAdmission() {
-    const payloadHope: any = {
+    const payloadAdmissionCheckIn: any = {
       organizationId: this.key.hospital.orgId,
       patientOrganizationId: this.choosedPatient.patientOrganizationId,
       primaryDoctorUserId: this.doctorSelected.doctor_hope_id,
-      consentId: this.consentInfo.consent_id
-    };
-
-    const payloadCheckin: any = {
-      consent_id: this.consentInfo.consent_id,
-      organization_id: this.key.hospital.orgId,
-      admission_id: 0,
-      patient_id: this.choosedPatient.patientId,
-      create_user: 'FO',
+      consentId: this.consentInfo.consent_id,
+      patientId: this.choosedPatient.patientId,
     };
 
     this.createAdmissionStatus = 'loading';
     document.documentElement.style.overflow = 'hidden';
 
-    this.consentService.createAdmissionVaccine(payloadHope).subscribe(
+    this.consentService.createAdmissionVaccine(payloadAdmissionCheckIn).subscribe(
       (res) => {
-        payloadCheckin.admission_id = res.data.admission_hope_id;
-        this.consentService
-          .checkinconsent(payloadCheckin)
-          .subscribe((checkedInRes) => {
             this.isAdmissionCreated = true;
             const foundIndex = this.consents.findIndex(
               (x) => x.consent_id === this.consentInfo.consent_id
@@ -686,7 +689,6 @@ export class WidgetVaccineConsentListComponent implements OnInit {
                 behavior: 'smooth',
               });
             }, 500);
-          });
       },
       (err) => {
         this.createAdmissionStatus = 'loaded';

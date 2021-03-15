@@ -1,0 +1,444 @@
+<div class="d-print-none" id="overlay"
+  *ngIf="updateStatus === 'loading' || createAdmissionStatus === 'loading' || isFromPatientData ">
+  <p>Loading..</p>
+</div>
+<div class="fo_vaccine_container d-print-none">
+  <div class="row">
+    <div class="col-3">
+      <div class="search-form shadow-sm">
+        <ngb-tabset type="pills">
+          <ngb-tab title="By Code">
+            <ng-template ngbTabContent>
+              <form (ngSubmit)="searchConsent('code')" class="mt-2">
+                <label for="unique-code">Patient unique code</label>
+                <input id="unique-code" name="unique-code" class="form-control" placeholder="Enter patient unique code"
+                  [(ngModel)]="uniqueCode" (change)="searchConsent('code')" autocomplete="off" />
+                <input type="submit" value="Search" class="btn btn-primary mt-2" />
+              </form>
+            </ng-template>
+          </ngb-tab>
+          <ngb-tab title="By Name">
+            <ng-template ngbTabContent>
+              <form (ngSubmit)="searchConsent('name')" class="mt-2">
+                <label for="patient-name-1">Patient name</label>
+                <input id="patient-name-1" name="patient-name-1" class="form-control" placeholder="Enter patient name"
+                  [(ngModel)]="patientName" autocomplete="off" />
+                <label for="dob">Date of birth</label>
+                <input id="dob" name="dob" class="form-control" placeholder="dd-mm-yyyy" [(ngModel)]="dob"
+                  autocomplete="off" [textMask]="{ mask: maskDate }" />
+                <input type="submit" value="Search" class="btn btn-primary mt-2" />
+              </form>
+            </ng-template>
+          </ngb-tab>
+        </ngb-tabset>
+      </div>
+      <div class="consent-result mt-4">
+        <div *ngIf="consents.length > 0">
+          <div *ngFor="let consent of consents">
+            <div class="card shadow-sm" (click)="goToDetail(consent)">
+              <div class="card-body" style="position: relative;">
+                <span
+                  [ngClass]="consent.vaccine_no === 1? 'badge badge-pill badge-success' : consent.vaccine_no === 2 ? 'badge badge-pill badge-info' : 'hidden-badge'">{{consent.vaccine_no}}</span>
+                <h5 class="card-title">{{ consent.patient_name }}</h5>
+                <h6 class="card-subtitle mb-2 text-muted">
+                  {{ consent.date_of_birth | date }}
+                </h6>
+                <h6 class="card-subtitle mb-2 text-muted">
+                  {{ consent.mobile_no }}
+                </h6>
+                <h6 class="card-subtitle mb-2 text-muted" style="font-weight: 700;">
+                  {{consent.unique_code}}
+                </h6>
+              </div>
+              <div *ngIf="consent.checkin_date" class="card-footer bg-warning">
+                Checked-in
+              </div>
+            </div>
+          </div>
+        </div>
+        <div *ngIf="showWaitMsg" class="alert alert-warning" role="alert">
+          Please wait ...
+        </div>
+        <div *ngIf="showNotFoundMsg" class="alert alert-danger" role="alert">
+          No data found
+        </div>
+      </div>
+    </div>
+    <div class="col-9" *ngIf="showDetailConsent && consentInfo.detail.length > 0">
+      <div class="consent-detail">
+        <div class="consent-detail-header">
+          <div>
+            <h2 style="text-align: center; margin-bottom: 12px">
+              PERSETUJUAN VAKSINASI COVID-19
+            </h2>
+            <button *ngIf="consentInfo.checkin_date" type="button" disabled class="btn btn-sm btn-warning">Checked-in at
+              {{consentInfo.checkin_date}}</button>
+            <button *ngIf="consentInfo.checkin_date" type="button" class="btn btn-sm ms_btn_blue" (click)="printPatientLabel()">Print Patient Label</button>
+          </div>
+          <button class="btn ms_btn_yellow" type="button" (click)="printForm()" style="height: fit-content;">
+            <img class="icon" src="{{ assetPath }}icons/ic_Print@2x.png" />
+          </button>
+        </div>
+        <hr />
+        <form class="" (ngSubmit)="updateConsent()">
+          <div class="row">
+            <div class="col-6">
+              <label for="patient-name-2">Name</label>
+              <input [disabled]="consentInfo.checkin_date !== null" id="patient-name-2" name="patient-name-2"
+                class="form-control" [(ngModel)]="consentInfo.patient_name" autocomplete="off"
+                (change)="handleformChange()"
+                [ngClass]="formValidity.name? 'form-control-error' : 'form-control-normal'" />
+              <span *ngIf="formValidity.name" style="color: red; margin-bottom: 4px;">{{formValidity.name}}</span>
+            </div>
+            <div class="col-6">
+              <label for="patient-dob">Date of birth</label>
+              <input [disabled]="consentInfo.checkin_date !== null" id="patient-dob" name="patient-dob"
+                class="form-control" [textMask]="{ mask: maskDate }" [(ngModel)]="consentInfo.date_of_birth"
+                autocomplete="off" (change)="handleformChange()" (blur)="onBirthDateBlur($event)"
+                [ngClass]="formValidity.dob? 'form-control-error' : 'form-control-normal'" />
+              <span *ngIf="formValidity.dob" style="color: red; margin-bottom: 4px;">{{formValidity.dob}}</span>
+            </div>
+          </div>
+          <div class="row">
+            <div class="col-6">
+              <label for="patient-mobile">Phone</label>
+              <input [disabled]="consentInfo.checkin_date !== null" id="patient-mobile" name="patient-mobile"
+                class="form-control" [(ngModel)]="consentInfo.mobile_no" autocomplete="off"
+                (change)="handleformChange()"
+                [ngClass]="formValidity.mobile? 'form-control-error' : 'form-control-normal'" />
+              <span *ngIf="formValidity.mobile" style="color: red; margin-bottom: 4px;">{{formValidity.mobile}}</span>
+            </div>
+            <div class="col-6">
+              <label for="patient-email">Email</label>
+              <input [disabled]="consentInfo.checkin_date !== null" id="patient-email" name="patient-email"
+                class="form-control" [(ngModel)]="consentInfo.email_address" autocomplete="off"
+                (change)="handleformChange()" />
+            </div>
+          </div>
+          <div class="vaccine-no"
+            style="margin-top: 1em;margin-bottom: 1em;border-bottom: 1px solid black; padding-bottom: 0.5em;">
+            <div class="form-check form-check-inline">
+              <input [disabled]="consentInfo.checkin_date !== null" class="form-check-input" type="radio"
+                id="vaccine-no-1" [checked]="consentInfo.vaccine_no === 1" value="1"
+                (change)="vaccineNoChange($event)" />
+              <label class="form-check-label" for="vaccine-no-1">Vaksinasi ke-1</label>
+            </div>
+            <div class="form-check form-check-inline">
+              <input [disabled]="consentInfo.checkin_date !== null" class="form-check-input" type="radio"
+                id="vaccine-no-2" [checked]="consentInfo.vaccine_no === 2" value="2"
+                (change)="vaccineNoChange($event)" />
+              <label class="form-check-label" for="vaccine-no-2">Vaksinasi ke-2</label>
+            </div>
+          </div>
+          <div *ngFor="let q of consentInfo.detail; let i = index" class="mt-2">
+            <h5 *ngIf="q.consent_question_id === 31 && age > 60"
+              style="border-bottom: 1px solid black; padding-bottom: 0.5em;">Pertanyaan tambahan bagi sasaran lansia (≥
+              60 tahun):</h5>
+            <div class="mb-4"
+              *ngIf="q.is_vaccine_seq === consentInfo.vaccine_no || q.is_vaccine_seq ===  0 && q.is_age < age">
+              <label for="question">{{q.seq}}. {{createMarkupQuestion1(q)}}<br
+                  *ngIf="q.consent_question_name.indexOf(':') >=0" />{{createMarkupQuestion2(q)}}</label>
+              <div *ngIf="q.is_remarks && q.answer_value === 'Ya'" class="form-inline">
+                <label>{{
+                  q.consent_question_name.split("?")[1].split(separator)[0]
+                  }}</label>
+                <input [disabled]="consentInfo.checkin_date !== null" style="
+                    width: 120px;
+                    margin-left: 4px;
+                    margin-right: 4px;
+                    text-align: center;
+                  " [(ngModel)]="q.answer_remarks" autocomplete="off" name="answer-remarks-{{i}}"
+                  [ngClass]="formValidity.remarks[q.consent_question_id]? 'form-control-error' : 'form-control-normal'"
+                  (change)="handleformChange()" [textMask]="{ mask: maskDate }" placeholder="dd-mm-yyyy" />
+                <span *ngIf="formValidity.remarks[q.consent_question_id] && q.answer_value === 'Ya'"
+                  style="color: red; margin-bottom: 4px;">{{formValidity.remarks[q.consent_question_id]}}</span>
+              </div>
+              <div>
+                <div class="form-check form-check-inline" *ngFor="let option of q.answer_list">
+                  <input [disabled]="consentInfo.checkin_date !== null" class="form-check-input" type="radio"
+                    [id]="'checkbox-'+ option.answer + q.consent_question_id" [checked]="
+                        q.answer_value === option.answer
+                      " (change)="fieldsChange($event, q.consent_question_id)" [value]="option.answer" />
+                  <label class="form-check-label"
+                    [for]="'checkbox-'+ option.answer + q.consent_question_id">{{option.answer}}</label>
+                </div>
+              </div>
+            </div>
+          </div>
+          <span
+            *ngIf="formValidity.mobile || (formValidity.remarks | json) != '{}' || formValidity.dob || formValidity.answers.length>0 || formValidity.name"
+            style="color: red;">Please check
+            your form again</span>
+          <div style="display: flex; justify-content: space-around">
+            <button type="submit" class="btn btn-primary mt-2" [disabled]="consentInfo.checkin_date !== null">
+              Save
+            </button>
+            <button [disabled]="consentInfo.checkin_date !== null" type="button" class="btn btn-primary mt-2"
+              (click)="searchPatientHOPE($event)">
+              Search patient data
+              <img class="icon" src="{{ assetPath }}icons/ic_Search_white.png" style="width: 1.2em; height: 1.2em" />
+            </button>
+          </div>
+        </form>
+      </div>
+      <div *ngIf="choosedPatient && !isAdmissionCreated" class="consent-detail">
+        <div class="col-12">
+          <div class="row">
+            <div class="col-4">
+              <div class="row">
+                <div class="col-12">
+                  <label>MR No.</label>
+                </div>
+              </div>
+              <div class="row">
+                <div class="col-12">
+                  <input disabled [value]="choosedPatient.mrNoUnit ? choosedPatient.mrNoUnit : ''"
+                    class="form-control" />
+                </div>
+              </div>
+            </div>
+            <div class="col-4">
+              <div class="row">
+                <div class="col-12">
+                  <label>Name</label>
+                </div>
+              </div>
+              <div class="row">
+                <div class="col-12">
+                  <input disabled [value]="choosedPatient.name" class="form-control" />
+                </div>
+              </div>
+            </div>
+            <div class="col-4">
+              <div class="row">
+                <div class="col-12">
+                  <label>Date of Birth</label>
+                </div>
+              </div>
+              <div class="row">
+                <div class="col-12">
+                  <input disabled [value]="choosedPatient.birthDate" class="form-control" />
+                </div>
+              </div>
+            </div>
+          </div>
+          <div class="row mt-4">
+            <div class="col-4">
+              <div class="row">
+                <div class="col-12">
+                  <label>Mobile Phone</label>
+                </div>
+              </div>
+              <div class="row">
+                <div class="col-12">
+                  <input disabled [value]="choosedPatient.mobileNo1" class="form-control" />
+                </div>
+              </div>
+            </div>
+            <div class="col-4">
+              <div class="row">
+                <div class="col-12">
+                  <label>Address</label>
+                </div>
+              </div>
+              <div class="row">
+                <div class="col-12">
+                  <input disabled [value]="choosedPatient.address" class="form-control" />
+                </div>
+              </div>
+            </div>
+          </div>
+          <div class="row mt-4">
+            <div class="col-8 mb-4">
+              <label>Doctor</label>
+              <div class="ng-autocomplete" class="angular-autocomplete">
+                <ng-autocomplete placeHolder="Doctor name ..." [(ngModel)]="doctorSelected" [data]="doctorList"
+                  searchKeyword="name" (selected)='setDoctor($event)' [itemTemplate]="itemTemplateDoctor"
+                  [notFoundTemplate]="notFoundTemplate">
+                </ng-autocomplete>
+
+                <ng-template #itemTemplateDoctor let-item>
+                  <a [innerHTML]="item.name"></a>
+                </ng-template>
+
+                <ng-template #notFoundTemplate let-notFound>
+                  <div [innerHTML]="notFound"></div>
+                </ng-template>
+              </div>
+            </div>
+          </div>
+          <div class="row mt-4">
+            <div class="col-12">
+              <button type="button" class="btn btn-primary" (click)="handlingCreateAdmission()"
+                [disabled]="isAdmissionCreated">Create Admission</button>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="fo_vaccine_container_print d-none d-print-block" *ngIf="showDetailConsent && consentInfo.detail.length > 0">
+  <div class="row">
+    <div style="border: 1px solid black; padding: 8px">
+      <p style="font-size: 18px; font-weight: 700; margin: 0">
+        Code: {{ consentInfo.unique_code }}
+      </p>
+    </div>
+  </div>
+  <div class="row">
+    <div class="col-print-12 header-print">
+      <img src="../../../../assets/icons/logoSiloam.png" alt="logo" style="max-width: 40%" />
+    </div>
+  </div>
+  <div class="row" style="margin-top: 8px">
+    <div class="col-print-6">
+      <div class="bordered-box-left">
+        <p class="p-hospital-name">Rumah Sakit {{ key.hospital.name }}</p>
+        <p class="p-title-1">PERSETUJUAN VAKSINASI COVID-19</p>
+        <p class="p-title-2">COVID-19 VACCINATION CONSENT FORM</p>
+      </div>
+    </div>
+    <div class="col-print-6">
+      <div class="bordered-box-right">
+        <div class="row" style="margin: 0">
+          <div class="col-print-4">
+            <p class="p-subtitle">Nama</p>
+          </div>
+          <div class="col-print-8">
+            <p class="p-subtitle">: {{ consentInfo.patient_name }}</p>
+          </div>
+        </div>
+        <div class="row" style="margin: 0">
+          <div class="col-print-4">
+            <p class="p-subtitle">Tanggal lahir</p>
+          </div>
+          <div class="col-print-8">
+            <p class="p-subtitle">: {{ consentInfo.date_of_birth }}</p>
+          </div>
+        </div>
+        <div class="row" style="margin: 0">
+          <div class="col-print-4">
+            <p class="p-subtitle">Telepon</p>
+          </div>
+          <div class="col-print-8">
+            <p class="p-subtitle">: {{ consentInfo.mobile_no }}</p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+  <div class="row" style="margin-top: 16px">
+    <div class="col-print-12 bordered-content">
+      <div style="margin-left: 1rem;">
+        <div class="form-check form-check-inline">
+          <input class="form-check-input" type="checkbox" id="vaccine-no-1-print"
+            [checked]="consentInfo.vaccine_no === 1" value="1" />
+          <label class="form-check-label" for="vaccine-no-1">Vaksinasi ke-1</label>
+        </div>
+        <div class="form-check form-check-inline">
+          <input class="form-check-input" type="checkbox" id="vaccine-no-2-print"
+            [checked]="consentInfo.vaccine_no === 2" value="2" />
+          <label class="form-check-label" for="vaccine-no-2">Vaksinasi ke-2</label>
+        </div>
+      </div>
+      <div class="row" style="margin-top: 8px; margin-left: 0; margin-right: 0">
+        <div class="col-print-12">
+          <table>
+            <thead>
+              <tr>
+                <th>No</th>
+                <th>Pertanyaan</th>
+                <th colspan="2">Jawaban</th>
+              </tr>
+            </thead>
+            <tbody>
+              <ng-container *ngFor="let q of consentInfo.detail">
+                <tr *ngIf="q.is_age === 0 && q.is_vaccine_seq === 0 || q.is_vaccine_seq === consentInfo.vaccine_no">
+                  <td style="text-align: center">{{q.seq}}</td>
+                  <td>
+                    {{createPrintOutQuestion1(q)}} <strong
+                      *ngIf="q.is_remarks && q.answer_remarks !== ''">{{q.answer_remarks}}</strong>
+                    <span *ngIf="q.is_remarks && q.answer_remarks === ''">...</span>
+                    <br *ngIf="q.consent_question_name.indexOf(':') >=0" />{{createMarkupQuestion2(q)}}
+                  </td>
+                  <td style="text-align: center; width: 100px;">
+                    {{q.answer_value}}
+                  </td>
+                </tr>
+              </ng-container>
+              <tr *ngIf="age > 60">
+                <th>14</th>
+                <th style="text-align: left;">
+                  Pertanyaan tambahan bagi sasaran lansia (≥ 60 tahun ):
+                </th>
+                <th></th>
+              </tr>
+              <ng-container *ngFor="let q of consentInfo.detail">
+                <tr *ngIf="age > 60 && q.is_age === 60">
+                  <td></td>
+                  <td>
+                    {{createPrintOutQuestion1(q)}}
+                    <br *ngIf="q.consent_question_name.indexOf(':') >=0" />{{createMarkupQuestion2(q)}}
+                  </td>
+                  <td style="text-align: center; width: 100px;">
+                    {{q.answer_value}}
+                  </td>
+                </tr>
+              </ng-container>
+            </tbody>
+          </table>
+        </div>
+      </div>
+      <div class="tnc" style="margin-top: 8px">
+        <p>
+          Yang bertanda tangan di bawah ini menyatakan memahami dan menyetujui bahwa:
+        </p>
+        <ol>
+          <li>
+            Bersedia untuk dilakukan vaksinasi COVID-19 yang terdiri dari dua dosis
+            <ol type="a">
+              <li>
+                Untuk penerima vaksin COVID-19 berusia 18-59 tahun, dosis kedua diberikan 14 (empat belas) hari kalender
+                setelah pemberian dosis pertama.
+              </li>
+              <li>
+                Untuk penerima vaksin COVID-19 berusia ≥ 60 tahun, dosis kedua diberikan 28 (dua puluh delapan) hari
+                kalender setelah pemberian dosis pertama.
+              </li>
+              <li>
+                Dosis kedua vaksin COVID-19 akan diberikan di fasilitas Kesehatan yang sama dengan pemberian vaksin
+                dosis pertama
+              </li>
+            </ol>
+          </li>
+          <li>
+            Risiko yang dapat terjadi sehubungan dengan Vaksinasi COVID-19 antara lain: nyeri dan/atau kemerahan di area
+            suntikan, lemah badan, nyeri kepala, nyeri otot, demam ringan, reaksi alergi, dan risiko lainnya yang
+            mungkin dapat timbul bergantung pada kondisi tubuh masing-masing.
+          </li>
+          <li>
+            Setelah pemberian vaksin, perlu dilakukan observasi selama 30 menit di fasilitas kesehatan.
+          </li>
+          <li>
+            Seseorang yang telah menerima vaksin COVID-19 tetap dapat terinfeksi dan menularkan kepada orang lain.
+            Pemberian vaksin tidak menjamin kekebalan dari infeksi COVID-19, namun meningkatkan imunitas terhadap
+            infeksi COVID-19 sehingga diharapkan derajat penyakit yang dialami lebih ringan.
+          </li>
+        </ol>
+        <p>
+          Dengan ini saya menyatakan telah memahami dan menyetujui sepenuhnya pernyataan di atas maupun penjelasan yang
+          diberikan. Saya juga menyatakan bahwa informasi yang saya berikan terkait riwayat penyakit saya diatas benar
+          adanya dan bertanggung jawab penuh atas informasi riwayat penyakit yang saya berikan diatas.
+        </p>
+      </div>
+      <div class="signature">
+        <p>.............., .........................20..........</p>
+        <br /><br /><br /><br />
+        <p>......................................................</p>
+        <p>Nama jelas dan tanda tangan</p>
+      </div>
+    </div>
+  </div>
+</div>

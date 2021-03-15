@@ -1,3 +1,21 @@
+p {
+  margin: 0;
+  padding: 0;
+}
+
+.page{
+  page-break-inside: avoid;
+  page-break-after:always;
+  position:relative;
+  height:1350px;
+}
+
+.page::after {
+  content:'SHCR 2101.19.1/0';
+  position:absolute;
+  bottom:0;
+  right:0;
+}
 .checkbox-upload {
   width: 1.5em;
 }

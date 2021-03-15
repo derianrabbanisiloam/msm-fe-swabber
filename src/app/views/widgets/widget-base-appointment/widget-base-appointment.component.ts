@@ -22,6 +22,7 @@ export class WidgetBaseAppointmentComponent implements OnInit {
   public alerts: Alert[] = [];
   public model: any = { speciality: '', doctor: '' };
   public specialities: Speciality[];
+  public fromPreRegis: any;
   public searchKeywords: any = {
     doctor: {},
     area: {},
@@ -40,6 +41,14 @@ export class WidgetBaseAppointmentComponent implements OnInit {
   ) { }
 
   async ngOnInit() {
+    
+    
+    if (this.doctorService.searchDoctorSource2){
+      if (this.doctorService.searchDoctorSource2.fromPreRegis === true){
+        this.fromPreRegis = true
+        localStorage.setItem('fromPreRegis', JSON.stringify(this.doctorService.searchDoctorSource2))
+      }
+    }
     await this.getListDoctor();
     await this.getSpecialities();
     await this.fromBack();
@@ -47,6 +56,14 @@ export class WidgetBaseAppointmentComponent implements OnInit {
 
   fromBack() {
     const type = this.route.snapshot.queryParams['type'];
+    const preReg = this.route.queryParams['fromPreRegis']
+    const specialtyId = this.route.snapshot.queryParams['speciality_id']
+
+    if (preReg === 'true') {
+      this.fromPreRegis = true;
+    } else {
+      this.fromPreRegis = false;
+    }
 
     if (type) {
       if (type === 'doctor') {
@@ -61,7 +78,7 @@ export class WidgetBaseAppointmentComponent implements OnInit {
 
         this.searchAutoComplete = this.doctorList[idx];
         this.searchSchedule1(searchKey);
-      } else {
+      } else if(specialtyId) {
         const searchKey = {
           speciality_id: this.route.snapshot.queryParams['speciality_id'],
           speciality_name: this.route.snapshot.queryParams['speciality_name'],
@@ -70,11 +87,12 @@ export class WidgetBaseAppointmentComponent implements OnInit {
         const idx = this.specialities.findIndex((a) => {
           return a.speciality_id === searchKey.speciality_id;
         });
-
         this.model.speciality = this.specialities[idx];
         this.searchSchedule2();
       }
     }
+
+    
   }
 
   async getListDoctor() {
@@ -108,7 +126,6 @@ export class WidgetBaseAppointmentComponent implements OnInit {
 
   searchSchedule1(item) {
     this.model.speciality = '';
-
     this.searchKeywords.doctor = {
       doctor_id: item.doctor_id,
       name: item.name
@@ -117,7 +134,7 @@ export class WidgetBaseAppointmentComponent implements OnInit {
     const searchKey = {
       type: 'doctor',
       doctor_id: item.doctor_id,
-      name: item.name
+      name: item.name,
     };
 
     localStorage.setItem('searchKey', JSON.stringify(searchKey));
@@ -130,7 +147,6 @@ export class WidgetBaseAppointmentComponent implements OnInit {
 
   searchSchedule2() {
     this.model.doctor = '';
-
     const speciality = this.model.speciality;
 
     this.searchKeywords = {

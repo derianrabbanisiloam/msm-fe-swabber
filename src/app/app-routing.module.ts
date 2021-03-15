@@ -13,6 +13,11 @@ const routes: Routes = [
     loadChildren: './views/pages/page-patient-data/page-patient-data.module#PagePatientDataModule',
   },
   {
+    path: 'pre-registration',
+    canActivate: [AuthGuard],
+    loadChildren: './views/pages/page-pre-registration/page-pre-registration.module#PagePreRegistrationModule',
+  },
+  {
     path: 'create-appointment',
     canActivate: [AuthGuard],
     loadChildren: './views/pages/page-create-appointment/page-create-appointment.module#PageCreateAppointmentModule',
@@ -46,6 +51,11 @@ const routes: Routes = [
     path: 'view-quota',
     canActivate: [AuthGuard],
     loadChildren: './views/pages/page-view-quota/page-view-quota.module#PageViewQuotaModule',
+  },
+  {
+    path: 'vaccine-list',
+    canActivate: [AuthGuard],
+    loadChildren: './views/pages/page-vaccine-consent-list/page-vaccine-consent-list.module#PageVaccineConsentListModule',
   },
   {
     path: 'reschedule-worklist',

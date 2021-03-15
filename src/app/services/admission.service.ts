@@ -16,9 +16,9 @@ export class AdmissionService {
 
   private admissionUrl = environment.FRONT_OFFICE_SERVICE + '/admissions';
 
+
   getActiveAdmission(patientHopeId: any): Observable<any>{
-    const url = `${this.admissionUrl}/active/patient/${patientHopeId}`;
-    
+    const url = `${this.admissionUrl}/active/patient/${patientHopeId}`;    
     return this.http.get<any[]>(url, httpOptions);
   }
 
@@ -30,6 +30,11 @@ export class AdmissionService {
 
   getPatientLabel(appointmentId: string): Observable<any>{
     const url = `${this.admissionUrl}/label/appointment/${appointmentId}`;
+    return this.http.get<any>(url, httpOptions);
+  }
+
+  getPatientLabelVaccine(consentId: any): Observable<any>{
+    const url = `${this.admissionUrl}/label/vaccine/${consentId}`;
     return this.http.get<any>(url, httpOptions);
   }
 

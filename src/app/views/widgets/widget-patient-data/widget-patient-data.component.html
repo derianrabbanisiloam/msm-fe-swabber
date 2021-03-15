@@ -1,8 +1,8 @@
-<div class="" style="width: 100%">
+<div class="unprintable" style="width: 100%">
   <div *ngFor="let alert of alerts">
     <ngb-alert *ngIf="alert" type="{{cssAlertType(alert)}}" (close)="removeAlert(alert)">{{ alert.message }}</ngb-alert>
   </div>
-  <form style="" #f="ngForm" novalidate>
+  <form #f="ngForm" novalidate>
     <div class="fo_personal_detail_container shadow-4">
       <div class="fo_personal_detail_title header-2">
         <div>Personal Detail</div>
@@ -74,7 +74,6 @@
                 </select>
               </div>
             </div>
-
             <div class="form-pr-sex form-group">
               <label for="centralMrNo" class="">Sex *</label>
               <div>
@@ -99,7 +98,7 @@
               <label for="religion" class="">Religion</label>
               <div>
                 <select id="religion" class="form-control" [(ngModel)]="model.religion" name="religion">
-                  <option *ngFor="let itr of listReligion" [ngValue]="itr">{{itr.description}}</option>
+                  <option *ngFor="let itr of listReligion" [ngValue]="itr" [selected]="itr.value == model.religion.value">{{itr.description}}</option>
                 </select>
               </div>
             </div>
@@ -110,7 +109,7 @@
             <label for="marital" class="">Marital Status</label>
             <div class="form-group" style="width: 40%">
               <select id="marital" class="form-control" [(ngModel)]="model.maritalStatus" name="marital">
-                <option *ngFor="let itr of listMarital" [ngValue]="itr">{{itr.description}}</option>
+                <option *ngFor="let itr of listMarital" [ngValue]="itr" [selected]="itr.value == model.maritalStatus.value">{{itr.description}}</option>
               </select>
             </div>
             <div class="form-group form-pr-birth-place">
@@ -273,7 +272,7 @@
                       <div class="">
                         <select id="subdistrict" class="form-control" [(ngModel)]="model.nationalidType"
                           name="nationalidType">
-                          <option *ngFor="let itr of listNationalIdType" [ngValue]="itr">{{itr.description}}</option>
+                          <option *ngFor="let itr of listNationalIdType" [ngValue]="itr" [selected]="itr.value == model.nationalidType.value">{{itr.description}}</option>
                         </select>
                       </div>
                     </div>
@@ -291,7 +290,9 @@
                   <div class="">
                     <input type="file" accept="image/*" class="form-control-file" id="scanKTP"
                       (change)="readUrl($event)">
-                    <!-- <img [src]="url" > -->
+                    <span *ngIf="model.identityImageUrl">
+                      <img src="{{model.identityImageUrl}}" alt="" style="width: 400px; height: 220px;" />
+                    </span>
                   </div>
 
                   <div class="">
@@ -403,7 +404,6 @@
 
     <div class="">
       <div class="form-group d-flex justify-content-end">
-
         <button *ngIf="!isSuccessCreatePatient" type="submit" class="fo_btn_registration fo_btn_save"
           [disabled]="f.submitted && isButtonSave"
           [ngStyle]="{ background: f.submitted && isButtonSave ? '#A5C39F' : '#4D9B35'}"
@@ -413,6 +413,11 @@
         <button *ngIf="isSuccessCreatePatient && isFromAppointmentList && !fromBpjs" type="button" [disabled]="buttonCreateAdmission"
           class="fo_btn_registration fo_btn_disabled" [ngClass]="{'fo_btn_create_admission': isFromAppointmentList}"
           (click)="createAdmission(checkInOldPatient)">
+          Create Admission
+        </button>
+        <button *ngIf="isSuccessCreatePatient && isFromVaccineList && !fromBpjs" type="button"
+          [disabled]="buttonCreateAdmission" class="fo_btn_registration fo_btn_disabled"
+          [ngClass]="{'fo_btn_create_admission': isFromVaccineList}" (click)="createVaccineAdmission()">
           Create Admission
         </button>
         <button *ngIf="isSuccessCreatePatient && isFromAppointmentList && fromBpjs" type="button" [disabled]="buttonCreateAdmission"
@@ -772,10 +777,10 @@
 </ng-template>
 
 <ng-template #checkInOldPatient let-c="close" let-d="dismiss">
+  <div *ngIf="isLoadingCheckEligible" class="spinner"></div>
   <div class="modal-header">
     <span class="modal-title header-2"> {{ selectedCheckIn.contact_name }}&nbsp;|&nbsp;Create Admission</span>
-    <button #close_adm type="button" class="close" aria-label="Close" (click)="d('Cross click')"
-      (click)="closeClicked()">
+    <button #close_adm type="button" class="close" aria-label="Close" (click)="d('Cross click')">
       <span aria-hidden="true"><img style="width: 1rem;height: 1rem" src="{{assetPath}}icons/ic_Cross@2x.png"></span>
     </button>
   </div>
@@ -853,14 +858,30 @@
             </div>
           </div>
         </div>
+        <div class="d-flex justify-content-start">
+          <div class="" style="width: 50%; min-width: 100px">
+            <label class="">Payer Name</label>
+            <div class="">
+              <input type="text" class="form-control" name="payer_name" [(ngModel)]="patDetail.payerName"
+                readonly>
+            </div>
+          </div>
+          <div style="width: 50%; min-width: 100px">
+            <label class="">Payer No</label>
+            <div class="input-group">
+              <input type="text" class="form-control" name="payer_no" [(ngModel)]="patDetail.payerIdNo" readonly>
+            </div>
+          </div>
+        </div>
       </div>
       <div *ngIf="!selectedCheckIn.admission_id" style="border-top: 0.5px solid #C1C1C1">
         <div class="d-flex justify-content-between">
-          <div style="width: 20%">
-            <label class="">Patient Type</label>
-            <div class="">
-              <select id="title" class="form-control" required (change)="changeCondition($event)" name="dropDownPatientType">
-                <option *ngFor="let itr of patientTypeList" [ngValue]="itr" [disabled]="itr.description == 'EMPLOYEE'"
+            <div style="width: 20%">
+                <label class="">Patient Type</label>
+                <div class="">
+                  <select *ngIf="!selectedCheckIn.payer_eligibility" id="title" class="form-control" required (change)="changeCondition($event)"
+                    name="dropDownPatientType">
+                    <option *ngFor="let itr of patientTypeList" [ngValue]="itr" [disabled]="itr.description == 'EMPLOYEE'"
                       [selected]="(itr.description == patientType.description && nationalIdTypeId == 4) 
                       || (itr.description == patientType.description && nationalIdTypeId == 3)
                       || (itr.description == patientType.description && nationalIdTypeId == 1)
@@ -868,60 +889,130 @@
                       || (itr.description == patientType.description && nationalIdTypeId == 5)
                       || (itr.description == patientType.description && nationalIdTypeId == '')">
                       {{itr.description}}</option>
-              </select>
-              <input type="hidden" name="patientType" [(ngModel)]="patientType">
+                  </select>
+
+                  <select *ngIf="selectedCheckIn.payer_eligibility" id="title" class="form-control"
+                  name="dropDownPatientType" [disabled]="true">
+                    <option *ngFor="let itr of patientTypeList" [ngValue]="itr" [selected] = "(itr.value == selectedCheckIn.patient_type_id)" > {{ itr.description }}</option>
+                  </select>
+                  
+                  <input type="hidden" name="patientType" [(ngModel)]="patientType">
+                </div>
+            </div>
+            <div style="width: 40%">
+              <label class="">Room / Location</label>
+              <div class="input-group">
+                <select class="form-control" [(ngModel)]="roomHope" name="dropDownRoom">
+                  <option *ngFor="let itr of listRoomHope" [ngValue]="itr">
+                    {{itr.name}} - {{itr.code}}
+                  </option>
+                </select>
+              </div>
+            </div>
+            <div style="width: 40%">
             </div>
           </div>
-          <div style="width: 40%">
-            <label class="">Room / Location</label>
-            <div class="input-group">
-              <select class="form-control" [(ngModel)]="roomHope" name="dropDownRoom">
-                <option *ngFor="let itr of listRoomHope" [ngValue]="itr">
-                  {{itr.name}} - {{itr.code}}
-                </option>
-              </select>
+          <div class="payer-wrap" *ngIf="!txtPayer">
+            <div class="d-flex justify-content-between">
+              <div style="width: 40%; margin-top: 5px;">
+                <label class="">Payer</label>
+                <div class="" *ngIf = "!selectedCheckIn.payer_eligibility">
+                  <input class="form-control" ngui-auto-complete auto-select-first-item="true" max-num-list="20"
+                    value-formatter="name" list-formatter="name" [match-formatted]="true" min-chars="3"
+                    [source]="listPayer" name="payer" [(ngModel)]="payer" [disabled]="isCreatedEligibility">
+                </div>
+                <div class="" *ngIf = "selectedCheckIn.payer_eligibility">
+                  <input class="form-control" name="payer" [disabled]="isCreatedEligibility" [value]="selectedCheckIn.payer_name ? selectedCheckIn.payer_name : payer.name">
+                </div>
+              </div>
+              <div style="width: 30%; margin-top: 5px;">
+                <label class="">Payer No</label>
+                <div class="input-group">
+                  <input type="text" class="form-control" name="payerNo" [(ngModel)]="payerNo" [disabled]="isCreatedEligibility">
+                </div>
+              </div>
+              <div style="width: 30%; margin-top: 5px;">
+                <label class="">Payer Eligibility No</label>
+                <div class="input-group">
+                  <input type="text" class="form-control" name="payerEligibility" [(ngModel)]="payerEligibility" [value]="payerEligibility"
+                    [disabled]="isCreatedEligibility">
+                </div>
+              </div>
             </div>
+            <!-- check if bridging -->
+            <div *ngIf="isBridging"> 
+              <div class="d-flex justify-content-between">
+                <div style="width: 40%; margin-top: 5px;">
+                  <label class="">Referral Source</label>
+                  <div class="">
+                       <input class="form-control"  type="text" name="referralSource" [disabled]="(payer == null || payer == '') || isCreatedEligibility " 
+                       placeholder="Click to search" (click)="searchReferralSource()" [value]="referralSource ? referralSource.referralName : ''">
+                  </div>
+                </div>
+                <div style="width: 30%; margin-top: 5px;">
+                  <label class="">Referral No</label>
+                  <div class="input-group">
+                    <input type="text"  class="form-control" name="referralNo" [(ngModel)]="referralNo" [disabled]="isCreatedEligibility">
+                  </div>
+                </div>
+                <div style="width: 30%; margin-top: 5px;">
+                  <label class="">Referral Date</label>
+                  <div class="input-group">
+                    <input class="form-control"
+                      name="referralDate"
+                      [(ngModel)]="referralDateModel"
+                      [maxDate]="getMaxDate()"
+                      ngbDatepicker #d="ngbDatepicker"
+                      [disabled] = "isCreatedEligibility"
+                    >
+                    <div class="input-group-append">
+                      <button class="btn btn-outline-secondary calendar" (click)="d.toggle()" type="button">
+                        <i class="fa fa-calendar" aria-hidden="true"></i>
+                      </button>
+                    </div>
+                  </div>
+                </div> 
+              </div>
+            <div class="d-flex justify-content-start">
+              <!-- <div style="width: 8%; margin-top: 5px; margin-right: 2px;">
+                <label class="">Diagnose</label>
+                <div class="">
+                  <input class="form-control"  [value]="diagnose ? diagnose.code  ? diagnose.code : '' : ''" readonly>
+                </div>
+              </div> -->
+              <div style="width: 40%; margin-top: 5px;">
+                <label class="">Diagnose</label>
+                <div class="input-group">
+                  <input class="form-control"  placeholder="Click to search"
+                  (click)="searchDiagnose()"
+                   name="diagnose"  [value]="diagnose ? diagnose.code  + ' - ' + diagnose.name : ''"
+                   [disabled]="isCreatedEligibility" >
+                </div>
+              </div>
+              <div style="width: 30%; margin-top: 5px; margin-left: 20px;">
+                <label class="">Payer Notes</label>
+                <div class="input-group">
+                  <input type="text" class="form-control" name="registNotes" [(ngModel)]="registNotes" [disabled]="isCreatedEligibility">
+                </div>
+              </div>
+            </div> 
           </div>
-          <div style="width: 40%">
           </div>
-        </div>
-        <div class="d-flex justify-content-between">
-          <div style="width: 40%">
-            <label class="">Payer</label>
-            <div class="">
-              <input class="form-control" ngui-auto-complete auto-select-first-item="true" max-num-list="20"
-                value-formatter="name" list-formatter="name" [match-formatted]="true" min-chars="3" [source]="listPayer"
-                name="payer" [(ngModel)]="payer" [disabled]="txtPayer">
-            </div>
-          </div>
-          <div style="width: 30%">
-            <label class="">Payer No</label>
-            <div class="input-group">
-              <input type="text" class="form-control" name="payerNo" [(ngModel)]="payerNo" [disabled]="txtPayerNo">
-            </div>
-          </div>
-          <div style="width: 30%">
-            <label class="">Payer Eligibility No</label>
-            <div class="input-group">
-              <input type="text" class="form-control" name="payerEligibility" [(ngModel)]="payerEligibility"
-                [disabled]="txtPayerEligibility">
-            </div>
-          </div>
-        </div>
+          <br>
         <div class="d-flex">
-          <div style="width: 10%">
+          <div style="width: 10%; margin-top: 5px;">
             <label class="">Form Signed</label>
             <div class="">
               <input class="form-control checkbox-upload" style="margin-left: 1.8em;" type="checkbox" [(ngModel)]="isSigned">
             </div>
           </div>
-          <div style="width: 40%">
-            <label class="">email</label>
+          <div style="width: 40%; margin-top: 5px;">
+            <label class="">Email</label>
             <div class="">
               <input type="text" class="form-control" name="email" [(ngModel)]="email">
             </div>
           </div>
-          <div style="width: 30%">
+          <div style="width: 30%; margin-top: 5px;">
             <label class="">Notes</label>
             <div class="input-group">
               <input type="text" class="form-control" name="notes" [(ngModel)]="notes">
@@ -931,34 +1022,30 @@
       </div>
       <div>
         <div class="d-flex justify-content-end">
+          <button *ngIf="isBridging" style="width: 120px;" type="button" class="fo_btn_admission button btn-primary"
+          [disabled]="checkIfBridging()"
+          (click)="checkEligible()"
+        > Create Eligibility </button>
+        <button *ngIf="isBridging" style="width: 120px;" type="button" class="fo_btn_admission button btn-warning"
+        [disabled]="txtPayerEligibility"
+        (click)="printSjp()"
+        > Print Eligibility </button>
           <button *ngIf="!selectedCheckIn.admission_id" class="fo_btn_admission fo_btn_save"
             [disabled]="buttonCreateAdmission || isLoadingCreateAdmission"
             (click)="actionAdmission(confirmCreateAdmissionProcess)">Create Admission</button>
-          <button class="fo_btn_admission fo_btn_blue" [disabled]="buttonPatientLabel && !selectedCheckIn.admission_id"
+          <button style="width: 120px;" class="fo_btn_admission fo_btn_blue" [disabled]="buttonPatientLabel && !selectedCheckIn.admission_id"
             (click)="printPatientLabel(selectedCheckIn)">Print Patient</button>
           <button class="fo_btn_admission fo_btn_black" [disabled]="buttonPrintQueue && !selectedCheckIn.admission_id"
             (click)="printQueue(queueNumber, close_adm)">Print Queue Number</button>
         </div>
         <div class="modal-message">
-          <img *ngIf="loading"
+          <img *ngIf="isLoadingCreateAdmission"
             src="data:image/gif;base64,R0lGODlhEAAQAPIAAP///wAAAMLCwkJCQgAAAGJiYoKCgpKSkiH/C05FVFNDQVBFMi4wAwEAAAAh/hpDcmVhdGVkIHdpdGggYWpheGxvYWQuaW5mbwAh+QQJCgAAACwAAAAAEAAQAAADMwi63P4wyklrE2MIOggZnAdOmGYJRbExwroUmcG2LmDEwnHQLVsYOd2mBzkYDAdKa+dIAAAh+QQJCgAAACwAAAAAEAAQAAADNAi63P5OjCEgG4QMu7DmikRxQlFUYDEZIGBMRVsaqHwctXXf7WEYB4Ag1xjihkMZsiUkKhIAIfkECQoAAAAsAAAAABAAEAAAAzYIujIjK8pByJDMlFYvBoVjHA70GU7xSUJhmKtwHPAKzLO9HMaoKwJZ7Rf8AYPDDzKpZBqfvwQAIfkECQoAAAAsAAAAABAAEAAAAzMIumIlK8oyhpHsnFZfhYumCYUhDAQxRIdhHBGqRoKw0R8DYlJd8z0fMDgsGo/IpHI5TAAAIfkECQoAAAAsAAAAABAAEAAAAzIIunInK0rnZBTwGPNMgQwmdsNgXGJUlIWEuR5oWUIpz8pAEAMe6TwfwyYsGo/IpFKSAAAh+QQJCgAAACwAAAAAEAAQAAADMwi6IMKQORfjdOe82p4wGccc4CEuQradylesojEMBgsUc2G7sDX3lQGBMLAJibufbSlKAAAh+QQJCgAAACwAAAAAEAAQAAADMgi63P7wCRHZnFVdmgHu2nFwlWCI3WGc3TSWhUFGxTAUkGCbtgENBMJAEJsxgMLWzpEAACH5BAkKAAAALAAAAAAQABAAAAMyCLrc/jDKSatlQtScKdceCAjDII7HcQ4EMTCpyrCuUBjCYRgHVtqlAiB1YhiCnlsRkAAAOwAAAAAAAAAAAA==" />
           <span *ngIf="isLoadingCreateAdmission">Loading... Please wait, we are creating the admission now...</span>
         </div>
       </div>
     </div>
-
-    <div class="col-md-12 content-appointment-02-group-col">
-
-      <form name="form" #f="ngForm" novalidate>
-
-        <div class="form-group row">
-
-        </div>
-
-      </form>
-    </div>
   </div>
-
 </ng-template>
 
 <ng-template #confirmCreateAdmissionProcess let-c="close" let-d="dismiss">
@@ -1039,3 +1126,362 @@
     <button class="btn ms_btn_green" (click)="newPatient()">Confirm</button>
   </div>
 </ng-template>
+
+<div class="for-print" style="font-family: Helvetica; margin-left: 3rem; margin-right: 3rem; margin-top: -2rem;">
+  <div class="page">
+    <div style="width: 100%; height: auto; display: flex; flex-direction: row;
+      justify-content: space-between; align-items: center;">
+      <div>
+        <img src="../../../../assets/icons/siloam_logo.png" style="width: 300px; height: auto" />
+      </div>
+      <div style="text-align: right">
+        <p style="font-size: 18px; color: #353957; line-height: 10px; margin-bottom: 2rem;">
+          <span *ngIf="hospital.name">{{hospital.name}}</span>
+          <span *ngIf="!hospital.name"><div style="height: 30px"></div></span>
+        </p>
+        <p style="font-size: 24px; color: #353957; font-weight: bold; letter-spacing: 0.7px; 
+          line-height: 10px; margin-top: 1rem;">
+          Pendaftaran Pasien Baru
+        </p>
+      </div>
+    </div>
+    <hr style="height: 2px; background: transparent; width: 100%; border: none; border-top: solid 2px rgba(161, 174, 183, 0.44);" />
+    <div style="display: flex; flex-direction: row; justify-content: space-between;">
+      <div style="margin-right: 1.5rem;">
+        <div>
+          <p style="color: #8a8da5; font-size: 16px">
+            No. Rekam Medis / <span><i>Medical Record Num</i></span>
+          </p>
+          <p style="color: #353957; font-size: 18px">
+            <span *ngIf="model.mrlocal">{{model.mrlocal}}</span>
+            <span *ngIf="!model.mrlocal"><div style="height: 30px"></div></span>
+          </p>
+        </div>
+        <div>
+          <p style="color: #8a8da5; font-size: 16px">
+            Kartu Identitas yang Digunakan / <span><i>Refer to ID Card</i></span>
+          </p>
+          <p style="color: #353957; font-size: 18px">
+            <span *ngIf="model.nationalidType">{{model.nationalidType.description}}</span>
+            <span *ngIf="!model.nationalidType"><div style="height: 30px"></div></span>
+            <span *ngIf="model.nationalidType || model.nationalIdNo">-</span>
+            <span *ngIf="model.nationalIdNo">{{model.nationalIdNo}}</span>
+            <span *ngIf="!model.nationalIdNo"><div style="height: 30px"></div></span>
+          </p>
+        </div>
+      </div>
+      <div style="margin:0 0 0 100px;">
+        <p style="color: #8a8da5; font-size: 16px">
+          Fotokopi Kartu Identitas / <span><i>Copy of ID Card</i></span>
+        </p>
+        <div style="margin:0 0 0 30px;">
+          <span *ngIf="model.identityImageUrl">
+            <img alt="" src="{{model.identityImageUrl}}" style="width: 240px; height: 130px" />
+          </span>
+          <span *ngIf="!model.identityImageUrl">
+            <div style="height: 130px"></div>
+          </span>
+        </div>
+      </div>
+    </div>
+    <hr style="height: 2px; background: transparent; width: 100%; border: none; border-top: solid 2px rgba(161, 174, 183, 0.44);" />
+    <div>
+      <p style="color: #23246c; font-size: 16px; font-weight: bold">
+        DATA DIRI / PERSONAL DATA
+      </p>
+      <div style="display: flex; flex-direction: row; justify-content: space-between;">
+        <div>
+          <div style="margin: 0 0 10px 0">
+            <p style="color: #8a8da5; font-size: 16px">
+              Nama Lengkap (sesuai ID) / <span><i>Full Name</i></span>
+            </p>
+            <p style="color: #353957; font-size: 18px">
+              <span *ngIf="model.patientName">{{model.patientName}}</span>
+              <span *ngIf="!model.patientName"><div style="height: 30px"></div></span>
+            </p>
+          </div>
+          <div style="margin: 10px 0 0 0">
+            <p style="color: #8a8da5; font-size: 16px">
+              Kebangsaan / <span><i>Nationality</i></span>
+            </p>
+            <p style="color: #353957; font-size: 18px">
+            <span *ngIf="model.nationality && model.nationality.country_id === 1">WNI</span>
+            <span *ngIf="model.nationality && model.nationality.country_id !== 1">WNA</span>
+            </p>
+          </div>
+        </div>
+        <div>
+          <div style="margin: 0 0 10px 0">
+            <p style="color: #8a8da5; font-size: 16px">
+              Tempat/Tanggal Lahir <span><i>Place/Date of Birth</i></span>
+            </p>
+            <p style="color: #353957; font-size: 16px">
+              <span *ngIf="model.birthPlace || model.birth">{{model.birthPlace}} 
+                {{model.birth.substr(0,2)}}/{{model.birth.substr(3,2)}}/{{model.birth.substr(6,4)}}</span>
+              <span *ngIf="!model.birthPlace && !model.birth"><div style="height: 30px"></div></span>
+            </p>
+          </div>
+          <div style="margin: 10px 0 0 0">
+            <p style="color: #8a8da5; font-size: 16px">
+              Status / <span><i>Status</i></span>
+            </p>
+            <p style="color: #353957; font-size: 18px">
+              <span *ngIf="model.maritalStatus">{{model.maritalStatus.description}}</span>
+              <span *ngIf="!model.maritalStatus">
+                <div style="height: 30px"></div>
+              </span>
+            </p>
+          </div>
+        </div>
+        <div>
+          <div style="margin: 0 0 10px 0">
+            <p style="color: #8a8da5; font-size: 16px">
+              Jenis Kelamin / <span><i>Sex</i></span>
+            </p>
+            <p style="color: #353957; font-size: 18px" 
+              *ngIf="model.sex && model.sex.value === '1'">Laki-laki / Male</p>
+            <p style="color: #353957; font-size: 18px"
+              *ngIf="model.sex && model.sex.value === '2'">Perempuan / Female</p>
+            <span *ngIf="!model.sex.value">
+              <div style="height: 30px"></div>
+            </span>
+          </div>
+          <div style="margin: 10px 0 0 0">
+            <p style="color: #8a8da5; font-size: 16px">
+              Agama / <span><i>Religion</i></span>
+            </p>
+            <p style="color: #353957; font-size: 18px">
+              <span *ngIf="model.religion">{{model.religion.description}}</span>
+              <span *ngIf="!model.religion">
+                <div style="height: 30px"></div>
+              </span>
+            </p>
+          </div>
+        </div>
+      </div>
+      <div style="display: flex; flex-direction: row; justify-content: space-between; margin-top: 10px;">
+        <div>
+          <div style="margin: 0 0 10px 0">
+            <p style="color: #8a8da5; font-size: 16px">
+              Email / <span><i>Email</i></span>
+            </p>
+            <p style="color: #353957; font-size: 18px">
+              <span *ngIf="model.email">{{model.email}}</span>
+              <span *ngIf="!model.email"><div style="height: 30px"></div></span>
+            </p>
+          </div>
+          <div style="margin: 10px 0 0 0">
+            <p style="color: #8a8da5; font-size: 16px">
+              Nomor HP 2 / <span><i>Mobile 2</i></span>
+            </p>
+            <p style="color: #353957; font-size: 18px">
+              <span *ngIf="model.mobileNo2">{{model.mobileNo2}}</span>
+              <span *ngIf="!model.mobileNo2"><div style="height: 30px"></div></span>
+            </p>
+          </div>
+        </div>
+        <div>
+          <div style="margin: 0 0 10px 0">
+            <p style="color: #8a8da5; font-size: 16px">
+              Nomor Telepon Rumah / <span><i>Home</i></span>
+            </p>
+            <p style="color: #353957; font-size: 16px">
+              <span *ngIf="model.homePhone">{{model.homePhone}}</span>
+              <span *ngIf="!model.homePhone"><div style="height: 30px"></div></span>
+            </p>
+          </div>
+          <div style="margin: 10px 0 0 0">
+            <p style="color: #8a8da5; font-size: 16px">
+              Nomor Kantor / <span><i>Office</i></span>
+            </p>
+            <p style="color: #353957; font-size: 18px">
+              <span *ngIf="model.officePhone">{{model.officePhone}}</span>
+              <span *ngIf="!model.officePhone"><div style="height: 30px"></div></span>
+            </p>
+          </div>
+        </div>
+        <div>
+          <div style="margin: 0 0 10px 0">
+            <p style="color: #8a8da5; font-size: 16px">
+              Nomor HP 1 / <span><i>Mobile 1</i></span>
+            </p>
+            <p style="color: #353957; font-size: 18px">
+              <span *ngIf="model.mobileNo1">{{model.mobileNo1}}</span>
+              <span *ngIf="!model.mobileNo1"><div style="height: 30px"></div></span>
+            </p>
+          </div>
+          <div style="margin: 10px 0 0 0">
+          </div>
+        </div>
+      </div>
+      <div style="display: flex; flex-direction: row; justify-content: space-between; margin-top: 10px;">
+        <div>
+          <p style="color: #8a8da5; font-size: 16px">
+            Alamat (sesuai ID) / <span><i>Address on ID</i></span>
+          </p>
+          <p style="color: #353957; font-size: 18px">
+            <span *ngIf="model.address">{{model.address}}</span>
+            <span *ngIf="!model.address"><div style="height: 30px"></div></span>
+          </p>
+        </div>
+      </div>
+    </div>
+    <div style="display: flex; flex-direction: row; justify-content: space-between; margin-top: 10px;">
+      <div>
+        <p style="color: #8a8da5; font-size: 16px">
+          Kelurahan / <span><i>Sub-District</i></span>
+        </p>
+        <p style="color: #353957; font-size: 16px">
+          <span *ngIf="model.subdistrict">{{model.subdistrict.name}}</span>
+          <span *ngIf="!model.subdistrict"><div style="height: 30px"></div></span>
+        </p>
+      </div>
+      <div>
+        <p style="color: #8a8da5; font-size: 16px">
+          Kecamatan / <span><i>Districts</i></span>
+        </p>
+        <p style="color: #353957; font-size: 16px">
+          <span *ngIf="model.district">{{model.district.name}}</span>
+          <span *ngIf="!model.district"><div style="height: 30px"></div></span>
+        </p>
+      </div>
+      <div>
+        <p style="color: #8a8da5; font-size: 16px">
+          Kab/Kota / <span><i>City</i></span>
+        </p>
+        <p style="color: #353957; font-size: 16px">
+          <span *ngIf="model.city">{{model.city.name}}</span>
+          <span *ngIf="!model.city"><div style="height: 30px"></div></span>
+        </p>
+      </div>
+      <div>
+        <p style="color: #8a8da5; font-size: 16px">
+          Kode Pos / <span><i>Postal Code</i></span>
+        </p>
+        <p style="color: #353957; font-size: 18px">
+          <span *ngIf="model.postCode">{{model.postCode}}</span>
+          <span *ngIf="!model.postCode"><div style="height: 30px"></div></span>
+        </p>
+      </div>
+    </div>
+    <div style="display: flex; flex-direction: row; justify-content: space-between; margin-top: 10px;">
+      <div>
+        <p style="color: #8a8da5; font-size: 16px">
+          Alamat Domisili / <span><i>A Current Residential Address</i></span>
+        </p>
+        <p style="color: #353957; font-size: 16px">
+          <span *ngIf="model.permanentAddress">{{model.permanentAddress}}</span>
+          <span *ngIf="!model.permanentAddress"><div style="height: 20px"></div></span>
+        </p>
+      </div>
+    </div>
+    <hr style="height: 2px; background: transparent; width: 100%; border: none; border-top: solid 2px rgba(161, 174, 183, 0.44);" />
+    <div>
+      <p style="color: #23246c; font-size: 16px; font-weight: bold">
+      DATA KELUARGA / FAMILY INFORMATION
+      </p>
+      <div style="display: flex; flex-direction: row; justify-content: space-between;">
+        <div>
+          <p style="color: #8a8da5; font-size: 16px">
+            Nama Ibu Kandung / <span><i>Mother’s <br>Name</i></span>
+          </p>
+          <p style="color: #353957; font-size: 18px">
+            <span *ngIf="model.motherName">{{model.motherName}}</span>
+            <span *ngIf="!model.motherName"><div style="height: 30px"></div></span>
+          </p>
+        </div>
+          <div>
+          <p style="color: #8a8da5; font-size: 16px">
+          Nama Ayah Kandung / <span><i>Father’s <br>Name</i></span>
+          </p>
+          <p style="color: #353957; font-size: 18px">
+            <span *ngIf="model.fatherName">{{model.fatherName}}</span>
+            <span *ngIf="!model.fatherName"><div style="height: 30px"></div></span>
+          </p>
+          </div>
+        <div>
+          <p style="color: #8a8da5; font-size: 16px">
+          Nama Suami/Istri / <span><i>Spouse’s <br>Name</i></span>
+          </p>
+          <p style="color: #353957; font-size: 18px">
+            <span *ngIf="model.spouseName">{{model.spouseName}}</span>
+            <span *ngIf="!model.spouseName"><div style="height: 30px"></div></span>
+          </p>
+        </div>
+      </div>
+    </div>
+    <hr style="height: 2px; background: transparent; width: 100%; border: none; border-top: solid 2px rgba(161, 174, 183, 0.44);" />
+    <div>
+      <p style="color: #23246c; font-size: 16px; font-weight: bold">
+        DALAM KEADAAN DARURAT / IN CASE OF EMERGENCY
+      </p>
+      <div style="display: flex; flex-direction: row; justify-content: space-between;">
+        <div>
+          <p style="color: #8a8da5; font-size: 16px">
+            Nama Keluarga / <span><i>Name of Relative</i></span>
+          </p>
+          <p style="color: #353957; font-size: 18px">
+            <span *ngIf="model.contactName">{{model.contactName}}</span>
+            <span *ngIf="!model.contactName"><div style="height: 30px"></div></span>
+          </p>
+        </div>
+        <div>
+          <p style="color: #8a8da5; font-size: 16px">
+            Hubungan / <span><i>Relationship</i></span>
+          </p>
+          <p style="color: #353957; font-size: 18px"></p>
+        </div>
+        <div>
+          <p style="color: #8a8da5; font-size: 16px">
+            Nomor Telepon / <span><i>Mobile/Phone Number</i></span>
+          </p>
+          <p style="color: #353957; font-size: 18px">
+            <span *ngIf="model.contactPhone">{{model.contactPhone}}</span>
+            <span *ngIf="!model.contactPhone"><div style="height: 10px"></div></span>
+            <span *ngIf="model.contactPhone && model.contactMobile">
+              /
+            </span>
+            <span *ngIf="model.contactMobile">{{model.contactMobile}}</span>
+            <span *ngIf="!model.contactMobile"><div style="height: 10px"></div></span>
+          </p>
+        </div>
+      </div>
+      <div>
+        <p style="color: #8a8da5; font-size: 16px">
+          Alamat Lengkap / <span><i>Residential Address</i></span>
+        </p>
+        <p style="color: #353957; font-size: 18px">
+          <span *ngIf="model.contactAddress">{{model.contactAddress}}</span>
+          <span *ngIf="!model.contactAddress"><div style="height: 30px"></div></span>
+        </p>
+      </div>
+    </div>
+    <hr style="height: 2px; background: transparent; width: 100%; border: none; border-top: solid 2px rgba(161, 174, 183, 0.44);" />
+    <div style="margin:10px 0; position: relative;">
+      <p style="line-height: 20px; margin: 0 0 50px 0; font-size: 16px; font-weight: 600;">
+        Dengan ini saya menyatakan bahwa data tersebut adalah yang sebenarnya, dan menyatakan persetujuan untuk penanganan pasien oleh pihak rumah sakit dengan fasilitasnya.
+        <br/><i>Herewith, I declare that the above data is correct and I agree to consent for all the treatment and facility usage, given by Siloam Hospitals.</i>
+      </p>
+      <div style="position: relative; width: 100%; display: flex; flex-direction: row; justify-content: space-between;">
+        <div style="position: relative; width: 37%;">
+          <hr style="height: 2px; background: transparent; width: 52%; border: none; border-top: solid 2px rgba(161, 174, 183, 0.44); margin: 8px 0;" />
+          <p style="color:#8A8DA5; font-size: 16px;">Tanda tangan & nama lengkap / <span><i>Register’s <br>signature and full name</i></span></p>
+        </div>
+        <div style="position: relative; width: 63%;">
+          <hr style="height: 2px; background: transparent; width: 52%; border: none; border-top: solid 2px rgba(161, 174, 183, 0.44); margin: 8px 0;" />
+          <p style="color:#8A8DA5; font-size: 16px;">Paraf Verifikator/FO/<span><i>Verificator Signature</i></span></p>
+        </div>
+      </div>
+      <div style="position: relative; width: 100%; display: flex; flex-direction: row; justify-content: space-between;">
+        <div style="position: relative; width: 37%; display: flex; flex-direction: row; align-items:flex-end">
+          <p style="color:#8A8DA5; font-size: 16px;">Tanggal / Date :</p>
+          <hr style="height: 2px; background: transparent; width: 40%; border: none; border-top: solid 2px rgba(161, 174, 183, 0.44); margin: 8px 0;" />
+        </div>
+        <div style="position: relative; width: 63%; display: flex; flex-direction: row; align-items:flex-end">
+          <p style="color:#8A8DA5; font-size: 16px;">Nama Verifikator/FO/<span><i>Verification by </i></span>:</p>
+          <hr style="height: 2px; background: transparent; width: 40%; border: none; border-top: solid 2px rgba(161, 174, 183, 0.44); margin: 8px 0;" />
+        </div>
+      </div>
+    </div>
+	</div>
+</div>

@@ -32,6 +32,10 @@
   display: none;
 }
 
+.for-print {
+  display: none;
+}
+
 .printable-table-schedule-doctor-name {
   text-align:center;
   padding-top: 5px
@@ -137,6 +141,7 @@ input[type="date" i]::-webkit-inner-spin-button, input[type="date"]::-webkit-cal
 .ms_btn_black:active{ background: #333333; color: white}
 .ms_btn_yellow { background: #F2C22C; color: white}
 .ms_btn_yellow:active{ background: #f0b80f; color: white}
+.ms_btn_green_lime { background: #92D050; color: white}
 
 html, body {
   font-size: 12px;
@@ -419,6 +424,13 @@ button:disabled { cursor: not-allowed }
 
 @media print
 {
+
+  hr { display:block; }
+
+  .for-print {
+    display: block;
+  }
+
   .col-print-1 {width:8%;  float:left;}
   .col-print-2 {width:16%; float:left;}
   .col-print-3 {width:25%; float:left;}
@@ -678,7 +690,6 @@ button:disabled { cursor: not-allowed }
     display: inline;
     /*position: fixed;top: 140px;right: 870px;*/
   }
-
 }
 
 .loading-div {
@@ -687,8 +698,6 @@ button:disabled { cursor: not-allowed }
 .loading-div img {
   width: 8vw;
 }
-
-
 
 
 /*Form Error*/
@@ -766,8 +775,9 @@ button:disabled { cursor: not-allowed }
     display: none;
   }
 }
+
 @page {
-  size: auto;   /* auto is the initial value */
+  size: A4;   /* auto is the initial value */
   margin: 0;  /* this affects the margin in the printer settings */
 }
 
@@ -852,3 +862,42 @@ button:disabled { cursor: not-allowed }
   color: rgba(0,0,0,.87);
   font-size: 15px;
 }
+
+/* loading */
+.spinner {
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  height:60px;
+  width:60px;
+  margin:0px auto;
+  z-index: 99999999;
+  -webkit-animation: rotation .6s infinite linear;
+  -moz-animation: rotation .6s infinite linear;
+  -o-animation: rotation .6s infinite linear;
+  animation: rotation .6s infinite linear;
+  border-left:6px solid rgba(0,174,239,.15);
+  border-right:6px solid rgba(0,174,239,.15);
+  border-bottom:6px solid rgba(0,174,239,.15);
+  border-top:6px solid rgba(70, 150, 255, 0.8);
+  border-radius:100%;
+
+}
+
+@-webkit-keyframes rotation {
+  from {-webkit-transform: rotate(0deg);}
+  to {-webkit-transform: rotate(359deg);}
+}
+@-moz-keyframes rotation {
+  from {-moz-transform: rotate(0deg);}
+  to {-moz-transform: rotate(359deg);}
+}
+@-o-keyframes rotation {
+  from {-o-transform: rotate(0deg);}
+  to {-o-transform: rotate(359deg);}
+}
+@keyframes rotation {
+  from {transform: rotate(0deg);}
+  to {transform: rotate(359deg);}
+}
+

@@ -11,5 +11,8 @@ export const environment = {
   ASSET_PATH: 'https://gtn-dev-mysiloam-02.siloamhospitals.com/fo-assets/',
   UPLOAD_IMAGE: 'http://10.85.136.23:5555',
   GET_IMAGE: 'http://10.85.136.23/staging',
-  MOBILE_SERVICE: 'http://10.85.139.13/mobileinternal/api/v2'
+  MOBILE_SERVICE: 'http://10.85.139.13/mobileinternal/api/v2',
+  INHEALTH: 'http://10.85.129.63:8803',
+  PAYMENT: 'http://10.85.139.13/online-payment',
+  VACCINE_CONSENT_SERVICE: 'http://10.85.139.13/consent-covid',
 };

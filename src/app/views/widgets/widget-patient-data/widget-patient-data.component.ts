@@ -7,19 +7,19 @@ import { District } from '../../../models/generals/district';
 import { Subdistrict } from '../../../models/generals/subdistrict';
 import { GeneralService } from '../../../services/general.service';
 import { PatientService } from '../../../services/patient.service';
+import { ConsentService } from '../../../services/consent.service';
 import { AppointmentService } from '../../../services/appointment.service';
 import { AdmissionService } from '../../../services/admission.service';
 import { QueueService } from '../../../services/queue.service';
 import { ScheduleService } from '../../../services/schedule.service';
 import { AlertService } from '../../../services/alert.service';
 import { Alert, AlertType } from '../../../models/alerts/alert';
-import { dateFormatter } from '../../../utils/helpers.util';
+import { dateFormatter, printPreview } from '../../../utils/helpers.util';
 import { channelId, sourceApps, queueType, typeFile } from '../../../variables/common.variable';
-import { NgbModal, ModalDismissReasons } from '@ng-bootstrap/ng-bootstrap';
+import { NgbModal, ModalDismissReasons, NgbDateStruct } from '@ng-bootstrap/ng-bootstrap';
 import * as pdfMake from 'pdfmake/build/pdfmake';
 import * as pdfFonts from 'pdfmake/build/vfs_fonts';
 import * as $ from 'jquery';
-import { THIS_EXPR } from '@angular/compiler/src/output/output_ast';
 import socket from 'socket.io-client';
 import { SecretKey, Jwt, QUEUE_NUMBER, CHECK_IN, keySocket, pathImage } from '../../../variables/common.variable';
 import Security from 'msm-kadapat';
@@ -28,6 +28,9 @@ import { localSpliter, regionTime } from '../../../../app/utils/helpers.util';
 import { isEmpty } from 'lodash';
 import Swal from 'sweetalert2';
 import { FormBuilder, FormGroup, FormControl } from '@angular/forms';
+import { PayerService } from '../../../services/payer.service';
+import { ModalSearchPayerComponent } from '../modal-search-payer/modal-search-payer.component';
+import { isNumber } from 'util'
 
 @Component({
   selector: 'app-widget-patient-data',
@@ -39,6 +42,7 @@ export class WidgetPatientDataComponent implements OnInit {
   public key: any = JSON.parse(localStorage.getItem('key'));
   public hospital = this.key.hospital;
   public user = this.key.user;
+  public isBridging = this.key.hospital.isBridging
 
   public model: any = {};
   public listSex: General[] = [];
@@ -50,11 +54,17 @@ export class WidgetPatientDataComponent implements OnInit {
   public listCountry: Country[];
   public listPayer: any = [];
 
+  public listReferralSource: any = [];
+  public listDiagnose: any = [];
+
+
   public listCity: City[];
   public listDistrict: District[];
   public listSubdistrict: Subdistrict[];
 
   public appointmentId: any;
+  public registerFormId: any;
+  public consentCode: any;
   public selectedCheckIn: any;
 
   public isFromAppointmentList: boolean = false;
@@ -65,6 +75,8 @@ export class WidgetPatientDataComponent implements OnInit {
   public isLoadingCreateAdmission: boolean = false;
   public isButtonSave: boolean = false;
 
+  public isLoadingCheckEligible: boolean = false;
+  public isError: boolean = false;
   public listActiveAdmission: any;
 
   public showWaitMsg: boolean = true;
@@ -78,6 +90,7 @@ export class WidgetPatientDataComponent implements OnInit {
 
   public alerts: Alert[] = [];
   public closeResult: string;
+  private userId: string = this.key.user.id;
 
   public listSuggestionPatient: any;
   public listInputUser: any = [];
@@ -94,6 +107,7 @@ export class WidgetPatientDataComponent implements OnInit {
   public buttonCloseAdm: boolean = true;
   public buttonVIP: boolean = false;
   public buttonReguler: boolean = false;
+  public buttonCheckEligible:boolean = true;
 
   public nationalIdTypeId: any;
 
@@ -112,6 +126,16 @@ export class WidgetPatientDataComponent implements OnInit {
   public txtPayer: boolean = true;
   public txtPayerNo: boolean = true;
   public txtPayerEligibility: boolean = true;
+
+  public diagnose: any;
+  public referralNo: any;
+  public refferalDate: any;
+  public referralSource: any;
+  public diagnoseCode: any;
+  public patientEligible: any;
+  public keyword: any;
+
+  public referralDateModel: NgbDateStruct;
 
   public dateAdmission: any = dateFormatter(new Date, true);
 
@@ -152,13 +176,24 @@ export class WidgetPatientDataComponent implements OnInit {
   public emailTemp: string = '';
   public notes: string = '';
   public notesTemp: string = '';
+  public registNotes: string = '';
   public isSigned: boolean = false;
   public isSignedTemp: boolean = false;
+  public isCreatedEligibility: boolean = false;
   public checkListModel: any = {
     checkOne: false, checkTwo: false, checkThree: false,
     checkFour: false, checkFive: false
   }
-
+  public bodyPreReg: any;
+  public patientPreReg: any;
+  public orderDetail: any;
+  public fromPreRegis: boolean = false;
+  public fromPatientData: boolean = false;
+  public emailFromPreReg: any;
+  public isFromVaccineList: boolean = false;
+  public nameToBring: string;
+  public dobToBring: string;
+  public patDetail: any = null;
   public flagErrorMobile1: boolean = false;
   public flagErrorMobile2: boolean = false;
   public flagErrorMobile3: boolean = false;
@@ -170,17 +205,23 @@ export class WidgetPatientDataComponent implements OnInit {
     private generalService: GeneralService,
     private alertService: AlertService,
     private patientService: PatientService,
+    private consentService: ConsentService,
+    private payerService: PayerService,
     private modalService: NgbModal,
     private modalTwoService: NgbModal,
     private admissionService: AdmissionService,
     private appointmentService: AppointmentService,
     private route: ActivatedRoute,
+    private activatedRoute: ActivatedRoute,
     private queueService: QueueService,
     private scheduleService: ScheduleService,
     private router: Router,
     private formBuilder: FormBuilder,
   ) {
     this.model.sex = {};
+    this.model.maritalStatus = {};
+    this.model.religion = {};
+    this.model.nationalidType = {};
     this.model.CentralRegDate = dateFormatter(new Date(), true);
     this.model.registerDate = this.model.CentralRegDate;
 
@@ -225,6 +266,21 @@ export class WidgetPatientDataComponent implements OnInit {
     this.getReligion();
     this.getBloodType();
     this.getCollectionAlert();
+    this.setDiagnose();
+    this.setReferralSource()
+    this.getPreReg()
+    this.setReferralSource();
+    this.isRegisterForm();
+  }
+
+  async getPatientHopeId(val) {
+    let body = await this.patientService.getPatientHopeDetailTwo(val)
+      .toPromise().then(res => {
+        return res.data;
+      }).catch(err => {
+        return null;
+      });
+    return body
   }
 
   async changeCheckbox(val) {
@@ -305,6 +361,135 @@ export class WidgetPatientDataComponent implements OnInit {
       this.alertService.error(err.error.message);
       return null;
     });
+  }
+  async isRegisterForm() {
+    this.registerFormId = this.route.snapshot.queryParams.formId;
+    this.consentCode = this.route.snapshot.queryParams.code;
+    if (this.registerFormId) {
+      window.scrollTo({
+        left: 0,
+        top: 0,
+        behavior: 'smooth',
+      });
+      this.isFromVaccineList = true;
+      const contact = await this.consentService
+        .getPreRegisFormById(this.registerFormId)
+        .toPromise()
+        .then((res) => {
+          return res.data[0];
+        })
+        .catch((err) => {
+          return null;
+        });
+
+      if (contact) {
+        // Binding response data into model
+        // This part --must be available both new & existing patient
+        // Basics text binding
+        this.model.patientName = contact.name;
+        this.model.mobileNo1 = contact.phone_number_1;
+        this.model.nationalIdNo = contact.identity_number;
+        this.model.email = contact.email;
+        this.emailFromPreReg = contact.email ? contact.email : null;
+        this.model.identityImageUrl = contact.identity_image_url ? contact.identity_image_url : '';
+
+        // Date binding
+        this.model.birth = dateFormatter(contact.birth_date, true);
+
+        // Select option binding
+        this.model.nationalidType.value = contact.identity_type_id
+          ? contact.identity_type_id.toString()
+          : this.model.nationalidType;
+        this.model.nationalidType.description = this.model.nationalidType.value
+          ? this.listNationalIdType.filter((el) => el.value === contact.identity_type_id)[0].description
+          : ''
+
+        // This part --only available both new patient
+        if (contact.is_new) {
+          // Basics text binding
+          this.model.address = contact.current_address
+            ? contact.current_address
+            : contact.identity_address;
+          this.model.permanentAddress = contact.current_address
+            ? contact.identity_address
+            : '';
+          this.model.mobileNo2 = contact.phone_number_2;
+          this.model.homePhone = contact.landline_number;
+          this.model.officePhone = contact.office_phonenumber;
+          this.model.spouseName = contact.spouse_name;
+          this.model.fatherName = contact.father_name;
+          this.model.motherName = contact.mother_name;
+          this.model.contactName = contact.emergency_contact_name;
+          this.model.contactAddress = contact.emergency_contact_address;
+          this.model.contactPhone = contact.emergency_contact_phone;
+
+          // Select option binding
+          const idxBirthCity = this.listCity.findIndex((a) => {
+            return a.city_id === Number(contact.birth_place_id);
+          });
+          const idxCity = this.listCity.findIndex((a) => {
+            return a.city_id === Number(contact.city_id);
+          });
+          const idxCountry = this.listCountry.findIndex((a) => {
+            return a.country_id === contact.country_id;
+          });
+          this.model.city =
+            idxCity >= 0
+              ? {
+                  city_id: this.listCity[idxCity].city_id,
+                  name: this.listCity[idxCity].name,
+                }
+              : { city_id: null, name: '' };
+          await this.getDetailAddress(true);
+          this.model.district.district_id = contact.district_id
+            ? contact.district_id.toString()
+            : this.listDistrict[0].district_id;
+          await this.getDetailAddress(true);
+          this.model.subdistrict.sub_district_id = contact.sub_district_id
+            ? contact.sub_district_id.toString()
+            : this.listSubdistrict[0].sub_district_id;
+          this.model.birthPlace =
+            idxBirthCity >= 0
+              ? {
+                  city_id: this.listCity[idxBirthCity].city_id,
+                  name: this.listCity[idxBirthCity].name,
+                }
+              : { city_id: null, name: '' };
+          this.model.nationality =
+            idxCountry >= 0
+              ? {
+                  country_id: this.listCountry[idxCountry].country_id,
+                  name: this.listCountry[idxCountry].name,
+                }
+              : { country_id: null, name: '' };
+          this.model.sex.value = contact.gender_id
+            ? contact.gender_id.toString()
+            : this.model.sex;
+          this.model.maritalStatus.value = contact.marital_status_id
+            ? contact.marital_status_id.toString()
+            : this.model.maritalStatus;
+          this.model.religion.value = contact.religion_id
+            ? contact.religion_id.toString()
+            : this.model.religion;
+          this.model.religion.value = contact.religion_id
+            ? contact.religion_id.toString()
+            : this.model.religion;
+
+        }
+      } else {
+        this.alertService.error('Contact not found', false, 5000);
+      }
+    }
+  }
+
+  createVaccineAdmission() {
+    const params = {
+      mrLocal: this.model.mrlocal,
+      code: this.consentCode,
+      name: this.nameToBring,
+      dob: this.dobToBring
+    };
+    this.router.navigate(['./vaccine-list'], { queryParams: params });
   }
 
   async isAppointment() {
@@ -780,7 +965,8 @@ export class WidgetPatientDataComponent implements OnInit {
       this.model.officePhone = this.bucketOne.officePhoneNo;
       this.model.mobileNo1 = this.bucketOne.mobileNo1;
       this.model.mobileNo2 = this.bucketOne.mobileNo2;
-      this.model.email = this.bucketOne.emailAddress;
+      if(this.emailFromPreReg) { this.model.email = this.emailFromPreReg }
+      else{ this.model.email = this.bucketOne.emailAddress; }
 
       this.model.contactEmail = this.bucketOne.contactEmailAddress;
       this.model.contactMobile = this.bucketOne.contactMobileNo;
@@ -790,6 +976,7 @@ export class WidgetPatientDataComponent implements OnInit {
       this.model.contactCity = this.bucketOne.str_contact_city;
 
       this.model.nationality = this.bucketOne.str_nationality;
+
       this.model.nationalidType = this.bucketOne.str_national_id_type;
       this.model.nationalIdNo = this.bucketOne.nationalIdNo;
 
@@ -864,7 +1051,8 @@ export class WidgetPatientDataComponent implements OnInit {
         this.model.officePhone = val.officePhoneNo;
         this.model.mobileNo1 = val.mobileNo1;
         this.model.mobileNo2 = val.mobileNo2;
-        this.model.email = val.emailAddress;
+        if(this.emailFromPreReg) { this.model.email = this.emailFromPreReg }
+        else {this.model.email = val.emailAddress; }
   
         this.model.contactEmail = val.contactEmailAddress;
         this.model.contactMobile = val.contactMobileNo;
@@ -1213,7 +1401,8 @@ export class WidgetPatientDataComponent implements OnInit {
       this.model.mrlocal = result.medical_record_number;
       this.model.patientOrganizationId = result.patient_organization_id;
 
-      this.buttonCreateAdmission = this.isFromAppointmentList ? false : true;
+     
+      this.buttonCreateAdmission = this.isFromAppointmentList || this.isFromVaccineList ? false : true;;
       this.isSuccessCreatePatient = true;
       this.isButtonSave = true;
     } else {
@@ -1400,7 +1589,7 @@ export class WidgetPatientDataComponent implements OnInit {
         this.isButtonSave = true;
         const payload = this.loadPayload();
         let body;
-        if(this.isFromAppointmentList) {
+        if (this.isFromAppointmentList) {
           body = {
             ...payload,
             patientHopeId: this.model.patientId,
@@ -1414,11 +1603,19 @@ export class WidgetPatientDataComponent implements OnInit {
         }
         this.resMappingData = null;
         this.resMappingData = await this.mappingProcess(body);
-        if(this.resMappingData) {
+        if (this.resMappingData) {
           this.model.mrlocal = this.resMappingData.medical_record_number;
           this.model.patientOrganizationId = this.resMappingData.patient_organization_id;
-    
-          this.buttonCreateAdmission = this.isFromAppointmentList ? false : true;
+          this.nameToBring = this.resMappingData.name;
+          this.dobToBring = `${this.resMappingData.birthDate[8] + this.resMappingData.birthDate[9]
+            + '-'
+            + this.resMappingData.birthDate[5] + this.resMappingData.birthDate[6]
+            + '-'
+            + this.resMappingData.birthDate[0] + this.resMappingData.birthDate[1] + this.resMappingData.birthDate[2] + this.resMappingData.birthDate[3]
+            }`
+
+          this.buttonCreateAdmission = this.isFromAppointmentList || this.isFromVaccineList ? false : true;
+
           this.isSuccessCreatePatient = true;
           this.isButtonSave = false;
         }
@@ -1493,11 +1690,11 @@ export class WidgetPatientDataComponent implements OnInit {
       this.resMappingData = null;
       this.isButtonSave = true;
       this.resMappingData = await this.mappingProcess(body);
-      if(this.resMappingData) {
+      if (this.resMappingData) {
         this.model.mrlocal = this.resMappingData.medical_record_number;
         this.model.patientOrganizationId = this.resMappingData.patient_organization_id;
-  
-        this.buttonCreateAdmission = this.isFromAppointmentList ? false : true;
+        this.buttonCreateAdmission = this.isFromAppointmentList || this.isFromVaccineList ? false : true;
+
         this.isSuccessCreatePatient = true;
         this.isButtonSave = true;
       }
@@ -1547,64 +1744,97 @@ export class WidgetPatientDataComponent implements OnInit {
     return params;
   }
 
+  formatDateModel(date: NgbDateStruct){
+    return date ? 
+    `${isNumber(date.year) ? date.year : ''}-${isNumber(date.month ) ? date.month : ''}-${date.day}` : ''
+  }
+
   processCreateAdmission(val) {
-    // Show loading bar
-    this.buttonCreateAdmission = true;
-    this.isLoadingCreateAdmission = true;
-
-    let payer = null;
-    let payerNo = null;
-    let payerEligibility = null;
-    let procedureRoomId = this.roomHope ? this.roomHope.procedureRoomId : null;
-
-    //check condition in checkin validate
-    let params = this.checkInValidate();
-
-    if(!params.valid){
-      this.alertService.error(params.msg, false, 3000);
-      this.buttonCreateAdmission = false;
-      this.isLoadingCreateAdmission = false;
-    }else{
-      if (this.patientType.description === 'PAYER') {
-        if (this.payer && this.payer.payer_id) {
-          payer = this.payer.payer_id;
-          payerNo = this.payerNo;
-          payerEligibility = this.payerEligibility;
-        }
-      }
-  
-      const body = {
-        appointmentId: val.appointment_id,
-        organizationId: Number(this.hospital.orgId),
-        patientTypeId: Number(this.patientType.value),
-        admissionTypeId: this.selectedAdmissionType.value,
-        payerId: payer,
-        payerNo: payerNo,
-        payerEligibility: payerEligibility,
-        procedureRoomId: procedureRoomId,
-        userId: this.user.id,
-        source: sourceApps,
-        userName: this.user.fullname,
-      };
-
-      if(this.notes !== this.notesTemp 
-        || this.email !== this.emailTemp
-        || this.isSigned !== this.isSignedTemp) {
-        const modifyNotesEmail = {
-          patientOrganizationId: val.patient_organization_id,
-          organizationId: Number(this.hospital.orgId),
-          emailAddress: this.email,
-          notes: this.notes,
-          isSigned: this.isSigned,
-          source: sourceApps,
-          userName: this.user.fullname,
-          userId: this.user.id
-        }
-        this.editNotesAndEmail(modifyNotesEmail, val.contact_id);
-      }
-  
-      var dataPatient;
-      this.admissionService.createAdmission(body).toPromise()
+     // Show loading bar
+     this.buttonCreateAdmission = true;
+     this.isLoadingCreateAdmission = true;
+   
+ 
+     let payerId = null;
+     let payerNo = null;
+     let payerName = null;
+     let payerEligibility = null;
+     
+     let diseaseClassificationId = null;
+     let referralNo = null;
+     let referralDate = null;
+     let referralSource = null;
+     let referralName = null;
+     let registrationNotes = null;
+     let procedureRoomId = this.roomHope ? this.roomHope.procedureRoomId : null;
+ 
+     if (this.selectedCheckIn.payer_eligibility){      
+       this.patientType = this.patientTypeList[3] 
+     }
+     
+     
+     
+     //check condition in checkin validate
+     let params = this.checkInValidate();
+     if(!params.valid){
+       this.alertService.error(params.msg, false, 3000);
+       this.buttonCreateAdmission = false;
+       this.isLoadingCreateAdmission = false;
+     }else{
+       if (this.patientType.description === 'PAYER') {
+         if (this.payer && this.payer.payer_id) {
+           payerId = this.payer.payer_id;
+           payerNo = this.payerNo;
+           payerName = this.payer.name;
+           payerEligibility = this.payerEligibility;
+           procedureRoomId = this.roomHope;
+           referralNo = this.referralNo
+           referralSource = this.referralSource ? this.referralSource.code : null;
+           referralName = this.referralSource ?  this.referralSource.referralName : null;
+           referralDate = this.referralDateModel ? this.formatDateModel(this.referralDateModel) : null;
+           registrationNotes = this.registNotes ? this.registNotes : null
+           diseaseClassificationId= this.diagnose ? this.diagnose.disease_classification_id : null
+         }
+       }
+       const body = {
+         appointmentId: val.appointment_id,
+         organizationId: Number(this.hospital.orgId),
+         patientTypeId: Number(this.patientType.value),
+         patientTypeName: this.patientType.description,
+         admissionTypeId: this.selectedAdmissionType.value,
+         payerId: payerId,
+         payerNo: payerNo,
+         payerEligibility: payerEligibility,
+         procedureRoomId: procedureRoomId,        
+         referralNo: referralNo,
+         referralSource: referralSource,
+         referralDate: referralDate,
+         referralName: referralName,
+         registrationNotes: registrationNotes,
+         diseaseClassificationId : diseaseClassificationId,      
+         userId: this.user.id,
+         source: sourceApps,
+         userName: this.user.fullname,
+       };
+ 
+       if(this.notes !== this.notesTemp 
+         || this.email !== this.emailTemp
+         || this.isSigned !== this.isSignedTemp) {
+         const modifyNotesEmail = {
+           patientOrganizationId: val.patient_organization_id,
+           organizationId: Number(this.hospital.orgId),
+           emailAddress: this.email,
+           notes: this.notes,
+           isSigned: this.isSigned,
+           source: sourceApps,
+           userName: this.user.fullname,
+           userId: this.user.id
+         }
+         this.editNotesAndEmail(modifyNotesEmail, val.contact_id);
+       }
+ 
+       var dataPatient;
+        this.admissionService.createAdmission(body).toPromise()
         .then(res => {
           dataPatient = {
             schedule_id: val.schedule_id,
@@ -1629,13 +1859,24 @@ export class WidgetPatientDataComponent implements OnInit {
           this.buttonCloseAdm = true;
           this.buttonPatientLabel = false;
           this.isLoadingCreateAdmission = false;
+          if (this.payer){
+            if (this.isCreatedEligibility) {
+              this.txtPayerEligibility = this.payer.is_bridging === true ? false : true;
+            } else {
+              this.txtPayerEligibility = this.payer.is_bridging && this.isError === false ? false : true;
+            }
+          } else {
+            this.txtPayerEligibility = true;
+          }
+          this.isCreatedEligibility = false;
+          this.isError = false;
           this.alertService.success(res.message, false, 3000);
         }).catch(err => {
           this.buttonCreateAdmission = false;
           this.isLoadingCreateAdmission = false;
           this.alertService.error(err.error.message, false, 3000);
         })
-    }
+     }
 
   }
 
@@ -1647,7 +1888,8 @@ export class WidgetPatientDataComponent implements OnInit {
       this.txtPayer = true;
       this.txtPayerNo = true;
       this.txtPayerEligibility = true;
-
+      this.buttonCheckEligible = true;
+      this.buttonCreateAdmission = false;
       this.payer = null;
       this.payerNo = null;
       this.payerEligibility = null;
@@ -1668,8 +1910,8 @@ export class WidgetPatientDataComponent implements OnInit {
     } else {
       this.txtPayer = false;
       this.txtPayerNo = false;
-      this.txtPayerEligibility = false;
-
+      // this.txtPayerEligibility = false;
+      this.buttonCheckEligible = false;
       idx = this.patientTypeList.findIndex((a) => {
         return a.description == "PAYER";
       })
@@ -1716,7 +1958,7 @@ export class WidgetPatientDataComponent implements OnInit {
     } else if(this.nationalIdTypeId && this.fromBpjs === true) {
       this.txtPayer = false;
       this.txtPayerNo = false;
-      this.txtPayerEligibility = false;
+      // this.txtPayerEligibility = false;
       this.payerNo = this.selectedCheckIn.bpjs_card_number;
       idx = this.patientTypeList.findIndex((a) => {
         return a.description == "PAYER";
@@ -1725,7 +1967,7 @@ export class WidgetPatientDataComponent implements OnInit {
       if(this.fromBpjs === true) {
         this.txtPayer = false;
         this.txtPayerNo = false;
-        this.txtPayerEligibility = false;
+        // this.txtPayerEligibility = false;
         this.payerNo = this.selectedCheckIn.bpjs_card_number;
         idx = this.patientTypeList.findIndex((a) => {
           return a.description == "PAYER";
@@ -1741,7 +1983,6 @@ export class WidgetPatientDataComponent implements OnInit {
 
   async createAdmission(content) {
     this.nationalIdTypeId = '';
-
     this.selectedCheckIn = await this.appointmentService.getAppointmentById(this.appointmentId)
       .toPromise().then(res => {
         return res.data[0];
@@ -1751,7 +1992,7 @@ export class WidgetPatientDataComponent implements OnInit {
 
     this.getNotesAndEmail(this.selectedCheckIn.contact_id);
     this.selectedCheckIn.custome_birth_date = dateFormatter(this.selectedCheckIn.birth_date, true);
-
+    this.patDetail = await this.getPatientHopeId(this.selectedCheckIn.patient_hope_id);
     await this.defaultPatientType(this.selectedCheckIn.patient_hope_id);
     if(this.fromBpjs === true) {
       this.documentModal(content);
@@ -2071,8 +2312,9 @@ export class WidgetPatientDataComponent implements OnInit {
     });
   }
 
+  
   printForm() {
-
+    window.print();
   }
 
   reset() {
@@ -2081,6 +2323,168 @@ export class WidgetPatientDataComponent implements OnInit {
     this.listDistrict = [];
     this.listSubdistrict = [];
   }
+
+
+    async getReferralSource(){
+      let payload = {
+        payerId: this.payer.payer_id,
+        organizationId: this.hospital.orgId,
+        keyword: this.keyword
+      }
+
+      this.listReferralSource = await this.payerService.getListRefferal(payload)
+        .toPromise().then(res => {
+          return res.data
+        }).catch(err => {
+          return []
+        })
+      }
+
+      setDiagnose(){
+        this.payerService.searchDiagnose$.subscribe(
+          data => {
+            this.diagnose = data
+          }
+        )
+      }
+      
+      setReferralSource(){
+        this.payerService.searchReferralSource$.subscribe(
+          data => {
+            this.referralSource = data
+          }
+        )
+      }
+
+      async searchDiagnose(){
+        let payload = {
+          patientId: this.selectedCheckIn.patient_hope_id,
+          from: 'diagnose'
+        }
+        
+        const modalRef = await this.modalService.open(ModalSearchPayerComponent, {windowClass:'modal-searchPayer', size: 'lg'})
+        modalRef.componentInstance.params = payload
+    }
+
+    async searchReferralSource(){
+      let payload = {
+          payerId: this.payer.payer_id,
+          organizationId: this.hospital.orgId,
+          from: 'referralSource'
+        }
+        const modalRef = await this.modalService.open(ModalSearchPayerComponent, {windowClass:'modal-searchPayer', size: 'lg'})
+        modalRef.componentInstance.params = payload
+      }
+
+    async getDiagnose(){
+      let payload = {
+        patientId: this.selectedCheckIn.patient_hope_id,
+        keyword: this.keyword
+      }
+
+      this.listDiagnose = await this.payerService.getDeaseClasification(payload)
+      .toPromise().then(res => {
+        return res.data
+      }).catch(err => {
+        return []
+      })
+    } 
+
+    getMaxDate(){
+      let currentDate = new Date();
+       let maxDate = {
+          year: currentDate.getFullYear(),
+          month: currentDate.getMonth() + 1,
+          day: currentDate.getDate()
+        }
+        return maxDate
+    }
+
+    checkEligible(){
+      this.isLoadingCheckEligible = true;
+      let payload = {
+        appointmentId: this.selectedCheckIn.appointment_id,
+        organizationId: this.hospital.orgId,
+        payerId: this.payer.payer_id,
+        payerNo:this.payerNo,
+        payerName: this.payer.name,
+        patientTypeId: this.patientType.value,
+        patientTypeName: this.patientType.description, 
+        referralNo: this.referralNo,
+        referralSource: this.referralSource ? this.referralSource.code : null,
+        referralDate: this.referralDateModel ? this.formatDateModel(this.referralDateModel)  : null,
+        referralName: this.referralSource ? this.referralSource.referralName : null,
+        registrationNotes: this.registNotes,
+        diseaseClassificationId: this.diagnose ? this.diagnose.disease_classification_id : null,
+        userName: this.user.username,
+        userId: this.user.id,
+  
+      }
+      
+      if (!this.referralDateModel){
+          this.alertService.error('Tanggal Rujukan Tidak Boleh Kosong', false, 2000)
+          this.isLoadingCheckEligible = false;
+      } else if (!this.payerNo) {
+        this.alertService.error('Payer Number Tidak boleh kosong', false, 2000)
+        this.isLoadingCheckEligible = false;
+      } else {
+        let data = this.payerService.checkEligible(payload)
+        .toPromise().then(
+          res => {
+            this.payerEligibility = res.data.eligibility_no;
+            this.patientEligible = res.data;
+            this.txtPayerEligibility = false;
+            this.isLoadingCheckEligible = false;
+            this.isCreatedEligibility = true;
+            this.buttonCreateAdmission = false;
+            this.alertService.success('Patient Eligible', false, 5000)        
+          }
+        )
+        .catch(err => {
+          this.isError = true;
+          this.isLoadingCheckEligible = false;
+          this.isCreatedEligibility = false;
+          this.buttonCreateAdmission = false;
+          this.alertService.error(err.error.message,false,5000)
+        })
+      }  
+    }
+
+    async getFilePdf(){
+      let payload = {
+        function_type_id: "1BBD60CE-ADBE-4F80-B8F7-A4A65616CD36",
+        organization_id: this.hospital.orgId,
+        payerEligibilityNo: this.payerEligibility,
+        payerId: this.payer.payer_id
+      }
+  
+      let data = await this.payerService.getPrint(payload)
+      .toPromise()
+      .then(res => {
+        this.isLoadingCheckEligible = false
+        return res.data;
+      })
+      .catch(err => {
+        this.isLoadingCheckEligible = false
+        this.alertService.error(err.message, false, 5000)
+        return null
+      })
+      return data
+    }
+
+    async printSjp(){
+     if(this.patientType.description == 'PAYER' || this.selectedCheckIn.patient_type_name == 'PAYER'){
+      this.isLoadingCheckEligible = true;
+      let filePdf = await this.getFilePdf() 
+      if (filePdf){
+        printPreview(filePdf)
+      } 
+    } else {
+      this.alertService.error('cannot print eligibility', false, 3000)
+    }
+
+  }
+
 
   private getDismissReason(reason: any): string {
 
@@ -2103,6 +2507,153 @@ export class WidgetPatientDataComponent implements OnInit {
       // add alert to array
       this.alerts.push(alert);
     });
+  }
+
+  checkIfBridging(){
+    if (this.patientType.description === 'PAYER'){
+      if ((this.payer == null || 
+          this.payer == '') ||
+          this.isCreatedEligibility){
+          this.buttonCreateAdmission = false;
+          return true;
+      } else if (this.payer && this.payer.is_bridging && this.isBridging){   
+          if (!this.buttonPatientLabel) return true;
+          this.buttonCreateAdmission = this.isError ? false : true;
+          return this.txtPayerEligibility ? false : true;
+      }else {
+        return true;
+      }
+    } else {
+      return true;
+    }    
+  }
+
+  async getPreReg() {
+    if(this.activatedRoute.snapshot.queryParamMap.get('fromPreRegis') === 'true' &&
+        this.activatedRoute.snapshot.queryParamMap.get('fromPatientData') === 'true') {
+      this.bodyPreReg = JSON.parse(localStorage.getItem('fromPreRegis'));
+      this.patientPreReg = this.bodyPreReg.patientPreReg;
+      this.orderDetail = this.bodyPreReg.orderDetail;
+      this.fromPreRegis = true;
+      this.fromPatientData = true;
+      this.formPatient(this.patientPreReg);
+    }
+  }
+
+  async formPatient(patient) {
+    this.model.identityImageUrl = patient.identity_image_url ? patient.identity_image_url : '';
+    this.model.patientName = patient.name ? patient.name : '';
+    this.model.fatherName = patient.father_name ? patient.father_name : '';
+    this.model.motherName = patient.mother_name ? patient.mother_name : '';
+    this.model.spouseName = patient.spouse_name ? patient.spouse_name : '';
+    this.model.address = patient.identity_address ? patient.identity_address : '';
+    this.model.postCode = patient.post_code ? patient.post_code : '';
+    this.model.notes = patient.notes ? patient.notes : '';
+    this.model.allergy = patient.allergy ? patient.allergy : '';
+    this.model.homePhone = patient.landline_number ? patient.landline_number : '';
+    this.model.officePhone = patient.office_phonenumber ? patient.office_phonenumber : '';
+    this.model.mobileNo1 = patient.phone_number_1 ? patient.phone_number_1 : '';
+    this.model.mobileNo2 = patient.phone_number_2 ? patient.phone_number_2 : '';
+    this.model.email = patient.email ? patient.email : '';
+    this.emailFromPreReg = patient.email ? patient.email : null;
+    this.model.contactEmail = patient.emergency_contact_email ? patient.emergency_contact_email : '';
+    this.model.contactMobile = patient.emergency_contact_mobile ? patient.emergency_contact_mobile : '';
+    this.model.contactAddress = patient.emergency_contact_address ? patient.emergency_contact_address : '';
+    this.model.contactPhone = patient.emergency_contact_phone ? patient.emergency_contact_phone : '';
+    this.model.contactName = patient.emergency_contact_name ? patient.emergency_contact_name : '';
+    this.model.nationalIdNo = patient.identity_number ? patient.identity_number : '';
+    this.model.permanentPostCode = patient.permanent_post_code ? patient.permanent_post_code : '';
+    this.model.permanentAddress = patient.permanent_address ? patient.permanent_address : '';
+    this.model.payerIdNo = patient.payer_id_no ? patient.payer_id_no : '';
+
+    if (patient.district_id) {
+      const district = await this.generalService.getDistrict(null, patient.district_id)
+        .toPromise().then(res => {
+          return res.data;
+        }).catch(err => {
+          return null;
+        })
+
+      this.model.district = district ? district : { district_id: null };
+    } else {
+      this.model.district = { district_id: null };
+    }
+
+    if (patient.sub_district_id) {
+      const subdistrict = await this.generalService.getSubDistrict(null, patient.sub_district_id)
+        .toPromise().then(res => {
+          return res.data;
+        }).catch(err => {
+          return null;
+        });
+
+      this.model.subdistrict = subdistrict ? subdistrict : { sub_district_id: null };
+    } else {
+      this.model.subdistrict = { sub_district_id: null };
+    }
+
+    let idx_sex, idx_city, idx_contact_city, idx_religion,
+    idx_bloodType, idx_nationality, idx_national_id_type, idx_birth_place, idx_title,
+    idx_marital, idx_permanent_city = -1;
+
+    idx_religion = patient.religion_id ? this.listReligion.findIndex((a) => {
+      return Number(a.value) === patient.religion_id;
+    }) : idx_religion;
+
+    idx_sex = patient.gender_id ? this.listSex.findIndex((a) => {
+      return Number(a.value) === Number(patient.gender_id);
+    }) : idx_sex;
+
+    idx_bloodType = patient.blood_type_id ? this.listBloodType.findIndex((a) => {
+      return Number(a.value) === patient.blood_type_id;
+    }) : idx_bloodType;
+
+    idx_nationality = patient.country_id ? this.listCountry.findIndex((a) => {
+      return a.country_id === patient.country_id;
+    }) : idx_nationality;
+
+    idx_city = patient.city_id ? this.listCity.findIndex((a) => {
+      return a.city_id === patient.city_id;
+    }) : idx_city;
+
+    idx_contact_city = patient.contact_city_id ? this.listCity.findIndex((a) => {
+      return a.city_id === patient.contact_city_id;
+    }) : idx_contact_city;
+
+    idx_permanent_city = patient.permanent_city_id ? this.listCity.findIndex((a) => {
+      return a.city_id === patient.permanent_city_id;
+    }) : idx_permanent_city;
+
+    idx_birth_place = patient.birth_place_id ? this.listCity.findIndex((a) => {
+      return a.city_id === patient.birth_place_id;
+    }) : idx_birth_place;
+
+    idx_title = patient.title_id ? this.listTitle.findIndex((a) => {
+      return Number(a.value) === patient.title_id;
+    }) : idx_title;
+
+    idx_marital = patient.marital_status_id ? this.listMarital.findIndex((a) => {
+      return Number(a.value) === patient.marital_status_id;
+    }) : idx_marital;
+
+    idx_national_id_type = patient.identity_type_id ? this.listNationalIdType.findIndex((a) => {
+      return Number(a.value) === Number(patient.identity_type_id);
+    }) : idx_national_id_type;
+    
+    this.model.birth = patient.birth_date ? dateFormatter(patient.birth_date, true) : '';
+    this.model.religion = (idx_religion >= 0) ? this.listReligion[idx_religion] : '';
+    this.model.sex = (idx_sex >= 0) ? this.listSex[idx_sex] : '';
+    this.model.bloodType = (idx_bloodType >= 0) ? this.listBloodType[idx_bloodType] : '';
+    this.model.nationality = (idx_nationality >= 0) ? this.listCountry[idx_nationality] : '';
+    this.model.city = (idx_city >= 0) ? this.listCity[idx_city] : '';
+    this.model.contactCity = (idx_contact_city >= 0) ? this.listCity[idx_contact_city] : '';
+    this.model.permanentCity = (idx_permanent_city >= 0) ? this.listCity[idx_permanent_city] : '';
+    this.model.birthPlace = (idx_birth_place >= 0) ? this.listCity[idx_birth_place] : '';
+    this.model.title = (idx_title >= 0) ? this.listTitle[idx_title] : '';
+    this.model.maritalStatus = (idx_marital >= 0) ? this.listMarital[idx_marital] : '';
+    this.model.nationalidType = (idx_national_id_type >= 0) ? this.listNationalIdType[idx_national_id_type] : '';
+
+    await this.getDetailAddress(true);
   }
 
   cssAlertType(alert: Alert) {

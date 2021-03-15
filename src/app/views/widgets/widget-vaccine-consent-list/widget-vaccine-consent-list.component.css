@@ -1,0 +1,154 @@
+:host(app-widget-vaccine-consent-list) {
+  width: 100%;
+}
+
+.form-control {
+  margin-bottom: 4px;
+}
+
+label {
+  font-weight: 700;
+}
+
+.card {
+  cursor: pointer;
+  border-radius: 4px;
+  padding: 6px;
+  margin-bottom: 2px;
+}
+
+.card-body {
+  padding: 6px;
+}
+
+.search-form {
+  background-color: #fff;
+  padding: 6px;
+  border-radius: 4px;
+}
+
+.consent-detail {
+  background-color: #fff;
+  padding: 16px;
+  margin-bottom: 12px;
+  border-radius: 4px;
+}
+
+.header-print {
+  text-align: center;
+}
+
+.bordered-box-left {
+  border: 1px solid black;
+  margin-right: 4px;
+  padding: 8px;
+  width: 94%;
+}
+
+.bordered-box-right {
+  border: 1px solid black;
+  margin-left: 4px;
+  padding: 8px;
+  width: 94%;
+  float: right;
+}
+
+.p-hospital-name,
+.p-title-1,
+.p-title-2 {
+  font-weight: 700;
+  margin-bottom: 0.2rem;
+}
+
+.p-title-2 {
+  font-style: italic;
+}
+
+.p-subtitle {
+  font-weight: 400;
+  margin-bottom: 0.2rem;
+}
+
+.fo_vaccine_container_print {
+  margin-right: 4em;
+}
+
+.bordered-content {
+  border: 1px solid black;
+  width: 100%;
+  padding: 10px;
+}
+
+table,
+th,
+td {
+  border: 1px solid black;
+}
+
+th {
+  text-align: center;
+}
+
+th,
+td {
+  padding: 2px;
+}
+
+table {
+  width: 100%;
+  margin-left: auto;
+  margin-right: auto;
+}
+
+ol {
+  padding-inline-start: 20px;
+}
+
+.signature {
+  text-align: right;
+}
+
+.consent-detail-header {
+  display: flex;
+  justify-content: space-between;
+}
+
+#overlay {
+  width: 100vw;
+  height: 100vh;
+  position: fixed;
+  top: 0;
+  left: 0;
+  background-color: rgba(0, 0, 0, 0.6);
+  color: #fff;
+  z-index: 20;
+  overflow: hidden;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.new-patient-button {
+  display: flex;
+  align-items: center;
+}
+
+.form-control-error {
+  border: 1px solid red;
+}
+
+.badge {
+  position: absolute;
+  right: 0.5em;
+}
+
+.hidden-badge {
+  display: none;
+}
+
+@media print {
+  table tr > th {
+    background-color: #D9D9D9 !important;
+    -webkit-print-color-adjust: exact;
+  }
+}

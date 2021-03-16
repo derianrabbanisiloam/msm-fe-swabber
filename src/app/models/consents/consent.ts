@@ -15,4 +15,6 @@ export class Consent {
   modified_by: string;
   detail: ConsentDetail[];
   vaccine_no: number;
+  consent_type: string;
+  corporate_name: string;
 }

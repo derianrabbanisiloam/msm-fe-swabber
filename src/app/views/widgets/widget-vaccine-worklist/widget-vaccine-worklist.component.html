@@ -1,0 +1,190 @@
+<div class="fo_container_input_date">
+  <div class="filter-box">
+    <span class="foot-note">Appointment date</span>
+    <div class="date-picker-element">
+      <my-date-range-picker name="mydaterange" [options]="myDateRangePickerOptions" [(ngModel)]="datePickerModel"
+        (dateRangeChanged)="changeDateRange($event)" #date>
+      </my-date-range-picker>
+    </div>
+  </div>
+</div>
+
+<div class="fo_container_list shadow-4">
+  <table class="table table-bordered">
+    <thead class="fo_color_blue foot-note">
+      <th style="width: 1em;">No.</th>
+      <th style="width: 7em">Kode Unik</th>
+      <th style="width: 10em">Nama</th>
+      <th style="width: 10em">Tanggal Lahir</th>
+      <th style="width: 8em;">No. Telp</th>
+      <th style="width: 7em">Tgl Perjanjian</th>
+      <th style="width: 9em">Jam Perjanjian</th>
+      <th style="width: 7em;">Pre-Regis & Screening</th>
+			<th style="width: 5em; text-align: center;">Status Pasien</th>
+      <th style="width: 7em; text-align: center;">Notes</th>
+      <th style="width: 9em; text-align: center;">Action</th>
+    </thead>
+
+    <tbody>
+      <tr class="fo_header_grey filter-row">
+        <td></td>
+        <td>
+          <div class="inner-addon right-addon">
+            <i class="glyphicon fa fa-search"></i>
+            <input type="text" class="form-control" placeholder="Kode Unik" [(ngModel)]="model.uniqueCode"
+              (change)="searchVaccineList(true)" />
+          </div>
+        </td>
+        <td>
+          <div class="inner-addon right-addon">
+            <i class="glyphicon fa fa-search"></i>
+            <input type="text" class="form-control" placeholder="Name" [(ngModel)]="model.name"
+              (change)="searchVaccineList(true)" />
+          </div>
+        </td>
+        <td>
+          <div class="inner-addon right-addon">
+            <i class="glyphicon fa fa-search"></i>
+            <input [textMask]="{mask: mask_birth}" type="text" placeholder="Search dob" class="form-control"
+              [(ngModel)]="model.birth" (change)="searchVaccineList(true)" placeholder="dd-mm-yyyy" />
+          </div>
+        </td>
+        <td>
+          <div class="inner-addon right-addon">
+            <i class="glyphicon fa fa-search"></i>
+            <input type="text" class="form-control" placeholder="no telp" [(ngModel)]="model.phoneNumber"
+              (change)="searchVaccineList(true)" />
+          </div>
+        </td>
+        <td>
+          <div class="inner-addon right-addon">
+            <i class="glyphicon fa fa-search"></i>
+            <input [textMask]="{mask: mask_birth}" type="text" placeholder="app date" class="form-control"
+              [(ngModel)]="model.appDate" (change)="searchVaccineList(true)" placeholder="dd-mm-yyyy" />
+          </div>
+        </td>
+        <td></td>
+				<td>
+          <select id="title" class="form-control" (change)="searchVaccineList(true)" [(ngModel)]="model.isPreRegist" name="isPreRegist">
+            <option [ngValue]=undefined [selected]="model.isPreRegist === undefined">ALL</option>
+            <option value=true>Yes</option>
+            <option value=false>No</option>
+          </select>
+        </td>
+        <td>
+          <select id="title" class="form-control" (change)="searchVaccineList(true)" [(ngModel)]="model.patientStatus" name="patientStatus">
+            <option [ngValue]=undefined [selected]="model.patientStatus === undefined">ALL</option>
+            <option value=1>Not Registered</option>
+            <option value=2>Registered</option>
+            <option value=3>Screened</option>
+            <option value=4>Evaluated</option>
+            <option value=5>Vaccinated</option>
+            <option value=6>Cancelled Vaccination</option>
+          </select>
+        </td>
+        <td></td>
+        <td></td>
+      </tr>
+
+      <tr *ngFor="let itr of vaccineWorklist; let i=index" [ngClass]="{ 'row-red' : itr.participant_status === patientStatus.CANCELLED_VACCINATION }">
+        <td>{{i+1}}</td>
+        <td>{{itr.consent_code}}</td>
+        <td>
+          <a href="javascript:void(0)" (click)="openRescheduleModal(itr)">{{itr.name}}</a>
+        </td>
+        <td>{{itr.new_birth_date}}</td>
+        <td>{{itr.phone_number_1}}</td>
+        <td>{{itr.app_date}}</td>
+        <td>
+          <span *ngIf="itr.appointment_start_time && itr.appointment_end_time">
+            {{itr.appointment_start_time.substr(0,5)}} - {{itr.appointment_end_time.substr(0,5)}}
+          </span>
+        </td>
+        <td style="text-align: center;">
+          <span *ngIf="itr.consent_id !== null">Yes</span>
+          <span *ngIf="itr.consent_id === null">No</span>
+        </td>
+        <td style="text-align: center;">
+					<div>
+            <div *ngIf="itr.participant_status === patientStatus.NOT_REGISTERED">
+              <span>Not Registered</span>
+            </div>
+            <div *ngIf="itr.participant_status === patientStatus.REGISTERED">
+              <span>Registered</span>
+            </div>
+            <div *ngIf="itr.participant_status === patientStatus.SCREENED">
+              <span>Screened</span>
+            </div>
+            <div *ngIf="itr.participant_status === patientStatus.EVALUATED">
+              <span>Evaluated</span>
+            </div>
+            <div *ngIf="itr.participant_status === patientStatus.VACCINATED">
+              <span>Vaccinated</span>
+            </div>
+            <div *ngIf="itr.participant_status === patientStatus.CANCELLED_VACCINATION">
+              <span>Cancelled Vaccination</span>
+            </div>
+          </div>
+        </td>
+        <td></td>
+        <td>
+          <div class="cell-img-nav d-flex justify-content-center">
+            <div (click)="cancelAppointment(itr, confirmCancel)">
+              <img src="{{assetPath}}icons/ic_Cancel@2x.png">
+            </div>
+          </div>
+        </td>
+      </tr>
+      <tr style="text-align: center;">
+        <td *ngIf="showNotFoundMsg" colspan="13">Result not found</td>
+        <td *ngIf="showWaitMsg" colspan="13">
+          <ngb-progressbar value="1000">Loading...</ngb-progressbar>
+        </td>
+      </tr>
+    </tbody>
+  </table>
+</div>
+
+<section class="full-width" id="group-list-appointment">
+  <button *ngIf="isCanPrevPage" (click)="prevPage()" class="btn ms_btn_blue">
+    <img src="{{assetPath}}icons/ic_ArrowRight_White.png"> Prev
+  </button>
+  <span style="width:10px">&nbsp;</span>
+  <button *ngIf="isCanNextPage" (click)="nextPage()" class="btn ms_btn_blue">
+    Next <img src="{{assetPath}}icons/ic_ArrowLeft_White.png">
+  </button>
+</section>
+
+<ng-template #confirmPayment let-c="close" let-d="dismiss">
+  <div class="modal-header">
+    <h4 class="modal-title">Confirmation</h4>
+    <button type="button" class="close" aria-label="Close" (click)="d('Cross click')">
+      <span aria-hidden="true">&times;</span>
+    </button>
+  </div>
+  <div class="modal-body">
+    <p>Are you sure to proceed?</p>
+    <div class="fo_confirmation_button d-flex justify-content-center">
+      <button type="button" class="btn fo_btn_green" (click)="paymentProcess()"
+        (click)="c('Cross click')">Ok</button>
+      <button type="button" class="btn fo_btn_black" (click)="c('Cross click')">Cancel</button>
+    </div>
+  </div>
+</ng-template>
+
+<ng-template #confirmCancel let-c="close" let-d="dismiss">
+  <div class="modal-header">
+    <h4 class="modal-title">Confirmation</h4>
+    <button type="button" class="close" aria-label="Close" (click)="d('Cross click')">
+      <span aria-hidden="true">&times;</span>
+    </button>
+  </div>
+  <div class="modal-body">
+    <p>Are you sure to cancel appointment of {{ selectedCancel.name }} ?</p>
+    <div class="fo_confirmation_button d-flex justify-content-center">
+      <button type="button" class="btn fo_btn_black" (click)="cancelProcessApp(selectedCancel)"
+        (click)="c('Cross click')">Ok</button>
+      <button type="button" class="btn fo_btn_green" (click)="c('Cross click')">Cancel</button>
+    </div>
+  </div>
+</ng-template>

@@ -23,8 +23,7 @@ export class ConsentService {
     uniCode?: string, birth?: string, appDate?: string, name?: string, 
     phoneNumber?: string, isPreRegist?: boolean, patientStatus?: string): Observable<any> {
 
-    let uri = `${this.preregisUrl}/worklist/${hospital}?appointmentDate=${date}`;
-    uri = toDate ? `${uri}&toAppointmentDate=${toDate}` : uri;
+    let uri = `${this.preregisUrl}/worklist/${hospital}?appointmentDate=${date}&toAppointmentDate=${toDate}`;
     uri = uniCode ? `${uri}&uniqueCode=${uniCode}` : uri;
     uri = birth ? `${uri}&birthDate=${birth}` : uri;
     uri = appDate ? `${uri}&appDate=${appDate}` : uri;

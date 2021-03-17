@@ -4,6 +4,8 @@ import { FormsModule } from '@angular/forms';
 import { PageVaccineWorklistRoutingModule } from './page-vaccine-worklist-routing.module';
 import { PageVaccineWorklistComponent } from './page-vaccine-worklist.component';
 import { WidgetVaccineWorklistComponent } from '../../widgets/widget-vaccine-worklist/widget-vaccine-worklist.component';
+import { ModalRescheduleCheckupComponent } from '../../widgets/modal-reschedule-checkup/modal-reschedule-checkup.component';
+import { ModalRescheduleCheckupModule } from '../../widgets/modal-reschedule-checkup/modal-reschedule-checkup.module';
 import { SectionHeaderModule } from '../../sections/section-header/section-header.module';
 import { SectionSidebarModule } from '../../sections/section-sidebar/section-sidebar.module';
 import { SectionFooterModule } from '../../sections/section-footer/section-footer.module';
@@ -39,9 +41,12 @@ import { MyDateRangePickerModule } from 'mydaterangepicker';
     AutocompleteLibModule,
     NguiAutoCompleteModule,
     NgbModalModule,
-    MyDateRangePickerModule
+    MyDateRangePickerModule,
+    ModalRescheduleCheckupModule
   ], exports: [
     PageVaccineWorklistComponent
+  ], entryComponents: [
+    ModalRescheduleCheckupComponent
   ]
 })
 export class PageVaccineWorklistModule { }

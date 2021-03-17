@@ -7,6 +7,10 @@
       </my-date-range-picker>
     </div>
   </div>
+
+  <div *ngFor="let alert of alerts">
+    <ngb-alert *ngIf="alert" type="{{cssAlertType(alert)}}" (close)="removeAlert(alert)">{{ alert.message }}</ngb-alert>
+  </div>
 </div>
 
 <div class="fo_container_list shadow-4">
@@ -15,13 +19,13 @@
       <th style="width: 1em;">No.</th>
       <th style="width: 7em">Kode Unik</th>
       <th style="width: 10em">Nama</th>
-      <th style="width: 10em">Tanggal Lahir</th>
+      <th style="width: 8em">Tanggal Lahir</th>
       <th style="width: 8em;">No. Telp</th>
-      <th style="width: 7em">Tgl Perjanjian</th>
+      <th style="width: 8em">Tgl Perjanjian</th>
       <th style="width: 9em">Jam Perjanjian</th>
       <th style="width: 7em;">Pre-Regis & Screening</th>
 			<th style="width: 5em; text-align: center;">Status Pasien</th>
-      <th style="width: 7em; text-align: center;">Notes</th>
+      <th style="width: 8em; text-align: center;">Notes</th>
       <th style="width: 9em; text-align: center;">Action</th>
     </thead>
 
@@ -66,14 +70,14 @@
         <td></td>
 				<td>
           <select id="title" class="form-control" (change)="searchVaccineList(true)" [(ngModel)]="model.isPreRegist" name="isPreRegist">
-            <option [ngValue]=undefined [selected]="model.isPreRegist === undefined">ALL</option>
+            <option [ngValue]=null [selected]="model.isPreRegist === null">ALL</option>
             <option value=true>Yes</option>
             <option value=false>No</option>
           </select>
         </td>
         <td>
           <select id="title" class="form-control" (change)="searchVaccineList(true)" [(ngModel)]="model.patientStatus" name="patientStatus">
-            <option [ngValue]=undefined [selected]="model.patientStatus === undefined">ALL</option>
+            <option [ngValue]=null [selected]="model.patientStatus === null">ALL</option>
             <option value=1>Not Registered</option>
             <option value=2>Registered</option>
             <option value=3>Screened</option>
@@ -86,11 +90,12 @@
         <td></td>
       </tr>
 
-      <tr *ngFor="let itr of vaccineWorklist; let i=index" [ngClass]="{ 'row-red' : itr.participant_status === patientStatus.CANCELLED_VACCINATION }">
+      <tr *ngFor="let itr of vaccineWorklist; let i=index" [ngClass]="{ 'row-pink' : itr.order_status === '2' }">
         <td>{{i+1}}</td>
         <td>{{itr.consent_code}}</td>
         <td>
           <a href="javascript:void(0)" (click)="openRescheduleModal(itr)">{{itr.name}}</a>
+          <!-- {{itr.name}} -->
         </td>
         <td>{{itr.new_birth_date}}</td>
         <td>{{itr.phone_number_1}}</td>
@@ -126,10 +131,16 @@
             </div>
           </div>
         </td>
-        <td></td>
+        <td>
+          <a ngbPopover="{{itr.note}}" popoverTitle=""
+            triggers="mouseenter:mouseleave" href="javascript:void(0)" (click)="updateNote(itr, confirmUpdateNote)">
+            <span *ngIf="itr.note === null || itr.note === ''">(Insert Notes)</span>
+            <span *ngIf="itr.note !== null || itr.note !== ''">{{itr.note && itr.note.length > 10 ? itr.note.substr(0,10)+"..." : itr.note}}</span>
+          </a>
+        </td>
         <td>
           <div class="cell-img-nav d-flex justify-content-center">
-            <div (click)="cancelAppointment(itr, confirmCancel)">
+            <div *ngIf="itr.order_status !== '2'" (click)="cancelAppointment(itr, confirmCancel)">
               <img src="{{assetPath}}icons/ic_Cancel@2x.png">
             </div>
           </div>
@@ -182,9 +193,30 @@
   <div class="modal-body">
     <p>Are you sure to cancel appointment of {{ selectedCancel.name }} ?</p>
     <div class="fo_confirmation_button d-flex justify-content-center">
-      <button type="button" class="btn fo_btn_black" (click)="cancelProcessApp(selectedCancel)"
+      <button type="button" class="btn fo_btn_green" (click)="cancelAppUpdateNote(selectedCancel,'cancel')"
         (click)="c('Cross click')">Ok</button>
-      <button type="button" class="btn fo_btn_green" (click)="c('Cross click')">Cancel</button>
+      <button type="button" class="btn ms_btn_red" (click)="c('Cross click')">Cancel</button>
+    </div>
+  </div>
+</ng-template>
+
+<ng-template #confirmUpdateNote let-c="close" let-d="dismiss">
+  <div class="modal-header">
+    <h4 class="modal-title">Update Note</h4>
+    <button type="button" class="close" aria-label="Close" (click)="d('Cross click')">
+      <span aria-hidden="true">&times;</span>
+    </button>
+  </div>
+  <div class="modal-body">
+    <div class="col-md-12">
+      <label>Note</label>
+      <textarea rows="5" [(ngModel)]="selectedNote.note"
+        class="form-control custom_select" maxlength="250"></textarea>
+    </div>
+    <div class="fo_confirmation_button d-flex justify-content-center">
+      <button type="button" class="btn fo_btn_green" (click)="cancelAppUpdateNote(selectedNote, 'note')"
+        (click)="c('Cross click')">Update</button>
+      <button type="button" class="btn ms_btn_red" (click)="c('Cross click')">Cancel</button>
     </div>
   </div>
 </ng-template>

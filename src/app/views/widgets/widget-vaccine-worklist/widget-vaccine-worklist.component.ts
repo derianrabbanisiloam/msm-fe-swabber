@@ -10,6 +10,7 @@ import { IMyDrpOptions } from 'mydaterangepicker';
 import { patientStatus } from '../../../variables/common.variable';
 import { sourceApps } from '../../../variables/common.variable';
 import { environment } from '../../../../environments/environment';
+import { ModalRescheduleCheckupComponent } from '../../widgets/modal-reschedule-checkup/modal-reschedule-checkup.component';
 import Swal from 'sweetalert2';
 
 @Component({
@@ -28,7 +29,7 @@ export class WidgetVaccineWorklistComponent implements OnInit {
   public offset = 0;
   public model: any = { 
     date: '', toDate: '', uniqueCode: '', birth: '', appDate: '',
-    name: '', phoneNumber: ''};
+    name: '', phoneNumber: '', patientStatus: null, isPreRegist: null};
   public showWaitMsg: boolean = false;
   public showNotFoundMsg: boolean = false;
   public isCanPrevPage: boolean = false;
@@ -44,6 +45,7 @@ export class WidgetVaccineWorklistComponent implements OnInit {
   public todayDateISO: any = moment().format('YYYY-MM-DD');
   public selectedCancel: any;
   public closeResult: string;
+  public selectedNote: any;
 
   constructor(
     private alertService: AlertService,
@@ -58,6 +60,7 @@ export class WidgetVaccineWorklistComponent implements OnInit {
 
   ngOnInit() {
     this.initializeDateRangePicker();
+    this.getCollectionAlert();
   }
 
   initializeDateRangePicker() {
@@ -100,7 +103,7 @@ export class WidgetVaccineWorklistComponent implements OnInit {
     this.model.name = '';
     this.model.phoneNumber = '';
     this.model.isPreRegist = null;
-    this.model.patientStatus = '';
+    this.model.patientStatus = null;
   }
 
   async searchVaccineList(search?: boolean) {
@@ -111,7 +114,7 @@ export class WidgetVaccineWorklistComponent implements OnInit {
     let uniCode = uniqueCode ? uniqueCode.toUpperCase() : '';
 
     if (date || toDate || uniCode || birth || appDate || name || phoneNumber || isPreRegist || patientStatus) {
-      this.getVaccineList(date || toDate || uniCode, birth, appDate, name, phoneNumber, isPreRegist, patientStatus);
+      this.getVaccineList(date, toDate, uniCode, birth, appDate, name, phoneNumber, isPreRegist, patientStatus);
     } else {
       this.getVaccineList();
     }
@@ -121,13 +124,13 @@ export class WidgetVaccineWorklistComponent implements OnInit {
     isPreRegist = null, patientStatus = '') {
     this.showWaitMsg = true;
     this.showNotFoundMsg = false;
-;
+
     const hospital = this.hospital.id;
 
     const limit = this.limit;
     const offset = this.offset;
 
-    this.vaccineWorklist = await this.consentService.getVaccineWorklist(date, null, hospital, limit, offset, uniCode,
+    this.vaccineWorklist = await this.consentService.getVaccineWorklist(date, toDate, hospital, limit, offset, uniCode,
       birth, appDate, name, phoneNumber, isPreRegist, patientStatus)
       .toPromise().then(res => {
         if (res.data.length > 0) {
@@ -159,15 +162,26 @@ export class WidgetVaccineWorklistComponent implements OnInit {
     this.openconfirmation(content);
   }
 
-  cancelProcessApp(val){
-    const appointmentId = val.order_id;
-    const body = { 
-      userId: this.user.id,
-      userName: this.user.fullname,
-      source: sourceApps
-    };
+  updateNote(val, content) {
+    this.selectedNote = val;
+    this.openconfirmation(content);
+  }
 
-    this.appointmentService.deleteAppointment(appointmentId, body)
+  cancelAppUpdateNote(val, option){
+    const registrationFormId = val.registration_form_id;
+    let body;
+    console.log('asdfasdfasf', option)
+    if(option === 'cancel') {
+      body = {
+        isCancelOrder: true
+      };
+    } else {
+      body = {
+        note: this.selectedNote.note
+      };
+    }
+
+    this.appointmentService.deleteAppointmentVaccine(registrationFormId, body)
       .toPromise().then(res => {
         this.alertService.success(res.message, false, 3000);
         this.searchVaccineList(false);
@@ -182,6 +196,12 @@ export class WidgetVaccineWorklistComponent implements OnInit {
     }, (reason) => {
       this.closeResult = `Dismissed ${this.getDismissReason(reason)}`;
     });
+  }
+
+  openRescheduleModal(appointmentSelected: any) {
+    const modalRef = this.modalService.open(ModalRescheduleCheckupComponent,
+      { windowClass: 'cc_modal_confirmation', size: 'lg' });
+      modalRef.componentInstance.appointmentSelected = appointmentSelected;
   }
 
   nextPage() {
@@ -205,7 +225,6 @@ export class WidgetVaccineWorklistComponent implements OnInit {
         this.alerts = [];
         return;
       }
-      
       // add alert to array
       this.alerts.push(alert);
     });

@@ -94,8 +94,8 @@
         <td>{{i+1}}</td>
         <td>{{itr.consent_code}}</td>
         <td>
-          <a href="javascript:void(0)" (click)="openRescheduleModal(itr)">{{itr.name}}</a>
-          <!-- {{itr.name}} -->
+          <span *ngIf="itr.appointment_id !== null"><a href="javascript:void(0)" (click)="openRescheduleModal(itr)">{{itr.name}}</a></span>
+          <span *ngIf="itr.appointment_id === null">{{itr.name}}</span>
         </td>
         <td>{{itr.new_birth_date}}</td>
         <td>{{itr.phone_number_1}}</td>

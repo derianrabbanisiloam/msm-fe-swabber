@@ -9,7 +9,7 @@ import { TextMaskModule } from 'angular2-text-mask';
 import { NguiAutoCompleteModule } from '@ngui/auto-complete';
 import { AutocompleteLibModule } from 'angular-ng-autocomplete';
 import { ModalRescheduleCheckupComponent } from './modal-reschedule-checkup.component';
-import { WidgetVaccineScheduleModule } from '../widget-Vaccine-schedule/widget-Vaccine-schedule.module';
+import { WidgetVaccineScheduleModule } from '../widget-Vaccine-schedule/widget-vaccine-schedule.module';
 import { WidgetCreateAppVaccineModule } from '../widget-create-app-vaccine/widget-create-app-vaccine.module';
 
 @NgModule({

@@ -20,6 +20,7 @@ export class DoctorService {
   ) { }
 
   private doctorUrl = environment.OPADMIN_SERVICE + '/doctors';
+  private noteCovidUrl = environment.OPADMIN_SERVICE + '/checkups';
   private scheduleUrl = environment.OPADMIN_SERVICE + '/schedules';
   private specialityUrl = environment.OPADMIN_SERVICE + '/generals/specialities';
 
@@ -54,6 +55,14 @@ export class DoctorService {
     const urlDefault = `${url}${hospital}?fromDate=${fromDate}&toDate=${toDate}`;
     url = doctor ? `${url}${hospital}?doctorId=${doctor}&fromDate=${fromDate}&toDate=${toDate}` : urlDefault;
     return this.http.get<DoctorNote[]>(url, httpOptions);
+  }
+
+  getDoctorNotesCovid(hospital: string, fromDate: string, toDate: string, checkupId?: string): Observable<any> {
+    const uri = '/schedule/note/';
+
+    let url = this.noteCovidUrl + uri;
+    const urlDefault = `${url}${hospital}?checkupId=${checkupId}&fromDate=${fromDate}&toDate=${toDate}`;
+    return this.http.get<DoctorNote[]>(urlDefault, httpOptions);
   }
 
   postDoctorNotes(hospital: string, payload: any) {

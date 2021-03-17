@@ -135,3 +135,12 @@ export const pathImage = {
   DISCLAIMER: '/disclaimer_1/',
   BPJS_CARD: '/bpjs_identity_card'
 }
+
+export const patientStatus = {
+  NOT_REGISTERED: '1',
+  REGISTERED: '2',
+  SCREENED: '3',
+  EVALUATED: '4',
+  VACCINATED: '5',
+  CANCELLED_VACCINATION: '6'
+};

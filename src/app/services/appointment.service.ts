@@ -18,7 +18,9 @@ export class AppointmentService {
 
   private appointmentUrl = environment.FRONT_OFFICE_SERVICE + '/appointments';
   private ccAppointmentUrl = environment.CALL_CENTER_SERVICE + '/appointments';
+  private ccAppointmentCovidUrl = environment.CALL_CENTER_SERVICE + '/appointments/covid';
   private rescheduleUrl = environment.CALL_CENTER_SERVICE + '/appointments/reschedules';
+  private rescheduleVaccineUrl = environment.CALL_CENTER_SERVICE + '/appointments/reschedules/covid';
   private reserveSlotAppUrl = environment.CALL_CENTER_SERVICE + '/appointments/reserved-slot';
   private appointmentRescheduleCount = environment.CALL_CENTER_SERVICE + '/appointments/reschedules/count';
   private appointmentRescheduleAidoCount = environment.CALL_CENTER_SERVICE + '/appointments/reschedules/count/aido';
@@ -168,6 +170,11 @@ export class AppointmentService {
     return this.http.get<any>(url, httpOptions);
   }
 
+  getAppointmentCovidById(appointmentId: string): Observable<any> {
+    const url = `${this.ccAppointmentCovidUrl}/detail/${appointmentId}`;
+    return this.http.get<any>(url, httpOptions);
+  }
+
   getRescheduleWorklist(
     hospitalId: string,
     fromDate: string,
@@ -240,6 +247,10 @@ export class AppointmentService {
     return this.http.post<any>(this.rescheduleUrl, addReschedulePayload, httpOptions);
   }
 
+  addRescheduleAppointmentVaccine(addReschedulePayload: any): Observable<any> {
+    return this.http.post<any>(this.rescheduleVaccineUrl, addReschedulePayload, httpOptions);
+  }
+
   deleteAppointment(appointmentId: string, payload: any, temp = false, isAido = false) {
     let url = `${this.ccAppointmentUrl}`;
 
@@ -265,6 +276,12 @@ export class AppointmentService {
     return this.http.delete<any>(url, options);
   }
 
+  deleteAppointmentVaccine(registrationFormId: string, payload: any) {
+    let url = `${this.preRegistrationUrl}/worklist/${registrationFormId}`;
+    const body = JSON.stringify(payload);
+    return this.http.put<any>(url, body, httpOptions);
+  }
+
   getAppointmentByScheduleId(scheduleId: string, date: string, sortBy?: string, orderBy?: string): Observable<any> {
     const url = `${this.ccAppointmentUrl}?scheduleId=${scheduleId}&date=${date}&sortBy=${sortBy}&orderBy=${orderBy}`;
     // return of(APPOINTMENT);
@@ -273,6 +290,12 @@ export class AppointmentService {
 
   getAppointmentByDay(hospitalId: string, doctorId: string, date: string, sortBy?: string, orderBy?: string): Observable<any> {
     let url = `${this.ccAppointmentUrl}?hospitalId=${hospitalId}&doctorId=${doctorId}&date=${date}&sortBy=${sortBy}&orderBy=${orderBy}`;
+    return this.http.get<any>(url, httpOptions);
+  }
+
+  getAppointmentByDayCovid(hospitalId: string, checkupId: string, date: string, isDriveThru?: boolean): Observable<any> {
+    let url = `${this.ccAppointmentCovidUrl}/list?hospitalId=${hospitalId}&checkUpId=${checkupId}&date=${date}`;
+    url = isDriveThru !== null && isDriveThru !== undefined ? `${url}&isDriveThru=${isDriveThru}` : url;
     return this.http.get<any>(url, httpOptions);
   }
 

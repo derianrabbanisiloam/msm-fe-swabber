@@ -59,6 +59,11 @@ export class WidgetVaccineWorklistComponent implements OnInit {
    }
 
   ngOnInit() {
+    window.scrollTo({
+      left: 0,
+      top: 0,
+      behavior: 'smooth',
+    });
     this.initializeDateRangePicker();
     this.getCollectionAlert();
   }
@@ -170,7 +175,6 @@ export class WidgetVaccineWorklistComponent implements OnInit {
   cancelAppUpdateNote(val, option){
     const registrationFormId = val.registration_form_id;
     let body;
-    console.log('asdfasdfasf', option)
     if(option === 'cancel') {
       body = {
         isCancelOrder: true

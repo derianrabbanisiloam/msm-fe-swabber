@@ -91,7 +91,7 @@
       </tr>
 
       <tr *ngFor="let itr of vaccineWorklist; let i=index" [ngClass]="{ 'row-pink' : itr.order_status === '2' }">
-        <td>{{i+1}}</td>
+        <td>{{(i+1+offset)}}</td>
         <td>{{itr.consent_code}}</td>
         <td>
           <span *ngIf="itr.appointment_id !== null"><a href="javascript:void(0)" (click)="openRescheduleModal(itr)">{{itr.name}}</a></span>

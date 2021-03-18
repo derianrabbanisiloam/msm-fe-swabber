@@ -65,7 +65,7 @@
     <div class="row">
       <div class="col-md-3">
         <span style="color: red;" *ngIf="!checkupCategoryVal">*Please find a checkup category first</span>
-        <select id="checkupCategory" (change)="searchCheckupCategories()" style="width: 20em;" class="form-control"
+        <select id="checkupCategory" [disabled]="flagDisable" (change)="searchCheckupCategories()" style="width: 20em;" class="form-control"
           [(ngModel)]="checkupCategoryVal" name="checkupCategory" required>
           <option *ngFor="let category of checkupCategoriesList" [ngValue]="category">
             {{category.checkup_name}}
@@ -108,9 +108,9 @@
         </p>
       </div>
       <div class="col-md-4" style="text-align: right">
-        <button class="ms_btn_border ms_btn_black" style="padding: 0.3vw 0vw; width: 7vw" #close_btn_reschedule
+        <button class="btn ms_btn_border ms_btn_black" style="padding: 0.3vw 0vw; width: 7vw" #close_btn_reschedule
           aria-label="Close" (click)="close()">Cancel</button>
-        <button class="ms_btn_border ms_btn_green" style="padding: 0.3vw 0vw; width: 7vw" (click)="updateAppointment()"
+        <button class="btn ms_btn_border ms_btn_green" [disabled]="flagDisable" style="padding: 0.3vw 0vw; width: 7vw" (click)="updateAppointment()"
           (click)="close()">Save & Close</button>
       </div>
     </div>

@@ -66,6 +66,8 @@ export class ModalRescheduleCheckupComponent implements OnInit {
   public showSchedule: boolean = false;
   public checkupCategoryVal: any;
   public doctorValNonBpjs: any;
+  public appData: any;
+  public flagDisable: boolean = false;
 
   constructor(
     private appointmentService: AppointmentService,
@@ -78,11 +80,31 @@ export class ModalRescheduleCheckupComponent implements OnInit {
   ) { }
 
   async ngOnInit() {
+    this.getAppIdbyRegFormId();
     this.getCheckupCategoriesList();
     this.modifiedDate = moment(this.appointmentSelected.modified_date).format('DD-MM-YYYY');
     this.createdDate = moment(this.appointmentSelected.created_date).format('DD-MM-YYYY');
     this.rescheduleSelected.note = this.appointmentSelected.note;
     this.editModel.phoneNo = this.appointmentSelected.phone_number_1;
+  }
+
+  async getAppIdbyRegFormId() {
+    let regisFormId = this.appointmentSelected.registration_form_id ? this.appointmentSelected.registration_form_id : null;
+    if(regisFormId) {
+      this.appData = await this.appointmentService.getAppointmentByRegisFormId(regisFormId).toPromise()
+      .then(res => {
+        if(res.data.length > 0) {
+          this.flagDisable = false;
+          return res.data;
+        } else {
+          this.flagDisable = true;
+          return null
+        }
+        }).catch(err => {
+          this.flagDisable = true;
+          return null;
+        });
+    }
   }
 
   async getCheckupCategoriesList() {
@@ -234,8 +256,8 @@ export class ModalRescheduleCheckupComponent implements OnInit {
     }
 
     this.rescheduleAppPayload = {
-      appointmentId: app.appointment_id,
-      channelId: app.channel_id ? app.channel_id : '2',
+      appointmentId: this.appData[0].appointment_id ? this.appData[0].appointment_id : null,
+      channelId: this.appData[0].channel_id ? this.appData[0].channel_id : '2',
       appointmentDate: sch.date,
       appointmentFromTime: sch.from_time,
       appointmentToTime: sch.to_time,

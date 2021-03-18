@@ -175,6 +175,11 @@ export class AppointmentService {
     return this.http.get<any>(url, httpOptions);
   }
 
+  getAppointmentByRegisFormId(registrationFormId: string): Observable<any> {
+    const url = `${this.preRegistrationUrl}/appointment/${registrationFormId}`;
+    return this.http.get<any>(url, httpOptions);
+  }
+
   getRescheduleWorklist(
     hospitalId: string,
     fromDate: string,

@@ -77,21 +77,21 @@
     <div class="header-2 header-doctor" style="border-bottom: 1px solid black; background-color: #E1E1E1;">
       {{checkupName}}</div>
     <div class="container-table">
-      <table border="0" class="">
-        <thead *ngFor="let sch of checkUpSchedules">
+      <table border="0" *ngFor="let sch of checkUpSchedules">
+        <thead>
           <tr>
             <th class="hack" *ngFor="let date of dates"
               [ngStyle]="{'background': date.dateISO == todayDateISO ? '#ccc' : '' }">
-              <span *ngIf="holidaysSpecialty.indexOf(sch.checkup_id+'-'+date.dateISO+'-'+sch.hospital_id) != -1"
-                class="unavailable">{{date.dateHeader}} * {{holidaysName[holidaysSpecialty.indexOf(sch.checkup_id+'-'+date.dateISO+'-'+sch.hospital_id)]}}</span>
-              <span *ngIf="!(holidaysSpecialty.indexOf(sch.checkup_id+'-'+date.dateISO+'-'+sch.hospital_id) != -1)">{{date.dateHeader}}</span>
+              <span *ngIf="holidaysSpecialty.indexOf(sch.checkUpId+'-'+date.dateISO+'-'+sch.hospital_id) != -1"
+              class="unavailable">{{date.dateHeader}} * {{holidaysName[holidaysSpecialty.indexOf(sch.checkUpId+'-'+date.dateISO+'-'+sch.hospital_id)]}}</span>
+              <span *ngIf="!(holidaysSpecialty.indexOf(sch.checkUpId+'-'+date.dateISO+'-'+sch.hospital_id) != -1)">{{date.dateHeader}}</span>
             </th>
           </tr>
         </thead>
         <tbody>
           <tr>
             <td *ngFor="let date of dates">
-              <ng-container *ngFor="let itemSch of checkUpSchedules">
+              <ng-container *ngFor="let itemSch of sch.schedules">
                 <span *ngIf="(itemSch.day == date.dateDay && date.dateISO >= todayDateISO)
                   && !(holidaysSpecialty.indexOf(itemSch.checkup_id+'-'+date.dateISO+'-'+itemSch.hospital_id) != -1)">
                   <a (click)="gotoCreateApp(itemSch, date.dateISO)" *ngIf="itemSch.day == date.dateDay && date.dateISO >= todayDateISO && isOriginal">

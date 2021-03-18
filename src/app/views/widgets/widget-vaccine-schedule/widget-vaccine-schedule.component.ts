@@ -21,7 +21,11 @@ export class WidgetVaccineScheduleComponent implements OnInit {
   public user = this.key.user;
   public keywords: any = {};
   private dates: any = [];
-  public checkUpSchedules: any;
+  public checkUpSchedules: any = [{
+    checkUpId: null,
+    schedules: []
+  }];
+  public checkUpTemp: any;
   public showScheduleType1: boolean = false;
   public showScheduleType2: boolean = false;
   public todayDateISO: any = moment().format('YYYY-MM-DD');
@@ -142,8 +146,10 @@ export class WidgetVaccineScheduleComponent implements OnInit {
   getCheckUpSchedulesById(checkup_id: any, isDriveThru?) {
     this.scheduleService.getCheckUpSchedule(this.hospital.id, checkup_id, null, isDriveThru)
       .subscribe(data => {
-        this.checkUpSchedules = data.data;
-        if (this.checkUpSchedules.length > 0) {
+        this.checkUpTemp = data.data;
+        if (data.data.length > 0) {
+          this.checkUpSchedules[0].checkUpId = this.checkUpTemp[0].checkup_id;
+          this.checkUpSchedules[0].schedules = this.checkUpTemp;
           this.checkupName = this.checkUpSchedules[0].checkup_name;
           this.showScheduleType1 = false;
           this.showScheduleType2 = true;
@@ -157,6 +163,8 @@ export class WidgetVaccineScheduleComponent implements OnInit {
           };
         }
       });
+
+      
   }
 
   async getLeaveHeader(keywords: any) {

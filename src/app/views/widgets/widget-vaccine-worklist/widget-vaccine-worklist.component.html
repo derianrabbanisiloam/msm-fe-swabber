@@ -1,15 +1,47 @@
 <div class="fo_container_input_date">
-  <div class="filter-box">
-    <span class="foot-note">Appointment date</span>
-    <div class="date-picker-element">
-      <my-date-range-picker name="mydaterange" [options]="myDateRangePickerOptions" [(ngModel)]="datePickerModel"
-        (dateRangeChanged)="changeDateRange($event)" #date>
-      </my-date-range-picker>
+  <div class="row">
+    <div class="col-md-3">
+      <span class="foot-note">Appointment date</span>
+      <div class="date-picker-element">
+        <my-date-range-picker name="mydaterange" [options]="myDateRangePickerOptions" [(ngModel)]="datePickerModel"
+          (dateRangeChanged)="changeDateRange($event)" #date>
+        </my-date-range-picker>
+      </div>
+    </div>
+    <div class="col-md-2">
+      <span class="foot-note">Pre-Regis & Screening</span>
+      <select id="title" class="form-control" (change)="noResetFilter(true, false)" [(ngModel)]="model.isPreRegist" name="isPreRegist">
+        <option [ngValue]=null [selected]="model.isPreRegist === null">ALL</option>
+        <option value=true>Yes</option>
+        <option value=false>No</option>
+      </select>
+    </div>
+    <div class="col-md-2">
+      <span class="foot-note">Status Pasien</span>
+      <select id="title" class="form-control" (change)="noResetFilter(true, false)" [(ngModel)]="model.patientStatus" name="patientStatus">
+        <option [ngValue]=null [selected]="model.patientStatus === null">ALL</option>
+        <option value=1>Not Registered</option>
+        <option value=2>Registered</option>
+        <option value=3>Screened</option>
+        <option value=4>Evaluated</option>
+        <option value=5>Vaccinated</option>
+        <option value=6>Cancelled Vaccination</option>
+      </select>
+    </div>
+    <div class="col-md-5">
+      <div *ngFor="let alert of alerts">
+        <ngb-alert *ngIf="alert" type="{{cssAlertType(alert)}}" (close)="removeAlert(alert)">{{ alert.message }}</ngb-alert>
+      </div>
     </div>
   </div>
-
-  <div *ngFor="let alert of alerts">
-    <ngb-alert *ngIf="alert" type="{{cssAlertType(alert)}}" (close)="removeAlert(alert)">{{ alert.message }}</ngb-alert>
+  <div class="row">
+    <div class="col-md-12">
+      <div class="space-export-button">
+        <button class="btn ms_btn_blue" (click)="downloadCsv()">
+          Export
+        </button>
+      </div>
+    </div>
   </div>
 </div>
 
@@ -18,15 +50,15 @@
     <thead class="fo_color_blue foot-note">
       <th style="width: 1em;">No.</th>
       <th style="width: 7em">Kode Unik</th>
-      <th style="width: 10em">Nama</th>
-      <th style="width: 8em">Tanggal Lahir</th>
-      <th style="width: 8em;">No. Telp</th>
-      <th style="width: 8em">Tgl Perjanjian</th>
+      <th style="width: 13em">Nama</th>
+      <th style="width: 9em">Tanggal Lahir</th>
+      <th style="width: 5em;">No. Telp</th>
+      <th style="width: 9em">Tgl Perjanjian</th>
       <th style="width: 9em">Jam Perjanjian</th>
       <th style="width: 7em;">Pre-Regis & Screening</th>
 			<th style="width: 5em; text-align: center;">Status Pasien</th>
-      <th style="width: 8em; text-align: center;">Notes</th>
-      <th style="width: 9em; text-align: center;">Action</th>
+      <th style="width: 8.5em; text-align: center;">Notes</th>
+      <th style="width: 7em; text-align: center;">Action</th>
     </thead>
 
     <tbody>
@@ -69,14 +101,14 @@
         </td>
         <td></td>
 				<td>
-          <select id="title" class="form-control" (change)="searchVaccineList(true)" [(ngModel)]="model.isPreRegist" name="isPreRegist">
+          <select id="title" class="form-control" (change)="noResetFilter(true, true)" [(ngModel)]="model.isPreRegist" name="isPreRegist">
             <option [ngValue]=null [selected]="model.isPreRegist === null">ALL</option>
             <option value=true>Yes</option>
             <option value=false>No</option>
           </select>
         </td>
         <td>
-          <select id="title" class="form-control" (change)="searchVaccineList(true)" [(ngModel)]="model.patientStatus" name="patientStatus">
+          <select id="title" class="form-control" (change)="noResetFilter(true, true)" [(ngModel)]="model.patientStatus" name="patientStatus">
             <option [ngValue]=null [selected]="model.patientStatus === null">ALL</option>
             <option value=1>Not Registered</option>
             <option value=2>Registered</option>
@@ -94,8 +126,8 @@
         <td>{{(i+1+offset)}}</td>
         <td>{{itr.consent_code}}</td>
         <td>
-          <span *ngIf="itr.appointment_id !== null"><a href="javascript:void(0)" (click)="openRescheduleModal(itr)">{{itr.name}}</a></span>
-          <span *ngIf="itr.appointment_id === null">{{itr.name}}</span>
+          <span *ngIf="itr.participant_status === patientStatus.NOT_REGISTERED"><a href="javascript:void(0)" (click)="openRescheduleModal(itr)">{{itr.name}}</a></span>
+          <span *ngIf="itr.participant_status !== patientStatus.NOT_REGISTERED">{{itr.name}}</span>
         </td>
         <td>{{itr.new_birth_date}}</td>
         <td>{{itr.phone_number_1}}</td>
@@ -109,28 +141,7 @@
           <span *ngIf="itr.consent_id !== null">Yes</span>
           <span *ngIf="itr.consent_id === null">No</span>
         </td>
-        <td style="text-align: center;">
-					<div>
-            <div *ngIf="itr.participant_status === patientStatus.NOT_REGISTERED">
-              <span>Not Registered</span>
-            </div>
-            <div *ngIf="itr.participant_status === patientStatus.REGISTERED">
-              <span>Registered</span>
-            </div>
-            <div *ngIf="itr.participant_status === patientStatus.SCREENED">
-              <span>Screened</span>
-            </div>
-            <div *ngIf="itr.participant_status === patientStatus.EVALUATED">
-              <span>Evaluated</span>
-            </div>
-            <div *ngIf="itr.participant_status === patientStatus.VACCINATED">
-              <span>Vaccinated</span>
-            </div>
-            <div *ngIf="itr.participant_status === patientStatus.CANCELLED_VACCINATION">
-              <span>Cancelled Vaccination</span>
-            </div>
-          </div>
-        </td>
+        <td style="text-align: center;">{{itr.status}}</td>
         <td>
           <a ngbPopover="{{itr.note}}" popoverTitle=""
             triggers="mouseenter:mouseleave" href="javascript:void(0)" (click)="updateNote(itr, confirmUpdateNote)">
@@ -156,15 +167,24 @@
   </table>
 </div>
 
-<section class="full-width" id="group-list-appointment">
-  <button *ngIf="isCanPrevPage" (click)="prevPage()" class="btn ms_btn_blue">
-    <img src="{{assetPath}}icons/ic_ArrowRight_White.png"> Prev
-  </button>
-  <span style="width:10px">&nbsp;</span>
-  <button *ngIf="isCanNextPage" (click)="nextPage()" class="btn ms_btn_blue">
-    Next <img src="{{assetPath}}icons/ic_ArrowLeft_White.png">
-  </button>
-</section>
+<div class="row">
+  <div class="col-md-9" style="text-align: left;">
+    <button *ngIf="isCanPrevPage" (click)="prevPage()" class="btn ms_btn_blue">
+      <img src="{{assetPath}}icons/ic_ArrowRight_White.png"> Prev
+    </button>
+    <span style="width:10px">&nbsp;</span>
+    <button *ngIf="isCanNextPage" (click)="nextPage()" class="btn ms_btn_blue">
+      Next <img src="{{assetPath}}icons/ic_ArrowLeft_White.png">
+    </button>
+  </div>
+  <div class="col-md-3" style="text-align: right; font-weight: bold;">
+    <div style="text-align: left; margin-left: 5rem;" *ngIf="counter !== ''">
+      <div>Jumlah Registrasi: {{counter.total}}</div>
+      <div>Jumlah PreRegist/Screen: {{counter.screened}}</div>
+    </div>
+    
+  </div>
+</div>
 
 <ng-template #confirmPayment let-c="close" let-d="dismiss">
   <div class="modal-header">

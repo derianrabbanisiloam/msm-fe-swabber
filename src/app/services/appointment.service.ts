@@ -42,6 +42,8 @@ export class AppointmentService {
 
   private updateNotesSource = new Subject<boolean>();
   public updateNotesSource$ = this.updateNotesSource.asObservable();
+  private urlDownloadCsv = new Subject<string>();
+  public urlDownloadCsv$ = this.urlDownloadCsv.asObservable();
 
   emitCloseModal(params: boolean) {
     this.closeModalSource.next(params);
@@ -65,6 +67,10 @@ export class AppointmentService {
 
   emitUpdateNotes(params: boolean) {
     this.updateNotesSource.next(params);
+  }
+
+  emitUrlDownload(params: string) {
+    this.urlDownloadCsv.next(params);
   }
 
   getOrderList(date: any, hospital: string, limit: number, offset: number,

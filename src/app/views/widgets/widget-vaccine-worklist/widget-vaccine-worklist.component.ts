@@ -12,6 +12,7 @@ import { sourceApps } from '../../../variables/common.variable';
 import { environment } from '../../../../environments/environment';
 import { ModalRescheduleCheckupComponent } from '../../widgets/modal-reschedule-checkup/modal-reschedule-checkup.component';
 import Swal from 'sweetalert2';
+import { HttpClient } from '@angular/common/http';
 
 @Component({
   selector: 'app-widget-vaccine-worklist',
@@ -39,19 +40,24 @@ export class WidgetVaccineWorklistComponent implements OnInit {
   private page: number = 0;
   public myDateRangePickerOptions: IMyDrpOptions = {
     dateFormat: 'dd/mm/yyyy',
-    height: '30px'
+    height: '28px',
+    width: '252px'
   };
   public datePickerModel: any = {};
   public todayDateISO: any = moment().format('YYYY-MM-DD');
   public selectedCancel: any;
   public closeResult: string;
   public selectedNote: any;
+  public counter: string = '';
+  public isResetFilter: boolean = true;
+  public urlDownload: string = '';
 
   constructor(
     private alertService: AlertService,
     private consentService: ConsentService,
     private appointmentService: AppointmentService,
     private modalService: NgbModal,
+    private http: HttpClient,
     modalSetting: NgbModalConfig,
   ) {
     modalSetting.backdrop = 'static';
@@ -66,7 +72,40 @@ export class WidgetVaccineWorklistComponent implements OnInit {
     });
     this.initializeDateRangePicker();
     this.getCollectionAlert();
+    this.emitUrlDownload();
   }
+
+  emitUrlDownload() {
+    this.appointmentService.urlDownloadCsv$.subscribe(
+      async (data) => {
+        this.urlDownload = data;
+      }
+    );
+  }
+
+  downloadCsv() {
+    if(this.urlDownload !== '' && this.vaccineWorklist.length > 0) {
+      let url = this.urlDownload+'&download=true';
+      let requestOptions = { responseType: 'blob' as 'blob' };
+      this.http.get(url, requestOptions).subscribe(val => {
+        let url = URL.createObjectURL(val);
+        this.downloadUrl(url);
+        URL.revokeObjectURL(url);
+      }, error => {
+        this.alertService.error(error.error.message, false, 3000);
+      });
+    }
+  }
+
+  downloadUrl(url) {
+    let a: any = document.createElement('a');
+    a.href = url;
+    a.download = 'Vaccine Worklist - '+this.todayDateISO+'.csv';
+    document.body.appendChild(a);
+    a.style = 'display: none';
+    a.click();
+    a.remove();
+  };
 
   initializeDateRangePicker() {
     const m = moment();
@@ -107,8 +146,15 @@ export class WidgetVaccineWorklistComponent implements OnInit {
     this.model.appDate = '';
     this.model.name = '';
     this.model.phoneNumber = '';
-    this.model.isPreRegist = null;
-    this.model.patientStatus = null;
+    if(this.isResetFilter === true) {
+      this.model.isPreRegist = null;
+      this.model.patientStatus = null;
+    }
+  }
+
+  async noResetFilter(search, flagReset) {
+    this.isResetFilter = flagReset;
+    this.searchVaccineList(search);
   }
 
   async searchVaccineList(search?: boolean) {
@@ -138,10 +184,10 @@ export class WidgetVaccineWorklistComponent implements OnInit {
     this.vaccineWorklist = await this.consentService.getVaccineWorklist(date, toDate, hospital, limit, offset, uniCode,
       birth, appDate, name, phoneNumber, isPreRegist, patientStatus)
       .toPromise().then(res => {
+        this.isCanNextPage = res.data.length >= 10 ? true : false;
+        this.counter = res.counter;
+        console.log('this.counter', this.counter)
         if (res.data.length > 0) {
-
-          this.isCanNextPage = res.data.length >= 10 ? true : false;
-
           for (let i = 0, { length } = res.data; i < length; i += 1) {
             res.data[i].new_birth_date = dateFormatter(res.data[i].birth_date, true);
             res.data[i].app_date = dateFormatter(res.data[i].appointment_date, true);

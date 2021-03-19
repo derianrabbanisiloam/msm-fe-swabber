@@ -85,7 +85,7 @@ export class WidgetPatientDataComponent implements OnInit {
   // Input mask
   public mask_birth = [/\d/, /\d/, '-', /\d/, /\d/, '-', /\d/, /\d/, /\d/, /\d/];
   public mask = [/\d/, /\d/, /\d/, /\d/, /\d/, /\d/, /\d/, /\d/, /\d/, /\d/, /\d/, /\d/, /\d/, /\d/, /\d/];
-  public checkEmail = '[a-z0-9._%+-]+@[a-z0-9.-]+\\.[a-z]{2,}$';
+  public checkEmail = '[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\\.[a-zA-Z]{2,}$';
   public checkNamed = /[*#!@&^'"/[\]{}()?]/;
 
   public alerts: Alert[] = [];

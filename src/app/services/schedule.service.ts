@@ -28,11 +28,13 @@ export class ScheduleService {
     this.scheduleBlockSource.next(params);
   }
 
-  getCheckUpSchedule(hospitalId: string, checkUpId: string, date?: number, isDriveThru?: boolean){
+  getCheckUpSchedule(hospitalId: string, checkUpId: string, date?: string, isDriveThru?: boolean, fromDate?: string, toDate?: string){
     let uri = `${this.schedulecovidUrl}/schedules/hospital/${hospitalId}?`;
     uri = checkUpId ? `${uri}checkupId=${checkUpId}` : uri;
     uri = date ? `${uri}&date=${date}` : uri;
     uri = isDriveThru !== null && isDriveThru !== undefined ? `${uri}&isDriveThru=${isDriveThru}` : uri;
+    uri = fromDate ? `${uri}&fromDate=${fromDate}` : uri;
+    uri = toDate ? `${uri}&toDate=${toDate}` : uri;
     return this.http.get<any>(uri, httpOptions);
   }
 

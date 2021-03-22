@@ -126,8 +126,7 @@
         <td>{{(i+1+offset)}}</td>
         <td>{{itr.consent_code}}</td>
         <td>
-          <span *ngIf="itr.participant_status === patientStatus.NOT_REGISTERED"><a href="javascript:void(0)" (click)="openRescheduleModal(itr)">{{itr.name}}</a></span>
-          <span *ngIf="itr.participant_status !== patientStatus.NOT_REGISTERED">{{itr.name}}</span>
+          <span><a href="javascript:void(0)" (click)="openRescheduleModal(itr)">{{itr.name}}</a></span>
         </td>
         <td>{{itr.new_birth_date}}</td>
         <td>{{itr.phone_number_1}}</td>

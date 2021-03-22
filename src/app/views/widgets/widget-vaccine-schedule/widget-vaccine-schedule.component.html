@@ -100,6 +100,7 @@
                   <a (click)="gotoCreateApp2(itemSch, date.dateISO)" *ngIf="itemSch.day == date.dateDay && date.dateISO >= todayDateISO && !isOriginal">
                     {{itemSch.from_time.substr(0,5)}} - {{itemSch.to_time.substr(0,5)}}
                   </a>
+                  <br>
                 </span>
                 <span *ngIf="(itemSch.day == date.dateDay && date.dateISO < todayDateISO)
                 || (itemSch.day == date.dateDay && date.dateISO >= todayDateISO && holidaysSpecialty.indexOf(itemSch.checkup_id+'-'+date.dateISO+'-'+itemSch.hospital_id) != -1)" class="unavailable">

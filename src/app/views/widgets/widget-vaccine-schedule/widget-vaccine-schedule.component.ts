@@ -75,6 +75,8 @@ export class WidgetVaccineScheduleComponent implements OnInit {
   public fromVaccineWorklist: boolean = false;
   public bodyPreReg: any;
   public patientDetail: any;
+  public day1week: string;
+  public day7week: string;
 
   constructor(
     private doctorService: DoctorService,
@@ -141,11 +143,13 @@ export class WidgetVaccineScheduleComponent implements OnInit {
         }
       }
     }
+    this.day1week = this.dates[0].dateISO;
+    this.day7week = this.dates[6].dateISO;
   }
 
   getCheckUpSchedulesById(checkup_id: any, isDriveThru?) {
-    this.scheduleService.getCheckUpSchedule(this.hospital.id, checkup_id, null, isDriveThru)
-      .subscribe(data => {
+    this.scheduleService.getCheckUpSchedule(this.hospital.id, checkup_id, null, 
+      isDriveThru, this.day1week, this.day7week).subscribe(data => {
         this.checkUpTemp = data.data;
         if (data.data.length > 0) {
           this.checkUpSchedules[0].checkUpId = this.checkUpTemp[0].checkup_id;
@@ -163,7 +167,6 @@ export class WidgetVaccineScheduleComponent implements OnInit {
           };
         }
       });
-
       
   }
 

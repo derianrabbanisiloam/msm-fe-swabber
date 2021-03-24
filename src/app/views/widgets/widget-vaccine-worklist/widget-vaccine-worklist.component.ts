@@ -186,7 +186,6 @@ export class WidgetVaccineWorklistComponent implements OnInit {
       .toPromise().then(res => {
         this.isCanNextPage = res.data.length >= 10 ? true : false;
         this.counter = res.counter;
-        console.log('this.counter', this.counter)
         if (res.data.length > 0) {
           for (let i = 0, { length } = res.data; i < length; i += 1) {
             res.data[i].new_birth_date = dateFormatter(res.data[i].birth_date, true);
@@ -223,7 +222,9 @@ export class WidgetVaccineWorklistComponent implements OnInit {
     let body;
     if(option === 'cancel') {
       body = {
-        isCancelOrder: true
+        isCancelOrder: true,
+        userName: this.user.fullname,
+        userId: this.user.id,
       };
     } else {
       body = {

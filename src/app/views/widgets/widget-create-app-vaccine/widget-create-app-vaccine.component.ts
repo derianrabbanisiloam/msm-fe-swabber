@@ -197,6 +197,7 @@ export class WidgetCreateAppVaccineComponent implements OnInit {
       this.appList.push(
         {
           checkup_schedule_id: this.schedule[k].checkup_schedule_id,
+          quota_max_person: this.schedule[k].quota_max_person,
           appointment: []
         }
       )
@@ -237,34 +238,36 @@ export class WidgetCreateAppVaccineComponent implements OnInit {
 
       const appListLength = this.appList[k].appointment.length;
       no += 1;
-      this.appList[k].appointment.push({
-        no: no,
-        hospital_id: hospitalId,
-        appointment_range_time: appListLength > 0 ? '' : appTime,
-        appointment_from_time: fromTime,
-        appointment_to_time: toTime,
-        appointment_id: null,
-        admission_no: null,
-        admission_hope_id: null,
-        patient_name: null,
-        contact_id: null,
-        date_of_birth: null,
-        local_mr_no: null,
-        phone_no: null,
-        queue_no: null,
-        modified_name: '',
-        modified_by: null,
-        is_can_create: true,
-        is_can_cancel: false,
-        is_walkin: false,
-        checkup_schedule_id: this.schedule[k].checkup_schedule_id,
-        channel_id: null,
-        patient_visit_number: null,
-        appointment_status_id: null,
-        patient_hope_id: null,
-        patient_organization_id: null,
-        payment_status_id: ''
-      });
+      if(no <= this.appList[k].quota_max_person) {
+        this.appList[k].appointment.push({
+          no: no,
+          hospital_id: hospitalId,
+          appointment_range_time: appListLength > 0 ? '' : appTime,
+          appointment_from_time: fromTime,
+          appointment_to_time: toTime,
+          appointment_id: null,
+          admission_no: null,
+          admission_hope_id: null,
+          patient_name: null,
+          contact_id: null,
+          date_of_birth: null,
+          local_mr_no: null,
+          phone_no: null,
+          queue_no: null,
+          modified_name: '',
+          modified_by: null,
+          is_can_create: true,
+          is_can_cancel: false,
+          is_walkin: false,
+          checkup_schedule_id: this.schedule[k].checkup_schedule_id,
+          channel_id: null,
+          patient_visit_number: null,
+          appointment_status_id: null,
+          patient_hope_id: null,
+          patient_organization_id: null,
+          payment_status_id: ''
+        });
+      }
     }
 
   }

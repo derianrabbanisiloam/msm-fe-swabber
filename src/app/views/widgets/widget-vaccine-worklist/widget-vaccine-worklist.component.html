@@ -150,7 +150,7 @@
         </td>
         <td>
           <div class="cell-img-nav d-flex justify-content-center">
-            <div *ngIf="itr.order_status !== '2'" (click)="cancelAppointment(itr, confirmCancel)">
+            <div *ngIf="itr.order_status !== '2' && itr.participant_status === '1'" (click)="cancelAppointment(itr, confirmCancel)">
               <img src="{{assetPath}}icons/ic_Cancel@2x.png">
             </div>
           </div>

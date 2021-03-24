@@ -132,7 +132,7 @@
     </div>
 
     <div class="fo_personal_detail_container shadow-4">
-      <ngb-tabset>
+      <ngb-tabset [destroyOnHide]="false">
         <ngb-tab>
           <ng-template ngbTabTitle><b>Contact Detail</b></ng-template>
           <ng-template ngbTabContent>
@@ -270,7 +270,7 @@
                     <div class="form-pr-nationalidtype">
                       <label for="city" class="">National Id Type *</label>
                       <div class="">
-                        <select id="subdistrict" class="form-control" [(ngModel)]="model.nationalidType"
+                        <select id="nationalidType" class="form-control" [(ngModel)]="model.nationalidType"
                           name="nationalidType">
                           <option *ngFor="let itr of listNationalIdType" [ngValue]="itr" [selected]="itr.value == model.nationalidType.value">{{itr.description}}</option>
                         </select>

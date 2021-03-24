@@ -50,7 +50,8 @@ export class WidgetVaccineWorklistComponent implements OnInit {
   public selectedNote: any;
   public counter: string = '';
   public isResetFilter: boolean = true;
-  public urlDownload: string = '';
+  public dateOne: string = '';
+  public dateTwo: string = '';
 
   constructor(
     private alertService: AlertService,
@@ -72,20 +73,13 @@ export class WidgetVaccineWorklistComponent implements OnInit {
     });
     this.initializeDateRangePicker();
     this.getCollectionAlert();
-    this.emitUrlDownload();
-  }
-
-  emitUrlDownload() {
-    this.appointmentService.urlDownloadCsv$.subscribe(
-      async (data) => {
-        this.urlDownload = data;
-      }
-    );
   }
 
   downloadCsv() {
-    if(this.urlDownload !== '' && this.vaccineWorklist.length > 0) {
-      let url = this.urlDownload+'&download=true';
+    if(this.vaccineWorklist.length > 0) {
+      let url = environment.FRONT_OFFICE_SERVICE 
+        +'/preregistrations/worklist/download/'
+        +this.hospital.id+'?appointmentDate='+this.dateOne+'&toAppointmentDate='+this.dateTwo;
       let requestOptions = { responseType: 'blob' as 'blob' };
       this.http.get(url, requestOptions).subscribe(val => {
         let url = URL.createObjectURL(val);
@@ -175,6 +169,8 @@ export class WidgetVaccineWorklistComponent implements OnInit {
     isPreRegist = null, patientStatus = '') {
     this.showWaitMsg = true;
     this.showNotFoundMsg = false;
+    this.dateOne = date;
+    this.dateTwo = toDate;
 
     const hospital = this.hospital.id;
 

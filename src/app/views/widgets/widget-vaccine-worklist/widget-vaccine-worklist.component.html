@@ -21,8 +21,7 @@
       <select id="title" class="form-control" (change)="noResetFilter(true, false)" [(ngModel)]="model.patientStatus" name="patientStatus">
         <option [ngValue]=null [selected]="model.patientStatus === null">ALL</option>
         <option value=1>Not Registered</option>
-        <option value=2>Registered</option>
-        <option value=3>Screened</option>
+        <option value=2>Registered/Screened</option>
         <option value=4>Evaluated</option>
         <option value=5>Vaccinated</option>
         <option value=6>Cancelled Vaccination</option>
@@ -111,8 +110,7 @@
           <select id="title" class="form-control" (change)="noResetFilter(true, true)" [(ngModel)]="model.patientStatus" name="patientStatus">
             <option [ngValue]=null [selected]="model.patientStatus === null">ALL</option>
             <option value=1>Not Registered</option>
-            <option value=2>Registered</option>
-            <option value=3>Screened</option>
+            <option value=2>Registered/Screened</option>
             <option value=4>Evaluated</option>
             <option value=5>Vaccinated</option>
             <option value=6>Cancelled Vaccination</option>

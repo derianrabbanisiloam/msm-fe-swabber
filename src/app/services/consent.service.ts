@@ -5,7 +5,6 @@ import { Consent } from '../models/consents/consent';
 import { ConsentDetail } from '../models/consents/consentDetail';
 import { environment } from '../../environments/environment';
 import { httpOptions } from '../utils/http.util';
-import { AppointmentService } from '../services/appointment.service';
 
 @Injectable({
   providedIn: 'root'
@@ -14,7 +13,6 @@ export class ConsentService {
 
   constructor(
     private http: HttpClient,
-    private appointmentService: AppointmentService,
   ) { }
 
   private consentUrl = environment.VACCINE_CONSENT_SERVICE;
@@ -34,7 +32,6 @@ export class ConsentService {
     uri = isPreRegist ? `${uri}&isPreRegist=${isPreRegist}` : uri;
     uri = patientStatus ? `${uri}&patientStatus=${patientStatus}` : uri;
     const url = `${uri}&limit=${limit}&offset=${offset}`;
-    this.appointmentService.emitUrlDownload(url);
     return this.http.get<any>(url, httpOptions);
   }
 

@@ -50,7 +50,6 @@ export class WidgetVaccineWorklistComponent implements OnInit {
   public selectedNote: any;
   public counter: string = '';
   public isResetFilter: boolean = true;
-  public urlDownload: string = '';
   public dateOne: string = '';
   public dateTwo: string = '';
 

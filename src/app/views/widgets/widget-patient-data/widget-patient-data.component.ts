@@ -243,7 +243,7 @@ export class WidgetPatientDataComponent implements OnInit {
     });
   }
 
-  ngOnInit() {
+  async ngOnInit() {
     this.uploadForm = this.formBuilder.group({
       bpjsCard: [''],
       identityCard: [''],
@@ -251,26 +251,26 @@ export class WidgetPatientDataComponent implements OnInit {
       familyCard: [''],
       controlLetter: ['']
     });
-    this.admissionType();
-    this.getListRoomHope();
-    this.getPatientType();
-    this.getReferral();
-    this.getCity();
-    this.isAppointment();
-    this.getNationalIdType();
-    this.getCountry();
-    this.getPayer();
-    this.getSex();
-    this.getMarital();
-    this.getTitle();
-    this.getReligion();
-    this.getBloodType();
-    this.getCollectionAlert();
-    this.setDiagnose();
-    this.setReferralSource()
-    this.getPreReg()
-    this.setReferralSource();
-    this.isRegisterForm();
+    await this.admissionType();
+    await this.getListRoomHope();
+    await this.getPatientType();
+    await this.getReferral();
+    await this.getCity();
+    await this.isAppointment();
+    await this.getNationalIdType();
+    await this.getCountry();
+    await this.getPayer();
+    await this.getSex();
+    await this.getMarital();
+    await this.getTitle();
+    await this.getReligion();
+    await this.getBloodType();
+    await this.getCollectionAlert();
+    await this.setDiagnose();
+    await this.setReferralSource()
+    await this.getPreReg()
+    await this.setReferralSource();
+    await this.isRegisterForm();
   }
 
   async getPatientHopeId(val) {

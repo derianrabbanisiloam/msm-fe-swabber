@@ -8,7 +8,7 @@ import { dateFormatter } from '../../../utils/helpers.util';
 import { NgbModalConfig, NgbModal, ModalDismissReasons } from '@ng-bootstrap/ng-bootstrap';
 import { IMyDrpOptions } from 'mydaterangepicker';
 import { patientStatus } from '../../../variables/common.variable';
-import { sourceApps } from '../../../variables/common.variable';
+import { sourceApps, vaccineType } from '../../../variables/common.variable';
 import { environment } from '../../../../environments/environment';
 import { ModalRescheduleCheckupComponent } from '../../widgets/modal-reschedule-checkup/modal-reschedule-checkup.component';
 import Swal from 'sweetalert2';
@@ -30,7 +30,8 @@ export class WidgetVaccineWorklistComponent implements OnInit {
   public offset = 0;
   public model: any = { 
     date: '', toDate: '', uniqueCode: '', birth: '', appDate: '',
-    name: '', phoneNumber: '', patientStatus: null, isPreRegist: null};
+    name: '', phoneNumber: '', patientStatus: null, isPreRegist: null,
+    formTypeId: null, };
   public showWaitMsg: boolean = false;
   public showNotFoundMsg: boolean = false;
   public isCanPrevPage: boolean = false;
@@ -50,8 +51,7 @@ export class WidgetVaccineWorklistComponent implements OnInit {
   public selectedNote: any;
   public counter: string = '';
   public isResetFilter: boolean = true;
-  public dateOne: string = '';
-  public dateTwo: string = '';
+  public vaccineType: any = vaccineType;
 
   constructor(
     private alertService: AlertService,
@@ -75,11 +75,26 @@ export class WidgetVaccineWorklistComponent implements OnInit {
     this.getCollectionAlert();
   }
 
-  downloadCsv() {
+  async downloadCsv() {
     if(this.vaccineWorklist.length > 0) {
+      let { date, toDate, uniqueCode, birth, appDate, 
+        name, phoneNumber, isPreRegist, patientStatus,
+        formTypeId } = await this.model;
+      let uniCode = uniqueCode ? uniqueCode.toUpperCase() : '';
       let url = environment.FRONT_OFFICE_SERVICE 
         +'/preregistrations/worklist/download/'
-        +this.hospital.id+'?appointmentDate='+this.dateOne+'&toAppointmentDate='+this.dateTwo;
+        +this.hospital.id+'?';
+        url = date ? `${url}appointmentDate=${date}` : url;
+        url = toDate ? `${url}&toAppointmentDate=${toDate}` : url;
+        url = uniCode ? `${url}&uniqueCode=${uniCode}` : url;
+        url = birth ? `${url}&birthDate=${birth}` : url;
+        url = appDate ? `${url}&appDate=${appDate}` : url;
+        url = name ? `${url}&name=${name}` : url;
+        url = phoneNumber ? `${url}&phoneNumber=${phoneNumber}` : url;
+        url = isPreRegist ? `${url}&isPreRegist=${isPreRegist}` : url;
+        url = patientStatus ? `${url}&patientStatus=${patientStatus}` : url;
+        url = formTypeId ? `${url}&formTypeId=${formTypeId}` : url;
+        
       let requestOptions = { responseType: 'blob' as 'blob' };
       this.http.get(url, requestOptions).subscribe(val => {
         let url = URL.createObjectURL(val);
@@ -130,7 +145,7 @@ export class WidgetVaccineWorklistComponent implements OnInit {
       this.model.date = bYear + '-' + bMonth + '-' + bDay;
       this.model.toDate = eYear + '-' + eMonth + '-' + eDay;
       this.clearSearch();
-      this.searchVaccineList(false);
+      this.searchVaccineList(true);
     }
   }
 
@@ -143,6 +158,7 @@ export class WidgetVaccineWorklistComponent implements OnInit {
     if(this.isResetFilter === true) {
       this.model.isPreRegist = null;
       this.model.patientStatus = null;
+      this.model.formTypeId = null;
     }
   }
 
@@ -154,23 +170,24 @@ export class WidgetVaccineWorklistComponent implements OnInit {
   async searchVaccineList(search?: boolean) {
     this.offset = search ? 0 : this.offset;
     let { date, toDate, uniqueCode, birth, appDate, 
-      name, phoneNumber, isPreRegist, patientStatus } = await this.model;
+      name, phoneNumber, isPreRegist, patientStatus,
+      formTypeId } = await this.model;
 
     let uniCode = uniqueCode ? uniqueCode.toUpperCase() : '';
 
-    if (date || toDate || uniCode || birth || appDate || name || phoneNumber || isPreRegist || patientStatus) {
-      this.getVaccineList(date, toDate, uniCode, birth, appDate, name, phoneNumber, isPreRegist, patientStatus);
+    if (date || toDate || uniCode || birth || appDate || 
+        name || phoneNumber || isPreRegist || patientStatus || formTypeId) {
+      this.getVaccineList(date, toDate, uniCode, birth, appDate, name, 
+        phoneNumber, isPreRegist, patientStatus, formTypeId);
     } else {
       this.getVaccineList();
     }
   }
 
   async getVaccineList(date = '', toDate = '', uniCode = '', birth = '', appDate = '', name = '', phoneNumber = '', 
-    isPreRegist = null, patientStatus = '') {
+    isPreRegist = null, patientStatus = '', formTypeId = '') {
     this.showWaitMsg = true;
     this.showNotFoundMsg = false;
-    this.dateOne = date;
-    this.dateTwo = toDate;
 
     const hospital = this.hospital.id;
 
@@ -178,9 +195,10 @@ export class WidgetVaccineWorklistComponent implements OnInit {
     const offset = this.offset;
 
     this.vaccineWorklist = await this.consentService.getVaccineWorklist(date, toDate, hospital, limit, offset, uniCode,
-      birth, appDate, name, phoneNumber, isPreRegist, patientStatus)
+      birth, appDate, name, phoneNumber, isPreRegist, patientStatus, formTypeId)
       .toPromise().then(res => {
         this.isCanNextPage = res.data.length >= 10 ? true : false;
+        this.isCanPrevPage = this.offset === 0 ? false : true;
         this.counter = res.counter;
         if (res.data.length > 0) {
           for (let i = 0, { length } = res.data; i < length; i += 1) {

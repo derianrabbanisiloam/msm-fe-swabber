@@ -21,7 +21,7 @@ export class ConsentService {
 
   getVaccineWorklist(date: any, toDate: string, hospital: string, limit: number, offset: number,
     uniCode?: string, birth?: string, appDate?: string, name?: string, 
-    phoneNumber?: string, isPreRegist?: boolean, patientStatus?: string): Observable<any> {
+    phoneNumber?: string, isPreRegist?: boolean, patientStatus?: string, formTypeId?: string): Observable<any> {
 
     let uri = `${this.preregisUrl}/worklist/${hospital}?appointmentDate=${date}&toAppointmentDate=${toDate}`;
     uri = uniCode ? `${uri}&uniqueCode=${uniCode}` : uri;
@@ -31,6 +31,7 @@ export class ConsentService {
     uri = phoneNumber ? `${uri}&phoneNumber=${phoneNumber}` : uri;
     uri = isPreRegist ? `${uri}&isPreRegist=${isPreRegist}` : uri;
     uri = patientStatus ? `${uri}&patientStatus=${patientStatus}` : uri;
+    uri = formTypeId ? `${uri}&formTypeId=${formTypeId}` : uri;
     const url = `${uri}&limit=${limit}&offset=${offset}`;
     return this.http.get<any>(url, httpOptions);
   }

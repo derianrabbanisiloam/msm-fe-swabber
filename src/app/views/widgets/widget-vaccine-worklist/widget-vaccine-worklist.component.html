@@ -27,7 +27,14 @@
         <option value=6>Cancelled Vaccination</option>
       </select>
     </div>
-    <div class="col-md-5">
+    <div class="col-md-2">
+      <span class="foot-note">Program Vaksinasi</span>
+      <select id="title" class="form-control" (change)="noResetFilter(true, false)" [(ngModel)]="model.formTypeId" name="formTypeId">
+        <option [ngValue]=null [selected]="model.formTypeId === null">ALL</option>
+        <option *ngFor = "let type of vaccineType" [ngValue]="type.form_type_id">{{type.form_type_name}}</option>
+      </select>
+    </div>
+    <div class="col-md-3">
       <div *ngFor="let alert of alerts">
         <ngb-alert *ngIf="alert" type="{{cssAlertType(alert)}}" (close)="removeAlert(alert)">{{ alert.message }}</ngb-alert>
       </div>
@@ -48,16 +55,17 @@
   <table class="table table-bordered">
     <thead class="fo_color_blue foot-note">
       <th style="width: 1em;">No.</th>
-      <th style="width: 7em">Kode Unik</th>
-      <th style="width: 13em">Nama</th>
+      <th style="width: 6em">Kode Unik</th>
+      <th style="width: 12em">Nama</th>
       <th style="width: 9em">Tanggal Lahir</th>
-      <th style="width: 5em;">No. Telp</th>
+      <th style="width: 4em;">No. Telp</th>
       <th style="width: 9em">Tgl Perjanjian</th>
       <th style="width: 9em">Jam Perjanjian</th>
       <th style="width: 7em;">Pre-Regis & Screening</th>
 			<th style="width: 5em; text-align: center;">Status Pasien</th>
-      <th style="width: 8.5em; text-align: center;">Notes</th>
-      <th style="width: 7em; text-align: center;">Action</th>
+      <th style="width: 5em; text-align: center;">Program Vaksinasi</th>
+      <th style="width: 9em; text-align: center;">Notes</th>
+      <th style="width: 6em; text-align: center;">Action</th>
     </thead>
 
     <tbody>
@@ -116,8 +124,12 @@
             <option value=6>Cancelled Vaccination</option>
           </select>
         </td>
-        <td></td>
-        <td></td>
+        <td>
+          <select id="title" class="form-control" (change)="noResetFilter(true, true)" [(ngModel)]="model.formTypeId" name="formTypeId">
+            <option [ngValue]=null [selected]="model.formTypeId === null">ALL</option>
+            <option *ngFor = "let type of vaccineType" [ngValue]="type.form_type_id">{{type.form_type_name}}</option>
+          </select>
+        </td>
       </tr>
 
       <tr *ngFor="let itr of vaccineWorklist; let i=index" [ngClass]="{ 'row-pink' : itr.order_status === '2' }">
@@ -126,7 +138,7 @@
         <td>
           <span><a href="javascript:void(0)" (click)="openRescheduleModal(itr)">{{itr.name}}</a></span>
         </td>
-        <td>{{itr.new_birth_date}}</td>
+        <td>{{itr.new_birth_date}}<br>{{itr.age}}</td>
         <td>{{itr.phone_number_1}}</td>
         <td>{{itr.app_date}}</td>
         <td>
@@ -139,6 +151,7 @@
           <span *ngIf="itr.consent_id === null">No</span>
         </td>
         <td style="text-align: center;">{{itr.status}}</td>
+        <td style="text-align: center;">{{itr.form_type}}</td>
         <td>
           <a ngbPopover="{{itr.note}}" popoverTitle=""
             triggers="mouseenter:mouseleave" href="javascript:void(0)" (click)="updateNote(itr, confirmUpdateNote)">

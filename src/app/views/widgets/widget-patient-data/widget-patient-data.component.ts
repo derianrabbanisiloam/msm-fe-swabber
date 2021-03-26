@@ -430,9 +430,7 @@ export class WidgetPatientDataComponent implements OnInit {
           const idxCity = this.listCity.findIndex((a) => {
             return a.city_id === Number(contact.city_id);
           });
-          const idxCountry = this.listCountry.findIndex((a) => {
-            return a.country_id === contact.country_id;
-          });
+
           this.model.city =
             idxCity >= 0
               ? {
@@ -455,13 +453,14 @@ export class WidgetPatientDataComponent implements OnInit {
                   name: this.listCity[idxBirthCity].name,
                 }
               : { city_id: null, name: '' };
-          this.model.nationality =
-            idxCountry >= 0
-              ? {
-                  country_id: this.listCountry[idxCountry].country_id,
-                  name: this.listCountry[idxCountry].name,
-                }
-              : { country_id: null, name: '' };
+              
+          let idx_nationality = contact.country_id ? this.listCountry.findIndex((a) => {
+            return a.country_id === contact.country_id;
+          }) : -1;
+          
+          this.model.nationality = (idx_nationality >= 0) ? this.listCountry[idx_nationality] : '';
+            
+
           this.model.sex.value = contact.gender_id
             ? contact.gender_id.toString()
             : this.model.sex;

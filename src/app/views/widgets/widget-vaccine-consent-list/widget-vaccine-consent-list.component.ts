@@ -837,7 +837,11 @@ export class WidgetVaccineConsentListComponent implements OnInit {
     if (reformatDate.length !== 8) {
       return false;
     } else {
-      return true;
+      if(moment(this.formatDate(value,'YYYY-MM-DD')).isValid()) {
+        return true
+      } else {
+        return false
+      }
     }
   }
 

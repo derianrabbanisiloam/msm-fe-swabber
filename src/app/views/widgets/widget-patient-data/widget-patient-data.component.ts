@@ -85,7 +85,7 @@ export class WidgetPatientDataComponent implements OnInit {
   // Input mask
   public mask_birth = [/\d/, /\d/, '-', /\d/, /\d/, '-', /\d/, /\d/, /\d/, /\d/];
   public mask = [/\d/, /\d/, /\d/, /\d/, /\d/, /\d/, /\d/, /\d/, /\d/, /\d/, /\d/, /\d/, /\d/, /\d/, /\d/];
-  public checkEmail = '[a-z0-9._%+-]+@[a-z0-9.-]+\\.[a-z]{2,}$';
+  public checkEmail = '[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\\.[a-zA-Z]{2,}$';
   public checkNamed = /[*#!@&^'"/[\]{}()?]/;
 
   public alerts: Alert[] = [];
@@ -243,7 +243,7 @@ export class WidgetPatientDataComponent implements OnInit {
     });
   }
 
-  ngOnInit() {
+  async ngOnInit() {
     this.uploadForm = this.formBuilder.group({
       bpjsCard: [''],
       identityCard: [''],
@@ -251,26 +251,26 @@ export class WidgetPatientDataComponent implements OnInit {
       familyCard: [''],
       controlLetter: ['']
     });
-    this.admissionType();
-    this.getListRoomHope();
-    this.getPatientType();
-    this.getReferral();
-    this.getCity();
-    this.isAppointment();
-    this.getNationalIdType();
-    this.getCountry();
-    this.getPayer();
-    this.getSex();
-    this.getMarital();
-    this.getTitle();
-    this.getReligion();
-    this.getBloodType();
-    this.getCollectionAlert();
-    this.setDiagnose();
-    this.setReferralSource()
-    this.getPreReg()
-    this.setReferralSource();
-    this.isRegisterForm();
+    await this.admissionType();
+    await this.getListRoomHope();
+    await this.getPatientType();
+    await this.getReferral();
+    await this.getCity();
+    await this.isAppointment();
+    await this.getNationalIdType();
+    await this.getCountry();
+    await this.getPayer();
+    await this.getSex();
+    await this.getMarital();
+    await this.getTitle();
+    await this.getReligion();
+    await this.getBloodType();
+    await this.getCollectionAlert();
+    await this.setDiagnose();
+    await this.setReferralSource()
+    await this.getPreReg()
+    await this.setReferralSource();
+    await this.isRegisterForm();
   }
 
   async getPatientHopeId(val) {
@@ -430,9 +430,7 @@ export class WidgetPatientDataComponent implements OnInit {
           const idxCity = this.listCity.findIndex((a) => {
             return a.city_id === Number(contact.city_id);
           });
-          const idxCountry = this.listCountry.findIndex((a) => {
-            return a.country_id === contact.country_id;
-          });
+
           this.model.city =
             idxCity >= 0
               ? {
@@ -455,13 +453,14 @@ export class WidgetPatientDataComponent implements OnInit {
                   name: this.listCity[idxBirthCity].name,
                 }
               : { city_id: null, name: '' };
-          this.model.nationality =
-            idxCountry >= 0
-              ? {
-                  country_id: this.listCountry[idxCountry].country_id,
-                  name: this.listCountry[idxCountry].name,
-                }
-              : { country_id: null, name: '' };
+              
+          let idx_nationality = contact.country_id ? this.listCountry.findIndex((a) => {
+            return a.country_id === contact.country_id;
+          }) : -1;
+          
+          this.model.nationality = (idx_nationality >= 0) ? this.listCountry[idx_nationality] : '';
+            
+
           this.model.sex.value = contact.gender_id
             ? contact.gender_id.toString()
             : this.model.sex;

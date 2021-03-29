@@ -58,6 +58,11 @@ const routes: Routes = [
     loadChildren: './views/pages/page-vaccine-consent-list/page-vaccine-consent-list.module#PageVaccineConsentListModule',
   },
   {
+    path: 'vaccine-worklist',
+    canActivate: [AuthGuard],
+    loadChildren: './views/pages/page-vaccine-worklist/page-vaccine-worklist.module#PageVaccineWorklistModule',
+  },
+  {
     path: 'reschedule-worklist',
     canActivate: [AuthGuard],
     loadChildren: './views/pages/page-reschedule-worklist/page-reschedule-worklist.module#PageRescheduleWorklistModule',

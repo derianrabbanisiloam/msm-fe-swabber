@@ -295,7 +295,7 @@ export class WidgetVaccineConsentListComponent implements OnInit {
             }
             return el;
           }),
-          create_user: 'FO',
+          create_user: this.key.user.fullname,
           organization_id: orgId,
           date_of_birth: `${this.consentInfo.date_of_birth.split('-')[2]}-${this.consentInfo.date_of_birth.split('-')[1]
             }-${this.consentInfo.date_of_birth.split('-')[0]}`,
@@ -653,6 +653,10 @@ export class WidgetVaccineConsentListComponent implements OnInit {
       primaryDoctorUserId: this.doctorSelected.doctor_hope_id,
       consentId: this.consentInfo.consent_id,
       patientId: this.choosedPatient.patientId,
+      registrationFormId: this.consentInfo.registration_form_id,
+      userId: this.key.user.id,
+      source: sourceApps,
+      userName: this.key.user.fullname,
     };
 
     this.createAdmissionStatus = 'loading';
@@ -833,7 +837,11 @@ export class WidgetVaccineConsentListComponent implements OnInit {
     if (reformatDate.length !== 8) {
       return false;
     } else {
-      return true;
+      if(moment(this.formatDate(value,'YYYY-MM-DD')).isValid()) {
+        return true
+      } else {
+        return false
+      }
     }
   }
 

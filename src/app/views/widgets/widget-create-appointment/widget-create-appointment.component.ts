@@ -10,6 +10,7 @@ import { AdmissionService } from '../../../services/admission.service';
 import { AppointmentMini } from '../../../models/appointments/appointment-mini';
 import { General } from '../../../models/generals/general';
 import { Schedule } from '../../../models/schedules/schedule';
+import { appointmentPayload } from '../../../payloads/appointment.payload';
 import { DoctorNote } from '../../../models/doctors/doctor-note';
 import { DoctorProfile } from '../../../models/doctors/doctor-profile';
 import { ScheduleBlock } from '../../../models/schedules/schedule-block';
@@ -222,6 +223,18 @@ export class WidgetCreateAppointmentComponent implements OnInit {
     checkOne: false, checkTwo: false, checkThree: false,
     checkFour: false, checkFive: false
   }
+  public patientPreReg: any;
+  public orderDetail: any;
+  public fromPreRegis: boolean = false;
+  public fromPatientData: boolean = false;
+  public isSubmitting: boolean = false;
+  public bodyPreReg: any;
+  public item: any;
+  public confirmClose: any;
+  public disableBut: boolean = false;
+  public preRegLoading: boolean = false;
+  public addAppPayload: appointmentPayload = new appointmentPayload;
+  public patDetail: any = null;
 
 
   constructor(
@@ -274,7 +287,7 @@ export class WidgetCreateAppointmentComponent implements OnInit {
       familyCard: [''],
       controlLetter: ['']
     });
-
+    await this.getPreReg();
     await this.getAppBpjs();
     //await this.provinceLakaLantas();
     await this.getQueryParams();
@@ -300,6 +313,7 @@ export class WidgetCreateAppointmentComponent implements OnInit {
     this.getCollectionAlert();
     this.setReferralSource()
     this.setDiagnose();
+   
     //socket reserve slot
     this.socketTwo.on(RESERVE_SLOT+'/'+this.hospital.id, (call) => {
       for(let k = 0, { length } = this.slotList; k < length; k += 1) {
@@ -463,6 +477,16 @@ export class WidgetCreateAppointmentComponent implements OnInit {
           }
       }
     });
+  }
+
+  async getPatientHopeId(val) {
+    let body = await this.patientService.getPatientHopeDetailTwo(val)
+      .toPromise().then(res => {
+        return res.data;
+      }).catch(err => {
+        return null;
+      });
+    return body
   }
 
   async emitBlockSchedule() {
@@ -1449,6 +1473,67 @@ export class WidgetCreateAppointmentComponent implements OnInit {
     modalRef.componentInstance.appointmentInfo = data;
   }
 
+
+  async openCreateAppModal3(item, closeModal) {
+    const canReserved = await this.getReservedSlot(item);
+    if(canReserved.key === null) {
+      await this.reserveSlotApp(item);
+    }
+    const fromTime = item.appointment_from_time ? item.appointment_from_time : item.schedule_from_time;
+    const toTime = item.appointment_to_time ? item.appointment_to_time : item.schedule_to_time;
+    let data = {};
+    if (this.fromPreRegis === true) {
+      if(this.patientPreReg.phone_number_1 === '' || this.patientPreReg.phone_number_1 === null) {
+        data = {
+          appointment_date: this.appointmentPayload.appointmentDate,
+          appointment_from_time: fromTime,
+          appointment_to_time: toTime,
+          hospital_id: item.hospital_id,
+          schedule_id: item.schedule_id,
+          doctor_id: item.doctor_id,
+          appointment_no: item.appointment_no,
+          fromPreRegis: true,
+          is_waiting_list: item.is_waiting_list,
+          can_reserved: canReserved,
+          doctor_type_id: item.doctor_type_id,
+          ...this.patientPreReg,
+          ...this.orderDetail
+        };
+
+        const modalRef = this.modalService.open(ModalCreateAppointmentComponent);
+        modalRef.componentInstance.appointmentInfo = data;
+      } else {
+        this.confirmSlotModal(item, closeModal);
+      }
+    } else {
+      data = {
+        appointment_date: this.appointmentPayload.appointmentDate,
+        appointment_from_time: fromTime,
+        appointment_to_time: toTime,
+        appointment_no: item.appointment_no,
+        hospital_id: item.hospital_id,
+        schedule_id: item.schedule_id,
+        is_waiting_list: item.is_waiting_list,
+        doctor_type_id: item.doctor_type_id,
+        doctor_id: item.doctor_id,
+        can_reserved: canReserved,
+      };
+
+      const modalRef = this.modalService.open(ModalCreateAppointmentComponent);
+      modalRef.componentInstance.appointmentInfo = data;
+    }
+  }
+
+  confirmSlotModal(app, content) {
+
+    this.item = app;
+    this.openModal(content);
+  }
+
+  openModal(modal) {
+    this.modalService.open(modal, { windowClass: 'modal_verification-2', size: 'lg' });
+  }
+
   public reschCurrentIdx: any;
   async openCreateAppModal2(item: any) {
     const canReserved = await this.getReservedSlot(item);
@@ -1728,6 +1813,7 @@ export class WidgetCreateAppointmentComponent implements OnInit {
           this.router.navigate(['./patient-data'], { queryParams: params });
         }
       } else {
+        this.patDetail = await this.getPatientHopeId(detail.patient_hope_id);
         await this.defaultPatientType(detail.patient_hope_id);
         if(this.fromBpjs === true) {
           this.checkListModel = {
@@ -1814,6 +1900,7 @@ export class WidgetCreateAppointmentComponent implements OnInit {
     if (this.resMrLocal) {
       this.selectedCheckIn.medical_record_number = this.resMrLocal.medical_record_number;
       this.selectedCheckIn.patient_organization_id = this.resMrLocal.patient_organization_id;
+      this.patDetail = await this.getPatientHopeId(detail.patient_hope_id);
       await this.defaultPatientType(detail.patient_hope_id);
       await this.getAppointmentList();
       await this.dataProcessing();
@@ -2624,6 +2711,101 @@ export class WidgetCreateAppointmentComponent implements OnInit {
     } else {
       return true;
     }    
+  }
+
+  async createAppFromPatientData(closeModal) {
+    this.disableBut = true;
+    this.preRegLoading = true;
+    this.confirmClose = closeModal;
+    let item = this.item;
+    
+    const fromTime = item.appointment_from_time ? item.appointment_from_time : item.schedule_from_time;
+    const toTime = item.appointment_to_time ? item.appointment_to_time : item.schedule_to_time;
+    const birthDate = this.patientPreReg.birth_date;
+
+    let addAppPayload = {
+      appointmentDate: this.appointmentPayload.appointmentDate,
+      appointmentFromTime: fromTime,
+      appointmentToTime: toTime,
+      appointmentNo: item.appointment_no,
+      hospitalId: item.hospital_id,
+      doctorId: this.appointmentPayload.doctorId,
+      scheduleId: item.schedule_id,
+      name: this.patientPreReg.patient_name,
+      birthDate: birthDate,
+      phoneNumber1: this.filterizePhoneNumber(this.patientPreReg.phone_number_1),
+      addressLine1: this.patientPreReg.identity_address,
+      note: this.patientPreReg.note === '' ? null : this.patientPreReg.note,
+      channelId: channelId.FRONT_OFFICE,
+      userId: this.userId,
+      userName: this.user.username,
+      source: this.source,
+      isWaitingList: item.is_waiting_list,
+      patientHopeId: this.patientPreReg.patient_hope_id,
+      orderId: this.patientPreReg.order_id,
+      registrationFormId: this.patientPreReg.registration_form_id,
+      confirmationCode: this.patientPreReg.confirmation_code
+    };
+
+
+    await this.appointmentService.addAppointment(addAppPayload)
+    .toPromise()
+    .then(
+      data => {
+        this.confirmClose.click();
+        this.disableBut = false;
+        this.preRegLoading = false;
+        localStorage.setItem('fromPreRegis', null);
+        localStorage.setItem('searchKey', null);
+        this.fromPreRegis = false;
+        this.router.navigate(['.'], 
+        {
+          relativeTo: this.activatedRoute,
+          queryParams: {
+            doctorId: this.appointmentPayload.doctorId,
+            date: this.appointmentPayload.appointmentDate,
+            fromPreRegis: false
+          },
+          queryParamsHandling: "merge"
+        })
+        
+        this.alertService.success('Success to create appointment', false, 3000);
+        this.appointmentService.emitCreateApp(true);
+      }, err => {
+        this.disableBut = false;
+        this.preRegLoading = false;
+        this.alertService.error(err.error.message, false, 3000);
+      }
+    );
+  }
+
+  filterizePhoneNumber(phoneNumber: string) {
+    phoneNumber = phoneNumber.replace(/_/gi, '');
+    return phoneNumber;
+  }
+
+  async getPreReg() {
+    if (this.doctorService.searchDoctorSource2) {
+      if (this.doctorService.searchDoctorSource2.fromPreRegis === true) { //from pre registration
+        this.bodyPreReg = JSON.parse(localStorage.getItem('fromPreRegis'))
+        this.patientPreReg = this.bodyPreReg.patientPreReg;
+        this.orderDetail = this.bodyPreReg.orderDetail;
+        this.fromPreRegis = true;
+        if(this.bodyPreReg.fromPatientData === true) {
+          this.fromPatientData = true;
+        }
+      }
+    } else if (this.activatedRoute.snapshot.queryParamMap.get('fromPreRegis') === 'true') {
+      this.bodyPreReg = JSON.parse(localStorage.getItem('fromPreRegis'))
+      this.patientPreReg = this.bodyPreReg.patientPreReg;
+      this.orderDetail = this.bodyPreReg.orderDetail;
+      this.fromPreRegis = true;
+
+   
+      if(this.bodyPreReg.fromPatientData === true) {
+        this.fromPatientData = true;
+      }
+    }
   }
 
   cssAlertType(alert: Alert) {

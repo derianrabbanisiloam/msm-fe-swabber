@@ -16,25 +16,49 @@ export class ScheduleService {
   private opAdminScheduleUrl = environment.OPADMIN_SERVICE + '/schedules';
   private scheduleBlockUrl = environment.CALL_CENTER_SERVICE + '/schedules/block';
   private leaveUrl = environment.OPADMIN_SERVICE + '/doctors/leaves';
+  private checkUpLeaveUrl = environment.OPADMIN_SERVICE + '/checkups/blocks';
   private timeSlotUrl = environment.CALL_CENTER_SERVICE + '/schedules/time-slot/hospital';
+  private timeSlotCovidUrl = environment.CALL_CENTER_SERVICE + '/schedules/time-slot/checkup';
+  private schedulecovidUrl = environment.OPADMIN_SERVICE + '/checkups';
 
   private scheduleBlockSource = new Subject<boolean>();
   public scheduleBlockSource$ = this.scheduleBlockSource.asObservable();
-  
+
   emitScheduleBlock(params: boolean) {
     this.scheduleBlockSource.next(params);
   }
 
-  getTimeSlotSchedule(hospitalId: string, doctorId: string, scheduleId: string, date: string){
+  getCheckUpSchedule(hospitalId: string, checkUpId: string, date?: string, isDriveThru?: boolean, fromDate?: string, toDate?: string){
+    let uri = `${this.schedulecovidUrl}/schedules/hospital/${hospitalId}?`;
+    uri = checkUpId ? `${uri}checkupId=${checkUpId}` : uri;
+    uri = date ? `${uri}&date=${date}` : uri;
+    uri = isDriveThru !== null && isDriveThru !== undefined ? `${uri}&isDriveThru=${isDriveThru}` : uri;
+    uri = fromDate ? `${uri}&fromDate=${fromDate}` : uri;
+    uri = toDate ? `${uri}&toDate=${toDate}` : uri;
+    return this.http.get<any>(uri, httpOptions);
+  }
+
+  getCategoriesTestList(hospitalId: string) {
+    const uri = `${this.schedulecovidUrl}/categories/hospital/${hospitalId}`;
+    return this.http.get<any>(uri, httpOptions);
+  }
+
+  getTimeSlotSchedule(hospitalId: string, doctorId: string, scheduleId: string, date: string) {
     const uri = `${this.timeSlotUrl}/${hospitalId}/doctor/${doctorId}/appointment-date/${date}?scheduleId=${scheduleId}`;
     return this.http.get<any>(uri, httpOptions);
   }
 
-  getTimeSlot(hospitalId: string, doctorId: string, date: string, consulType?: string){
+  getTimeSlot(hospitalId: string, doctorId: string, date: string, consulType?: string) {
     let uri = `${this.timeSlotUrl}/${hospitalId}/doctor/${doctorId}/appointment-date/${date}`;
     if (consulType) {
       uri = `${uri}?consultationTypeId=${consulType}`;
     }
+    return this.http.get<any>(uri, httpOptions);
+  }
+
+  getTimeSlotCovid(hospitalId: string, checkUpId: string, date: string, isDriveThru?: boolean){
+    let uri = `${this.timeSlotCovidUrl}?hospitalId=${hospitalId}&checkUpId=${checkUpId}&appointmentDate=${date}`;
+    uri = isDriveThru !== null && isDriveThru !== undefined ? `${uri}&isDriveThru=${isDriveThru}` : uri;
     return this.http.get<any>(uri, httpOptions);
   }
 
@@ -85,8 +109,8 @@ export class ScheduleService {
   }
 
   getLeaveHeader(
-    year: string, 
-    hospitalId: string, 
+    year: string,
+    hospitalId: string,
     doctorId?: string,
     areaId?: string,
     specialityId?: string
@@ -99,6 +123,15 @@ export class ScheduleService {
     } else if (hospitalId && specialityId) {
       url = `${url}&hospitalId=${hospitalId}&specialityId=${specialityId}`;
     }
+    return this.http.get<any>(url, httpOptions);
+  }
+
+  getLeaveHeaderCheckUp(
+    hospitalId: string,
+    checkUpId: string
+  ): Observable<any> {
+    let url = `${this.checkUpLeaveUrl}?hospitalId=${hospitalId}`;
+    url = checkUpId ? `${url}&checkupId=${checkUpId}` : url;
     return this.http.get<any>(url, httpOptions);
   }
 

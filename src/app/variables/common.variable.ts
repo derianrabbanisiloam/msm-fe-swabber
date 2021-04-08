@@ -126,11 +126,40 @@ export const activityType = {
 
 export const paymentStatus = {
   PAID: '1',
-  UNPAID: '2',
-  NOTPAID: '3',
+  NOTPAID: '2',
+  PAYMENTEXPIRED: '3',
+  PAYLATER: '4'
 };
 
 export const pathImage = {
   DISCLAIMER: '/disclaimer_1/',
   BPJS_CARD: '/bpjs_identity_card'
 }
+
+export const patientStatus = {
+  NOT_REGISTERED: '1',
+  REGISTERED: '2',
+  SCREENED: '3',
+  EVALUATED: '4',
+  VACCINATED: '5',
+  CANCELLED_VACCINATION: '6'
+};
+
+export const vaccineType = [
+  {
+    form_type_name: 'Appointment Vaksin Lansia',
+    form_type_id: '748234e7-c142-4786-9e64-e0f3cefc1b4d'
+  },
+  {
+    form_type_name: 'Appointment Vaksin Gotong Royong',
+    form_type_id: 'a5f94f58-6734-40b5-a98a-d6263d86defb'
+  },
+  {
+    form_type_name: 'Appointment Vaksin Tenaga Publik',
+    form_type_id: '4081e078-dfb7-4d67-8256-7fea3785d766'
+  },
+  {
+    form_type_name: 'Appointment Vaksin',
+    form_type_id: 'dc1071a7-0a9a-4dd3-a8fa-62cc7299211f'
+  },
+]

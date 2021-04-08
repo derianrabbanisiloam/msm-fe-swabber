@@ -2,7 +2,7 @@ import { Injectable } from '@angular/core';
 import { Observable, of, Subject } from 'rxjs';
 import { HttpClient } from '@angular/common/http';
 import { catchError, tap } from 'rxjs/operators';
-import { Appointment} from  '../models/appointments/appointment';
+import { Appointment } from '../models/appointments/appointment';
 import { Receiver } from '../models/appointments/receiver';
 import { environment } from '../../environments/environment';
 import { httpOptions } from '../utils/http.util';
@@ -18,11 +18,14 @@ export class AppointmentService {
 
   private appointmentUrl = environment.FRONT_OFFICE_SERVICE + '/appointments';
   private ccAppointmentUrl = environment.CALL_CENTER_SERVICE + '/appointments';
+  private ccAppointmentCovidUrl = environment.CALL_CENTER_SERVICE + '/appointments/covid';
   private rescheduleUrl = environment.CALL_CENTER_SERVICE + '/appointments/reschedules';
+  private rescheduleVaccineUrl = environment.CALL_CENTER_SERVICE + '/appointments/reschedules/covid';
   private reserveSlotAppUrl = environment.CALL_CENTER_SERVICE + '/appointments/reserved-slot';
   private appointmentRescheduleCount = environment.CALL_CENTER_SERVICE + '/appointments/reschedules/count';
   private appointmentRescheduleAidoCount = environment.CALL_CENTER_SERVICE + '/appointments/reschedules/count/aido';
   private aidoWorklistUrl = environment.CALL_CENTER_SERVICE + '/appointments/aido';
+  private preRegistrationUrl = environment.FRONT_OFFICE_SERVICE + '/preregistrations';
 
   private rescheduleAppSource = new Subject<any>();
   public rescheduleAppSource$ = this.rescheduleAppSource.asObservable();
@@ -32,9 +35,21 @@ export class AppointmentService {
   public cancelAppSource$ = this.cancelAppSource.asObservable();
   private verifyAppSource = new Subject<boolean>();
   public verifyAppSource$ = this.verifyAppSource.asObservable();
+  private closeModalSource = new Subject<boolean>();
+  public closeModalSource$ = this.closeModalSource.asObservable();
+  private openModalSource = new Subject<any>();
+  public openModalSource$ = this.openModalSource.asObservable();
 
   private updateNotesSource = new Subject<boolean>();
   public updateNotesSource$ = this.updateNotesSource.asObservable();
+
+  emitCloseModal(params: boolean) {
+    this.closeModalSource.next(params);
+  }
+
+  emitOpenModal(params: any) {
+    this.openModalSource.next(params);
+  }
 
   emitCreateApp(params: boolean) {
     this.createAppSource.next(params);
@@ -48,21 +63,40 @@ export class AppointmentService {
     this.verifyAppSource.next(params);
   }
 
-  emitUpdateNotes(params: boolean){
+  emitUpdateNotes(params: boolean) {
     this.updateNotesSource.next(params);
+  }
+
+  getOrderList(date: any, hospital: string, limit: number, offset: number,
+    confirmCode?: string, submitDate?: string, name?: string): Observable<any> {
+
+    let uri = `${this.preRegistrationUrl}/orders/hospital/${hospital}?preRegDate=${date}`; 
+    uri = confirmCode ? `${uri}&confirmationCode=${confirmCode}` : uri;
+    uri = name ? `${uri}&name=${name}` : uri;
+    const url = `${uri}&limit=${limit}&offset=${offset}`;
+    return this.http.get<any>(url, httpOptions);
+  }
+
+  
+  getPreRegistrationList(orderId: any, limit: number, offset: number, isNew: boolean): Observable<any> {
+    let uri = `${this.preRegistrationUrl}/order/${orderId}?limit=${limit}&offset=${offset}`;
+
+    uri = isNew ? `${uri}&isNew=${isNew}` : uri;
+
+    return this.http.get<any>(uri, httpOptions);
   }
 
   updateDetailTemporaryApp(tempAppId: any, payload: any): Observable<any> {
     const url = `${this.ccAppointmentUrl}/temporary/${tempAppId}`;
     const body = JSON.stringify(payload);
-    
+
     return this.http.put<any>(url, body, httpOptions);
   }
 
   updateAppBpjs(appointmentId: any, payload: any): Observable<any> {
     const url = `${this.ccAppointmentUrl}/${appointmentId}`;
     const body = JSON.stringify(payload);
-    
+
     return this.http.put<any>(url, body, httpOptions);
   }
 
@@ -88,7 +122,7 @@ export class AppointmentService {
   getCountAppReschedule(hospital: string, channel?: string, exclude?: boolean) {
     let url = `${this.appointmentRescheduleCount}?hospitalId=${hospital}`;
     url = channel ? `${url}&channelId=${channel}` : url;
-    url =`${url}&exclude=${exclude}`;
+    url = `${url}&exclude=${exclude}`;
     return this.http.get<any>(url, httpOptions);
   }
 
@@ -98,11 +132,11 @@ export class AppointmentService {
   }
 
   getListAppointment(date: any, hospital: string, name?: string, birth?: any, mr?: any, doctor?: string,
-     modifiedName?: string, isWaitingList?: boolean, limit?: number, offset?: number, channel?: string,
-     exclude?: boolean): Observable<any> {
+    modifiedName?: string, isWaitingList?: boolean, limit?: number, offset?: number, channel?: string,
+    exclude?: boolean): Observable<any> {
 
     let uri = `/hospital/${hospital}?date=${date}`;
-    
+
     uri = name ? `${uri}&name=${name}` : uri;
     uri = birth ? `${uri}&birth=${birth}` : uri;
     uri = mr ? `${uri}&mr=${mr}` : uri;
@@ -110,7 +144,7 @@ export class AppointmentService {
     uri = modifiedName ? `${uri}&modifiedName=${modifiedName}` : uri;
     uri = isWaitingList ? `${uri}&isWaitingList=${isWaitingList}` : uri;
     uri = channel ? `${uri}&channelId=${channel}` : uri;
-    uri =`${uri}&exclude=${exclude}`;
+    uri = `${uri}&exclude=${exclude}`;
 
     const url = `${uri}&limit=${limit}&offset=${offset}`;
 
@@ -126,13 +160,23 @@ export class AppointmentService {
     return this.http.get<Receiver[]>(this.appointmentUrl + uri, httpOptions);
   }
 
-  isLate(appointmentId: string): Observable<any>{
+  isLate(appointmentId: string): Observable<any> {
     const uri = '/late/' + appointmentId;
     return this.http.get<any>(this.appointmentUrl + uri, httpOptions);
   }
 
   getAppointmentById(appointmentId: string): Observable<any> {
     const url = `${this.ccAppointmentUrl}/${appointmentId}`;
+    return this.http.get<any>(url, httpOptions);
+  }
+
+  getAppointmentCovidById(appointmentId: string): Observable<any> {
+    const url = `${this.ccAppointmentCovidUrl}/detail/${appointmentId}`;
+    return this.http.get<any>(url, httpOptions);
+  }
+
+  getAppointmentByRegisFormId(registrationFormId: string): Observable<any> {
+    const url = `${this.preRegistrationUrl}/appointment/${registrationFormId}`;
     return this.http.get<any>(url, httpOptions);
   }
 
@@ -152,7 +196,7 @@ export class AppointmentService {
     url = doctor ? `${url}&doctorId=${doctor}` : url;
     url = `${url}&limit=${limit}&offset=${offset}`;
     url = channel ? `${url}&channelId=${channel}` : url;
-    url =`${url}&exclude=${exclude}`;
+    url = `${url}&exclude=${exclude}`;
     // return of(APPOINTMENT)
     return this.http.get<any>(url, httpOptions);
   }
@@ -170,7 +214,7 @@ export class AppointmentService {
     url = name ? `${url}&patientName=${name}` : url;
     url = doctor ? `${url}&doctorId=${doctor}` : url;
     url = `${url}&limit=${limit}&offset=${offset}`;
-    
+
     // return of(APPOINTMENT)
     return this.http.get<any>(url, httpOptions);
   }
@@ -194,12 +238,12 @@ export class AppointmentService {
     url = admStatus ? `${url}&admStatus=${admStatus}` : url;
     url = payStatus ? `${url}&paymentStatus=${payStatus}` : url;
     url = `${url}&limit=${limit}&offset=${offset}`;
-    
+
     // return of(APPOINTMENT)
     return this.http.get<any>(url, httpOptions);
   }
 
-  submitEligibleAido(payload: any, appId: string): Observable<any>{
+  submitEligibleAido(payload: any, appId: string): Observable<any> {
     const url = `${this.aidoWorklistUrl}/${appId}`;
     return this.http.put<any>(url, payload, httpOptions);
   }
@@ -208,29 +252,39 @@ export class AppointmentService {
     return this.http.post<any>(this.rescheduleUrl, addReschedulePayload, httpOptions);
   }
 
+  addRescheduleAppointmentVaccine(addReschedulePayload: any): Observable<any> {
+    return this.http.post<any>(this.rescheduleVaccineUrl, addReschedulePayload, httpOptions);
+  }
+
   deleteAppointment(appointmentId: string, payload: any, temp = false, isAido = false) {
     let url = `${this.ccAppointmentUrl}`;
 
-    if(isAido){
+    if (isAido) {
       url = `${url}/aido/${appointmentId}`;
     }
 
-    if(temp){
+    if (temp) {
       url = `${url}/temporary/${appointmentId}`;
     }
 
-    if(!temp && !isAido){
+    if (!temp && !isAido) {
       url = `${url}/${appointmentId}`
     }
-    
+
     const body = JSON.stringify(payload);
-    
+
     const options = {
       ...httpOptions,
       body,
     };
-    
+
     return this.http.delete<any>(url, options);
+  }
+
+  deleteAppointmentVaccine(registrationFormId: string, payload: any) {
+    let url = `${this.preRegistrationUrl}/worklist/${registrationFormId}`;
+    const body = JSON.stringify(payload);
+    return this.http.put<any>(url, body, httpOptions);
   }
 
   getAppointmentByScheduleId(scheduleId: string, date: string, sortBy?: string, orderBy?: string): Observable<any> {
@@ -244,14 +298,20 @@ export class AppointmentService {
     return this.http.get<any>(url, httpOptions);
   }
 
+  getAppointmentByDayCovid(hospitalId: string, checkupId: string, date: string, isDriveThru?: boolean): Observable<any> {
+    let url = `${this.ccAppointmentCovidUrl}/list?hospitalId=${hospitalId}&checkUpId=${checkupId}&date=${date}`;
+    url = isDriveThru !== null && isDriveThru !== undefined ? `${url}&isDriveThru=${isDriveThru}` : url;
+    return this.http.get<any>(url, httpOptions);
+  }
+
   reserveSlotApp(reserveSlotAppPayload: any): Observable<any> {
     return this.http.post<any>(this.reserveSlotAppUrl, reserveSlotAppPayload, httpOptions);
   }
 
   getReservedSlotApp(
-    scheduleId: string, 
-    appointmentDate: string, 
-    appointmentNo: number, 
+    scheduleId: string,
+    appointmentDate: string,
+    appointmentNo: number,
     userId: string,
     channelId: string): Observable<any> {
     const url = `${this.reserveSlotAppUrl}?scheduleId=${scheduleId}&appointmentDate=${appointmentDate}`
@@ -271,7 +331,7 @@ export class AppointmentService {
   }
 
 
-  getTempAppointment(tempId: any){
+  getTempAppointment(tempId: any) {
     const url = `${this.ccAppointmentUrl}/temporary/${tempId}`;
     // return of(APPOINTMENT);
     return this.http.get<any>(url, httpOptions);

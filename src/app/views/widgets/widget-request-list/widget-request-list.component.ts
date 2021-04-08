@@ -89,6 +89,7 @@ export class WidgetRequestListComponent implements OnInit {
   public offset: number = 0;
   public countOne: number = 1;
   public countTwo: number = 0;
+  public catatan: any = 'asdklfjasldh alsjkdhflas akljh laksjdh lkjahslkdfj';
 
   constructor(
     private doctorService: DoctorService,

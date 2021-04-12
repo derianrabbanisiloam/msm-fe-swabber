@@ -27,7 +27,6 @@
       <table class="table table-bordered">
         <thead class="fo_color_blue foot-note" style="text-align: center">
           <th>No.</th>
-          <th style="min-width: 2em">Request ID</th>
           <th style="min-width: 2em">Request Date</th>
           <th style="min-width: 14em">Patient Name</th>
           <th style="white-space: nowrap; text-align: center; min-width: 11em">Date of Birth</th>
@@ -35,13 +34,13 @@
           <th>BPJS Number</th>
           <th style="min-width: 5em">Preferred Appointment Date</th>
           <th>Control No.</th>
+          <th>Poly</th>
           <th>Document</th>
           <th>Action</th>
         </thead>
     
         <tbody>
           <tr class="fo_header_grey filter-row">
-            <td></td>
             <td></td>
             <td>
               <my-date-range-picker name="mydaterange" [options]="myDateRangeCreatedDate" [(ngModel)]="datePickerCreatedDate"
@@ -74,13 +73,13 @@
             <td></td>
             <td></td>
             <td></td>
+            <td></td>
           </tr>
     
           <tr *ngFor="let r of appRequestList; let i = index">
             <td>
               {{i+1}}
             </td>
-            <td>{{r.booking_code}}</td>
             <td>{{r.created_date}}</td>
             <td style="text-transform: uppercase; min-width: 8em">
               <a ngbPopover="{{r.patient_name}}" popoverTitle=""
@@ -94,6 +93,10 @@
             <td style="text-align: center">{{ r.bpjs_card_number }}</td>
             <td style="min-width: 8em">{{ r.appointment_date }}</td>
             <td>{{r.control_number}}</td>
+            <td>
+              <a ngbPopover="{{r.poly_name}}" popoverTitle=""
+                triggers="mouseenter:mouseleave">{{r.poly_name && r.poly_name.length > 25 ? r.poly_name.substr(0,25)+"..." : r.poly_name}}</a>
+            </td>
             <td>
               <span *ngIf="r.bpjs_card_file">
                 <a href=":javascript"
@@ -164,7 +167,6 @@
       <table class="table table-bordered">
         <thead class="fo_color_blue foot-note" style="text-align: center">
           <th>No.</th>
-          <th style="min-width: 2em">Request ID</th>
           <th style="min-width: 2em">Request Date</th>
           <th style="min-width: 14em">Patient Name</th>
           <th style="white-space: nowrap; text-align: center; min-width: 11em">Date of Birth</th>
@@ -172,13 +174,13 @@
           <th>BPJS Number</th>
           <th style="min-width: 5em">Preferred Appointment Date</th>
           <th>Control No.</th>
+          <th>Poly</th>
           <th>Document</th>
           <th>Status</th>
         </thead>
     
         <tbody>
           <tr class="fo_header_grey filter-row">
-            <td></td>
             <td></td>
             <td>
               <my-date-range-picker name="mydaterange" [options]="myDateRangeCreatedDate" [(ngModel)]="datePickerCreatedDateTwo"
@@ -211,13 +213,13 @@
             <td></td>
             <td></td>
             <td></td>
+            <td></td>
           </tr>
     
           <tr *ngFor="let r of appReqCompleted; let i = index">
             <td>
               {{i+1}}
             </td>
-            <td>{{r.booking_code}}</td>
             <td>{{r.fix_created_date}}</td>
             <td style="text-transform: uppercase; min-width: 8em">
               <a ngbPopover="{{r.patient_name}}" popoverTitle=""
@@ -231,6 +233,10 @@
             <td style="text-align: center">{{ r.bpjs_card_number }}</td>
             <td style="min-width: 8em">{{ r.fix_appointment_date }}</td>
             <td>{{r.control_number}}</td>
+            <td>
+              <a ngbPopover="{{r.poly_name}}" popoverTitle=""
+                triggers="mouseenter:mouseleave">{{r.poly_name && r.poly_name.length > 25 ? r.poly_name.substr(0,25)+"..." : r.poly_name}}</a>
+            </td>
             <td>
               <span *ngIf="r.bpjs_card_file">
                 <a href=":javascript"

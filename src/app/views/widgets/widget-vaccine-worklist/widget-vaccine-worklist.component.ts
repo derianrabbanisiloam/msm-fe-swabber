@@ -28,9 +28,10 @@ export class WidgetVaccineWorklistComponent implements OnInit {
   public alerts: Alert[] = [];
   public limit = 10;
   public offset = 0;
-  public model: any = { 
+  public model: any = {
     date: '', toDate: '', uniqueCode: '', birth: '', appDate: '',
     name: '', phoneNumber: '', patientStatus: null, isPreRegist: null,
+    iteration: 0,
     formTypeId: null, };
   public showWaitMsg: boolean = false;
   public showNotFoundMsg: boolean = false;
@@ -77,11 +78,11 @@ export class WidgetVaccineWorklistComponent implements OnInit {
 
   async downloadCsv() {
     if(this.vaccineWorklist.length > 0) {
-      let { date, toDate, uniqueCode, birth, appDate, 
+      let { date, toDate, uniqueCode, birth, appDate,
         name, phoneNumber, isPreRegist, patientStatus,
         formTypeId } = await this.model;
       let uniCode = uniqueCode ? uniqueCode.toUpperCase() : '';
-      let url = environment.FRONT_OFFICE_SERVICE 
+      let url = environment.FRONT_OFFICE_SERVICE
         +'/preregistrations/worklist/download/'
         +this.hospital.id+'?';
         url = date ? `${url}appointmentDate=${date}` : url;
@@ -94,7 +95,7 @@ export class WidgetVaccineWorklistComponent implements OnInit {
         url = isPreRegist ? `${url}&isPreRegist=${isPreRegist}` : url;
         url = patientStatus ? `${url}&patientStatus=${patientStatus}` : url;
         url = formTypeId ? `${url}&formTypeId=${formTypeId}` : url;
-        
+
       let requestOptions = { responseType: 'blob' as 'blob' };
       this.http.get(url, requestOptions).subscribe(val => {
         let url = URL.createObjectURL(val);
@@ -162,30 +163,30 @@ export class WidgetVaccineWorklistComponent implements OnInit {
     }
   }
 
-  async noResetFilter(search, flagReset) {
+  noResetFilter(search, flagReset) {
     this.isResetFilter = flagReset;
     this.searchVaccineList(search);
   }
 
-  async searchVaccineList(search?: boolean) {
+  searchVaccineList(search?: boolean) {
     this.offset = search ? 0 : this.offset;
-    let { date, toDate, uniqueCode, birth, appDate, 
+    const { date, toDate, uniqueCode, birth, appDate,
       name, phoneNumber, isPreRegist, patientStatus,
-      formTypeId } = await this.model;
+      formTypeId, iteration } = this.model;
 
-    let uniCode = uniqueCode ? uniqueCode.toUpperCase() : '';
+    const uniCode = uniqueCode ? uniqueCode.toUpperCase() : '';
 
-    if (date || toDate || uniCode || birth || appDate || 
+    if (date || toDate || uniCode || birth || appDate ||
         name || phoneNumber || isPreRegist || patientStatus || formTypeId) {
-      this.getVaccineList(date, toDate, uniCode, birth, appDate, name, 
-        phoneNumber, isPreRegist, patientStatus, formTypeId);
+      this.getVaccineList(date, toDate, uniCode, birth, appDate, name,
+        phoneNumber, isPreRegist, patientStatus, formTypeId, iteration);
     } else {
       this.getVaccineList();
     }
   }
 
-  async getVaccineList(date = '', toDate = '', uniCode = '', birth = '', appDate = '', name = '', phoneNumber = '', 
-    isPreRegist = null, patientStatus = '', formTypeId = '') {
+  getVaccineList(date = '', toDate = '', uniCode = '', birth = '', appDate = '', name = '', phoneNumber = '',
+    isPreRegist = null, patientStatus = '', formTypeId = '', iteration = 0) {
     this.showWaitMsg = true;
     this.showNotFoundMsg = false;
 
@@ -194,9 +195,9 @@ export class WidgetVaccineWorklistComponent implements OnInit {
     const limit = this.limit;
     const offset = this.offset;
 
-    this.vaccineWorklist = await this.consentService.getVaccineWorklist(date, toDate, hospital, limit, offset, uniCode,
-      birth, appDate, name, phoneNumber, isPreRegist, patientStatus, formTypeId)
-      .toPromise().then(res => {
+    this.consentService.getVaccineWorklist(date, toDate, hospital, limit, offset, uniCode,
+      birth, appDate, name, phoneNumber, isPreRegist, patientStatus, formTypeId, iteration)
+      .subscribe(res => {
         this.isCanNextPage = res.data.length >= 10 ? true : false;
         this.isCanPrevPage = this.offset === 0 ? false : true;
         this.counter = res.counter;
@@ -212,12 +213,12 @@ export class WidgetVaccineWorklistComponent implements OnInit {
           this.showWaitMsg = false;
           this.showNotFoundMsg = true;
         }
-        return res.data;
-      }).catch(err => {
+        this.vaccineWorklist = res.data;
+      }, err => {
         this.showWaitMsg = false;
         this.showNotFoundMsg = true;
         this.alertService.error(err.error.message, false, 3000);
-        return [];
+        this.vaccineWorklist = [];
       });
   }
 

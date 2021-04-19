@@ -19,9 +19,12 @@ export class ConsentService {
   private admissionUrl = environment.FRONT_OFFICE_SERVICE + '/admissions';
   private preregisUrl = environment.FRONT_OFFICE_SERVICE + '/preregistrations';
 
-  getVaccineWorklist(date: any, toDate: string, hospital: string, limit: number, offset: number,
-    uniCode?: string, birth?: string, appDate?: string, name?: string, 
-    phoneNumber?: string, isPreRegist?: boolean, patientStatus?: string, formTypeId?: string): Observable<any> {
+  getVaccineWorklist(
+    date: any,
+    toDate: string, hospital: string, limit: number, offset: number,
+    uniCode?: string, birth?: string, appDate?: string, name?: string,
+    phoneNumber?: string, isPreRegist?: boolean, patientStatus?: string,
+    formTypeId?: string, iteration: number = 0): Observable<any> {
 
     let uri = `${this.preregisUrl}/worklist/${hospital}?appointmentDate=${date}&toAppointmentDate=${toDate}`;
     uri = uniCode ? `${uri}&uniqueCode=${uniCode}` : uri;
@@ -32,6 +35,7 @@ export class ConsentService {
     uri = isPreRegist ? `${uri}&isPreRegist=${isPreRegist}` : uri;
     uri = patientStatus ? `${uri}&patientStatus=${patientStatus}` : uri;
     uri = formTypeId ? `${uri}&formTypeId=${formTypeId}` : uri;
+    uri = iteration !== 0 ? `${uri}&iteration=${iteration}` : uri;
     const url = `${uri}&limit=${limit}&offset=${offset}`;
     return this.http.get<any>(url, httpOptions);
   }

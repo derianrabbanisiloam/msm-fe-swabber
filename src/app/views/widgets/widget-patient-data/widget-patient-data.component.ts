@@ -1505,6 +1505,10 @@ export class WidgetPatientDataComponent implements OnInit {
     window.open(this.urlBpjsCard +'/'+ pathFile +'/'+ fileName, '_blank', "status=1");
   }
 
+  getImageTwo(fileName) {
+    window.open(fileName, '_blank', "status=1");
+  }
+
   async editAppointmentData(pathFile, nameFile) {
     this.bodyUpload = {
       userId: this.user.id,

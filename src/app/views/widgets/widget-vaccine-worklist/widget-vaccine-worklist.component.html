@@ -52,7 +52,7 @@
 </div>
 
 <div class="fo_container_list shadow-4">
-  <table class="table table-bordered">
+  <table class="table table-bordered vaccine-worklist">
     <thead class="fo_color_blue foot-note">
       <th style="width: 1em;">No.</th>
       <th style="width: 6em">Kode Unik</th>
@@ -63,6 +63,7 @@
       <th style="width: 9em">Jam Perjanjian</th>
       <th style="width: 7em;">Pre-Regis & Screening</th>
 			<th style="width: 5em; text-align: center;">Status Pasien</th>
+      <th style="width: 5em; text-align: center;">Vaksinasi ke</th>
       <th style="width: 5em; text-align: center;">Program Vaksinasi</th>
       <th style="width: 9em; text-align: center;">Notes</th>
       <th style="width: 6em; text-align: center;">Action</th>
@@ -125,6 +126,13 @@
           </select>
         </td>
         <td>
+          <select id="iteration-option" class="form-control" (change)="noResetFilter(true, true)" [(ngModel)]="model.iteration" name="iteration">
+            <option [ngValue]=0 [selected]="model.iteration === 0">ALL</option>
+            <option [ngValue]=1>1</option>
+            <option [ngValue]=2>2</option>
+          </select>
+        </td>
+        <td>
           <select id="title" class="form-control" (change)="noResetFilter(true, true)" [(ngModel)]="model.formTypeId" name="formTypeId">
             <option [ngValue]=null [selected]="model.formTypeId === null">ALL</option>
             <option *ngFor = "let type of vaccineType" [ngValue]="type.form_type_id">{{type.form_type_name}}</option>
@@ -132,7 +140,10 @@
         </td>
       </tr>
 
-      <tr *ngFor="let itr of vaccineWorklist; let i=index" [ngClass]="{ 'row-pink' : itr.order_status === '2' }">
+      <tr
+        class="worklist-item"
+        *ngFor="let itr of vaccineWorklist; let i=index"
+        [ngClass]="{ 'row-pink' : itr.order_status === '2' }">
         <td>{{(i+1+offset)}}</td>
         <td>{{itr.consent_code}}</td>
         <td>
@@ -151,6 +162,7 @@
           <span *ngIf="itr.consent_id === null">No</span>
         </td>
         <td style="text-align: center;">{{itr.status}}</td>
+        <td style="text-align: center;">{{itr.iteration}}</td>
         <td style="text-align: center;">{{itr.form_type}}</td>
         <td>
           <a ngbPopover="{{itr.note}}" popoverTitle=""
@@ -192,7 +204,7 @@
       <div>Jumlah Registrasi: {{counter.registered}}</div>
       <div>Jumlah PreRegist/Screen: {{counter.screened}}</div>
     </div>
-    
+
   </div>
 </div>
 

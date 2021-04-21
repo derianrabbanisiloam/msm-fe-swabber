@@ -18,6 +18,7 @@ import {
 } from '../modal-appointment-bpjs/modal-appointment-bpjs.component';
 import socket from 'socket.io-client';
 import Security from 'msm-kadapat';
+import { WebsocketService } from '../../../services/websocket.service';
 
 @Component({
   selector: 'app-widget-reschedule-worklist',
@@ -53,7 +54,6 @@ export class WidgetRescheduleWorklistComponent implements OnInit {
   public isBpjs: boolean = false;
   public countAppRes: number;
   public countAppResBpjs: number;
-  private socket;
   //aido
   public count: number = -1;
   public countAppResAido: number;
@@ -75,22 +75,16 @@ export class WidgetRescheduleWorklistComponent implements OnInit {
     private appointmentService: AppointmentService,
     private doctorService: DoctorService,
     private patientService: PatientService,
+    private webSocketService: WebsocketService,
     private modalService: NgbModal,
     private alertService: AlertService,
-  ) {
-    this.socket = socket(`${environment.WEB_SOCKET_SERVICE + keySocket.APPOINTMENT}`, {
-      transports: ['websocket'],
-      query: `data=${
-        Security.encrypt({ secretKey: SecretKey }, Jwt)
-        }&url=${environment.CALL_CENTER_SERVICE}`,
-    });
-   }
+  ) {}
 
   ngOnInit() {
     this.keywordsModel.hospitalId = this.hospital.id;
     this.keywordsModelTwo.hospitalId = this.hospital.id;
     this.keywordsBpjs.hospitalId = this.hospital.id;
-    this.socket.on(APP_RESCHEDULE+'/'+this.hospital.id, (call) => {
+    this.webSocketService.appointmentSocket(`${APP_RESCHEDULE}/${this.hospital.id}`).subscribe((call) => {
       this.countAppRes = call.data;
     });
     this.getDoctors(this.hospital.id);

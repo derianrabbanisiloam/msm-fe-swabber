@@ -64,7 +64,8 @@ import Swal from 'sweetalert2';
 import { FormBuilder, FormGroup, FormControl } from '@angular/forms';
 import { PayerService } from '../../../services/payer.service';
 import { ModalSearchPayerComponent } from '../modal-search-payer/modal-search-payer.component';
-import { isNumber } from 'util'
+import { isNumber } from 'util';
+import { WebsocketService } from '../../../services/websocket.service';
 
 @Component({
   selector: 'app-widget-create-appointment',
@@ -79,9 +80,6 @@ export class WidgetCreateAppointmentComponent implements OnInit {
   public user = this.key.user;
   public isBridging = this.key.hospital.isBridging
   public assetPath = environment.ASSET_PATH;
-  private socket;
-  private socketTwo;
-  private socketThree;
   public appointments: any;
   public appList: any = [];
   public schLength: number = 0;
@@ -252,29 +250,9 @@ export class WidgetCreateAppointmentComponent implements OnInit {
     private queueService: QueueService,
     private bpjsService: BpjsService,
     private formBuilder: FormBuilder,
+    private webSocketService: WebsocketService,
     modalSetting: NgbModalConfig,
   ) {
-    this.socket = socket(`${environment.WEB_SOCKET_SERVICE + keySocket.APPOINTMENT}`, {
-      transports: ['websocket'],
-      query: `data=${
-        Security.encrypt({ secretKey: SecretKey }, Jwt)
-        }&url=${environment.FRONT_OFFICE_SERVICE}`,
-    });
-
-    this.socketTwo = socket(`${environment.WEB_SOCKET_SERVICE + keySocket.QUEUE}`, {
-      transports: ['websocket'],
-      query: `data=${
-        Security.encrypt({ secretKey: SecretKey }, Jwt)
-        }&url=${environment.FRONT_OFFICE_SERVICE}`,
-    });
-
-    this.socketThree = socket(environment.WEB_SOCKET_SERVICE + keySocket.SCHEDULE, {
-      transports: ['websocket'],  
-      query: `data=${
-        Security.encrypt({ secretKey: SecretKey }, Jwt)
-        }&url=${environment.FRONT_OFFICE_SERVICE}`,
-    });
-
     modalSetting.backdrop = 'static';
     modalSetting.keyboard = false;
   }
@@ -315,7 +293,7 @@ export class WidgetCreateAppointmentComponent implements OnInit {
     this.setDiagnose();
    
     //socket reserve slot
-    this.socketTwo.on(RESERVE_SLOT+'/'+this.hospital.id, (call) => {
+    this.webSocketService.queueSocket(`${RESERVE_SLOT}/${this.hospital.id}`).subscribe((call) => {
       for(let k = 0, { length } = this.slotList; k < length; k += 1) {
         if (call.data.scheduleId == this.slotList[k].schedule_id
           && call.data.appointmentDate == this.appointmentPayload.appointmentDate
@@ -328,7 +306,7 @@ export class WidgetCreateAppointmentComponent implements OnInit {
     });
 
     //socket release slot
-    this.socketTwo.on(RELEASE_SLOT+'/'+this.hospital.id, (call) => {
+    this.webSocketService.queueSocket(`${RELEASE_SLOT}/${this.hospital.id}`).subscribe((call) => {
       for(let k = 0, { length } = this.slotList; k < length; k += 1) {
         if (call.data.scheduleId == this.slotList[k].schedule_id
           && call.data.appointmentDate == this.appointmentPayload.appointmentDate
@@ -340,8 +318,8 @@ export class WidgetCreateAppointmentComponent implements OnInit {
       }
     });
 
-    //scoket create appointment
-    this.socket.on(CREATE_APP+'/'+this.hospital.id, (call) => {
+    //socket create appointment
+    this.webSocketService.appointmentSocket(`${CREATE_APP}/${this.hospital.id}`).subscribe((call) => {
       for(let k = 0, { length } = this.schedule; k < length; k += 1) {
         if (call.data.schedule_id == this.schedule[k].schedule_id
           && call.data.appointment_date == this.appointmentPayload.appointmentDate) {
@@ -360,7 +338,7 @@ export class WidgetCreateAppointmentComponent implements OnInit {
     });
 
     //socket cancel appointment
-    this.socket.on(CANCEL_APP+'/'+this.hospital.id, (call) => {
+    this.webSocketService.appointmentSocket(`${CANCEL_APP}/${this.hospital.id}`).subscribe((call) => {
       for(let k = 0, { length } = this.schedule; k < length; k += 1) {
         if (call.data.schedule_id == this.schedule[k].schedule_id
           && call.data.appointment_date == this.appointmentPayload.appointmentDate) {
@@ -378,7 +356,7 @@ export class WidgetCreateAppointmentComponent implements OnInit {
     });
 
     //socket checkin appointment
-    this.socket.on(CHECK_IN+'/'+this.hospital.id, (call) => {
+    this.webSocketService.appointmentSocket(`${CHECK_IN}/${this.hospital.id}`).subscribe((call) => {
       for(let k = 0, { length } = this.schedule; k < length; k += 1) {
         if (call.data.schedule_id == this.schedule[k].schedule_id
           && call.data.appointment_date == this.appointmentPayload.appointmentDate) {
@@ -394,7 +372,7 @@ export class WidgetCreateAppointmentComponent implements OnInit {
     });
 
     //socket reschedule appointment
-    this.socket.on(RESCHEDULE_APP+'/'+this.hospital.id, (call) => {
+    this.webSocketService.appointmentSocket(`${RESCHEDULE_APP}/${this.hospital.id}`).subscribe((call) => {
       if (this.appointments.length) {
         let flag: any = '';
         this.appointments.map((value) => {
@@ -452,8 +430,8 @@ export class WidgetCreateAppointmentComponent implements OnInit {
       }
     });
 
-    //scoket queue number
-    this.socketTwo.on(QUEUE_NUMBER+'/'+this.hospital.id, (call) => {
+    //socket queue number
+    this.webSocketService.queueSocket(`${QUEUE_NUMBER}/${this.hospital.id}`).subscribe((call) => {
       for(let k = 0, { length } = this.schedule; k < length; k += 1) {
         if (call.data.schedule_id == this.schedule[k].schedule_id
           && call.data.appointment_date == this.appointmentPayload.appointmentDate) {
@@ -469,7 +447,7 @@ export class WidgetCreateAppointmentComponent implements OnInit {
     });
 
     //socket block slot
-    this.socketThree.on(SCHEDULE_BLOCK+'/'+this.schedule[0].hospital_id, (call) => {
+    this.webSocketService.scheduleSocket(`${SCHEDULE_BLOCK}/${this.schedule[0].hospital_id}`).subscribe((call) => {
       for(let k = 0, { length } = this.schedule; k < length; k += 1) {
         if(call.data.schedule_id === this.schedule[k].schedule_id
           && call.data.from_date === this.appointmentPayload.appointmentDate) {
@@ -2100,7 +2078,7 @@ export class WidgetCreateAppointmentComponent implements OnInit {
           }
           // broadcast check-in
           dataPatient.hospitalId = this.hospital.id;
-          this.socket.emit(CHECK_IN, dataPatient);
+          this.webSocketService.emitAppointmentSocket(CHECK_IN, dataPatient);
           this.buttonCreateAdmission = true;
           this.buttonPrintQueue = false;
           this.buttonCloseAdm = true;
@@ -2287,7 +2265,7 @@ export class WidgetCreateAppointmentComponent implements OnInit {
         }
         // broadcast queue-number
         dataPatient.hospitalId = this.hospital.id;
-        this.socketTwo.emit(QUEUE_NUMBER, dataPatient);
+        this.webSocketService.emitQueueSocket(QUEUE_NUMBER, dataPatient);
         return res.data;
       }).catch(err => {
         this.buttonReguler = false;

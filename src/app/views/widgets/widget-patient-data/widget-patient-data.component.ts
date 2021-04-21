@@ -30,7 +30,8 @@ import Swal from 'sweetalert2';
 import { FormBuilder, FormGroup, FormControl } from '@angular/forms';
 import { PayerService } from '../../../services/payer.service';
 import { ModalSearchPayerComponent } from '../modal-search-payer/modal-search-payer.component';
-import { isNumber } from 'util'
+import { isNumber } from 'util';
+import { WebsocketService } from '../../../services/websocket.service';
 
 @Component({
   selector: 'app-widget-patient-data',
@@ -145,8 +146,6 @@ export class WidgetPatientDataComponent implements OnInit {
 
   public resQueue: any;
   public roomDetail: any;
-  public socket;
-  public socketTwo;
   public listRoomHope: any = [];
   public roomHope: any;
   public dataSiloamPatient;
@@ -215,6 +214,7 @@ export class WidgetPatientDataComponent implements OnInit {
     private activatedRoute: ActivatedRoute,
     private queueService: QueueService,
     private scheduleService: ScheduleService,
+    private webSocketService: WebsocketService,
     private router: Router,
     private formBuilder: FormBuilder,
   ) {
@@ -227,20 +227,6 @@ export class WidgetPatientDataComponent implements OnInit {
 
     this.model.district = { district_id: null };
     this.model.subdistrict = { sub_district_id: null };
-
-    this.socket = socket(`${environment.WEB_SOCKET_SERVICE + keySocket.APPOINTMENT}`, {
-      transports: ['websocket'],
-      query: `data=${
-        Security.encrypt({ secretKey: SecretKey }, Jwt)
-        }&url=${environment.FRONT_OFFICE_SERVICE}`,
-    });
-
-    this.socketTwo = socket(`${environment.WEB_SOCKET_SERVICE + keySocket.QUEUE}`, {
-      transports: ['websocket'],
-      query: `data=${
-        Security.encrypt({ secretKey: SecretKey }, Jwt)
-        }&url=${environment.FRONT_OFFICE_SERVICE}`,
-    });
   }
 
   async ngOnInit() {
@@ -1505,6 +1491,10 @@ export class WidgetPatientDataComponent implements OnInit {
     window.open(this.urlBpjsCard +'/'+ pathFile +'/'+ fileName, '_blank', "status=1");
   }
 
+  getImageTwo(fileName) {
+    window.open(fileName, '_blank', "status=1");
+  }
+
   async editAppointmentData(pathFile, nameFile) {
     this.bodyUpload = {
       userId: this.user.id,
@@ -1852,7 +1842,7 @@ export class WidgetPatientDataComponent implements OnInit {
           }
           // broadcast check-in
           dataPatient.hospitalId = this.hospital.id;
-          this.socket.emit(CHECK_IN, dataPatient);
+          this.webSocketService.emitAppointmentSocket(CHECK_IN, dataPatient);
           this.buttonCreateAdmission = true;
           this.buttonPrintQueue = false;
           this.buttonCloseAdm = true;
@@ -2135,7 +2125,7 @@ export class WidgetPatientDataComponent implements OnInit {
         }
         // broadcast queue-number
         dataPatient.hospitalId = this.hospital.id;
-        this.socketTwo.emit(QUEUE_NUMBER, dataPatient);
+        this.webSocketService.emitQueueSocket(QUEUE_NUMBER, dataPatient);
         return res.data;
       }).catch(err => {
         this.buttonReguler = false;

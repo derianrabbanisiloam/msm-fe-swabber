@@ -7,6 +7,7 @@ import { SecretKey, Jwt, REQUEST_LIST,
 import Security from 'msm-kadapat';
 import { environment } from '../../../../environments/environment';
 import * as moment from 'moment';
+import { WebsocketService } from '../../../services/websocket.service';
 
 @Component({
   selector: 'app-section-sidebar',
@@ -17,8 +18,6 @@ export class SectionSidebarComponent implements OnInit {
   public assetPath = environment.ASSET_PATH;
   public countReqList: number = 0;
   public countAidoList: number = 0;
-  private socket;
-  private socketTwo;
   public key: any = JSON.parse(localStorage.getItem('key'));
   public hospital = this.key.hospital;
   public yogyaHospitalId = hospitalId.yogyakarta;
@@ -27,29 +26,18 @@ export class SectionSidebarComponent implements OnInit {
 
   constructor(
     private bpjsService: BpjsService,
-    private appointmentService: AppointmentService
+    private appointmentService: AppointmentService,
+    private webSocketService: WebsocketService,
   ) {
-    this.socket = socket(`${environment.WEB_SOCKET_SERVICE + keySocket.BPJS}`, {
-      transports: ['websocket'],
-      query: `data=${
-        Security.encrypt({ secretKey: SecretKey }, Jwt)
-        }&url=${environment.BPJS_SERVICE}`,
-    });
-    this.socketTwo = socket(`${environment.WEB_SOCKET_SERVICE + keySocket.APPOINTMENT}`, {
-      transports: ['websocket'],
-      query: `data=${
-        Security.encrypt({ secretKey: SecretKey }, Jwt)
-        }&url=${environment.CALL_CENTER_SERVICE}`,
-    });
     this.countRechedule();
     this.countAido();
   }
 
   ngOnInit() {
-    this.socket.on(REQUEST_LIST+'/'+this.hospital.id, (call) => {
+    this.webSocketService.bpjsAppSocket(`${REQUEST_LIST}/${this.hospital.id}`).subscribe((call) => {
       this.countReqList = call.data;
     });
-    this.socketTwo.on(APP_TELE_AIDO+'/'+this.hospital.id, (call) => {
+    this.webSocketService.appointmentSocket(`${APP_TELE_AIDO}/${this.hospital.id}`).subscribe((call) => {
       this.countAidoList = call.data;
     });
   }

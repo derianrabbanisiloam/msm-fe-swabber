@@ -287,16 +287,16 @@
                     </div>
                   </div>
                   <label for="scanKTP" class="">Scan KTP</label>
-                  <div class="">
+                  <div>
                     <input type="file" accept="image/*" class="form-control-file" id="scanKTP"
                       (change)="readUrl($event)">
-                    <span *ngIf="model.identityImageUrl">
-                      <img src="{{model.identityImageUrl}}" alt="" style="width: 400px; height: 220px;" />
-                    </span>
                   </div>
-
-                  <div class="">
-                    <img *ngIf="url" [src]="url" height="100px" width="100px">
+                  <div style="height: 10rem; text-align: center; margin-top: 3rem;">
+                    <span *ngIf="model.identityImageUrl">
+                      <button class="btn ms_btn_green" (click)="getImageTwo(model.identityImageUrl)">
+                        View Photo ID
+                      </button>
+                    </span>
                   </div>
                 </div>
               </div>

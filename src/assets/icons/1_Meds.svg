@@ -1,0 +1,7 @@
+<svg id="ic_Meds" xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24">
+  <ellipse id="Ellipse_1588" data-name="Ellipse 1588" cx="12" cy="12" rx="12" ry="12" transform="translate(24 0) rotate(90)" fill="#ff7f00"/>
+  <path id="Rectangle_12838" data-name="Rectangle 12838" d="M0,0H10a0,0,0,0,1,0,0V9a2,2,0,0,1-2,2H2A2,2,0,0,1,0,9V0A0,0,0,0,1,0,0Z" transform="translate(7 9)" fill="#fff"/>
+  <rect id="Rectangle_12839" data-name="Rectangle 12839" width="12" height="2.5" rx="0.5" transform="translate(6 5)" fill="#fff"/>
+  <line id="Line_2857" data-name="Line 2857" x2="5" transform="translate(9.5 14.5)" fill="none" stroke="#ff8a01" stroke-linecap="round" stroke-width="1.5"/>
+  <line id="Line_2858" data-name="Line 2858" x2="5" transform="translate(12 12) rotate(90)" fill="none" stroke="#ff8a01" stroke-linecap="round" stroke-width="1.5"/>
+</svg>

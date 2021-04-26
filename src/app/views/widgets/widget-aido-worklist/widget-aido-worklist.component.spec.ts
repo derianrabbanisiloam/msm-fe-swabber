@@ -76,6 +76,7 @@ describe('WidgetAidoWorklistComponent', () => {
     button.click();
     fixture.detectChanges();
 
+    expect(component.selectedCancel).toBeTruthy();
     expect(component.modalService.hasOpenModals()).toBeTruthy();
 
     component.modalService.dismissAll();

@@ -11,7 +11,7 @@
 </div>
 
 <div class="fo_container_list shadow-4">
-  <table class="table table-bordered">
+  <table class="table table-bordered aido-appts-table">
     <thead class="fo_color_blue foot-note" style="text-align: center;">
       <th style="min-width: 14em">
         Patient Name
@@ -110,7 +110,7 @@
         <td></td>
       </tr>
 
-      <tr *ngFor="let r of aidoAppointments; let i = index" [ngClass]="{
+      <tr class="aido-appt-item" *ngFor="let r of aidoAppointments; let i = index" [ngClass]="{
         'row-pink' : r.appointment_status_id === appStatusId.INACTIVE}">
         <td style="text-transform: uppercase">
           <a ngbPopover="{{r.contact_name}}" popoverTitle=""
@@ -235,7 +235,10 @@
             <button (click)="verifyAppointment(r)" class="btn ms_btn_blue" style="font-size: 10px; width: 7.5rem">Verify MR</button>
           </div>
         </div>
-        
+          <div *ngIf="r.appointment_status_id !== appStatusId.INACTIVE">
+            <button (click)="cancelAppointment(r, confirmCancel)" class="btn ms_btn_red button-cancel">Cancel</button>
+          </div>
+
         <div *ngIf="r.appointment_status_id !== appStatusId.INACTIVE && ((r.identity_card_file && r.employee_card_file) || (r.identity_card_file && r.insurance_card_file))
         && r.eligible_status_id === eligibleVal.NOT_YET_ELIGIBLE">
           <button (click)="eligibleModal(confirmEligible, r)" class="btn ms_btn_green_light" style="font-size: 10px; margin-top: 0.5rem; width: 7.5rem">Check Eligibility</button>

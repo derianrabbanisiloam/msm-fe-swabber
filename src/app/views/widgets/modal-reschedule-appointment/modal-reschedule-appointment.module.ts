@@ -1,10 +1,7 @@
 import { NgModule } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule, ReactiveFormsModule } from '@angular/forms';
-import { 
-  NgbAlertModule, NgbPaginationModule, 
-  NgbPopoverModule, NgbProgressbarModule, NgbModalModule, NgbTabsetModule
-} from '@ng-bootstrap/ng-bootstrap';
+import { NgbProgressbarModule, NgbTabsetModule } from '@ng-bootstrap/ng-bootstrap';
 import { TextMaskModule } from 'angular2-text-mask';
 import { NguiAutoCompleteModule } from '@ngui/auto-complete';
 import { AutocompleteLibModule } from 'angular-ng-autocomplete';
@@ -30,6 +27,9 @@ import { WidgetCreateAppointmentModule } from '../widget-create-appointment/widg
   ],
   exports: [
     ModalRescheduleAppointmentComponent
+  ],
+  entryComponents: [
+    ModalRescheduleAppointmentComponent,
   ]
 })
 export class ModalRescheduleAppointmentModule { }

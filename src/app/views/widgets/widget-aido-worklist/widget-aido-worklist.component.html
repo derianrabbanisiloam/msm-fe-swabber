@@ -232,14 +232,14 @@
           || (r.patient_hope_id !== 0 && r.patient_organization_id === 0 && r.is_double_mr === true)
           || (r.patient_hope_id === 0 && r.patient_organization_id === 0 && r.is_double_mr === false)
           || (r.patient_hope_id !== 0 && r.patient_organization_id === 0 && r.is_double_mr === false)">
-            <button (click)="verifyAppointment(r)" class="btn ms_btn_blue" style="font-size: 10px; width: 7.5rem">Verify MR</button>
+            <button (click)="verifyAppointment(r)" class="btn ms_btn_blue verify-mr-button" style="font-size: 10px; width: 7.5rem">Verify MR</button>
           </div>
         </div>
-          <div *ngIf="r.appointment_status_id !== appStatusId.INACTIVE">
+          <div *ngIf="r.appointment_status_id !== appStatusId.INACTIVE && (r.channel_id === arrChannel.MOBILE_OTHER || r.channel_id === arrChannel.MOBILE)">
             <button (click)="cancelAppointment(r, confirmCancel)" class="btn ms_btn_red button-cancel">Cancel</button>
           </div>
-          <div>
-            <button (click)="rescheduleAppointment(r)" class="btn ms_btn_black button-reschedule">Reschedule</button>
+          <div *ngIf="(r.channel_id === arrChannel.MOBILE_OTHER || r.channel_id === arrChannel.MOBILE)">
+            <button (click)="rescheduleAppointment(r)" class="btn ms_btn_black reschedule-button">Reschedule</button>
           </div>
         <div *ngIf="r.appointment_status_id !== appStatusId.INACTIVE && ((r.identity_card_file && r.employee_card_file) || (r.identity_card_file && r.insurance_card_file))
         && r.eligible_status_id === eligibleVal.NOT_YET_ELIGIBLE">

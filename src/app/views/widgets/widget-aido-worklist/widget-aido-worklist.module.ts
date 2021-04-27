@@ -24,6 +24,7 @@ import {ModalRescheduleAppointmentModule} from '../modal-reschedule-appointment/
     MyDateRangePickerModule,
     TextMaskModule,
     ModalVerificationAidoModule,
+    ModalRescheduleAppointmentModule,
     NgbAlertModule,
   ],
   exports: [

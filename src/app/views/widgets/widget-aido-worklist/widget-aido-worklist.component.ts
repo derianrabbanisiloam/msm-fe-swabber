@@ -6,7 +6,7 @@ import { PatientService } from '../../../services/patient.service';
 import { AlertService } from '../../../services/alert.service';
 import { AdmissionService } from '../../../services/admission.service';
 import { IMyDrpOptions } from 'mydaterangepicker';
-import { NgbModal, NgbModalConfig, ModalDismissReasons } from '@ng-bootstrap/ng-bootstrap';
+import {NgbModal, NgbModalConfig, ModalDismissReasons, NgbModalRef} from '@ng-bootstrap/ng-bootstrap';
 import { Doctor } from '../../../models/doctors/doctor';
 import { Alert, AlertType } from '../../../models/alerts/alert';
 import { environment } from '../../../../environments/environment';
@@ -77,6 +77,8 @@ export class WidgetAidoWorklistComponent implements OnInit {
   public eligibleVal: any = eligibleStatus;
   public eligibleRes: string;
   public appResult: any = null;
+
+  public rescheduleModalRef: NgbModalRef;
 
   private page = 0;
 
@@ -403,7 +405,11 @@ export class WidgetAidoWorklistComponent implements OnInit {
   }
 
   rescheduleAppointment(item) {
-    this.modalService.open(ModalRescheduleAppointmentComponent)
+    this.rescheduleModalRef = this.modalService.open(ModalRescheduleAppointmentComponent, {
+      windowClass: 'cc_modal_confirmation',
+      size: 'lg'
+    });
+    this.rescheduleModalRef.componentInstance.appointmentSelected = item;
   }
 
 }

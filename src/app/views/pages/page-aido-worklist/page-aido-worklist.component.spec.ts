@@ -7,6 +7,7 @@ import {PageAidoWorklistModule} from './page-aido-worklist.module';
 import {HTTP_INTERCEPTORS} from '@angular/common/http';
 import {AidoWorklistInterceptor} from '../../widgets/widget-aido-worklist/widget-aido-worklist.component.spec';
 import {mockLocalStorage} from '../page-vaccine-worklist/page-vaccine-worklist.component.spec';
+import {DoctorInterceptor} from '../../../interceptors/doctor-interceptor';
 
 describe('PageAidoWorklistComponent', () => {
   let component: PageAidoWorklistComponent;

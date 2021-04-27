@@ -23,6 +23,11 @@ import { AlertService } from '../../../services/alert.service';
 export class ModalRescheduleAppointmentComponent implements OnInit {
   public assetPath = environment.ASSET_PATH;
   @Input() appointmentSelected: any;
+  @Input()
+  public teleAppointmentData: TeleRescheduleAppointmentData = {
+    isTele: false,
+    appointment: null,
+  };
   public key: any = JSON.parse(localStorage.getItem('key'));
   public hospital = this.key.hospital;
   public user = this.key.user;
@@ -59,6 +64,7 @@ export class ModalRescheduleAppointmentComponent implements OnInit {
 
   public doctorVal: any;
   public doctorValNonBpjs: any;
+  public consultationTypeIds = null;
 
   constructor(
     private doctorService: DoctorService,
@@ -70,11 +76,23 @@ export class ModalRescheduleAppointmentComponent implements OnInit {
     private alertService: AlertService
   ) { }
 
-  async ngOnInit() {
-    await this.getAppointmentById();
-    await this.getListDoctorBySpecialty();
-    await this.getListDoctor();
-    await this.getSpecialities();
+  ngOnInit() {
+    if (this.teleAppointmentData.isTele) {
+      this.appointment = {
+        ...this.teleAppointmentData.appointment
+      };
+      this.appointmentSelected = {
+        ...this.teleAppointmentData.appointment
+      };
+      this.isReschBpjs = false;
+      this.isBpjsUnlock = false;
+      this.consultationTypeIds = `${consultationType.TELECONSULTATION}:${consultationType.NON_BPJS_TELE}`;
+    } else {
+      this.getAppointmentById();
+      this.getListDoctorBySpecialty();
+    }
+    this.getListDoctor();
+    this.getSpecialities();
   }
 
   async getListDoctorBySpecialty() {
@@ -133,12 +151,19 @@ export class ModalRescheduleAppointmentComponent implements OnInit {
     this.openWidgetCreateApp = false;
   }
 
-  async getListDoctor() {
-    this.doctorList = await this.doctorService.getListDoctor(this.hospital.id)
-      .toPromise().then(res => {
-        return res.data;
-      }).catch(err => {
-        return [];
+  getListDoctor() {
+    this.doctorService.getListDoctor(this.hospital.id)
+      .subscribe(res => {
+        this.doctorList = res.data;
+        if (this.teleAppointmentData.isTele) {
+          this.doctorBySpecialty = res.data
+            .filter(e => e.doctor_id === this.teleAppointmentData.appointment.doctor_id);
+          this.doctorList = [...this.doctorBySpecialty];
+          this.doctorValNonBpjs = this.doctorList.length > 0 ? this.doctorList[0] : null;
+          this.searchSchedule1(false);
+        }
+      }, err => {
+        this.doctorList = [];
       });
   }
 
@@ -157,7 +182,7 @@ export class ModalRescheduleAppointmentComponent implements OnInit {
     }
   }
 
-  async searchSchedule1(isBpjs) {
+  searchSchedule1(isBpjs) {
     this.openWidgetCreateApp = false;
     this.model.speciality = '';
     let doctorId = null;
@@ -272,7 +297,7 @@ export class ModalRescheduleAppointmentComponent implements OnInit {
     if(this.appToBPJS === true) {
       this.createAppInputData = {
         appointmentDate: data.date,
-        name: name,
+        name,
         doctorId: data.doctor_id,
         consulType: consultationType.BPJS+':'+consultationType.BPJS_REGULER,
         isRescheduleBpjs: true
@@ -280,8 +305,9 @@ export class ModalRescheduleAppointmentComponent implements OnInit {
     } else {
       this.createAppInputData = {
         appointmentDate: data.date,
-        name: name,
-        doctorId: data.doctor_id
+        name,
+        doctorId: data.doctor_id,
+        consulType: this.consultationTypeIds
       };
     }
   }
@@ -421,4 +447,9 @@ export class ModalRescheduleAppointmentComponent implements OnInit {
     );
   }
 
+}
+
+export interface TeleRescheduleAppointmentData {
+  isTele: boolean;
+  appointment: any;
 }

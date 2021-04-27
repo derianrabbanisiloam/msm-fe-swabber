@@ -15,7 +15,10 @@ import {
 } from '../../widgets/modal-verification-aido/modal-verification-aido.component';
 import { sourceApps, channelId, appointmentStatusId, paymentStatus,
           eligibleStatus } from '../../../variables/common.variable';
-import {ModalRescheduleAppointmentComponent} from '../modal-reschedule-appointment/modal-reschedule-appointment.component';
+import {
+  ModalRescheduleAppointmentComponent,
+  TeleRescheduleAppointmentData
+} from '../modal-reschedule-appointment/modal-reschedule-appointment.component';
 
 @Component({
   selector: 'app-widget-aido-worklist',
@@ -409,7 +412,11 @@ export class WidgetAidoWorklistComponent implements OnInit {
       windowClass: 'cc_modal_confirmation',
       size: 'lg'
     });
-    this.rescheduleModalRef.componentInstance.appointmentSelected = item;
+    const data: TeleRescheduleAppointmentData = {
+      isTele: true,
+      appointment: item,
+    };
+    this.rescheduleModalRef.componentInstance.teleAppointmentData = data;
   }
 
 }

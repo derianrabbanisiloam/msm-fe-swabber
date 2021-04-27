@@ -238,7 +238,9 @@
           <div *ngIf="r.appointment_status_id !== appStatusId.INACTIVE">
             <button (click)="cancelAppointment(r, confirmCancel)" class="btn ms_btn_red button-cancel">Cancel</button>
           </div>
-
+          <div>
+            <button (click)="rescheduleAppointment(r)" class="btn ms_btn_black button-reschedule">Reschedule</button>
+          </div>
         <div *ngIf="r.appointment_status_id !== appStatusId.INACTIVE && ((r.identity_card_file && r.employee_card_file) || (r.identity_card_file && r.insurance_card_file))
         && r.eligible_status_id === eligibleVal.NOT_YET_ELIGIBLE">
           <button (click)="eligibleModal(confirmEligible, r)" class="btn ms_btn_green_light" style="font-size: 10px; margin-top: 0.5rem; width: 7.5rem">Check Eligibility</button>

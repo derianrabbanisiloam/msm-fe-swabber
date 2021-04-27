@@ -12,30 +12,20 @@ import {HTTP_INTERCEPTORS, HttpEvent, HttpHandler, HttpInterceptor, HttpRequest,
 import {Observable, of} from 'rxjs';
 import {By} from '@angular/platform-browser';
 import {appointmentStatusId} from '../../../variables/common.variable';
+import {mockLocalStorage} from '../../pages/page-vaccine-worklist/page-vaccine-worklist.component.spec';
+import {WidgetAidoWorklistModule} from './widget-aido-worklist.module';
 
 describe('WidgetAidoWorklistComponent', () => {
   let component: WidgetAidoWorklistComponent;
   let fixture: ComponentFixture<WidgetAidoWorklistComponent>;
 
   beforeEach(async(() => {
-    localStorage.setItem('key', JSON.stringify({
-      hospital: {
-        id: 'test-hospital-id',
-      }
-    }));
+    mockLocalStorage();
     TestBed.configureTestingModule({
-      declarations: [ WidgetAidoWorklistComponent ],
       imports: [
         RouterTestingModule,
         HttpClientTestingModule,
-        MyDateRangePickerModule,
-        FormsModule,
-        NgbAlertModule,
-        NguiAutoCompleteModule,
-        AutocompleteLibModule,
-        NgbPopoverModule,
-        NgbProgressbarModule,
-        NgbModalModule
+        WidgetAidoWorklistModule
       ],
       providers: [
         {

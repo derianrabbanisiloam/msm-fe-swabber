@@ -15,6 +15,7 @@ import {
 } from '../../widgets/modal-verification-aido/modal-verification-aido.component';
 import { sourceApps, channelId, appointmentStatusId, paymentStatus,
           eligibleStatus } from '../../../variables/common.variable';
+import {ModalRescheduleAppointmentComponent} from '../modal-reschedule-appointment/modal-reschedule-appointment.component';
 
 @Component({
   selector: 'app-widget-aido-worklist',
@@ -399,6 +400,10 @@ export class WidgetAidoWorklistComponent implements OnInit {
 
   removeAlert(alert: Alert) {
     this.alerts = this.alerts.filter(x => x !== alert);
+  }
+
+  rescheduleAppointment(item) {
+    this.modalService.open(ModalRescheduleAppointmentComponent)
   }
 
 }

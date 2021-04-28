@@ -92,6 +92,7 @@ export class WidgetAidoWorklistComponent implements OnInit {
     this.getCollectionAlert();
     this.getAidoWorklist();
     this.emitVerifyApp();
+    this.emitRescheduleApp();
   }
 
   emitVerifyApp() {
@@ -417,6 +418,19 @@ export class WidgetAidoWorklistComponent implements OnInit {
       appointment: item,
     };
     this.rescheduleModalRef.componentInstance.teleAppointmentData = data;
+  }
+
+  emitRescheduleApp() {
+    this.appointmentService.rescheduleAppSource$.subscribe(
+      result => {
+        if (result === true) {
+          this.alertService.success('Reschedule appointment berhasil', false, 3000);
+          this.getAidoWorklist();
+        } else {
+          this.alertService.error(result, false, 3000);
+        }
+      }
+    );
   }
 
 }

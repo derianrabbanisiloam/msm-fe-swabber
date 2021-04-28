@@ -352,7 +352,7 @@ export class AppointmentService {
     };
   }
 
-  public rescheduleApptAido(payload: TeleRescheduleRequest): Observable<TeleRescheduleResponse> {
+  public rescheduleApptTele(payload: TeleRescheduleRequest): Observable<TeleRescheduleResponse> {
     return this.http.post<TeleRescheduleResponse>(this.rescheduleTeleUrl, payload, httpOptions);
   }
 }

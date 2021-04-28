@@ -357,7 +357,7 @@ export class ModalRescheduleAppointmentComponent implements OnInit {
 
   async updateAppointment() {
     if (this.teleAppointmentData.isTele) {
-      this.appointmentService.rescheduleApptAido({
+      this.appointmentService.rescheduleApptTele({
         appointmentId: this.teleAppointmentData.appointment.appointment_id,
         appointmentDate: this.rescheduleAppPayload.appointmentDate,
         appointmentFromTime: this.rescheduleAppPayload.appointmentFromTime,

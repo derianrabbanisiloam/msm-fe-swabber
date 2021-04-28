@@ -238,7 +238,7 @@
           <div *ngIf="r.appointment_status_id !== appStatusId.INACTIVE && (r.channel_id === arrChannel.MOBILE_OTHER || r.channel_id === arrChannel.MOBILE)">
             <button (click)="cancelAppointment(r, confirmCancel)" class="btn ms_btn_red button-cancel">Cancel</button>
           </div>
-          <div *ngIf="(r.channel_id === arrChannel.MOBILE_OTHER || r.channel_id === arrChannel.MOBILE)">
+          <div *ngIf="r.appointment_status_id !== appStatusId.INACTIVE && (r.channel_id === arrChannel.MOBILE_OTHER || r.channel_id === arrChannel.MOBILE)">
             <button (click)="rescheduleAppointment(r)" class="btn ms_btn_black reschedule-button">Reschedule</button>
           </div>
         <div *ngIf="r.appointment_status_id !== appStatusId.INACTIVE && ((r.identity_card_file && r.employee_card_file) || (r.identity_card_file && r.insurance_card_file))

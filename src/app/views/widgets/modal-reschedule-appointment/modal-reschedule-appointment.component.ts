@@ -84,6 +84,7 @@ export class ModalRescheduleAppointmentComponent implements OnInit {
       };
       this.isReschBpjs = false;
       this.isBpjsUnlock = false;
+      this.editModel.phoneNo = this.appointment.phone_number;
       this.consultationTypeIds = `${consultationType.TELECONSULTATION}:${consultationType.NON_BPJS_TELE}`;
     } else {
       this.getAppointmentById();

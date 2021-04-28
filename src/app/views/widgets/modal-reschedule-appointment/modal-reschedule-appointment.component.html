@@ -90,7 +90,9 @@
     <div class="col-md-12" style="padding: 0;max-height: 350px;overflow-y: scroll">
       <div [style.display]="flag" *ngIf="!isReschBpjs && openWidget === true">
         <app-widget-doctor-schedule
-        (opScheduleSelected)="getScheduleData($event)">
+          [consulType]="consultationTypeIds"
+          [hideScheduleTypeOptionOnTele]="teleAppointmentData.isTele"
+          (opScheduleSelected)="getScheduleData($event)">
         </app-widget-doctor-schedule>
       </div>
 

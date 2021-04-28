@@ -6,7 +6,7 @@ import { PatientService } from '../../../services/patient.service';
 import { AlertService } from '../../../services/alert.service';
 import { AdmissionService } from '../../../services/admission.service';
 import { IMyDrpOptions } from 'mydaterangepicker';
-import { NgbModal, NgbModalConfig, ModalDismissReasons } from '@ng-bootstrap/ng-bootstrap';
+import {NgbModal, NgbModalConfig, ModalDismissReasons, NgbModalRef} from '@ng-bootstrap/ng-bootstrap';
 import { Doctor } from '../../../models/doctors/doctor';
 import { Alert, AlertType } from '../../../models/alerts/alert';
 import { environment } from '../../../../environments/environment';
@@ -15,6 +15,10 @@ import {
 } from '../../widgets/modal-verification-aido/modal-verification-aido.component';
 import { sourceApps, channelId, appointmentStatusId, paymentStatus,
           eligibleStatus } from '../../../variables/common.variable';
+import {
+  ModalRescheduleAppointmentComponent,
+  TeleRescheduleAppointmentData
+} from '../modal-reschedule-appointment/modal-reschedule-appointment.component';
 
 @Component({
   selector: 'app-widget-aido-worklist',
@@ -77,6 +81,8 @@ export class WidgetAidoWorklistComponent implements OnInit {
   public eligibleRes: string;
   public appResult: any = null;
 
+  public rescheduleModalRef: NgbModalRef;
+
   private page = 0;
 
   ngOnInit() {
@@ -86,6 +92,7 @@ export class WidgetAidoWorklistComponent implements OnInit {
     this.getCollectionAlert();
     this.getAidoWorklist();
     this.emitVerifyApp();
+    this.emitRescheduleApp();
   }
 
   emitVerifyApp() {
@@ -399,6 +406,31 @@ export class WidgetAidoWorklistComponent implements OnInit {
 
   removeAlert(alert: Alert) {
     this.alerts = this.alerts.filter(x => x !== alert);
+  }
+
+  rescheduleAppointment(item) {
+    this.rescheduleModalRef = this.modalService.open(ModalRescheduleAppointmentComponent, {
+      windowClass: 'cc_modal_confirmation',
+      size: 'lg'
+    });
+    const data: TeleRescheduleAppointmentData = {
+      isTele: true,
+      appointment: item,
+    };
+    this.rescheduleModalRef.componentInstance.teleAppointmentData = data;
+  }
+
+  emitRescheduleApp() {
+    this.appointmentService.rescheduleAppSource$.subscribe(
+      result => {
+        if (result === true) {
+          this.alertService.success('Reschedule appointment berhasil', false, 3000);
+          this.getAidoWorklist();
+        } else {
+          this.alertService.error(result, false, 3000);
+        }
+      }
+    );
   }
 
 }

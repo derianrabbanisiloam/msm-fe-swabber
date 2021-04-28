@@ -5,9 +5,7 @@ import { NgbActiveModal, NgbModal } from '@ng-bootstrap/ng-bootstrap';
 import { AppointmentService } from '../../../services/appointment.service';
 import { ScheduleService } from '../../../services/schedule.service';
 import { PatientService } from '../../../services/patient.service';
-import { Appointment } from '../../../models/appointments/appointment';
 import { editContactPayload } from '../../../payloads/edit-contact.payload';
-import { rescheduleAppointmentPayload } from '../../../payloads/reschedule-appointment.payload';
 import { sourceApps, channelId, consultationType } from '../../../variables/common.variable';
 import { environment } from '../../../../environments/environment';
 import { Speciality } from '../../../models/specialities/speciality';
@@ -23,6 +21,11 @@ import { AlertService } from '../../../services/alert.service';
 export class ModalRescheduleAppointmentComponent implements OnInit {
   public assetPath = environment.ASSET_PATH;
   @Input() appointmentSelected: any;
+  @Input()
+  public teleAppointmentData: TeleRescheduleAppointmentData = {
+    isTele: false,
+    appointment: null,
+  };
   public key: any = JSON.parse(localStorage.getItem('key'));
   public hospital = this.key.hospital;
   public user = this.key.user;
@@ -59,6 +62,7 @@ export class ModalRescheduleAppointmentComponent implements OnInit {
 
   public doctorVal: any;
   public doctorValNonBpjs: any;
+  public consultationTypeIds = null;
 
   constructor(
     private doctorService: DoctorService,
@@ -70,11 +74,24 @@ export class ModalRescheduleAppointmentComponent implements OnInit {
     private alertService: AlertService
   ) { }
 
-  async ngOnInit() {
-    await this.getAppointmentById();
-    await this.getListDoctorBySpecialty();
-    await this.getListDoctor();
-    await this.getSpecialities();
+  ngOnInit() {
+    if (this.teleAppointmentData.isTele) {
+      this.appointment = {
+        ...this.teleAppointmentData.appointment
+      };
+      this.appointmentSelected = {
+        ...this.teleAppointmentData.appointment
+      };
+      this.isReschBpjs = false;
+      this.isBpjsUnlock = false;
+      this.editModel.phoneNo = this.appointment.phone_number;
+      this.consultationTypeIds = `${consultationType.TELECONSULTATION}:${consultationType.NON_BPJS_TELE}`;
+    } else {
+      this.getAppointmentById();
+      this.getListDoctorBySpecialty();
+    }
+    this.getListDoctor();
+    this.getSpecialities();
   }
 
   async getListDoctorBySpecialty() {
@@ -133,12 +150,19 @@ export class ModalRescheduleAppointmentComponent implements OnInit {
     this.openWidgetCreateApp = false;
   }
 
-  async getListDoctor() {
-    this.doctorList = await this.doctorService.getListDoctor(this.hospital.id)
-      .toPromise().then(res => {
-        return res.data;
-      }).catch(err => {
-        return [];
+  getListDoctor() {
+    this.doctorService.getListDoctor(this.hospital.id)
+      .subscribe(res => {
+        this.doctorList = res.data;
+        if (this.teleAppointmentData.isTele) {
+          this.doctorBySpecialty = res.data
+            .filter(e => e.doctor_id === this.teleAppointmentData.appointment.doctor_id);
+          this.doctorList = [...this.doctorBySpecialty];
+          this.doctorValNonBpjs = this.doctorList.length > 0 ? this.doctorList[0] : null;
+          this.searchSchedule1(false);
+        }
+      }, err => {
+        this.doctorList = [];
       });
   }
 
@@ -157,7 +181,7 @@ export class ModalRescheduleAppointmentComponent implements OnInit {
     }
   }
 
-  async searchSchedule1(isBpjs) {
+  searchSchedule1(isBpjs) {
     this.openWidgetCreateApp = false;
     this.model.speciality = '';
     let doctorId = null;
@@ -272,7 +296,7 @@ export class ModalRescheduleAppointmentComponent implements OnInit {
     if(this.appToBPJS === true) {
       this.createAppInputData = {
         appointmentDate: data.date,
-        name: name,
+        name,
         doctorId: data.doctor_id,
         consulType: consultationType.BPJS+':'+consultationType.BPJS_REGULER,
         isRescheduleBpjs: true
@@ -280,8 +304,9 @@ export class ModalRescheduleAppointmentComponent implements OnInit {
     } else {
       this.createAppInputData = {
         appointmentDate: data.date,
-        name: name,
-        doctorId: data.doctor_id
+        name,
+        doctorId: data.doctor_id,
+        consulType: this.consultationTypeIds
       };
     }
   }
@@ -332,6 +357,29 @@ export class ModalRescheduleAppointmentComponent implements OnInit {
   }
 
   async updateAppointment() {
+    if (this.teleAppointmentData.isTele) {
+      this.appointmentService.rescheduleApptTele({
+        appointmentId: this.teleAppointmentData.appointment.appointment_id,
+        appointmentDate: this.rescheduleAppPayload.appointmentDate,
+        appointmentFromTime: this.rescheduleAppPayload.appointmentFromTime,
+        appointmentToTime: this.rescheduleAppPayload.appointmentToTime,
+        scheduleId: this.rescheduleAppPayload.scheduleId,
+        channelId: this.teleAppointmentData.appointment.channel_id,
+        userName: this.user.fullname,
+        userId: this.user.id,
+        source: sourceApps,
+      })
+        .subscribe(response => {
+          if (response.status === 'OK') {
+            this.appointmentService.emitRescheduleApp(true);
+          } else {
+            this.appointmentService.emitRescheduleApp(response.message);
+          }
+        }, error => {
+          this.appointmentService.emitRescheduleApp(error.error.message);
+        });
+      return;
+    }
     const app = this.appointmentSelected;
 
     if (app.appointment_id) {
@@ -421,4 +469,9 @@ export class ModalRescheduleAppointmentComponent implements OnInit {
     );
   }
 
+}
+
+export interface TeleRescheduleAppointmentData {
+  isTele: boolean;
+  appointment: any;
 }

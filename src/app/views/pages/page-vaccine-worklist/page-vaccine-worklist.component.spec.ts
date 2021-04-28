@@ -10,7 +10,7 @@ import {Observable, of} from 'rxjs';
 export function mockLocalStorage() {
   localStorage.setItem('key', JSON.stringify({
     hospital: {
-      id: 'test-hospital',
+      id: 'test-hospital-id',
       orgId: 2,
       isBpjs: true,
     },

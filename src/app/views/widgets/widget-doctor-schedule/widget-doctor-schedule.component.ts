@@ -165,10 +165,6 @@ export class WidgetDoctorScheduleComponent implements OnInit {
     );
 
     this.initForeignSource();
-    console.log(this.hideScheduleTypeOptionOnTele)
-    console.log(this.fromBpjs)
-    console.log(this.fromRegistration)
-    console.log(this.reschBpjs)
   }
 
   async getScheduleByConsType() {

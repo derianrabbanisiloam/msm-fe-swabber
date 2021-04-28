@@ -363,7 +363,7 @@ export class ModalRescheduleAppointmentComponent implements OnInit {
         appointmentFromTime: this.rescheduleAppPayload.appointmentFromTime,
         appointmentToTime: this.rescheduleAppPayload.appointmentToTime,
         scheduleId: this.rescheduleAppPayload.scheduleId,
-        channelId: channelId.FRONT_OFFICE,
+        channelId: this.teleAppointmentData.appointment.channel_id,
         userName: this.user.fullname,
         userId: this.user.id,
         source: sourceApps,

@@ -72,6 +72,8 @@ export class WidgetDoctorScheduleComponent implements OnInit {
 
   @Input()
   public consulType: string = null;
+  @Input()
+  public hideScheduleTypeOptionOnTele = false;
   public consulTypeFlag: number;
   public flagCon: number;
 
@@ -163,6 +165,10 @@ export class WidgetDoctorScheduleComponent implements OnInit {
     );
 
     this.initForeignSource();
+    console.log(this.hideScheduleTypeOptionOnTele)
+    console.log(this.fromBpjs)
+    console.log(this.fromRegistration)
+    console.log(this.reschBpjs)
   }
 
   async getScheduleByConsType() {

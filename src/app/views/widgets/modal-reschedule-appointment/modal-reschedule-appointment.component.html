@@ -91,6 +91,7 @@
       <div [style.display]="flag" *ngIf="!isReschBpjs && openWidget === true">
         <app-widget-doctor-schedule
           [consulType]="consultationTypeIds"
+          [hideScheduleTypeOptionOnTele]="teleAppointmentData.isTele"
           (opScheduleSelected)="getScheduleData($event)">
         </app-widget-doctor-schedule>
       </div>

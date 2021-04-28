@@ -243,7 +243,7 @@ export const teleResponse = {
       delivery_address: 'Karawaci, KARAWACI, KARAWACI, TANGERANG, KOTA, BANTEN. 15811',
       appointment_status_id: appointmentStatusId.ACTIVE,
       admission_status_id: '1',
-      channel_id: channelId.AIDO,
+      channel_id: channelId.CALL_CENTER,
       is_double_mr: true,
       patient_hope_id: 0,
       patient_organization_id: 0,

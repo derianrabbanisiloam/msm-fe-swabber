@@ -17,7 +17,7 @@ import {WidgetAidoWorklistModule} from './widget-aido-worklist.module';
 import {teleResponse} from '../../../mocks/tele-data';
 import {DoctorInterceptor} from '../../../interceptors/doctor-interceptor';
 
-describe('WidgetAidoWorklistComponent', () => {
+describe('Widget Aido Worklist Component', () => {
   let component: WidgetAidoWorklistComponent;
   let fixture: ComponentFixture<WidgetAidoWorklistComponent>;
 
@@ -126,6 +126,18 @@ describe('WidgetAidoWorklistComponent', () => {
     expect(component.modalService.hasOpenModals()).toBeTruthy();
 
     component.modalService.dismissAll();
+    flush();
+  }));
+
+  it('should not be able to show rescheduling button on canceled appointment', fakeAsync(() => {
+    fixture.whenStable();
+
+    const button = fixture.debugElement.query(
+      By.css('.aido-appts-table tbody .aido-appt-item:nth-child(4) .reschedule-button')
+    );
+
+    expect(button).toBeFalsy();
+
     flush();
   }));
 });

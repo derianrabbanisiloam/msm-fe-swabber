@@ -5,9 +5,7 @@ import { NgbActiveModal, NgbModal } from '@ng-bootstrap/ng-bootstrap';
 import { AppointmentService } from '../../../services/appointment.service';
 import { ScheduleService } from '../../../services/schedule.service';
 import { PatientService } from '../../../services/patient.service';
-import { Appointment } from '../../../models/appointments/appointment';
 import { editContactPayload } from '../../../payloads/edit-contact.payload';
-import { rescheduleAppointmentPayload } from '../../../payloads/reschedule-appointment.payload';
 import { sourceApps, channelId, consultationType } from '../../../variables/common.variable';
 import { environment } from '../../../../environments/environment';
 import { Speciality } from '../../../models/specialities/speciality';
@@ -358,6 +356,29 @@ export class ModalRescheduleAppointmentComponent implements OnInit {
   }
 
   async updateAppointment() {
+    if (this.teleAppointmentData.isTele) {
+      this.appointmentService.rescheduleApptAido({
+        appointmentId: this.teleAppointmentData.appointment.appointment_id,
+        appointmentDate: this.rescheduleAppPayload.appointmentDate,
+        appointmentFromTime: this.rescheduleAppPayload.appointmentFromTime,
+        appointmentToTime: this.rescheduleAppPayload.appointmentToTime,
+        scheduleId: this.rescheduleAppPayload.scheduleId,
+        channelId: channelId.FRONT_OFFICE,
+        userName: this.user.fullname,
+        userId: this.user.id,
+        source: sourceApps,
+      })
+        .subscribe(response => {
+          if (response.status === 'OK') {
+            this.appointmentService.emitRescheduleApp(true);
+          } else {
+            this.appointmentService.emitRescheduleApp(response.message);
+          }
+        }, error => {
+          this.appointmentService.emitRescheduleApp(error.error.message);
+        });
+      return;
+    }
     const app = this.appointmentSelected;
 
     if (app.appointment_id) {

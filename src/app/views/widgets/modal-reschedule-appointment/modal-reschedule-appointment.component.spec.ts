@@ -10,7 +10,6 @@ import {teleResponse} from '../../../mocks/tele-data';
 import {By} from '@angular/platform-browser';
 import {HTTP_INTERCEPTORS} from '@angular/common/http';
 import {DoctorInterceptor} from '../../../interceptors/doctor-interceptor';
-import {consultationType} from '../../../variables/common.variable';
 
 describe('Modal Reschedule Appointment Component', () => {
   let component: ModalRescheduleAppointmentComponent;

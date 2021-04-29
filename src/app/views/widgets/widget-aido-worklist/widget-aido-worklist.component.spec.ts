@@ -1,17 +1,12 @@
 import {async, ComponentFixture, fakeAsync, flush, TestBed, tick} from '@angular/core/testing';
 
 import { WidgetAidoWorklistComponent } from './widget-aido-worklist.component';
-import {MyDateRangePickerModule} from 'mydaterangepicker';
 import {RouterTestingModule} from '@angular/router/testing';
 import {HttpClientTestingModule} from '@angular/common/http/testing';
-import {FormsModule} from '@angular/forms';
-import {NgbAlertModule, NgbModalModule, NgbPopoverModule, NgbProgressbarModule} from '@ng-bootstrap/ng-bootstrap';
-import {NguiAutoCompleteModule} from '@ngui/auto-complete';
-import {AutocompleteLibModule} from 'angular-ng-autocomplete';
 import {HTTP_INTERCEPTORS, HttpEvent, HttpHandler, HttpInterceptor, HttpRequest, HttpResponse} from '@angular/common/http';
 import {Observable, of} from 'rxjs';
 import {By} from '@angular/platform-browser';
-import {appointmentStatusId, channelId, paymentStatus} from '../../../variables/common.variable';
+import { channelId } from '../../../variables/common.variable';
 import {mockLocalStorage} from '../../pages/page-vaccine-worklist/page-vaccine-worklist.component.spec';
 import {WidgetAidoWorklistModule} from './widget-aido-worklist.module';
 import {teleResponse} from '../../../mocks/tele-data';

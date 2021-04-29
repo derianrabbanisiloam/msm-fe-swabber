@@ -65,6 +65,17 @@ describe('WidgetCreateAppointmentComponent', () => {
     }, 200);
   });
 
+  it('should be able to render tele rows with checkin label', (done) => {
+    fixture.whenStable();
+    setTimeout(() => {
+      fixture.detectChanges();
+      const button = fixture.debugElement.query(By.css('.tele-body tr:nth-child(2) .badge-success'));
+
+      expect(button).toBeTruthy();
+      done();
+    }, 200);
+  });
+
   it('should not be able to render tele rows with checkin button on rescheduling tele', (done) => {
     component.hideTeleActionOnRescheduling = true;
     fixture.whenStable();

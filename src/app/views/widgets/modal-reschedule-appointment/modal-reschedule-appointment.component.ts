@@ -66,7 +66,7 @@ export class ModalRescheduleAppointmentComponent implements OnInit {
 
   constructor(
     private doctorService: DoctorService,
-    private appointmentService: AppointmentService,
+    public appointmentService: AppointmentService,
     private patientService: PatientService,
     private activeModal: NgbActiveModal,
     private scheduleService: ScheduleService,

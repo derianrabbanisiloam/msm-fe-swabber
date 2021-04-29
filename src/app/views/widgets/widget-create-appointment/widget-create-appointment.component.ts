@@ -1317,9 +1317,7 @@ export class WidgetCreateAppointmentComponent implements OnInit {
       +consultationType.TELECONSULTATION+':'+consultationType.BPJS_REGULER+':'+consultationType.NON_BPJS_TELE;
     let consulTypeList = this.fromBpjs === true ? this.consulType : consulTypeAll;
     if(this.reschBpjs === true) consulTypeList = this.consulType; // reschedule bpjs
-    if (this.appointmentPayloadInput !== undefined
-      && this.appointmentPayloadInput != null
-      && this.appointmentPayloadInput.consulType !== null) {
+    if (this.appointmentPayloadInput && this.appointmentPayloadInput.consulType) {
       consulTypeList = this.appointmentPayloadInput.consulType;
     }
     await this.scheduleService.getTimeSlot(hospitalId, doctorId, date, consulTypeList).toPromise().then(
@@ -1382,9 +1380,7 @@ export class WidgetCreateAppointmentComponent implements OnInit {
       +consultationType.TELECONSULTATION+':'+consultationType.BPJS_REGULER+':'+consultationType.NON_BPJS_TELE;
     let consulTypeList = this.fromBpjs === true ? this.consulType : consulTypeAll;
     if(this.reschBpjs === true) consulTypeList = this.consulType; // reschedule bpjs
-    if (this.appointmentPayloadInput !== undefined
-      && this.appointmentPayloadInput != null
-      && this.appointmentPayloadInput.consulType !== null) {
+    if (this.appointmentPayloadInput && this.appointmentPayloadInput.consulType) {
       consulTypeList = this.appointmentPayloadInput.consulType;
     }
     await this.scheduleService.getScheduleDoctor(this.hospital.id, doctorId, date, consulTypeList).toPromise().then(

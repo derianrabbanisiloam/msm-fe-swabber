@@ -222,6 +222,32 @@ export class DoctorInterceptor implements HttpInterceptor {
         }
       }));
     }
+    if (req.method === 'GET'
+      && req.urlWithParams.includes('/appointments/reserved-slot')) {
+      return of(new HttpResponse({
+        status: 200,
+        body: {status: 'OK', data: {key: null}, message: 'Get reserved slot successfully'}
+      }));
+    }
+    if (req.method === 'POST'
+      && req.urlWithParams.includes('/appointments/reserved-slot')) {
+      return of(new HttpResponse({
+        status: 200,
+        body: {
+          status: 'OK',
+          data: {
+            scheduleId: 'bf7eab78-2fd6-4c67-bdbf-034b18fd5f05',
+            appointmentDate: '2021-04-29',
+            appointmentNo: 15,
+            channelId: '2',
+            userId: 'ef91ac82-350a-4523-87b7-0f0b72f34180',
+            source: 'FrontOffice'
+          },
+          message: 'Slot reserved'
+        }
+      }));
+    }
+    console.log(req.method);
     console.log(req.urlWithParams);
     return next.handle(req);
   }

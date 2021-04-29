@@ -130,17 +130,14 @@ describe('Modal Reschedule Appointment Component', () => {
       setTimeout(() => {
         fixture.detectChanges();
         clickTeleSchedule();
-
+        fixture.detectChanges();
         setTimeout(() => {
           fixture.detectChanges();
-          setTimeout(() => {
-            fixture.detectChanges();
-            const table = fixture.debugElement.query(By.css('app-widget-create-appointment .tele-body'));
+          const table = fixture.debugElement.query(By.css('app-widget-create-appointment .tele-body'));
 
-            expect(table).toBeTruthy();
-            done();
-          }, 150);
-        }, 150);
+          expect(table).toBeTruthy();
+          done();
+        }, 300);
       }, 300);
     });
 
@@ -154,39 +151,38 @@ describe('Modal Reschedule Appointment Component', () => {
       setTimeout(() => {
         fixture.detectChanges();
         clickTeleSchedule();
+        fixture.detectChanges();
 
         setTimeout(() => {
           fixture.detectChanges();
+          const availableButton = fixture.debugElement.query(
+            By.css('app-widget-create-appointment .tele-body tr:nth-child(3) td:nth-child(3) a')
+          ).nativeElement;
+          availableButton.click();
+          fixture.detectChanges();
+
           setTimeout(() => {
-            fixture.detectChanges();
-            const availableButton = fixture.debugElement.query(
-              By.css('app-widget-create-appointment .tele-body tr:nth-child(3) td:nth-child(3) a')
+            const saveButton = fixture.debugElement.query(
+              By.css('.save-close-button')
             ).nativeElement;
-            availableButton.click();
+            saveButton.click();
+            fixture.detectChanges();
 
-            setTimeout(() => {
-              const saveButton = fixture.debugElement.query(
-                By.css('.save-close-button')
-              ).nativeElement;
-              saveButton.click();
-              fixture.detectChanges();
+            expect(component.appointmentService.rescheduleApptTele).toHaveBeenCalledWith({
+              appointmentId: 'dec25b90-8332-4f6c-93ad-cd1527d80e52',
+              appointmentDate: '2021-04-27',
+              appointmentFromTime: '16:30',
+              appointmentToTime: '16:45',
+              scheduleId: 'bf7eab78-2fd6-4c67-bdbf-034b18fd5f05',
+              channelId: channelId.MOBILE,
+              userName: 'Test User',
+              userId: '234dasfawe',
+              source: 'FrontOffice'
+            });
 
-              expect(component.appointmentService.rescheduleApptTele).toHaveBeenCalledWith({
-                appointmentId: 'dec25b90-8332-4f6c-93ad-cd1527d80e52',
-                appointmentDate: '2021-04-27',
-                appointmentFromTime: '16:30',
-                appointmentToTime: '16:45',
-                scheduleId: 'bf7eab78-2fd6-4c67-bdbf-034b18fd5f05',
-                channelId: channelId.MOBILE,
-                userName: 'Test User',
-                userId: '234dasfawe',
-                source: 'FrontOffice'
-              });
-
-              done();
-            }, 100);
+            done();
           }, 100);
-        }, 100);
+        }, 300);
       }, 300);
     });
   });

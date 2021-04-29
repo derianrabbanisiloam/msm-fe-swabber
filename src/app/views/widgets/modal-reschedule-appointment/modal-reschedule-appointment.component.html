@@ -107,7 +107,8 @@
       <app-widget-create-appointment
         *ngIf="opScheduleSelected && openWidgetCreateApp"
         (opSlotSelected)="getSlotData($event)"
-        [appointmentPayloadInput]="createAppInputData">
+        [appointmentPayloadInput]="createAppInputData"
+        [hideTeleActionOnRescheduling]="teleAppointmentData.isTele">
       </app-widget-create-appointment>
     </div>
   </div>

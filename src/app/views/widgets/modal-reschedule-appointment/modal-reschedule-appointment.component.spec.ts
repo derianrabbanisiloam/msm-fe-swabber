@@ -105,7 +105,7 @@ describe('Modal Reschedule Appointment Component', () => {
   });
 
   /** normal test with fakeAsync is hard in here, using setTimeout does the job */
-  describe('TELE Save', () => {
+  describe('TELE Rescheduling', () => {
     beforeAll(async(() => {
       jasmine.clock().mockDate(moment('2021-04-27').toDate());
     }));
@@ -118,9 +118,9 @@ describe('Modal Reschedule Appointment Component', () => {
       createComponent();
     });
 
-    function clickTeleSchedule() {
+    function clickTeleSchedule(tdIndex: number, timeIndex: number) {
       const schedule = fixture.debugElement.query(
-        By.css('app-widget-doctor-schedule table tbody tr:nth-child(1) td:nth-child(2) span:nth-child(2) a')
+        By.css(`app-widget-doctor-schedule table tbody tr:nth-child(1) td:nth-child(${tdIndex}) span:nth-child(${timeIndex}) a`)
       ).nativeElement;
       schedule.click();
     }
@@ -129,7 +129,7 @@ describe('Modal Reschedule Appointment Component', () => {
       fixture.whenStable();
       setTimeout(() => {
         fixture.detectChanges();
-        clickTeleSchedule();
+        clickTeleSchedule(2, 2);
         fixture.detectChanges();
         setTimeout(() => {
           fixture.detectChanges();
@@ -150,7 +150,7 @@ describe('Modal Reschedule Appointment Component', () => {
       fixture.whenStable();
       setTimeout(() => {
         fixture.detectChanges();
-        clickTeleSchedule();
+        clickTeleSchedule(2, 2);
         fixture.detectChanges();
 
         setTimeout(() => {
@@ -182,6 +182,77 @@ describe('Modal Reschedule Appointment Component', () => {
 
             done();
           }, 100);
+        }, 300);
+      }, 300);
+    });
+
+    it('should be able to reschedule to the future schedule', (done) => {
+      spyOn(component.appointmentService, 'rescheduleApptTele').and.returnValue(of({
+        status: 'OK',
+        message: 'success',
+        data: {},
+      }));
+      fixture.whenStable();
+      setTimeout(() => {
+        fixture.detectChanges();
+        clickTeleSchedule(4, 1);
+        fixture.detectChanges();
+
+        setTimeout(() => {
+          fixture.detectChanges();
+          const availableButton = fixture.debugElement.query(
+            By.css('app-widget-create-appointment .tele-body tr:nth-child(3) td:nth-child(3) a')
+          ).nativeElement;
+          availableButton.click();
+          fixture.detectChanges();
+
+          setTimeout(() => {
+            const saveButton = fixture.debugElement.query(
+              By.css('.save-close-button')
+            ).nativeElement;
+            saveButton.click();
+            fixture.detectChanges();
+
+            expect(component.appointmentService.rescheduleApptTele).toHaveBeenCalledWith({
+              appointmentId: 'dec25b90-8332-4f6c-93ad-cd1527d80e52',
+              appointmentDate: '2021-04-29',
+              appointmentFromTime: '16:30',
+              appointmentToTime: '16:45',
+              scheduleId: 'bf7eab78-2fd6-4c67-bdbf-034b18fd5f05',
+              channelId: channelId.MOBILE,
+              userName: 'Test User',
+              userId: '234dasfawe',
+              source: 'FrontOffice'
+            });
+
+            done();
+          }, 100);
+        }, 300);
+      }, 300);
+    });
+
+    it('should not be able to reschedule to the future if not tele rescheduling mode', (done) => {
+      spyOn(component.appointmentService, 'rescheduleApptTele').and.returnValue(of({
+        status: 'OK',
+        message: 'success',
+        data: {},
+      }));
+      fixture.whenStable();
+      setTimeout(() => {
+        fixture.detectChanges();
+        clickTeleSchedule(4, 1);
+        fixture.detectChanges();
+        component.createAppointmentView.hideTeleActionOnRescheduling = false;
+
+        setTimeout(() => {
+          fixture.detectChanges();
+          const availableButton = fixture.debugElement.query(
+            By.css('app-widget-create-appointment .tele-body tr:nth-child(3) td:nth-child(3) a')
+          );
+
+          expect(availableButton).toBeFalsy();
+
+          done();
         }, 300);
       }, 300);
     });

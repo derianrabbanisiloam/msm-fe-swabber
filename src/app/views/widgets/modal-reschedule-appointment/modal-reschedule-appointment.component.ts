@@ -1,5 +1,5 @@
 import * as moment from 'moment';
-import { Component, OnInit, Input } from '@angular/core';
+import {Component, OnInit, Input, ViewChild} from '@angular/core';
 import { DoctorService } from '../../../services/doctor.service';
 import { NgbActiveModal, NgbModal } from '@ng-bootstrap/ng-bootstrap';
 import { AppointmentService } from '../../../services/appointment.service';
@@ -12,6 +12,7 @@ import { Speciality } from '../../../models/specialities/speciality';
 import { isEmpty } from 'lodash';
 import { Alert, AlertType } from '../../../models/alerts/alert';
 import { AlertService } from '../../../services/alert.service';
+import {WidgetCreateAppointmentComponent} from '../widget-create-appointment/widget-create-appointment.component';
 
 @Component({
   selector: 'app-modal-reschedule-appointment',
@@ -19,6 +20,10 @@ import { AlertService } from '../../../services/alert.service';
   styleUrls: ['./modal-reschedule-appointment.component.css']
 })
 export class ModalRescheduleAppointmentComponent implements OnInit {
+
+  @ViewChild(WidgetCreateAppointmentComponent)
+  public createAppointmentView: WidgetCreateAppointmentComponent;
+
   public assetPath = environment.ASSET_PATH;
   @Input() appointmentSelected: any;
   @Input()

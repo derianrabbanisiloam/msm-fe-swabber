@@ -235,7 +235,7 @@ export class WidgetCreateAppointmentComponent implements OnInit {
   public patDetail: any = null;
 
   @Input()
-  public hideTeleActionOnRescheduling = false;
+  public hideTeleActionOnRescheduling = false; // if it's true it means rescheduling mode
 
   constructor(
     private router: Router,
@@ -744,7 +744,11 @@ export class WidgetCreateAppointmentComponent implements OnInit {
   // }
 
   async enableWalkInChecker() {
-    //to enable or disable button checkin and slot walkin
+    // to enable or disable button checkin and slot walkin
+    if (this.hideTeleActionOnRescheduling) {
+      this.isOpen = true;
+      return;
+    }
     const appointmentDate = this.appointmentPayload.appointmentDate;
     const zone = this.hospital.zone;
     const dateNow = await regionTime(zone);

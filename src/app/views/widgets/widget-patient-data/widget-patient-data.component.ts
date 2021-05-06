@@ -1083,7 +1083,9 @@ export class WidgetPatientDataComponent implements OnInit {
     let contactMobile = this.model.contactMobile ? this.model.contactMobile.trim() : "";
     let contactPhone = this.model.contactPhone ? this.model.contactPhone.trim() : "";
     let nationalidType = this.isEmpty(this.model.nationalidType) ? null : this.model.nationalidType;
-    let nationalIdNo =  this.model.nationalIdNo ? this.model.nationalIdNo.trim() : ""; 
+    let nationalIdNo =  this.model.nationalIdNo ? this.model.nationalIdNo.trim() : "";
+    let maritalStatus = this.isEmpty(this.model.maritalStatus) ? null : this.model.maritalStatus;
+    let religion = this.isEmpty(this.model.religion) ? null : this.model.religion;
 
 
     if (!patientName) {
@@ -1114,6 +1116,12 @@ export class WidgetPatientDataComponent implements OnInit {
     if (!birthPlace) {
       valid = false; $('.form-pr-birth-place').addClass('form-error');
     } else { $('.form-pr-birth-place').removeClass('form-error'); }
+    if (!maritalStatus) {
+      valid = false; $('.form-pr-marital-status').addClass('form-error');
+    } else { $('.form-pr-marital-status').removeClass('form-error'); }
+    if (!religion) {
+      valid = false; $('.form-pr-religion').addClass('form-error');
+    } else { $('.form-pr-religion').removeClass('form-error'); }
     // Contact Detail
     if (!address) {
       valid = false; $('.form-pr-address').addClass('form-error');

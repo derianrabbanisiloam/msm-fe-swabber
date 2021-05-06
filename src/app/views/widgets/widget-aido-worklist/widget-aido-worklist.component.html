@@ -146,10 +146,10 @@
             <div style="background:green; border-radius: 1em; padding: 0.2em" *ngIf="r.payment_status_id === payStatus.PAID">
               <span>Paid</span>
             </div>
-            <div style="background: black; border-radius: 1em;" *ngIf="r.payment_status_id === payStatus.UNPAID">
+            <div style="background: black; border-radius: 1em;" *ngIf="r.payment_status_id === payStatus.NOTPAID">
               <span>Waiting</span>
             </div>
-            <div style="background: red; border-radius: 1em; padding: 0.2em" *ngIf="r.payment_status_id === payStatus.NOTPAID">
+            <div style="background: red; border-radius: 1em; padding: 0.2em" *ngIf="r.payment_status_id === payStatus.PAYMENTEXPIRED">
               <span>Payment Expired</span>
             </div>
           </div>

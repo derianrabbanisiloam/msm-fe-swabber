@@ -33,7 +33,7 @@ export class WidgetAidoWorklistComponent implements OnInit {
     private patientService: PatientService,
     public admissionService: AdmissionService,
     public modalService: NgbModal,
-    private alertService: AlertService,
+    public alertService: AlertService,
     modalSetting: NgbModalConfig,
   ) {
     modalSetting.backdrop = 'static';
@@ -282,11 +282,12 @@ export class WidgetAidoWorklistComponent implements OnInit {
         this.isSendingAdmission = (data.status === 'OK');
         if (this.isSendingAdmission) {
           this.getAidoWorklist();
+        } else {
+          this.alertService.error(data.message, false, 3000);
         }
-        if (this.admissionModalRef) {
+        if (this.isSendingAdmission && this.admissionModalRef) {
           this.admissionModalRef.close();
         }
-        this.alertService.success(data.message, false, 3000);
       }, err => {
         this.isSendingAdmission = false;
         this.alertService.error(err.error.message, false, 3000);

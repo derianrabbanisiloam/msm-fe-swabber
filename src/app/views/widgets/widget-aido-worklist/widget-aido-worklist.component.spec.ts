@@ -168,6 +168,7 @@ describe('Widget Aido Worklist Component', () => {
         .pipe(delay(300))
     );
     spyOn(component, 'getAidoWorklist');
+    spyOn(component.alertService, 'error');
     fixture.whenStable().then(() => {
       component.selectedAdm = admissionPayload;
       component.createAdm();
@@ -179,6 +180,7 @@ describe('Widget Aido Worklist Component', () => {
           // assert request is sent
           expect(component.isSendingAdmission).toBeTruthy();
           expect(component.getAidoWorklist).toHaveBeenCalled();
+          expect(component.alertService.error).not.toHaveBeenCalled();
           done();
         }, 300);
       }, 100);
@@ -190,6 +192,7 @@ describe('Widget Aido Worklist Component', () => {
       of({status: 'ERROR', message: 'success', data: {appointmentId: 'test-appointment-id'}})
         .pipe(delay(300))
     );
+    spyOn(component.alertService, 'error');
     fixture.whenStable().then(() => {
       component.selectedAdm = admissionPayload;
       component.createAdm();
@@ -200,6 +203,7 @@ describe('Widget Aido Worklist Component', () => {
         setTimeout(() => {
           // assert request is sent
           expect(component.isSendingAdmission).toBeFalsy();
+          expect(component.alertService.error).toHaveBeenCalled();
           done();
         }, 300);
       }, 100);

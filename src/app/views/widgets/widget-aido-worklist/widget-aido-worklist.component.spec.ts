@@ -44,6 +44,7 @@ describe('Widget Aido Worklist Component', () => {
   beforeEach(() => {
     fixture = TestBed.createComponent(WidgetAidoWorklistComponent);
     component = fixture.componentInstance;
+    component.isSendingAdmission = false;
     fixture.detectChanges();
   });
 
@@ -137,22 +138,67 @@ describe('Widget Aido Worklist Component', () => {
     flush();
   }));
 
-  it('should be able to disabled sending admission button', async (done) => {
+  const admissionPayload = {
+    appointmentId: 'test-appointment-id',
+    userId: 'testuser id',
+    source: sourceApps,
+    userName: 'test user name'
+  };
+
+  it('should be able to change isSendingAdmission to true when sending request', async (done) => {
     spyOn(component.admissionService, 'createAdmissionAido').and.returnValue(
       of({status: 'OK', message: 'success', data: {appointmentId: 'test-appointment-id'}})
         .pipe(delay(300))
     );
     fixture.whenStable().then(() => {
-      component.selectedAdm = {
-        appointmentId: 'test-appointment-id',
-        userId: component.user.id,
-        source: sourceApps,
-        userName: component.user.fullname
-      };
+      component.selectedAdm = admissionPayload;
       component.createAdm();
       setTimeout(() => {
+        // assert sending request
         expect(component.isSendingAdmission).toBeTruthy();
+
+        done();
+      }, 100);
+    });
+  });
+
+  it('should be able to change isSendingAdmission to true if request is succeed', async (done) => {
+    spyOn(component.admissionService, 'createAdmissionAido').and.returnValue(
+      of({status: 'OK', message: 'success', data: {appointmentId: 'test-appointment-id'}})
+        .pipe(delay(300))
+    );
+    spyOn(component, 'getAidoWorklist');
+    fixture.whenStable().then(() => {
+      component.selectedAdm = admissionPayload;
+      component.createAdm();
+      setTimeout(() => {
+        // assert sending request
+        expect(component.isSendingAdmission).toBeTruthy();
+
         setTimeout(() => {
+          // assert request is sent
+          expect(component.isSendingAdmission).toBeTruthy();
+          expect(component.getAidoWorklist).toHaveBeenCalled();
+          done();
+        }, 300);
+      }, 100);
+    });
+  });
+
+  it('should be able to change isSendingAdmission to false if request is failed(retry)', async (done) => {
+    spyOn(component.admissionService, 'createAdmissionAido').and.returnValue(
+      of({status: 'ERROR', message: 'success', data: {appointmentId: 'test-appointment-id'}})
+        .pipe(delay(300))
+    );
+    fixture.whenStable().then(() => {
+      component.selectedAdm = admissionPayload;
+      component.createAdm();
+      setTimeout(() => {
+        // assert sending request
+        expect(component.isSendingAdmission).toBeTruthy();
+
+        setTimeout(() => {
+          // assert request is sent
           expect(component.isSendingAdmission).toBeFalsy();
           done();
         }, 300);

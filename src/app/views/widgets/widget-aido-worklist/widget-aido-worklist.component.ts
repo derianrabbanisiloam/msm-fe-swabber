@@ -82,6 +82,7 @@ export class WidgetAidoWorklistComponent implements OnInit {
   public appResult: any = null;
 
   public rescheduleModalRef: NgbModalRef;
+  public admissionModalRef: NgbModalRef;
   public isSendingAdmission = false;
 
   private page = 0;
@@ -271,18 +272,26 @@ export class WidgetAidoWorklistComponent implements OnInit {
       source: sourceApps,
       userName: this.user.fullname
     };
-    this.open(content);
+    this.admissionModalRef = this.open(content);
   }
 
   createAdm() {
     this.isSendingAdmission = true;
     this.admissionService.createAdmissionAido(this.selectedAdm)
       .subscribe(data => {
-        this.isSendingAdmission = false;
-        this.getAidoWorklist();
+        this.isSendingAdmission = (data.status === 'OK');
+        if (this.isSendingAdmission) {
+          this.getAidoWorklist();
+        }
+        if (this.admissionModalRef) {
+          this.admissionModalRef.close();
+        }
         this.alertService.success(data.message, false, 3000);
       }, err => {
         this.isSendingAdmission = false;
+        if (this.admissionModalRef) {
+          this.admissionModalRef.close();
+        }
         this.alertService.error(err.error.message, false, 3000);
       }
     );

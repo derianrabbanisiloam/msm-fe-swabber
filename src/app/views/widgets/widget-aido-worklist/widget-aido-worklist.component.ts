@@ -31,7 +31,7 @@ export class WidgetAidoWorklistComponent implements OnInit {
     private appointmentService: AppointmentService,
     private doctorService: DoctorService,
     private patientService: PatientService,
-    private admissionService: AdmissionService,
+    public admissionService: AdmissionService,
     public modalService: NgbModal,
     private alertService: AlertService,
     modalSetting: NgbModalConfig,
@@ -82,6 +82,7 @@ export class WidgetAidoWorklistComponent implements OnInit {
   public appResult: any = null;
 
   public rescheduleModalRef: NgbModalRef;
+  public isSendingAdmission = false;
 
   private page = 0;
 
@@ -263,6 +264,7 @@ export class WidgetAidoWorklistComponent implements OnInit {
   }
 
   async createAdmModal(val, content) {
+    this.isSendingAdmission = false;
     this.selectedAdm = {
       appointmentId: val.appointment_id,
       userId: this.user.id,
@@ -272,12 +274,15 @@ export class WidgetAidoWorklistComponent implements OnInit {
     this.open(content);
   }
 
-  async createAdm() {
+  createAdm() {
+    this.isSendingAdmission = true;
     this.admissionService.createAdmissionAido(this.selectedAdm)
       .subscribe(data => {
+        this.isSendingAdmission = false;
         this.getAidoWorklist();
         this.alertService.success(data.message, false, 3000);
       }, err => {
+        this.isSendingAdmission = false;
         this.alertService.error(err.error.message, false, 3000);
       }
     );

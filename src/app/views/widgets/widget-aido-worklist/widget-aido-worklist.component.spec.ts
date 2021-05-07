@@ -6,11 +6,12 @@ import {HttpClientTestingModule} from '@angular/common/http/testing';
 import {HTTP_INTERCEPTORS, HttpEvent, HttpHandler, HttpInterceptor, HttpRequest, HttpResponse} from '@angular/common/http';
 import {Observable, of} from 'rxjs';
 import {By} from '@angular/platform-browser';
-import { channelId } from '../../../variables/common.variable';
+import {channelId, sourceApps} from '../../../variables/common.variable';
 import {mockLocalStorage} from '../../pages/page-vaccine-worklist/page-vaccine-worklist.component.spec';
 import {WidgetAidoWorklistModule} from './widget-aido-worklist.module';
 import {teleResponse} from '../../../mocks/tele-data';
 import {DoctorInterceptor} from '../../../interceptors/doctor-interceptor';
+import {delay} from 'rxjs/operators';
 
 describe('Widget Aido Worklist Component', () => {
   let component: WidgetAidoWorklistComponent;
@@ -135,6 +136,29 @@ describe('Widget Aido Worklist Component', () => {
 
     flush();
   }));
+
+  it('should be able to disabled sending admission button', async (done) => {
+    spyOn(component.admissionService, 'createAdmissionAido').and.returnValue(
+      of({status: 'OK', message: 'success', data: {appointmentId: 'test-appointment-id'}})
+        .pipe(delay(300))
+    );
+    fixture.whenStable().then(() => {
+      component.selectedAdm = {
+        appointmentId: 'test-appointment-id',
+        userId: component.user.id,
+        source: sourceApps,
+        userName: component.user.fullname
+      };
+      component.createAdm();
+      setTimeout(() => {
+        expect(component.isSendingAdmission).toBeTruthy();
+        setTimeout(() => {
+          expect(component.isSendingAdmission).toBeFalsy();
+          done();
+        }, 300);
+      }, 100);
+    });
+  });
 });
 
 export class AidoWorklistInterceptor implements HttpInterceptor {
@@ -145,6 +169,18 @@ export class AidoWorklistInterceptor implements HttpInterceptor {
         status: 200,
         body: {
           ...teleResponse,
+        },
+      }));
+    }
+    if (req.method === 'POST' && req.urlWithParams.includes('/admissions/aido')) {
+      return of(new HttpResponse({
+        status: 200,
+        body: {
+          status: 'OK',
+          message: 'success',
+          data: {
+            admission_id: 'test-admission-id',
+          },
         },
       }));
     }

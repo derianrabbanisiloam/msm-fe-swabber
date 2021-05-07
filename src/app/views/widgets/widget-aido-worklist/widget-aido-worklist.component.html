@@ -280,7 +280,7 @@
     <div class="modal-body">
       <p>Are you sure to create admission ?</p>
       <div class="fo_confirmation_button d-flex justify-content-center">
-        <button type="button" class="btn fo_btn_green"
+        <button [disabled]="isSendingAdmission" type="button" class="btn fo_btn_green"
           (click)="createAdm()"
           (click)="c('Cross click')">Ok</button>
         <button type="button" class="btn fo_btn_black" (click)="c('Cross click')">Cancel</button>

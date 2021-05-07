@@ -278,6 +278,9 @@
       </button>
     </div>
     <div class="modal-body">
+      <div *ngFor="let alert of alerts">
+        <ngb-alert *ngIf="alert" type="{{cssAlertType(alert)}}" (close)="removeAlert(alert)">{{ alert.message }}</ngb-alert>
+      </div>
       <p>Are you sure to create admission ?</p>
       <div class="fo_confirmation_button d-flex justify-content-center">
         <button

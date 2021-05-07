@@ -289,9 +289,6 @@ export class WidgetAidoWorklistComponent implements OnInit {
         this.alertService.success(data.message, false, 3000);
       }, err => {
         this.isSendingAdmission = false;
-        if (this.admissionModalRef) {
-          this.admissionModalRef.close();
-        }
         this.alertService.error(err.error.message, false, 3000);
       }
     );

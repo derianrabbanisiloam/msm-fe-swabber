@@ -6,11 +6,12 @@ import {HttpClientTestingModule} from '@angular/common/http/testing';
 import {HTTP_INTERCEPTORS, HttpEvent, HttpHandler, HttpInterceptor, HttpRequest, HttpResponse} from '@angular/common/http';
 import {Observable, of} from 'rxjs';
 import {By} from '@angular/platform-browser';
-import { channelId } from '../../../variables/common.variable';
+import {channelId, sourceApps} from '../../../variables/common.variable';
 import {mockLocalStorage} from '../../pages/page-vaccine-worklist/page-vaccine-worklist.component.spec';
 import {WidgetAidoWorklistModule} from './widget-aido-worklist.module';
 import {teleResponse} from '../../../mocks/tele-data';
 import {DoctorInterceptor} from '../../../interceptors/doctor-interceptor';
+import {delay} from 'rxjs/operators';
 
 describe('Widget Aido Worklist Component', () => {
   let component: WidgetAidoWorklistComponent;
@@ -43,6 +44,7 @@ describe('Widget Aido Worklist Component', () => {
   beforeEach(() => {
     fixture = TestBed.createComponent(WidgetAidoWorklistComponent);
     component = fixture.componentInstance;
+    component.isSendingAdmission = false;
     fixture.detectChanges();
   });
 
@@ -135,6 +137,78 @@ describe('Widget Aido Worklist Component', () => {
 
     flush();
   }));
+
+  const admissionPayload = {
+    appointmentId: 'test-appointment-id',
+    userId: 'testuser id',
+    source: sourceApps,
+    userName: 'test user name'
+  };
+
+  it('should be able to change isSendingAdmission to true when sending request', async (done) => {
+    spyOn(component.admissionService, 'createAdmissionAido').and.returnValue(
+      of({status: 'OK', message: 'success', data: {appointmentId: 'test-appointment-id'}})
+        .pipe(delay(300))
+    );
+    fixture.whenStable().then(() => {
+      component.selectedAdm = admissionPayload;
+      component.createAdm();
+      setTimeout(() => {
+        // assert sending request
+        expect(component.isSendingAdmission).toBeTruthy();
+
+        done();
+      }, 100);
+    });
+  });
+
+  it('should be able to change isSendingAdmission to true if request is succeed', async (done) => {
+    spyOn(component.admissionService, 'createAdmissionAido').and.returnValue(
+      of({status: 'OK', message: 'success', data: {appointmentId: 'test-appointment-id'}})
+        .pipe(delay(300))
+    );
+    spyOn(component, 'getAidoWorklist');
+    spyOn(component.alertService, 'error');
+    fixture.whenStable().then(() => {
+      component.selectedAdm = admissionPayload;
+      component.createAdm();
+      setTimeout(() => {
+        // assert sending request
+        expect(component.isSendingAdmission).toBeTruthy();
+
+        setTimeout(() => {
+          // assert request is sent
+          expect(component.isSendingAdmission).toBeTruthy();
+          expect(component.getAidoWorklist).toHaveBeenCalled();
+          expect(component.alertService.error).not.toHaveBeenCalled();
+          done();
+        }, 300);
+      }, 100);
+    });
+  });
+
+  it('should be able to change isSendingAdmission to false if request is failed(retry)', async (done) => {
+    spyOn(component.admissionService, 'createAdmissionAido').and.returnValue(
+      of({status: 'ERROR', message: 'success', data: {appointmentId: 'test-appointment-id'}})
+        .pipe(delay(300))
+    );
+    spyOn(component.alertService, 'error');
+    fixture.whenStable().then(() => {
+      component.selectedAdm = admissionPayload;
+      component.createAdm();
+      setTimeout(() => {
+        // assert sending request
+        expect(component.isSendingAdmission).toBeTruthy();
+
+        setTimeout(() => {
+          // assert request is sent
+          expect(component.isSendingAdmission).toBeFalsy();
+          expect(component.alertService.error).toHaveBeenCalled();
+          done();
+        }, 300);
+      }, 100);
+    });
+  });
 });
 
 export class AidoWorklistInterceptor implements HttpInterceptor {
@@ -145,6 +219,18 @@ export class AidoWorklistInterceptor implements HttpInterceptor {
         status: 200,
         body: {
           ...teleResponse,
+        },
+      }));
+    }
+    if (req.method === 'POST' && req.urlWithParams.includes('/admissions/aido')) {
+      return of(new HttpResponse({
+        status: 200,
+        body: {
+          status: 'OK',
+          message: 'success',
+          data: {
+            admission_id: 'test-admission-id',
+          },
         },
       }));
     }

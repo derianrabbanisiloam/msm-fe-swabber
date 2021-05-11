@@ -40,6 +40,7 @@ import { HttpClient } from '@angular/common/http';
 import { HttpHeaders } from '@angular/common/http';
 import { FormBuilder, FormGroup, FormControl } from '@angular/forms';
 import Swal from 'sweetalert2';
+import { WebsocketService } from '../../../services/websocket.service';
 
 @Component({
   selector: 'app-widget-appointment-list-bpjs',
@@ -182,21 +183,8 @@ export class WidgetAppointmentListBpjsComponent implements OnInit {
     private router: Router,
     private http: HttpClient,
     private formBuilder: FormBuilder,
-  ) {
-    this.socket = socket(`${environment.WEB_SOCKET_SERVICE + keySocket.APPOINTMENT}`, {
-      transports: ['websocket'],
-      query: `data=${
-        Security.encrypt({ secretKey: SecretKey }, Jwt)
-        }&url=${environment.FRONT_OFFICE_SERVICE}`,
-    });
-
-    this.socketTwo = socket(`${environment.WEB_SOCKET_SERVICE + keySocket.QUEUE}`, {
-      transports: ['websocket'],
-      query: `data=${
-        Security.encrypt({ secretKey: SecretKey }, Jwt)
-        }&url=${environment.FRONT_OFFICE_SERVICE}`,
-    });
-  }
+    private webSocketService: WebsocketService
+  ) {}
 
   ngOnInit() {
     this.uploadForm = this.formBuilder.group({
@@ -218,7 +206,7 @@ export class WidgetAppointmentListBpjsComponent implements OnInit {
     this.emitUpdateContact();
     this.getCollectionAlert();
 
-    this.socket.on(CANCEL_APP+'/'+this.hospital.id, (call) => {
+    this.webSocketService.appointmentSocket(`${CANCEL_APP}/${this.hospital.id}`).subscribe((call) => {
       if (call.data.hospital_id == this.hospital.id
         && call.data.appointment_date == this.dateApp) {
         this.appList = this.appList.map((value) => {
@@ -229,7 +217,8 @@ export class WidgetAppointmentListBpjsComponent implements OnInit {
         });
       }
     });
-    this.socket.on(CHECK_IN+'/'+this.hospital.id, (call) => {
+
+    this.webSocketService.appointmentSocket(`${CHECK_IN}/${this.hospital.id}`).subscribe((call) => {
       if (call.data.hospital_id == this.hospital.id
         && call.data.appointment_date == this.dateApp) {
         this.appList = this.appList.map((value) => {
@@ -243,7 +232,8 @@ export class WidgetAppointmentListBpjsComponent implements OnInit {
         });
       }
     });
-    this.socketTwo.on(QUEUE_NUMBER+'/'+this.hospital.id, (call) => {
+
+    this.webSocketService.queueSocket(`${QUEUE_NUMBER}/${this.hospital.id}`).subscribe((call) => {
       if (call.data.hospital_id == this.hospital.id
         && call.data.appointment_date == this.dateApp) {
         this.appList = this.appList.map((value) => {
@@ -1115,7 +1105,7 @@ export class WidgetAppointmentListBpjsComponent implements OnInit {
           }
           // broadcast check-in
           dataPatient.hospitalId = this.hospital.id;
-          this.socket.emit(CHECK_IN, dataPatient);
+          this.webSocketService.emitAppointmentSocket(CHECK_IN, dataPatient);
           this.buttonCreateAdmission = true;
           this.buttonPrintQueue = false;
           this.buttonCloseAdm = true;
@@ -1274,7 +1264,7 @@ export class WidgetAppointmentListBpjsComponent implements OnInit {
         }
         // broadcast queue-number
         dataPatient.hospitalId = this.hospital.id;
-        this.socketTwo.emit(QUEUE_NUMBER, dataPatient);
+        this.webSocketService.emitQueueSocket(QUEUE_NUMBER, dataPatient);
         return res.data;
       }).catch(err => {
         this.buttonReguler = false;

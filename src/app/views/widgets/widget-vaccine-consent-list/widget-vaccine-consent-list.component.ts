@@ -7,6 +7,7 @@ import { Component, OnInit } from '@angular/core';
 import { Consent } from '../../../models/consents/consent';
 import { ConsentDetail } from '../../../models/consents/consentDetail';
 import { ConsentService } from '../../../services/consent.service';
+import { GeneralService } from '../../../services/general.service';
 import { environment } from '../../../../environments/environment';
 import { PatientService } from '../../../services/patient.service';
 import { ModalSearchPatientComponent } from '../../../views/widgets/modal-search-patient/modal-search-patient.component';
@@ -14,7 +15,7 @@ import { PatientHope } from '../../../models/patients/patient-hope';
 import { DoctorService } from '../../../services/doctor.service';
 import { AdmissionService } from '../../../services/admission.service';
 import { Doctor } from '../../../models/doctors/doctor';
-import { sourceApps, channelId } from '../../../variables/common.variable';
+import { sourceApps, channelId, consentTypeKey, consentTypeValue } from '../../../variables/common.variable';
 import * as pdfMake from 'pdfmake/build/pdfmake';
 import * as pdfFonts from 'pdfmake/build/vfs_fonts';
 
@@ -52,8 +53,12 @@ export class WidgetVaccineConsentListComponent implements OnInit {
   public dobFromPatientData: string;
   public isFromPatientData: boolean = false;
   public formValidity: any = { remarks: {}, name: null, mobile: null, answers: [], dob: null };
+  public listPayer: any = [];
+  public consentType: string = null;
+  public payer: any;
 
   constructor(
+    private generalService: GeneralService,
     private doctorService: DoctorService,
     private patientService: PatientService,
     private admissionService: AdmissionService, 
@@ -84,6 +89,7 @@ export class WidgetVaccineConsentListComponent implements OnInit {
       this.doctorList = res.data;
     });
     this.isNewPatient();
+    this.getPayer();
   }
 
   isNewPatient() {
@@ -179,10 +185,12 @@ export class WidgetVaccineConsentListComponent implements OnInit {
       return;
     }
     this.doctorSelected = undefined;
+    this.payer = undefined;
     this.isAdmissionCreated = false;
     this.isConsentDetailChanged = false;
     this.updateStatus = 'initial';
     this.consentInfo = payload;
+    this.consentType = this.getConsentType(this.consentInfo.consent_type);
     this.showDetailConsent = false;
     this.consentService.getDetailAnswer(payload.consent_id).subscribe(
       (res) => {
@@ -235,10 +243,10 @@ export class WidgetVaccineConsentListComponent implements OnInit {
             });
         } else if (this.isFromPatientData && this.nameFromPatientData && this.dobFromPatientData) {
           this.consentInfo.patient_name = this.nameFromPatientData;
-          this.consentInfo.date_of_birth = this.dobFromPatientData
+          this.consentInfo.date_of_birth = this.dobFromPatientData;
           this.isFromPatientData = false;
           document.documentElement.style.overflow = 'auto';
-          this.updateConsent()
+          this.updateConsent();
         } else {
           this.isFromPatientData = false;
           document.documentElement.style.overflow = 'auto';
@@ -657,7 +665,12 @@ export class WidgetVaccineConsentListComponent implements OnInit {
       userId: this.key.user.id,
       source: sourceApps,
       userName: this.key.user.fullname,
+      consentType: this.consentType,
     };
+
+    if (this.consentType === consentTypeValue.CORPORATE) {
+      payloadAdmissionCheckIn.payerId = this.payer.payer_id;
+    }
 
     this.createAdmissionStatus = 'loading';
     document.documentElement.style.overflow = 'hidden';
@@ -899,6 +912,28 @@ export class WidgetVaccineConsentListComponent implements OnInit {
       return `${this.createMarkupQuestion1(rawQuestion)} ${rawQuestion.consent_question_name.split('?')[1].split(this.separator)[0]}`;
     } else {
       return this.createMarkupQuestion1(rawQuestion);
+    }
+  }
+
+  async getPayer() {
+    this.listPayer = await this.generalService.getPayer(this.hospital.orgId)
+      .toPromise().then(res => {
+        return res.data;
+      }).catch(err => {
+        return [];
+      })
+  }
+
+  getConsentType(consentType: string) {
+    switch (consentType) {
+      case consentTypeKey.DEFAULT:
+        return consentTypeValue.DEFAULT;
+      case consentTypeKey.ELDERLY:
+        return consentTypeValue.ELDERLY;
+      case consentTypeKey.CORPORATE:
+        return consentTypeValue.CORPORATE;
+      default:
+        return consentTypeValue.DEFAULT;
     }
   }
 }

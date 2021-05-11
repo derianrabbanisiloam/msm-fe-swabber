@@ -7,6 +7,7 @@ import { Component, OnInit } from '@angular/core';
 import { Consent } from '../../../models/consents/consent';
 import { ConsentDetail } from '../../../models/consents/consentDetail';
 import { ConsentService } from '../../../services/consent.service';
+import { GeneralService } from '../../../services/general.service';
 import { environment } from '../../../../environments/environment';
 import { PatientService } from '../../../services/patient.service';
 import { ModalSearchPatientComponent } from '../../../views/widgets/modal-search-patient/modal-search-patient.component';
@@ -52,8 +53,10 @@ export class WidgetVaccineConsentListComponent implements OnInit {
   public dobFromPatientData: string;
   public isFromPatientData: boolean = false;
   public formValidity: any = { remarks: {}, name: null, mobile: null, answers: [], dob: null };
+  public listPayer: any = [];
 
   constructor(
+    private generalService: GeneralService,
     private doctorService: DoctorService,
     private patientService: PatientService,
     private admissionService: AdmissionService, 
@@ -84,6 +87,7 @@ export class WidgetVaccineConsentListComponent implements OnInit {
       this.doctorList = res.data;
     });
     this.isNewPatient();
+    this.getPayer();
   }
 
   isNewPatient() {
@@ -900,5 +904,14 @@ export class WidgetVaccineConsentListComponent implements OnInit {
     } else {
       return this.createMarkupQuestion1(rawQuestion);
     }
+  }
+
+  async getPayer() {
+    this.listPayer = await this.generalService.getPayer(this.hospital.orgId)
+      .toPromise().then(res => {
+        return res.data;
+      }).catch(err => {
+        return [];
+      })
   }
 }

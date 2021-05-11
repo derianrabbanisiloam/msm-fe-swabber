@@ -163,3 +163,15 @@ export const vaccineType = [
     form_type_id: 'dc1071a7-0a9a-4dd3-a8fa-62cc7299211f'
   },
 ]
+
+export const consentTypeKey = {
+  DEFAULT: '',
+  ELDERLY: 'Lansia',
+  CORPORATE: 'Gotong Royong',
+}
+
+export const consentTypeValue = {
+  DEFAULT: '1',
+  ELDERLY: '2',
+  CORPORATE: '3',  
+}

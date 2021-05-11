@@ -30,7 +30,7 @@
               <input type="text" class="form-control" id="patientName" [(ngModel)]="model.patientName"
                 name="patientName" required>
               <span *ngIf="validName" style="color: red; font-size: 9px;">
-                *Sorry, only letters (a-z), numbers (0-9), (.), and (,) Are allowed.
+                *Sorry, only letters (a-z), numbers (0-9), (.), (') and (,) Are allowed.
               </span>
             </div>
             <div class="form-pr-bdate">
@@ -94,8 +94,8 @@
               </div>
             </div>
 
-            <div class="form-group">
-              <label for="religion" class="">Religion</label>
+            <div class="form-group form-pr-religion">
+              <label for="religion" class="">Religion *</label>
               <div>
                 <select id="religion" class="form-control" [(ngModel)]="model.religion" name="religion">
                   <option *ngFor="let itr of listReligion" [ngValue]="itr" [selected]="itr.value == model.religion.value">{{itr.description}}</option>
@@ -106,11 +106,13 @@
         </div>
         <div class="fo_personal_form_right">
           <div class="form-group">
-            <label for="marital" class="">Marital Status</label>
-            <div class="form-group" style="width: 40%">
-              <select id="marital" class="form-control" [(ngModel)]="model.maritalStatus" name="marital">
-                <option *ngFor="let itr of listMarital" [ngValue]="itr" [selected]="itr.value == model.maritalStatus.value">{{itr.description}}</option>
-              </select>
+            <div class="form-group form-pr-marital-status">
+              <label for="marital" class="">Marital Status *</label>
+              <div class="form-group" style="width: 40%">
+                <select id="marital" class="form-control" [(ngModel)]="model.maritalStatus" name="marital">
+                  <option *ngFor="let itr of listMarital" [ngValue]="itr" [selected]="itr.value == model.maritalStatus.value">{{itr.description}}</option>
+                </select>
+              </div>
             </div>
             <div class="form-group form-pr-birth-place">
               <label for="birthPlace" class="">Birth Place *</label>
@@ -287,16 +289,16 @@
                     </div>
                   </div>
                   <label for="scanKTP" class="">Scan KTP</label>
-                  <div class="">
+                  <div>
                     <input type="file" accept="image/*" class="form-control-file" id="scanKTP"
                       (change)="readUrl($event)">
-                    <span *ngIf="model.identityImageUrl">
-                      <img src="{{model.identityImageUrl}}" alt="" style="width: 400px; height: 220px;" />
-                    </span>
                   </div>
-
-                  <div class="">
-                    <img *ngIf="url" [src]="url" height="100px" width="100px">
+                  <div style="height: 10rem; text-align: center; margin-top: 3rem;">
+                    <span *ngIf="model.identityImageUrl">
+                      <button class="btn ms_btn_green" (click)="getImageTwo(model.identityImageUrl)">
+                        View Photo ID
+                      </button>
+                    </span>
                   </div>
                 </div>
               </div>

@@ -133,22 +133,24 @@
           </div>
           <div *ngFor="let q of consentInfo.detail; let i = index" class="mt-2">
             <h5 *ngIf="q.consent_question_id === 31 && age > 60"
-              style="border-bottom: 1px solid black; padding-bottom: 0.5em;">Pertanyaan tambahan bagi sasaran lansia (≥
+              style="border-bottom: 1px solid black; padding-bottom: 0.5em;">Pertanyaan tambahan bagi sasaran
+              lansia (≥
               60 tahun):</h5>
             <div class="mb-4"
               *ngIf="q.is_vaccine_seq === consentInfo.vaccine_no || q.is_vaccine_seq ===  0 && q.is_age < age">
-              <label for="question">{{q.seq}}. {{createMarkupQuestion1(q)}}<br
-                  *ngIf="q.consent_question_name.indexOf(':') >=0" />{{createMarkupQuestion2(q)}}</label>
+              <!-- <label for="question">{{q.seq}}. {{createMarkupQuestion1(q)}}<br
+                            *ngIf="q.consent_question_name.indexOf(':') >=0" />{{createMarkupQuestion2(q)}}</label> -->
+              <label for="question" [innerHTML]="formatQuestion(q.seq, q.consent_question_name)"></label>
               <div *ngIf="q.is_remarks && q.answer_value === 'Ya'" class="form-inline">
                 <label>{{
-                  q.consent_question_name.split("?")[1].split(separator)[0]
+                  q.consent_question_name.split("?")[1].split(calSeparator)[0]
                   }}</label>
                 <input [disabled]="consentInfo.checkin_date !== null" style="
-                    width: 120px;
-                    margin-left: 4px;
-                    margin-right: 4px;
-                    text-align: center;
-                  " [(ngModel)]="q.answer_remarks" autocomplete="off" name="answer-remarks-{{i}}"
+                              width: 120px;
+                              margin-left: 4px;
+                              margin-right: 4px;
+                              text-align: center;
+                            " [(ngModel)]="q.answer_remarks" autocomplete="off" name="answer-remarks-{{i}}"
                   [ngClass]="formValidity.remarks[q.consent_question_id]? 'form-control-error' : 'form-control-normal'"
                   (change)="handleformChange()" [textMask]="{ mask: maskDate }" placeholder="dd-mm-yyyy" />
                 <span *ngIf="formValidity.remarks[q.consent_question_id] && q.answer_value === 'Ya'"
@@ -158,10 +160,11 @@
                 <div class="form-check form-check-inline" *ngFor="let option of q.answer_list">
                   <input [disabled]="consentInfo.checkin_date !== null" class="form-check-input" type="radio"
                     [id]="'checkbox-'+ option.answer + q.consent_question_id" [checked]="
-                        q.answer_value === option.answer
-                      " (change)="fieldsChange($event, q.consent_question_id)" [value]="option.answer" />
-                  <label class="form-check-label"
-                    [for]="'checkbox-'+ option.answer + q.consent_question_id">{{option.answer}}</label>
+                                  q.answer_value === option.answer
+                                " (change)="fieldsChange($event, q.consent_question_id)"
+                    [value]="option.answer" />
+                  <label class="form-check-label" [for]="'checkbox-'+ option.answer + q.consent_question_id"
+                    [innerHTML]="option.answer"></label>
                 </div>
               </div>
             </div>
@@ -378,8 +381,7 @@
                     <span *ngIf="q.is_remarks && q.answer_remarks === ''">...</span>
                     <br *ngIf="q.consent_question_name.indexOf(':') >=0" />{{createMarkupQuestion2(q)}}
                   </td>
-                  <td style="text-align: center; width: 100px;">
-                    {{q.answer_value}}
+                  <td style="text-align: center; width: 100px;" [innerHTML]="q.answer_value">
                   </td>
                 </tr>
               </ng-container>

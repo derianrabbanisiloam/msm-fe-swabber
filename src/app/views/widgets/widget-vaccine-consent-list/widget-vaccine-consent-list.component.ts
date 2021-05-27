@@ -57,6 +57,7 @@ export class WidgetVaccineConsentListComponent implements OnInit {
   public listPayer: any = [];
   public consentType: string = null;
   public payer: any;
+  public formType: number;
 
   constructor(
     private generalService: GeneralService,
@@ -216,6 +217,8 @@ export class WidgetVaccineConsentListComponent implements OnInit {
           }),
         };
         this.age = moment().diff(moment(this.formatDate(this.consentInfo.date_of_birth, 'YYYY-MM-DD')), 'years', true);
+        this.formType = this.consentAnswer[0].group_question;
+        console.log(this.formType);
         if (
           this.isFromPatientData &&
           this.mrLocal &&
@@ -296,7 +299,7 @@ export class WidgetVaccineConsentListComponent implements OnInit {
         .updateConsent({
           ...this.consentInfo,
           detail: this.filterQuestions(this.consentInfo.detail, this.consentInfo.vaccine_no).map((el) => {
-            if (el.answer_value === 'Tidak') {
+            if (el.answer_value.trim() !== el.answer_list[0].answer.trim()) {
               el.answer_remarks = '';
             }
             if (el.answer_remarks) {
@@ -755,7 +758,8 @@ export class WidgetVaccineConsentListComponent implements OnInit {
 
     // check if all reqeuired remarks are filled
     const checkRemarks = this.consentInfo.detail.filter((el) => {
-      if (el.answer_remarks !== '' && el.answer_value === 'Ya') {
+      console.log(el);
+      if (el.answer_remarks !== '' && el.answer_value.trim() === el.answer_list[0].answer.trim()) {
         if (!this.isDateValid(el.answer_remarks)) {
           this.formValidity.remarks[el.consent_question_id] =
             'Invalid format';
@@ -770,7 +774,7 @@ export class WidgetVaccineConsentListComponent implements OnInit {
         ) {
           delete this.formValidity.remarks[el.consent_question_id];
         }
-      } else if (el.is_remarks && el.answer_value === 'Ya' && !el.answer_remarks) {
+      } else if (el.is_remarks && el.answer_value.trim() === el.answer_list[0].answer.trim() && !el.answer_remarks) {
         return el;
       }
     });
@@ -944,22 +948,39 @@ export class WidgetVaccineConsentListComponent implements OnInit {
     return option;
   }
 
-  formatQuestion(seq: number, question: string) {
+  formatQuestion(seq: number, question: string, remarks: string) {
     const langSeparated = question.split(this.langSeparator);
     if (langSeparated.length === 1) {
-      return seq + '. ' + langSeparated[0];
+      // return seq + '. ' + langSeparated[0];
+      return '<b>' + langSeparated[0] + '</b>';
     } else if (langSeparated.length > 1) {
-      let result = seq + '. ';
+      // let result = seq + '. ';
+      let result = '';
       for (let i = 0; i < langSeparated.length - 1; i += 1) {
         if (i % 2 === 0) {
-          result = result + langSeparated[i] + '<br />';
+          result = result + '<b>' + langSeparated[i] + '</b><br />';
         } else {
           result = result + '<i>' + langSeparated[i] + '</i><br />';
         }
       }
+      if (remarks) {
+        result = result + '<b><u>' + remarks + '</u></b>';
+      }
       return result;
     } else {
       return question;
+    }
+  }
+
+  getAgeSeparation(currentIsAge: number, previousIsAge: number) {
+    if (this.age < 60) {
+      return false;
+    } else {
+      if (currentIsAge !== previousIsAge) {
+        return true;
+      } else {
+        return false;
+      }
     }
 
   }

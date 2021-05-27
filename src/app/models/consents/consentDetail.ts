@@ -13,4 +13,5 @@ export class ConsentDetail {
     answer_list: any;
     option_list: any;
     remarks: string;
+    group_question: number;
 }

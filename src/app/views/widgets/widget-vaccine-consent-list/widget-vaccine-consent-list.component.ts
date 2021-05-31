@@ -218,7 +218,6 @@ export class WidgetVaccineConsentListComponent implements OnInit {
         };
         this.age = moment().diff(moment(this.formatDate(this.consentInfo.date_of_birth, 'YYYY-MM-DD')), 'years', true);
         this.formType = this.consentAnswer[0].group_question;
-        console.log(this.formType);
         if (
           this.isFromPatientData &&
           this.mrLocal &&
@@ -753,12 +752,11 @@ export class WidgetVaccineConsentListComponent implements OnInit {
     // initial parameter
     let isValid: boolean = true;
     const isNum = /^\d*$/;
-    const isNameValid = /^[\w .,]+$/;
+    const isNameValid = /^[\w .,'‘’-]+$/;
     const findEmptyAnswer = this.filterQuestions(this.consentInfo.detail, this.consentInfo.vaccine_no).filter((item) => !item.answer_value);
 
     // check if all reqeuired remarks are filled
     const checkRemarks = this.consentInfo.detail.filter((el) => {
-      console.log(el);
       if (el.answer_remarks !== '' && el.answer_value.trim() === el.answer_list[0].answer.trim()) {
         if (!this.isDateValid(el.answer_remarks)) {
           this.formValidity.remarks[el.consent_question_id] =
@@ -775,6 +773,7 @@ export class WidgetVaccineConsentListComponent implements OnInit {
           delete this.formValidity.remarks[el.consent_question_id];
         }
       } else if (el.is_remarks && el.answer_value.trim() === el.answer_list[0].answer.trim() && !el.answer_remarks) {
+        this.formValidity.remarks[el.consent_question_id] = 'Please fill the remarks';
         return el;
       }
     });
@@ -787,7 +786,7 @@ export class WidgetVaccineConsentListComponent implements OnInit {
     const checkName = isNameValid.test(this.consentInfo.patient_name);
     if (!checkName) {
       isValid = false;
-      this.formValidity.name = 'Invalid format. Only allows a-z, A-Z, 0-9, (,), (.)';
+      this.formValidity.name = `Invalid format. Only allows a-z, A-Z, 0-9, (,), (.), ('), (-)`;
       window.scrollTo({
         left: 0,
         top: 0,
@@ -895,10 +894,10 @@ export class WidgetVaccineConsentListComponent implements OnInit {
       return `${rawQuestion.consent_question_name.split('?')[0]}?`;
     } else {
       if (rawQuestion.consent_question_name.indexOf(':') >= 0) {
-        return rawQuestion.consent_question_name.split(':')[0].replace('>=', '≥')
+        return rawQuestion.consent_question_name.split(':')[0].replace(/>=/g, '≥')
           + ':';
       } else {
-        return rawQuestion.consent_question_name.replace('>=', '≥');
+        return rawQuestion.consent_question_name.replace(/>=/g, '≥');
       }
     }
   };
@@ -906,7 +905,7 @@ export class WidgetVaccineConsentListComponent implements OnInit {
     if (!rawQuestion.is_remarks && rawQuestion.consent_question_name.indexOf(':') >= 0) {
       const splitString = rawQuestion.consent_question_name.split(':');
       splitString.shift();
-      return splitString.join(':').replace('>=', '≥');
+      return splitString.join(':').replace(/>=/g, '≥');
     } else {
       return '';
     }
@@ -942,20 +941,21 @@ export class WidgetVaccineConsentListComponent implements OnInit {
     }
   }
 
-  formatOption(option: string) {
-    const separatedOption = option.split(this.langSeparator);
-    console.log(separatedOption);
+  formatOption(originalOption: string) {
+    const option = originalOption.replace(/>=/g, '≥');
     return option;
   }
 
-  formatQuestion(seq: number, question: string, remarks: string) {
+  formatQuestion(seq: number, originalQuestion: string, remarks: string, ageGroup: number) {
+    const question = originalQuestion.replace(/>=/g, '≥');
     const langSeparated = question.split(this.langSeparator);
+    let result = '';
+    if (ageGroup !== null) {
+      if (ageGroup !== 60 || this.formType === 2) result = seq + '. ';
+    }
     if (langSeparated.length === 1) {
-      // return seq + '. ' + langSeparated[0];
-      return '<b>' + langSeparated[0] + '</b>';
+      return result + '<b>' + langSeparated[0] + '</b>';
     } else if (langSeparated.length > 1) {
-      // let result = seq + '. ';
-      let result = '';
       for (let i = 0; i < langSeparated.length - 1; i += 1) {
         if (i % 2 === 0) {
           result = result + '<b>' + langSeparated[i] + '</b><br />';
@@ -982,6 +982,5 @@ export class WidgetVaccineConsentListComponent implements OnInit {
         return false;
       }
     }
-
   }
 }

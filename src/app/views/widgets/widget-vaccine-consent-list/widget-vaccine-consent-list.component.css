@@ -159,4 +159,10 @@ li > * {
     background-color: #d9d9d9 !important;
     -webkit-print-color-adjust: exact;
   }
+
+  .page-break {
+    page-break-before: always;
+    page-break-after: always;
+    margin-bottom: 24px;
+  }
 }

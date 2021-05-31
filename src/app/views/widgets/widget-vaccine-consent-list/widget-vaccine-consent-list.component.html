@@ -343,6 +343,8 @@
 <div class="fo_vaccine_container_print d-none d-print-block"
   *ngIf="showDetailConsent && consentInfo.detail.length > 0">
   <!-- <div class="fo_vaccine_container_print d-print-none" *ngIf="showDetailConsent && consentInfo.detail.length > 0"> -->
+    <table class="page-print" style="border: 1px solid white !important;">
+      <thead class="print-header-information" style="border: 1px solid white !important;"><tr style="border: 1px solid white !important; margin-bottom: 24px;"><td style="border: 1px solid white !important;">
   <div class="row">
     <div style="border: 1px solid black; padding: 8px">
       <p style="font-size: 18px; font-weight: 700; margin: 0">
@@ -391,7 +393,8 @@
         </div>
       </div>
     </div>
-  </div>
+  </div></td></tr></thead>
+  <tbody><tr style="border: 1px solid white !important;"><td style="border: 1px solid white !important;">
   <div class="row" style="margin-top: 16px">
     <div class="col-print-12 bordered-content">
       <div style="margin-left: 1rem;">
@@ -573,7 +576,7 @@
               COVID-19 vaccination.
             </i>
           </li>
-          <div class="page-break" *ngIf="age > 60"></div>
+          <!-- <div class="page-break" *ngIf="age > 60"></div> -->
           <li [ngStyle]="{ 'margin-top': age > 60 ? '24px' : 'auto' }">
             Seseorang yang telah menerima vaksin COVID-19 tetap dapat terinfeksi dan menularkan
             kepada orang lain. Pemberian vaksin tidak menjamin kekebalan dari infeksi COVID-19,
@@ -620,5 +623,6 @@
         </p>
       </div>
     </div>
-  </div>
+  </div></td></tr></tbody>
+</table>
 </div>

@@ -6,14 +6,6 @@
   margin-bottom: 4px;
 }
 
-/* label {
-  font-weight: 700;
-} */
-
-/* i {
-  font-weight: 500;
-} */
-
 .card {
   cursor: pointer;
   border-radius: 4px;
@@ -78,7 +70,6 @@
 }
 
 .bordered-content {
-  border: 1px solid black;
   width: 100%;
   padding: 10px;
 }
@@ -160,27 +151,11 @@ li > * {
     -webkit-print-color-adjust: exact;
   }
 
-  /* #print-header {
-    display: table-header-group
-  } */
-
-  .page-break {
-    page-break-before: always;
-    page-break-after: always;
-    margin-bottom: 24px;
+  .fo_vaccine_container_print {
+    margin-top: -36px;
   }
-
-  /* table .page-print {
-    border: solid white !important;
-    border-width: 1px 0 0 1px !important;
-    border-bottom-style: none;
-  } */
 
   thead .print-header-information {
     display: table-header-group;
-  }
-
-  @page {
-    margin: 20mm;
   }
 }

@@ -487,7 +487,7 @@
                   </table>
                 </div>
               </div>
-              <div class="tnc" style="margin-top: 8px" *ngIf="formType === 2">
+              <div class="tnc" style="margin-top: 8px" *ngIf="formType === 2 || !formType">
                 <p>
                   Yang bertanda tangan di bawah ini menyatakan memahami dan menyetujui bahwa:
                 </p>
@@ -649,7 +649,7 @@
                   </i>
                 </p>
               </div>
-              <div class="signature" *ngIf="formType === 2">
+              <div class="signature" *ngIf="formType === 2 || !formType">
                 <p>.............., .........................20..........</p>
                 <br /><br /><br /><br />
                 <p>......................................................</p>

@@ -11,7 +11,7 @@
 </div>
 
 <div class="fo_container_list shadow-4">
-  <table class="table table-bordered">
+  <table class="table table-bordered aido-appts-table">
     <thead class="fo_color_blue foot-note" style="text-align: center;">
       <th style="min-width: 14em">
         Patient Name
@@ -110,7 +110,7 @@
         <td></td>
       </tr>
 
-      <tr *ngFor="let r of aidoAppointments; let i = index" [ngClass]="{
+      <tr class="aido-appt-item" *ngFor="let r of aidoAppointments; let i = index" [ngClass]="{
         'row-pink' : r.appointment_status_id === appStatusId.INACTIVE}">
         <td style="text-transform: uppercase">
           <a ngbPopover="{{r.contact_name}}" popoverTitle=""
@@ -224,7 +224,7 @@
                r.modified_by.substr(0,15)+"..." : r.modified_by}}</a>
         </td>
         <td style="text-align: center; min-width: 12em">
-        <div *ngIf="r.admission_status_id != 2 && r.appointment_status_id !== appStatusId.INACTIVE && r.payment_status_id === payStatus.PAID">
+        <div *ngIf="r.admission_status_id != 2 && r.appointment_status_id !== appStatusId.INACTIVE && r.payment_status_id === payStatus.PAID && r.eligible_status_id !== eligibleVal.NOT_ELIGIBLE">
           <div *ngIf="r.patient_hope_id !== 0 && r.patient_organization_id !== 0 && r.is_double_mr === false">
             <button (click)="createAdmModal(r, confirmAdmission)" class="btn ms_btn_green" style="font-size: 11px; width: 7.5rem">Check In</button>
           </div>
@@ -232,10 +232,15 @@
           || (r.patient_hope_id !== 0 && r.patient_organization_id === 0 && r.is_double_mr === true)
           || (r.patient_hope_id === 0 && r.patient_organization_id === 0 && r.is_double_mr === false)
           || (r.patient_hope_id !== 0 && r.patient_organization_id === 0 && r.is_double_mr === false)">
-            <button (click)="verifyAppointment(r)" class="btn ms_btn_blue" style="font-size: 10px; width: 7.5rem">Verify MR</button>
+            <button (click)="verifyAppointment(r)" class="btn ms_btn_blue verify-mr-button" style="font-size: 10px; width: 7.5rem">Verify MR</button>
           </div>
         </div>
-        
+        <div *ngIf="r.appointment_status_id !== appStatusId.INACTIVE && r.eligible_status_id !== eligibleVal.NOT_ELIGIBLE && (r.channel_id === arrChannel.MOBILE_OTHER || r.channel_id === arrChannel.MOBILE)">
+          <button (click)="cancelAppointment(r, confirmCancel)" class="btn ms_btn_red button-cancel">Cancel</button>
+        </div>
+        <div *ngIf="r.appointment_status_id !== appStatusId.INACTIVE && r.eligible_status_id !== eligibleVal.NOT_ELIGIBLE && (r.channel_id === arrChannel.MOBILE_OTHER || r.channel_id === arrChannel.MOBILE)">
+          <button (click)="rescheduleAppointment(r)" class="btn ms_btn_black reschedule-button">Reschedule</button>
+        </div>
         <div *ngIf="r.appointment_status_id !== appStatusId.INACTIVE && ((r.identity_card_file && r.employee_card_file) || (r.identity_card_file && r.insurance_card_file))
         && r.eligible_status_id === eligibleVal.NOT_YET_ELIGIBLE">
           <button (click)="eligibleModal(confirmEligible, r)" class="btn ms_btn_green_light" style="font-size: 10px; margin-top: 0.5rem; width: 7.5rem">Check Eligibility</button>
@@ -273,11 +278,16 @@
       </button>
     </div>
     <div class="modal-body">
+      <div *ngFor="let alert of alerts">
+        <ngb-alert *ngIf="alert" type="{{cssAlertType(alert)}}" (close)="removeAlert(alert)">{{ alert.message }}</ngb-alert>
+      </div>
       <p>Are you sure to create admission ?</p>
       <div class="fo_confirmation_button d-flex justify-content-center">
-        <button type="button" class="btn fo_btn_green"
-          (click)="createAdm()"
-          (click)="c('Cross click')">Ok</button>
+        <button
+          [disabled]="isSendingAdmission"
+          type="button"
+          class="btn fo_btn_green"
+          (click)="createAdm()">Ok</button>
         <button type="button" class="btn fo_btn_black" (click)="c('Cross click')">Cancel</button>
       </div>
     </div>
@@ -321,8 +331,7 @@
           <tr>
             <td>Insurance no / Employee no</td>
             <td>:</td>
-            <td *ngIf="appResult && appResult.employee_number">{{appResult.employee_number}}</td>
-            <td *ngIf="appResult && appResult.insurance_number">{{appResult.insurance_number}}</td>
+            <td *ngIf="appResult && appResult.payer_number">{{appResult.payer_number}}</td>
           </tr>
         </table>
       </div>

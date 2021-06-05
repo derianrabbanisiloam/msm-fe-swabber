@@ -1,7 +1,7 @@
 import { NgModule } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule, ReactiveFormsModule } from '@angular/forms';
-import { 
+import {
   NgbAlertModule
 } from '@ng-bootstrap/ng-bootstrap';
 import { TextMaskModule } from 'angular2-text-mask';
@@ -21,6 +21,9 @@ import { ModalVerificationAidoComponent } from './modal-verification-aido.compon
   ],
   exports: [
     ModalVerificationAidoComponent,
+  ],
+  entryComponents: [
+    ModalVerificationAidoComponent
   ]
 })
 export class ModalVerificationAidoModule { }

@@ -4,8 +4,8 @@
     <p>{{message1.message}}</p>
   </div>
   <div id="tutorial_week_button" class="btn-box header_right" *ngIf="showScheduleType1">
-    <div style="padding-right: 0.5em" *ngIf="fromRegistration == false && reschBpjs == false && fromBpjs == false">
-      <select class="form-control" (change)="getScheduleByConsType()" [(ngModel)]="consulType">
+    <div style="padding-right: 0.5em" *ngIf="fromRegistration == false && reschBpjs == false && fromBpjs == false && hideScheduleTypeOptionOnTele == false">
+      <select class="form-control schedule-type-option" name="schedule-type" (change)="getScheduleByConsType()" [(ngModel)]="consulType">
         <option [ngValue]=null [selected]="consulType === null">All Schedule</option>
         <option value=4 selected="consulType == 4">Teleconsultation</option>
         <option value=1 selected="consulType == 1">Regular</option>
@@ -92,7 +92,7 @@
                             </a>
                             <br>
                           </span>
-                          <span *ngIf="(itemSch.day == date.dateDay && date.dateISO < todayDateISO) 
+                          <span *ngIf="(itemSch.day == date.dateDay && date.dateISO < todayDateISO)
                           || (itemSch.day == date.dateDay && date.dateISO >= todayDateISO && holidaysSpecialty.indexOf(itemSch.doctor_id+'-'+date.dateISO+'-'+itemSch.hospital_id) != -1)
                           || (itemSch.day == date.dateDay && fromBpjs == true && fromRegistration == false && date.dateISO >= todayDateISOBPJS)"
                             class="unavailable">
@@ -272,7 +272,7 @@
                             <br>
                           </span>
                           <span
-                            *ngIf="(itemSch.day == date.dateDay && date.dateISO < todayDateISO) 
+                            *ngIf="(itemSch.day == date.dateDay && date.dateISO < todayDateISO)
                             || (itemSch.day == date.dateDay && date.dateISO >= todayDateISO && holidaysSpecialty.indexOf(itemSch.doctor_id+'-'+date.dateISO+'-'+itemSch.hospital_id) != -1)
                             || (itemSch.day == date.dateDay && fromBpjs == true && fromRegistration == false && date.dateISO >= todayDateISOBPJS)"
                             class="unavailable">

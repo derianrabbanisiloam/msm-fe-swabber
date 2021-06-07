@@ -85,7 +85,7 @@ export class WidgetDoctorScheduleComponent implements OnInit {
   ) {
   }
 
-  ngOnInit() {
+  async ngOnInit() {
   if (this.doctorService.searchDoctorSource2) {
     if(this.doctorService.searchDoctorSource2.fromBpjs === true &&
       this.doctorService.searchDoctorSource2.fromRegistration === false) { //from BPJS request list
@@ -151,9 +151,9 @@ export class WidgetDoctorScheduleComponent implements OnInit {
     }
 
     this.doctorService.searchDoctorSource2 = null;
-    this.getLeaveHeader(this.keywords);
-    this.generateDates(this.initDate);
-    this.getSchedulesLogic(this.keywords);
+    await this.getLeaveHeader(this.keywords);
+    await this.generateDates(this.initDate);
+    await this.getSchedulesLogic(this.keywords);
 
     this.doctorService.searchDoctorSource$.subscribe(
       async (params) => {

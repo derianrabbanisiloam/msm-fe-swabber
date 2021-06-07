@@ -146,7 +146,7 @@
             <ng-container *ngFor="let q of consentInfo.detail; let i = index">
               <ng-container *ngIf="i !== 0">
                 <h5
-                  *ngIf="getAgeSeparation(q.is_age, consentInfo.detail[i-1].is_age) && formType === 2"
+                  *ngIf="getAgeSeparation(q.is_age, consentInfo.detail[i-1].is_age) && (formType === 2 || !formType)"
                   style="border-bottom: 1px solid black; padding-bottom: 0.5em;">Pertanyaan
                   tambahan bagi
                   sasaran
@@ -441,7 +441,7 @@
                           </td>
                         </tr>
                       </ng-container>
-                      <tr *ngIf="age > 60 && formType === 2">
+                      <tr *ngIf="age > 60 && ( formType === 2 || !formType) ">
                         <th>14</th>
                         <th style="text-align: left;">
                           Pertanyaan tambahan bagi sasaran lansia (≥ 60 tahun ):
@@ -470,7 +470,7 @@
                           </td>
                           <td
                             [innerHTML]="formatQuestion(q.seq, q.consent_question_name, null, null)"
-                            *ngIf="formType === 2">
+                            *ngIf="formType === 2 || !formType">
                           </td>
                           <td style="width:74%;" *ngIf="formType === 3">
                             <ol type="a" start="{{i - 8}}">

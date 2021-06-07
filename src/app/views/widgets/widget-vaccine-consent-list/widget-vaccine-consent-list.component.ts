@@ -951,7 +951,7 @@ export class WidgetVaccineConsentListComponent implements OnInit {
     const langSeparated = question.split(this.langSeparator);
     let result = '';
     if (ageGroup !== null) {
-      if (ageGroup !== 60 || this.formType === 2) result = seq + '. ';
+      if (ageGroup !== 60 || this.formType === 2 || !this.formType) result = seq + '. ';
     }
     if (langSeparated.length === 1) {
       return result + '<b>' + langSeparated[0] + '</b>';

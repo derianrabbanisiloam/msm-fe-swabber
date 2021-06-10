@@ -60,7 +60,7 @@
               {{ schList.room_name }} ( {{ schList.from_time }} - {{ schList.to_time }} )
             </th>
             <th *ngIf="schArray.consultation_type_id == 4" colspan="11" class="header-2 left-text no-padding center-text" style="padding: 1rem 1rem">
-              <span style="font-weight: bold;">Teleconsultation</span> <span class="flag-tele">TELE</span> 
+              <span style="font-weight: bold;">Teleconsultation</span> <span class="flag-tele">TELE</span>
               {{ appDateDisplay }}
             </th>
           </tr>
@@ -82,7 +82,7 @@
               (click)="openCreateAppModal(app)"><a>Available</a></td>
             <td *ngIf="app.is_can_create && isOriginal && fromPreRegis" class="st-kolom-available"
               (click)="openCreateAppModal3(app, confirmSlot)"><a>Available</a></td>
-            <td *ngIf="app.is_can_create && isOriginal && app.is_walkin == true && isOpen == true && app.is_reserved_slot == false" 
+            <td *ngIf="app.is_can_create && isOriginal && app.is_walkin == true && isOpen == true && app.is_reserved_slot == false"
               class="st-kolom-available" (click)="openCreateAppModal(app)"><a>Available/Walk In Slot</a></td>
             <td *ngIf="app.is_can_create && isOriginal && app.is_walkin == true && isOpen == false && app.is_reserved_slot == false"
               class="st-kolom-available">
@@ -146,13 +146,13 @@
                       <img src="{{assetPath}}icons/ic_Cancel@2x.png">
                     </div>
                   </div>
-  
+
                   <div *ngIf="app.is_can_cancel && isOriginal && app.admission_id"
                     class="cell-img-nav d-flex justify-content-center">
                     <span class="badge badge-success">Checked in</span>
                   </div>
                 </div>
-  
+
                 <div *ngIf="app.appointment_temp_id">
                   <button (click)="verifyAppointment(app.appointment_temp_id)" class="btn ms_btn_green">Verify</button>
                   <span class="filler-05"></span>
@@ -162,7 +162,7 @@
               </div>
 
               <!-- button action for teleconsultation -->
-              <div *ngIf="app.channel_id == aidoChannel 
+              <div *ngIf="app.channel_id == aidoChannel
                 || (app.channel_id == mobileChannel && app.zoom_url != null)
                 || (app.channel_id == mobileOtherChannel && app.zoom_url != null)" style="width: auto; text-align: center">
                 <div *ngIf="app.payment_status_id === payStatusId.UNPAID">
@@ -224,7 +224,7 @@
               <span style="color:red;font-weight:bold">Not Yet Opened</span>
              <td>
             <!-- reschedule bpjs -->
-            
+
             <td *ngIf="!app.is_can_create">
               {{app.patient_name}}
               <span *ngIf="app.appointment_temp_id" class="newPatientIcon">
@@ -275,8 +275,8 @@
             </td>
           </tr>
         </tbody>
-        
-        <tbody *ngIf="schArray.consultation_type_id == 4">
+
+        <tbody class="tele-body" *ngIf="schArray.consultation_type_id == 4">
           <tr *ngFor="let app of schArray.appointment; let i=index"
             [ngClass]="{'cc_row_rescheduled': app.is_blocked == true || isOpen == false || app.is_reserved_slot == true}">
             <td class="st-kolom-time">{{app.appointment_range_time}}</td>
@@ -292,7 +292,7 @@
             <td *ngIf="app.is_can_create && !isOriginal && isOpen == true && app.is_reserved_slot == false" class="st-kolom-available"
               (click)="openCreateAppModal2(app)"><a>Available</a></td>
             <td *ngIf="app.is_can_create && !isOriginal && isOpen == false && app.is_reserved_slot == false" class="st-kolom-available">Available</td>
-            
+
             <td *ngIf="app.is_can_create && app.is_reserved_slot == true"
               class="st-kolom-available">
               <span style="color:black;font-weight:bold">Slot temporarily reserved</span>
@@ -332,13 +332,13 @@
                       <img src="{{assetPath}}icons/ic_Cancel@2x.png">
                     </div>
                   </div>
-  
+
                   <div *ngIf="app.is_can_cancel && isOriginal && app.admission_id"
                     class="cell-img-nav d-flex justify-content-center">
                     <span class="badge badge-success">Checked in</span>
                   </div>
                 </div>
-  
+
                 <div *ngIf="app.appointment_temp_id && isOpen == true">
                   <button (click)="verifyAppointment(app.appointment_temp_id)" class="btn ms_btn_green">Verify</button>
                   <span class="filler-05"></span>
@@ -348,15 +348,18 @@
               </div>
 
               <!-- button action for teleconsultation -->
-              <div *ngIf="app.channel_id == aidoChannel 
+              <div *ngIf="app.channel_id == aidoChannel
               || (app.channel_id == mobileChannel && app.zoom_url != null)
               || (app.channel_id == mobileOtherChannel && app.zoom_url != null)" style="width: auto; text-align: center">
                 <div *ngIf="app.payment_status_id === payStatusId.UNPAID">
                   <span class="flag-payment">Waiting Payment</span>
                 </div>
-                <div *ngIf="app.admission_status_id != 2 && app.appointment_status_id !== appStatusId.INACTIVE && app.payment_status_id === payStatusId.PAID">
+                <div *ngIf="app.admission_status_id != 2
+                && app.appointment_status_id !== appStatusId.INACTIVE
+                && app.payment_status_id === payStatusId.PAID
+                && !hideTeleActionOnRescheduling">
                   <div *ngIf="app.patient_hope_id && app.patient_organization_id && app.is_double_mr === false">
-                    <button (click)="createAdmModal(app, confirmAdmission)" class="btn ms_btn_green" style="font-size: 11px;">Check In</button>
+                    <button (click)="createAdmModal(app, confirmAdmission)" class="btn ms_btn_green checkin-button" style="font-size: 11px;">Check In</button>
                   </div>
                   <div *ngIf="app.patient_hope_id && !app.patient_organization_id && app.is_double_mr === false">
                     <button (click)="createMrModal(app, confirmCreateMr)" class="btn ms_btn_black" style="font-size: 11px;">Create MR</button>
@@ -376,7 +379,7 @@
             </td>
           </tr>
         </tbody>
-        <tbody *ngIf="schArray.consultation_type_id == 6">
+        <tbody class="non-bpjs-tele-body" *ngIf="schArray.consultation_type_id == 6">
           <tr *ngFor="let app of schArray.appointment; let i=index"
             [ngClass]="{'cc_row_rescheduled': app.is_blocked == true || isOpen == false && app.is_walkin == true || app.is_reserved_slot == true }">
             <td class="st-kolom-time">{{app.appointment_range_time}}</td>
@@ -400,7 +403,7 @@
               class="st-kolom-available">
               <span style="color:black;font-weight:bold">Slot temporarily reserved</span>
             </td>
-            
+
             <td *ngIf="app.is_can_create && !isOriginal && app.is_walkin == false && !fromPreRegis" class="st-kolom-available"
               (click)="openCreateAppModal2(app)"><a>Available</a></td>
             <td *ngIf="app.is_can_create && !isOriginal && app.is_walkin == false && fromPreRegis" class="st-kolom-available"
@@ -446,13 +449,13 @@
                       <img src="{{assetPath}}icons/ic_Cancel@2x.png">
                     </div>
                   </div>
-  
+
                   <div *ngIf="app.is_can_cancel && isOriginal && app.admission_id"
                     class="cell-img-nav d-flex justify-content-center">
                     <span class="badge badge-success">Checked in</span>
                   </div>
                 </div>
-  
+
                 <div *ngIf="app.appointment_temp_id">
                   <button (click)="verifyAppointment(app.appointment_temp_id)" class="btn ms_btn_green">Verify</button>
                   <span class="filler-05"></span>
@@ -462,15 +465,18 @@
               </div>
 
               <!-- button action for teleconsultation -->
-              <div *ngIf="app.channel_id == aidoChannel 
+              <div *ngIf="app.channel_id == aidoChannel
               || (app.channel_id == mobileChannel && app.zoom_url != null)
               || (app.channel_id == mobileOtherChannel && app.zoom_url != null)" style="width: auto; text-align: center">
                 <div *ngIf="app.payment_status_id === payStatusId.UNPAID">
                   <span class="flag-payment">Waiting Payment</span>
                 </div>
-                <div *ngIf="app.admission_status_id != 2 && app.appointment_status_id !== appStatusId.INACTIVE && app.payment_status_id === payStatusId.PAID">
+                <div *ngIf="app.admission_status_id != 2
+                && app.appointment_status_id !== appStatusId.INACTIVE
+                && app.payment_status_id === payStatusId.PAID
+                && !hideTeleActionOnRescheduling">
                   <div *ngIf="app.patient_hope_id && app.patient_organization_id && app.is_double_mr === false">
-                    <button (click)="createAdmModal(app, confirmAdmission)" class="btn ms_btn_green" style="font-size: 11px;">Check In</button>
+                    <button (click)="createAdmModal(app, confirmAdmission)" class="btn ms_btn_green checkin-button" style="font-size: 11px;">Check In</button>
                   </div>
                   <div *ngIf="app.patient_hope_id && !app.patient_organization_id && app.is_double_mr === false">
                     <button (click)="createMrModal(app, confirmCreateMr)" class="btn ms_btn_black" style="font-size: 11px;">Create MR</button>
@@ -547,7 +553,7 @@
                     triggers="mouseenter:mouseleave">{{app.modified_name && app.modified_name.length > 10 ? app.modified_name.substr(0,10)+"..." : app.modified_name}}</a>
                 </td>
                 <td class="st-kolom-button">
-      
+
                   <div *ngIf="!app.appointment_temp_id">
                     <div *ngIf="app.is_can_cancel && isOriginal && !app.admission_id"
                       class="cell-img-nav d-flex justify-content-center">
@@ -562,13 +568,13 @@
                         <img src="{{assetPath}}icons/ic_Cancel@2x.png">
                       </div>
                     </div>
-      
+
                     <div *ngIf="app.is_can_cancel && isOriginal && app.admission_id"
                       class="cell-img-nav d-flex justify-content-center">
                       <span class="badge badge-success">Checked in</span>
                     </div>
                   </div>
-      
+
                   <div *ngIf="app.appointment_temp_id">
                     <button (click)="verifyAppointment(app.appointment_temp_id)" class="btn ms_btn_green">Verify</button>
                     <span class="filler-05"></span>
@@ -581,13 +587,13 @@
           </table>
         </div>
       </div>
-      
+
     </div>
 
     <div *ngIf="i < schLength - 1">
       <hr class="line-border">
     </div>
-    
+
   </div>
 </div>
 
@@ -724,14 +730,14 @@
                 readonly>
             </div>
           </div>
-          
+
           <div class="form-group" style="width: 50%" *ngIf="fromBpjs">
             <label class="">No. Surat Keterangan</label>
             <div class="input-group">
               <input type="text" class="form-control" name="surat_keterangan" readonly>
             </div>
           </div>
-          
+
         </div>
       </div>
       <div *ngIf="!selectedCheckIn.admission_id" style="border-top: 0.5px solid #C1C1C1">
@@ -741,12 +747,12 @@
                 <div class="">
                   <select id="title" class="form-control" required (change)="changeCondition($event)"
                     name="dropDownPatientType">
-      
+
                     <option *ngFor="let itr of patientTypeList" [ngValue]="itr" [disabled]="itr.description == 'EMPLOYEE'"
                       [selected]="(itr.description == 'KITAS' && nationalIdTypeId == 4) || (itr.description == 'PASSPORT' && nationalIdTypeId == 3)
                         || itr.description == 'PRIVATE' && nationalIdTypeId == 1 || (itr.description == 'PRIVATE' && nationalIdTypeId == 2) || (itr.description == 'PRIVATE' && nationalIdTypeId == 5) || (itr.description == 'PRIVATE' && nationalIdTypeId == '')">
                       {{itr.description}}</option>
-      
+
                   </select>
                   <input type="hidden" name="patientType" [(ngModel)]="patientType">
                 </div>
@@ -789,7 +795,7 @@
         </div>
       </div>
       <div style="width: 100%" *ngIf="fromBpjs">
-        
+
         <div class="d-flex justify-content-start">
           <div style="width: 2%">
             <div class="form-group">
@@ -816,7 +822,7 @@
             <span style="font-weight: bold;">Katarak</span>
           </div>
         </div>
-      
+
       </div>
       <div>
         <div class="d-flex justify-content-end">
@@ -955,7 +961,7 @@
                   <select *ngIf="!selectedCheckIn.payer_eligibility" id="title" class="form-control" required (change)="changeCondition($event)"
                     name="dropDownPatientType">
                     <option *ngFor="let itr of patientTypeList" [ngValue]="itr" [disabled]="itr.description == 'EMPLOYEE'"
-                      [selected]="(itr.description == patientType.description && nationalIdTypeId == 4) 
+                      [selected]="(itr.description == patientType.description && nationalIdTypeId == 4)
                       || (itr.description == patientType.description && nationalIdTypeId == 3)
                       || (itr.description == patientType.description && nationalIdTypeId == 1)
                       || (itr.description == patientType.description && nationalIdTypeId == 2)
@@ -968,7 +974,7 @@
                   name="dropDownPatientType" [disabled]="true">
                     <option *ngFor="let itr of patientTypeList" [ngValue]="itr" [selected] = "(itr.value == selectedCheckIn.patient_type_id)" > {{ itr.description }}</option>
                   </select>
-                  
+
                   <input type="hidden" name="patientType" [(ngModel)]="patientType">
                 </div>
             </div>
@@ -1013,12 +1019,12 @@
               </div>
             </div>
             <!-- check if bridging -->
-            <div *ngIf="isBridging"> 
+            <div *ngIf="isBridging">
               <div class="d-flex justify-content-between">
                 <div style="width: 40%; margin-top: 5px;">
                   <label class="">Referral Source</label>
                   <div class="">
-                       <input class="form-control"  type="text" name="referralSource" [disabled]="(payer == null || payer == '') || isCreatedEligibility " 
+                       <input class="form-control"  type="text" name="referralSource" [disabled]="(payer == null || payer == '') || isCreatedEligibility "
                        placeholder="Click to search" (click)="searchReferralSource()" [value]="referralSource ? referralSource.referralName : ''">
                   </div>
                 </div>
@@ -1044,7 +1050,7 @@
                       </button>
                     </div>
                   </div>
-                </div> 
+                </div>
               </div>
             <div class="d-flex justify-content-start">
               <div style="width: 40%; margin-top: 5px;">
@@ -1062,7 +1068,7 @@
                   <input type="text" class="form-control" name="registNotes" [(ngModel)]="registNotes" [disabled]="isCreatedEligibility">
                 </div>
               </div>
-            </div> 
+            </div>
           </div>
           </div>
           <br>
@@ -1391,8 +1397,8 @@
     </div>
   </div>
   <div class="modal-footer">
-    <button class="btn ms_btn_green" 
-    [disabled]="!(selectedCheckIn.bpjs_card_file && selectedCheckIn.refference_letter_file) && !(checkListModel.checkOne === true && checkListModel.checkFour === true)" 
+    <button class="btn ms_btn_green"
+    [disabled]="!(selectedCheckIn.bpjs_card_file && selectedCheckIn.refference_letter_file) && !(checkListModel.checkOne === true && checkListModel.checkFour === true)"
     (click)="afterUploadCheckIn(checkInOldPatient, cls_confirm_document)">Continue</button>
     <button type="button" class="btn ms_btn_red" (click)="c('Cross click')">Cancel</button>
   </div>
@@ -1464,7 +1470,7 @@
               </div>
             </ng-template>
           </ngb-tab>
-    
+
           <ngb-tab title="Suplesi">
             <ng-template ngbTabContent>
               <div class="form-group">
@@ -1531,7 +1537,7 @@
           </ngb-tab>
       </ngb-tabset>
       </div>
-        
+
     </div>
   </div>
 

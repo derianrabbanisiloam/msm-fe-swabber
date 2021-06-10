@@ -70,7 +70,10 @@ export class WidgetDoctorScheduleComponent implements OnInit {
   public myDateRangePickerOptionsTwo: IMyDpOptions;
   public today: any;
 
+  @Input()
   public consulType: string = null;
+  @Input()
+  public hideScheduleTypeOptionOnTele = false;
   public consulTypeFlag: number;
   public flagCon: number;
 
@@ -100,7 +103,7 @@ export class WidgetDoctorScheduleComponent implements OnInit {
         this.fromBpjs = true;
         this.fromRegistration = true;
         this.consulType = this.doctorService.searchDoctorSource2.consulType;
-      } 
+      }
     this.keywords = this.doctorService.searchDoctorSource2;
   } else if(this.activatedRoute.snapshot.queryParamMap.get('fromBpjs') === 'true' &&
       this.activatedRoute.snapshot.queryParamMap.get('fromRegistration') === 'false') {
@@ -117,17 +120,17 @@ export class WidgetDoctorScheduleComponent implements OnInit {
       this.fromRegistration = true;
       this.consulType = this.bodyBpjs.consulType;
       this.keywords = this.bodyBpjs;
-  
+
   }
 
     var dateFix = null;
     if(this.fromBpjs === true && this.fromRegistration === false) {
       var splitDate = this.patFromBpjs.appointment_date.split('-');
       dateFix = splitDate[2]+'-'+splitDate[1]+'-'+splitDate[0];
-      let dateChoosed = moment(dateFix); 
+      let dateChoosed = moment(dateFix);
       this.todayDateISOBPJS = dateChoosed.add(90, 'days').format('YYYY-MM-DD');
       let today = this.todayDateISOBPJS.split('-');
-      
+
       this.myDateRangePickerOptionsTwo = {
         todayBtnTxt: 'Today',
         dateFormat: 'dd/mm/yyyy',
@@ -146,7 +149,7 @@ export class WidgetDoctorScheduleComponent implements OnInit {
         this.initDate = dateFix;
       }
     }
-    
+
     this.doctorService.searchDoctorSource2 = null;
     await this.getLeaveHeader(this.keywords);
     await this.generateDates(this.initDate);
@@ -233,7 +236,7 @@ export class WidgetDoctorScheduleComponent implements OnInit {
 
   async generateDates(selectedDate?: any) {
     this.dates = [];
-    let dateChoosed = selectedDate ? moment(selectedDate) : moment(); 
+    let dateChoosed = selectedDate ? moment(selectedDate) : moment();
     let now = dateChoosed.startOf('isoWeek').format('YYYY-MM-DD');
     let date: any = now ? moment(now).startOf('week') : moment().startOf('week');
     let dateTemp: any;
@@ -252,7 +255,7 @@ export class WidgetDoctorScheduleComponent implements OnInit {
             this.holidaysName.push(this.leaves[l].schedule_type_name);
           }
       }
-      
+
     }
   }
 

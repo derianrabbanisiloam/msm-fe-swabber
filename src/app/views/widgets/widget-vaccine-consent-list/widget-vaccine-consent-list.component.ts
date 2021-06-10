@@ -41,7 +41,8 @@ export class WidgetVaccineConsentListComponent implements OnInit {
   public showNotFoundMsg: boolean = false;
   public showDetailConsent: boolean = false;
   public updateStatus: string = 'initial';
-  public separator: string = '<calendar>';
+  public calSeparator: string = '<calendar>';
+  public langSeparator: string = '<i>';
   public choosedPatient: PatientHope;
   public doctorList: Doctor[];
   public doctorSelected: any;
@@ -56,12 +57,13 @@ export class WidgetVaccineConsentListComponent implements OnInit {
   public listPayer: any = [];
   public consentType: string = null;
   public payer: any;
+  public formType: number;
 
   constructor(
     private generalService: GeneralService,
     private doctorService: DoctorService,
     private patientService: PatientService,
-    private admissionService: AdmissionService, 
+    private admissionService: AdmissionService,
     private modalService: NgbModal,
     public activeModal: NgbActiveModal,
     private consentService: ConsentService,
@@ -215,6 +217,7 @@ export class WidgetVaccineConsentListComponent implements OnInit {
           }),
         };
         this.age = moment().diff(moment(this.formatDate(this.consentInfo.date_of_birth, 'YYYY-MM-DD')), 'years', true);
+        this.formType = this.consentAnswer[0].group_question;
         if (
           this.isFromPatientData &&
           this.mrLocal &&
@@ -260,7 +263,7 @@ export class WidgetVaccineConsentListComponent implements OnInit {
 
   goToDetail(payload: any) {
     this.choosedPatient = undefined;
-    this.consentInfo = undefined
+    this.consentInfo = undefined;
     if (this.isConsentDetailChanged) {
       Swal.fire({
         position: 'center',
@@ -295,7 +298,7 @@ export class WidgetVaccineConsentListComponent implements OnInit {
         .updateConsent({
           ...this.consentInfo,
           detail: this.filterQuestions(this.consentInfo.detail, this.consentInfo.vaccine_no).map((el) => {
-            if (el.answer_value === 'Tidak') {
+            if (el.answer_value.trim() !== el.answer_list[0].answer.trim()) {
               el.answer_remarks = '';
             }
             if (el.answer_remarks) {
@@ -369,7 +372,7 @@ export class WidgetVaccineConsentListComponent implements OnInit {
   }
 
   printForm(): void {
-    if(this.consentInfo.checkin_date){
+    if (this.consentInfo.checkin_date) {
       window.print();
     } else {
       if (this.isConsentDetailChanged || !this.checkFormValidity()) {
@@ -479,7 +482,7 @@ export class WidgetVaccineConsentListComponent implements OnInit {
                       text: 'Would you like to continue to create admission?',
                     }).then(async (res) => {
                       if (res.value) {
-                        if(this.consentInfo.email_address === null || this.consentInfo.email_address === '') {
+                        if (this.consentInfo.email_address === null || this.consentInfo.email_address === '') {
                           Swal.fire({
                             position: 'center',
                             type: 'error',
@@ -489,7 +492,7 @@ export class WidgetVaccineConsentListComponent implements OnInit {
                           });
                         } else {
                           let isSuccess = await this.editPatientHope(this.choosedPatient.patientId, this.consentInfo.email_address);
-                          if(isSuccess) {
+                          if (isSuccess) {
                             this.createAdmission();
                           }
                         }
@@ -512,7 +515,7 @@ export class WidgetVaccineConsentListComponent implements OnInit {
         }
       });
     } else {
-      if(this.consentInfo.email_address === null || this.consentInfo.email_address === '') {
+      if (this.consentInfo.email_address === null || this.consentInfo.email_address === '') {
         Swal.fire({
           position: 'center',
           type: 'error',
@@ -522,7 +525,7 @@ export class WidgetVaccineConsentListComponent implements OnInit {
         });
       } else {
         let isSuccess = await this.editPatientHope(this.choosedPatient.patientId, this.consentInfo.email_address);
-        if(isSuccess) {
+        if (isSuccess) {
           this.createAdmission();
         }
       }
@@ -541,19 +544,19 @@ export class WidgetVaccineConsentListComponent implements OnInit {
         return null;
       });
 
-    return body
+    return body;
   }
 
   async editPatientHope(patient_Hope_Id, email?) {
     let isSuccess = false;
     let body = await this.getPatientHope(patient_Hope_Id);
-    if(body) {
-      const { patientId, name, sexId, birthPlaceId, birthDate, titleId, maritalStatusId, address, cityId, districtId, 
-              subDistrictId, postCode, homePhoneNo, officePhoneNo, mobileNo1, mobileNo2, emailAddress,
-              permanentAddress, permanentCityId, permanentPostCode, nationalIdTypeId, nationalIdNo,
-              nationalityId, religionId, bloodTypeId, fatherName, motherName, spouseName, contactName,
-              contactAddress, contactCityId, contactPhoneNo, contactMobileNo, contactEmailAddress, allergy,
-              payerId, payerIdNo, notes } = body;
+    if (body) {
+      const { patientId, name, sexId, birthPlaceId, birthDate, titleId, maritalStatusId, address, cityId, districtId,
+        subDistrictId, postCode, homePhoneNo, officePhoneNo, mobileNo1, mobileNo2, emailAddress,
+        permanentAddress, permanentCityId, permanentPostCode, nationalIdTypeId, nationalIdNo,
+        nationalityId, religionId, bloodTypeId, fatherName, motherName, spouseName, contactName,
+        contactAddress, contactCityId, contactPhoneNo, contactMobileNo, contactEmailAddress, allergy,
+        payerId, payerIdNo, notes } = body;
 
       let payload = {
         address, allergy, birthDate, birthPlaceId, bloodTypeId, channelId: channelId.FRONT_OFFICE, cityId,
@@ -561,11 +564,11 @@ export class WidgetVaccineConsentListComponent implements OnInit {
         districtId, emailAddress, fatherName, homePhoneNo, hospitalId: this.hospital.id, maritalStatusId,
         mobileNo1, mobileNo2, motherName, name, nationalIdNo, nationalIdTypeId, nationalityId, notes,
         officePhoneNo, organizationId: this.hospital.orgId, patientHopeId: patientId, payerId, payerIdNo,
-        permanentAddress, permanentCityId, permanentPostCode, postCode, religionId, sexId, source: sourceApps, 
+        permanentAddress, permanentCityId, permanentPostCode, postCode, religionId, sexId, source: sourceApps,
         spouseName, subDistrictId, titleId, userId: this.user.id, userName: this.user.fullname
-      }
+      };
 
-      if(email) {
+      if (email) {
         payload.emailAddress = email; //replace email from preregistration
         isSuccess = await this.mappingProcess(payload);
       }
@@ -581,7 +584,7 @@ export class WidgetVaccineConsentListComponent implements OnInit {
         return res.data;
       }).catch(err => {
         return null;
-      })
+      });
 
     if (contentPdf) {
       await this.filePdfCreated(contentPdf);
@@ -650,7 +653,7 @@ export class WidgetVaccineConsentListComponent implements OnInit {
           timer: 2000,
         });
         return false;
-      })
+      });
     return patient;
   }
 
@@ -677,35 +680,35 @@ export class WidgetVaccineConsentListComponent implements OnInit {
 
     this.consentService.createAdmissionVaccine(payloadAdmissionCheckIn).subscribe(
       (res) => {
-            this.isAdmissionCreated = true;
-            const foundIndex = this.consents.findIndex(
-              (x) => x.consent_id === this.consentInfo.consent_id
-            );
-            this.consents[foundIndex].checkin_date = moment().format(
-              'YYYY-MM-DDTHH:mm:ss'
-            );
-            this.consentInfo.checkin_date = moment().format('DD-MM-YYYY HH:mm');
-            this.createAdmissionStatus = 'loaded';
-            if(!this.isFromPatientData){
-              this.consentInfo.patient_name = this.choosedPatient.name;
-              this.updateConsent();
-            }
-            this.clearQueryParams()
-            document.documentElement.style.overflow = 'auto';
-            Swal.fire({
-              position: 'center',
-              type: 'success',
-              title: 'Admission successfully created',
-              showConfirmButton: false,
-              timer: 2000,
-            });
-            setTimeout(() => {
-              window.scrollTo({
-                left: 0,
-                top: 0,
-                behavior: 'smooth',
-              });
-            }, 500);
+        this.isAdmissionCreated = true;
+        const foundIndex = this.consents.findIndex(
+          (x) => x.consent_id === this.consentInfo.consent_id
+        );
+        this.consents[foundIndex].checkin_date = moment().format(
+          'YYYY-MM-DDTHH:mm:ss'
+        );
+        this.consentInfo.checkin_date = moment().format('DD-MM-YYYY HH:mm');
+        this.createAdmissionStatus = 'loaded';
+        if (!this.isFromPatientData) {
+          this.consentInfo.patient_name = this.choosedPatient.name;
+          this.updateConsent();
+        }
+        this.clearQueryParams();
+        document.documentElement.style.overflow = 'auto';
+        Swal.fire({
+          position: 'center',
+          type: 'success',
+          title: 'Admission successfully created',
+          showConfirmButton: false,
+          timer: 2000,
+        });
+        setTimeout(() => {
+          window.scrollTo({
+            left: 0,
+            top: 0,
+            behavior: 'smooth',
+          });
+        }, 500);
       },
       (err) => {
         this.createAdmissionStatus = 'loaded';
@@ -749,12 +752,12 @@ export class WidgetVaccineConsentListComponent implements OnInit {
     // initial parameter
     let isValid: boolean = true;
     const isNum = /^\d*$/;
-    const isNameValid = /^[\w .,]+$/;
+    const isNameValid = /^[\w .,'‘’-]+$/;
     const findEmptyAnswer = this.filterQuestions(this.consentInfo.detail, this.consentInfo.vaccine_no).filter((item) => !item.answer_value);
 
     // check if all reqeuired remarks are filled
     const checkRemarks = this.consentInfo.detail.filter((el) => {
-      if (el.answer_remarks !== '' && el.answer_value === 'Ya') {
+      if (el.answer_remarks !== '' && el.answer_value.trim() === el.answer_list[0].answer.trim()) {
         if (!this.isDateValid(el.answer_remarks)) {
           this.formValidity.remarks[el.consent_question_id] =
             'Invalid format';
@@ -769,7 +772,8 @@ export class WidgetVaccineConsentListComponent implements OnInit {
         ) {
           delete this.formValidity.remarks[el.consent_question_id];
         }
-      } else if (el.is_remarks && el.answer_value === 'Ya' && !el.answer_remarks) {
+      } else if (el.is_remarks && el.answer_value.trim() === el.answer_list[0].answer.trim() && !el.answer_remarks) {
+        this.formValidity.remarks[el.consent_question_id] = 'Please fill the remarks';
         return el;
       }
     });
@@ -782,7 +786,7 @@ export class WidgetVaccineConsentListComponent implements OnInit {
     const checkName = isNameValid.test(this.consentInfo.patient_name);
     if (!checkName) {
       isValid = false;
-      this.formValidity.name = 'Invalid format. Only allows a-z, A-Z, 0-9, (,), (.)';
+      this.formValidity.name = `Invalid format. Only allows a-z, A-Z, 0-9, (,), (.), ('), (-)`;
       window.scrollTo({
         left: 0,
         top: 0,
@@ -850,10 +854,10 @@ export class WidgetVaccineConsentListComponent implements OnInit {
     if (reformatDate.length !== 8) {
       return false;
     } else {
-      if(moment(this.formatDate(value,'YYYY-MM-DD')).isValid()) {
-        return true
+      if (moment(this.formatDate(value, 'YYYY-MM-DD')).isValid()) {
+        return true;
       } else {
-        return false
+        return false;
       }
     }
   }
@@ -890,30 +894,30 @@ export class WidgetVaccineConsentListComponent implements OnInit {
       return `${rawQuestion.consent_question_name.split('?')[0]}?`;
     } else {
       if (rawQuestion.consent_question_name.indexOf(':') >= 0) {
-        return rawQuestion.consent_question_name.split(':')[0].replace('>=', '≥')
+        return rawQuestion.consent_question_name.split(':')[0].replace(/>=/g, '≥')
           + ':';
       } else {
-        return rawQuestion.consent_question_name.replace('>=', '≥');
+        return rawQuestion.consent_question_name.replace(/>=/g, '≥');
       }
     }
-  }
+  };
   createMarkupQuestion2 = (rawQuestion: any) => {
     if (!rawQuestion.is_remarks && rawQuestion.consent_question_name.indexOf(':') >= 0) {
       const splitString = rawQuestion.consent_question_name.split(':');
       splitString.shift();
-      return splitString.join(':').replace('>=', '≥');
+      return splitString.join(':').replace(/>=/g, '≥');
     } else {
       return '';
     }
-  }
+  };
 
   createPrintOutQuestion1 = (rawQuestion: any) => {
     if (rawQuestion.is_remarks) {
-      return `${this.createMarkupQuestion1(rawQuestion)} ${rawQuestion.consent_question_name.split('?')[1].split(this.separator)[0]}`;
+      return `${this.createMarkupQuestion1(rawQuestion)} ${rawQuestion.consent_question_name.split('?')[1].split(this.calSeparator)[0]}`;
     } else {
       return this.createMarkupQuestion1(rawQuestion);
     }
-  }
+  };
 
   async getPayer() {
     this.listPayer = await this.generalService.getPayer(this.hospital.orgId)
@@ -921,7 +925,7 @@ export class WidgetVaccineConsentListComponent implements OnInit {
         return res.data;
       }).catch(err => {
         return [];
-      })
+      });
   }
 
   getConsentType(consentType: string) {
@@ -934,6 +938,49 @@ export class WidgetVaccineConsentListComponent implements OnInit {
         return consentTypeValue.CORPORATE;
       default:
         return consentTypeValue.DEFAULT;
+    }
+  }
+
+  formatOption(originalOption: string) {
+    const option = originalOption.replace(/>=/g, '≥');
+    return option;
+  }
+
+  formatQuestion(seq: number, originalQuestion: string, remarks: string, ageGroup: number) {
+    const question = originalQuestion.replace(/>=/g, '≥');
+    const langSeparated = question.split(this.langSeparator);
+    let result = '';
+    if (ageGroup !== null) {
+      if (ageGroup !== 60 || this.formType === 2 || !this.formType) result = seq + '. ';
+    }
+    if (langSeparated.length === 1) {
+      return result + '<b>' + langSeparated[0] + '</b>';
+    } else if (langSeparated.length > 1) {
+      for (let i = 0; i < langSeparated.length - 1; i += 1) {
+        if (i % 2 === 0) {
+          result = result + '<b>' + langSeparated[i] + '</b><br />';
+        } else {
+          result = result + '<i>' + langSeparated[i] + '</i><br />';
+        }
+      }
+      if (remarks) {
+        result = result + '<b><u>' + remarks + '</u></b>';
+      }
+      return result;
+    } else {
+      return question;
+    }
+  }
+
+  getAgeSeparation(currentIsAge: number, previousIsAge: number) {
+    if (this.age < 60) {
+      return false;
+    } else {
+      if (currentIsAge !== previousIsAge) {
+        return true;
+      } else {
+        return false;
+      }
     }
   }
 }

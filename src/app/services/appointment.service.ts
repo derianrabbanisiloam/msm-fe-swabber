@@ -6,6 +6,8 @@ import { Appointment } from '../models/appointments/appointment';
 import { Receiver } from '../models/appointments/receiver';
 import { environment } from '../../environments/environment';
 import { httpOptions } from '../utils/http.util';
+import {TeleRescheduleRequest} from '../models/teleconsultation/tele-reschedule-request';
+import {TeleRescheduleResponse} from '../models/teleconsultation/tele-reschedule-response';
 
 @Injectable({
   providedIn: 'root'
@@ -26,6 +28,7 @@ export class AppointmentService {
   private appointmentRescheduleAidoCount = environment.CALL_CENTER_SERVICE + '/appointments/reschedules/count/aido';
   private aidoWorklistUrl = environment.CALL_CENTER_SERVICE + '/appointments/aido';
   private preRegistrationUrl = environment.FRONT_OFFICE_SERVICE + '/preregistrations';
+  private rescheduleTeleUrl = environment.CALL_CENTER_SERVICE + '/appointments/reschedules/aido';
 
   private rescheduleAppSource = new Subject<any>();
   public rescheduleAppSource$ = this.rescheduleAppSource.asObservable();
@@ -70,14 +73,14 @@ export class AppointmentService {
   getOrderList(date: any, hospital: string, limit: number, offset: number,
     confirmCode?: string, submitDate?: string, name?: string): Observable<any> {
 
-    let uri = `${this.preRegistrationUrl}/orders/hospital/${hospital}?preRegDate=${date}`; 
+    let uri = `${this.preRegistrationUrl}/orders/hospital/${hospital}?preRegDate=${date}`;
     uri = confirmCode ? `${uri}&confirmationCode=${confirmCode}` : uri;
     uri = name ? `${uri}&name=${name}` : uri;
     const url = `${uri}&limit=${limit}&offset=${offset}`;
     return this.http.get<any>(url, httpOptions);
   }
 
-  
+
   getPreRegistrationList(orderId: any, limit: number, offset: number, isNew: boolean): Observable<any> {
     let uri = `${this.preRegistrationUrl}/order/${orderId}?limit=${limit}&offset=${offset}`;
 
@@ -347,5 +350,9 @@ export class AppointmentService {
       // Let the app keep running by returning an empty result.
       return of(result as T);
     };
+  }
+
+  public rescheduleApptTele(payload: TeleRescheduleRequest): Observable<TeleRescheduleResponse> {
+    return this.http.post<TeleRescheduleResponse>(this.rescheduleTeleUrl, payload, httpOptions);
   }
 }

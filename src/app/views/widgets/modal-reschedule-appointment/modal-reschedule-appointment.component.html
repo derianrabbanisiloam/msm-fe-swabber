@@ -90,7 +90,9 @@
     <div class="col-md-12" style="padding: 0;max-height: 350px;overflow-y: scroll">
       <div [style.display]="flag" *ngIf="!isReschBpjs && openWidget === true">
         <app-widget-doctor-schedule
-        (opScheduleSelected)="getScheduleData($event)">
+          [consulType]="consultationTypeIds"
+          [hideScheduleTypeOptionOnTele]="teleAppointmentData.isTele"
+          (opScheduleSelected)="getScheduleData($event)">
         </app-widget-doctor-schedule>
       </div>
 
@@ -105,7 +107,8 @@
       <app-widget-create-appointment
         *ngIf="opScheduleSelected && openWidgetCreateApp"
         (opSlotSelected)="getSlotData($event)"
-        [appointmentPayloadInput]="createAppInputData">
+        [appointmentPayloadInput]="createAppInputData"
+        [hideTeleActionOnRescheduling]="teleAppointmentData.isTele">
       </app-widget-create-appointment>
     </div>
   </div>
@@ -133,7 +136,7 @@
   </div>
   <div class="col-md-4" style="text-align: right">
     <button class="ms_btn_border ms_btn_black" style="padding: 0.3vw 0vw; width: 7vw" #close_btn_reschedule aria-label="Close" (click)="close()">Cancel</button>
-    <button class="ms_btn_border ms_btn_green" style="padding: 0.3vw 0vw; width: 7vw" (click)="updateAppointment()" (click)="close()">Save & Close</button>
+    <button class="ms_btn_border ms_btn_green save-close-button" style="padding: 0.3vw 0vw; width: 7vw" (click)="updateAppointment()" (click)="close()">Save & Close</button>
   </div>
 
   <ng-template #direct_non_bpjs let-modal>

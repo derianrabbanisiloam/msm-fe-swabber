@@ -58,6 +58,7 @@ export class WidgetVaccineConsentListComponent implements OnInit {
   public consentType: string = null;
   public payer: any;
   public formType: number;
+  public registrationFormId: string = null;
 
   constructor(
     private generalService: GeneralService,
@@ -123,7 +124,7 @@ export class WidgetVaccineConsentListComponent implements OnInit {
     this.resetFormValidity();
     this.updateStatus = 'initial';
     this.choosedPatient = undefined;
-    this.doctorSelected = undefined;
+    this.doctorSelected = undefined;  
     this.consents = [];
     this.showWaitMsg = true;
     this.showNotFoundMsg = false;
@@ -151,12 +152,14 @@ export class WidgetVaccineConsentListComponent implements OnInit {
           if (res.status === 'Success') {
             if (res.data.length > 0) {
               this.consents = res.data;
+              this.registrationFormId = this.consents[0].registration_form_id;
               if (this.isFromPatientData) {
                 this.goToDetail(this.consents[0]);
               } else {
                 this.isFromPatientData = false;
                 document.documentElement.style.overflow = 'auto';
               }
+              this.getRegistrationForm();
             } else {
               this.showNotFoundMsg = true;
               this.consents = [];
@@ -179,6 +182,25 @@ export class WidgetVaccineConsentListComponent implements OnInit {
       );
   }
 
+  getRegistrationForm() {
+    this.consentService
+      .getPreRegisFormById(this.registrationFormId)
+      .subscribe(
+        (res) => {
+          const data = res.data;
+          const payerId = data[0].payer_id;
+          const payer = this.listPayer.filter((item) =>{
+            if (item.payer_id == payerId) {
+              return item;
+            }
+          });
+          if (payer.length > 0) {
+            this.payer = payer[0];
+          }
+        }
+      );
+  }
+
   getDetailInformation(payload: any) {
     if (
       this.isAdmissionCreated &&
@@ -187,7 +209,7 @@ export class WidgetVaccineConsentListComponent implements OnInit {
       return;
     }
     this.doctorSelected = undefined;
-    this.payer = undefined;
+    this.payer = this.payer ? this.payer : undefined;
     this.isAdmissionCreated = false;
     this.isConsentDetailChanged = false;
     this.updateStatus = 'initial';

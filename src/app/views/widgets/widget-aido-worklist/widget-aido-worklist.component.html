@@ -171,6 +171,9 @@
           <div *ngIf="r.channel_id == arrChannel.AIDO">
             <span>AIDO</span>
           </div>
+          <div *ngIf="r.channel_id == arrChannel.MOBILE || r.channel_id == arrChannel.MOBILE_OTHER">
+            <span>MySiloam</span>
+          </div>
         </td>
         <td>
           <div *ngIf="r.patient_hope_id !== 0 && r.patient_organization_id !== 0 && r.is_double_mr === false">

@@ -19,6 +19,7 @@ import {
   ModalRescheduleAppointmentComponent,
   TeleRescheduleAppointmentData
 } from '../modal-reschedule-appointment/modal-reschedule-appointment.component';
+import { HttpClient } from '@angular/common/http';
 
 @Component({
   selector: 'app-widget-aido-worklist',
@@ -34,6 +35,7 @@ export class WidgetAidoWorklistComponent implements OnInit {
     public admissionService: AdmissionService,
     public modalService: NgbModal,
     public alertService: AlertService,
+    private http: HttpClient,
     modalSetting: NgbModalConfig,
   ) {
     modalSetting.backdrop = 'static';
@@ -96,6 +98,31 @@ export class WidgetAidoWorklistComponent implements OnInit {
     this.emitVerifyApp();
     this.emitRescheduleApp();
   }
+
+  downloadCsv() {
+    let date = moment().format('YYYY-MM-DD');
+    let params = this.hospital.id+'/'+date;
+    let url = environment.FRONT_OFFICE_SERVICE + '/appointments/teleconsultation/'+params;
+    let requestOptions = { responseType: 'blob' as 'blob' };
+    this.http.get(url, requestOptions).subscribe(val => {
+      let url = URL.createObjectURL(val);
+      this.downloadUrl(url);
+      URL.revokeObjectURL(url);
+    }, error => {
+      this.alertService.error('Download Failed', false, 3000);
+    });
+  }
+  
+  downloadUrl(url) {
+    let date = moment().format('YYYY-MM-DD');
+    let a: any = document.createElement('a');
+    a.href = url;
+    a.download = 'Teleconsultation Worklist - '+date+'.csv';
+    document.body.appendChild(a);
+    a.style = 'display: none';
+    a.click();
+    a.remove();
+  };
 
   emitVerifyApp() {
     this.appointmentService.verifyAppSource$.subscribe(

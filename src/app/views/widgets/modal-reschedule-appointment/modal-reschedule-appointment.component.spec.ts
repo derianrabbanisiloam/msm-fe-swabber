@@ -77,31 +77,34 @@ describe('Modal Reschedule Appointment Component', () => {
       flush();
     }));
 
-    it('should be able to show doctor schedules', fakeAsync(() => {
+    it('should be able to show doctor schedules', async (done) => {
       fixture.whenStable();
-      tick(1000);
-      fixture.detectChanges();
+      setTimeout(() => {
+        fixture.detectChanges();
 
-      const rows = fixture.debugElement.queryAll(By.css('app-widget-doctor-schedule table tbody tr'));
+        const rows = fixture.debugElement.queryAll(By.css('app-widget-doctor-schedule table tbody tr'));
 
-      expect(rows.length).toEqual(2);
+        expect(rows.length).toEqual(2);
 
-      flush();
-    }));
+        done();
+      }, 300);
+    });
 
-    it(`should be able to show schedules with consultation type TELE`, fakeAsync(() => {
+    it(`should be able to show schedules with consultation type TELE`, (done) => {
       fixture.whenStable();
-      tick(1000);
-      fixture.detectChanges();
+      setTimeout(() => {
+        fixture.detectChanges();
 
-      const contents = fixture.debugElement.queryAll(
-        By.css('app-widget-doctor-schedule table tbody tr:nth-child(1) span')
-      ).map(e => e.nativeElement.textContent)
-        .filter(e => e !== null && e !== '' && e.match(/[0-9]/g));
+        const contents = fixture.debugElement.queryAll(
+          By.css('app-widget-doctor-schedule table tbody tr:nth-child(1) span')
+        ).map(e => e.nativeElement.textContent)
+          .filter(e => e !== null && e !== '' && e.match(/[0-9]/g));
 
-      expect(contents.length).toEqual(8);
-      flush();
-    }));
+        expect(contents.length).toEqual(8);
+
+        done();
+      }, 300);
+    });
   });
 
   /** normal test with fakeAsync is hard in here, using setTimeout does the job */

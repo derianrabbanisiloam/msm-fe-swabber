@@ -1,5 +1,5 @@
 import * as moment from 'moment';
-import {Component, OnInit, Input, ViewChild} from '@angular/core';
+import {Component, OnInit, Input, ViewChild, forwardRef} from '@angular/core';
 import { DoctorService } from '../../../services/doctor.service';
 import { NgbActiveModal, NgbModal } from '@ng-bootstrap/ng-bootstrap';
 import { AppointmentService } from '../../../services/appointment.service';
@@ -10,7 +10,7 @@ import { sourceApps, channelId, consultationType } from '../../../variables/comm
 import { environment } from '../../../../environments/environment';
 import { Speciality } from '../../../models/specialities/speciality';
 import { isEmpty } from 'lodash';
-import { Alert, AlertType } from '../../../models/alerts/alert';
+import { Alert } from '../../../models/alerts/alert';
 import { AlertService } from '../../../services/alert.service';
 import {WidgetCreateAppointmentComponent} from '../widget-create-appointment/widget-create-appointment.component';
 
@@ -21,7 +21,7 @@ import {WidgetCreateAppointmentComponent} from '../widget-create-appointment/wid
 })
 export class ModalRescheduleAppointmentComponent implements OnInit {
 
-  @ViewChild(WidgetCreateAppointmentComponent)
+  @ViewChild(forwardRef(() => WidgetCreateAppointmentComponent))
   public createAppointmentView: WidgetCreateAppointmentComponent;
 
   public assetPath = environment.ASSET_PATH;

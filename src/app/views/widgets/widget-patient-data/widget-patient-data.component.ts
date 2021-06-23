@@ -199,6 +199,7 @@ export class WidgetPatientDataComponent implements OnInit {
   public flagErrorMobile4: boolean = false;
   public flagErrorMobile5: boolean = false;
   public flagErrorMobile6: boolean = false;
+  public defaultCountry: any = {country_id: 1, name: "INDONESIA"};
 
   constructor(
     private generalService: GeneralService,
@@ -218,6 +219,7 @@ export class WidgetPatientDataComponent implements OnInit {
     private router: Router,
     private formBuilder: FormBuilder,
   ) {
+    this.model.nationality = this.defaultCountry;
     this.model.sex = {};
     this.model.maritalStatus = {};
     this.model.religion = {};
@@ -486,7 +488,6 @@ export class WidgetPatientDataComponent implements OnInit {
 
     if (this.appointmentId) {
       this.isFromAppointmentList = true;
-
       const appointment = await this.appointmentService.getAppointmentById(this.appointmentId)
         .toPromise().then(res => {
           return res.data[0];

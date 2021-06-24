@@ -58,7 +58,7 @@ export class WidgetVaccineConsentListComponent implements OnInit {
   public consentType: string = null;
   public payer: any;
   public formType: number;
-  public registrationFormId: string = null;
+  public identityNumber: string = null;
 
   constructor(
     private generalService: GeneralService,
@@ -129,6 +129,7 @@ export class WidgetVaccineConsentListComponent implements OnInit {
     this.showWaitMsg = true;
     this.showNotFoundMsg = false;
     this.isAdmissionCreated = false;
+    this.identityNumber = null;
 
     // payload to search consent
     let searchType: number;
@@ -152,14 +153,12 @@ export class WidgetVaccineConsentListComponent implements OnInit {
           if (res.status === 'Success') {
             if (res.data.length > 0) {
               this.consents = res.data;
-              this.registrationFormId = this.consents[0].registration_form_id;
               if (this.isFromPatientData) {
                 this.goToDetail(this.consents[0]);
               } else {
                 this.isFromPatientData = false;
                 document.documentElement.style.overflow = 'auto';
               }
-              this.getRegistrationForm();
             } else {
               this.showNotFoundMsg = true;
               this.consents = [];
@@ -182,12 +181,13 @@ export class WidgetVaccineConsentListComponent implements OnInit {
       );
   }
 
-  getRegistrationForm() {
+  getRegistrationForm(registrationFormId: string) {
     this.consentService
-      .getPreRegisFormById(this.registrationFormId)
+      .getPreRegisFormById(registrationFormId)
       .subscribe(
         (res) => {
           const data = res.data;
+          this.identityNumber = data[0].identity_number;
           const payerId = data[0].payer_id;
           const payer = this.listPayer.filter((item) =>{
             if (item.payer_id == payerId) {
@@ -208,6 +208,7 @@ export class WidgetVaccineConsentListComponent implements OnInit {
     ) {
       return;
     }
+    this.getRegistrationForm(payload.registration_form_id)
     this.doctorSelected = undefined;
     this.payer = this.payer ? this.payer : undefined;
     this.isAdmissionCreated = false;

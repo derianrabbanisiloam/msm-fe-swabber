@@ -49,21 +49,22 @@
   float: right;
 }
 
-.p-hospital-name,
-.p-title-1,
-.p-title-2 {
-  font-weight: 700;
-  margin-bottom: 0.2rem;
-}
-
-.p-title-2 {
-  font-style: italic;
-}
-
 .p-subtitle {
   font-weight: 400;
   margin-bottom: 0.2rem;
 }
+
+#p-hospital-name,
+#p-title-1,
+#p-title-2 {
+  font-weight: 700;
+  margin-bottom: 0.2rem;
+}
+
+#p-title-2 {
+  font-style: italic;
+}
+
 
 .fo_vaccine_container_print {
   margin-right: 4em;

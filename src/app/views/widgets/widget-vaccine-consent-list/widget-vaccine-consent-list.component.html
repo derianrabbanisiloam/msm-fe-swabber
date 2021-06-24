@@ -363,9 +363,26 @@
           <div class="row" style="margin-top: 8px" id="print-header">
             <div class="col-print-6">
               <div class="bordered-box-left" style="margin-bottom: 12px !important;">
-                <p class="p-hospital-name">Rumah Sakit {{ key.hospital.name }}</p>
-                <p class="p-title-1">PERSETUJUAN VAKSINASI COVID-19</p>
-                <p class="p-title-2">COVID-19 VACCINATION CONSENT FORM</p>
+                <div class="row" style="margin: 0">
+                  <div class="col-print-12">
+                    <p class="p-subtitle" id="p-hospital-name">Rumah Sakit {{ key.hospital.name }}</p>
+                  </div>
+                </div>
+                <div class="row" style="margin: 0">
+                  <div class="col-print-12">
+                    <p class="p-subtitle" id="p-title-1">PERSETUJUAN VAKSINASI COVID-19</p>
+                  </div>
+                </div>
+                <div class="row" style="margin: 0">
+                  <div class="col-print-12">
+                    <p class="p-subtitle" id="p-title-2">COVID-19 VACCINATION CONSENT FORM</p>
+                  </div>
+                </div>
+                <div class="row" style="margin: 0">
+                  <div class="col-print-12">
+                    <p class="p-subtitle" style="visibility: hidden;">a</p>
+                  </div>
+                </div>
               </div>
             </div>
             <div class="col-print-6">
@@ -392,6 +409,14 @@
                   </div>
                   <div class="col-print-8">
                     <p class="p-subtitle">: {{ consentInfo.mobile_no }}</p>
+                  </div>
+                </div>
+                <div class="row" style="margin: 0">
+                  <div class="col-print-4">
+                    <p class="p-subtitle">NIK</p>
+                  </div>
+                  <div class="col-print-8">
+                    <p class="p-subtitle">: {{ identityNumber }}</p>
                   </div>
                 </div>
               </div>

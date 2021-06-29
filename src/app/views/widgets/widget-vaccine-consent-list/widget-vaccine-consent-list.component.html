@@ -40,7 +40,9 @@
               <div class="card-body" style="position: relative;">
                 <span
                   [ngClass]="consent.vaccine_no === 1? 'badge badge-pill badge-success' : consent.vaccine_no === 2 ? 'badge badge-pill badge-info' : 'hidden-badge'">{{consent.vaccine_no}}</span>
-                <h5 class="card-title">{{ consent.patient_name }}</h5>
+                <h5 class="card-title text-primary font-weight-bold" style="letter-spacing: 0.08em;">{{ consent.patient_name }}</h5>
+                <h6 class="card-subtitle mb-2 text-muted font-italic" *ngIf="consent.corporate_name">{{ consent.corporate_name }}</h6>
+                <hr />
                 <h6 class="card-subtitle mb-2 text-muted">
                   {{ consent.date_of_birth | date }}
                 </h6>
@@ -50,6 +52,7 @@
                 <h6 class="card-subtitle mb-2 text-muted" style="font-weight: 700;">
                   {{consent.unique_code}}
                 </h6>
+                <hr />
               </div>
               <div *ngIf="consent.checkin_date" class="card-footer bg-warning">
                 Checked-in
@@ -124,6 +127,14 @@
               <input [disabled]="consentInfo.checkin_date !== null" id="patient-email"
                 name="patient-email" class="form-control" [(ngModel)]="consentInfo.email_address"
                 autocomplete="off" (change)="handleformChange()" />
+            </div>
+          </div>
+          <div class="row" *ngIf="consentInfo.corporate_name">
+            <div class="col-6">
+              <label for="patient-mobile">Corporate name</label>
+              <input disabled id="patient-corporate-name"
+                name="patient-corporate-name" class="form-control"
+                autocomplete="off" [value]="consentInfo.corporate_name" />
             </div>
           </div>
           <div class="vaccine-no"

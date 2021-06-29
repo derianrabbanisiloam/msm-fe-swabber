@@ -5,19 +5,22 @@ import { AppointmentService } from '../../../services/appointment.service';
 import { AlertService } from '../../../services/alert.service';
 import { PatientService } from '../../../services/patient.service';
 import { IMyDrpOptions } from 'mydaterangepicker';
-import { NgbModal } from '@ng-bootstrap/ng-bootstrap';
+import {NgbModal, NgbModalRef} from '@ng-bootstrap/ng-bootstrap';
 import { Doctor } from '../../../models/doctors/doctor';
 import { Alert, AlertType } from '../../../models/alerts/alert';
-import { ModalRescheduleAppointmentComponent } from '../modal-reschedule-appointment/modal-reschedule-appointment.component';
+import {
+  ModalRescheduleAppointmentComponent,
+  TeleRescheduleAppointmentData
+} from '../modal-reschedule-appointment/modal-reschedule-appointment.component';
 import { RescheduleAppointment } from '../../../models/appointments/reschedule-appointment';
 import { environment } from '../../../../environments/environment';
-import { sourceApps, channelId, appointmentStatusId, paymentStatus,
-  SecretKey, Jwt, APP_RESCHEDULE, keySocket } from '../../../variables/common.variable';
+import {
+  channelId, appointmentStatusId, paymentStatus,
+  APP_RESCHEDULE, eligibleStatus
+} from '../../../variables/common.variable';
 import {
   ModalAppointmentBpjsComponent
 } from '../modal-appointment-bpjs/modal-appointment-bpjs.component';
-import socket from 'socket.io-client';
-import Security from 'msm-kadapat';
 import { WebsocketService } from '../../../services/websocket.service';
 
 @Component({
@@ -26,6 +29,15 @@ import { WebsocketService } from '../../../services/websocket.service';
   styleUrls: ['./widget-reschedule-worklist.component.css']
 })
 export class WidgetRescheduleWorklistComponent implements OnInit {
+
+  constructor(
+    private appointmentService: AppointmentService,
+    private doctorService: DoctorService,
+    private patientService: PatientService,
+    private webSocketService: WebsocketService,
+    public modalService: NgbModal,
+    private alertService: AlertService,
+  ) {}
   public assetPath = environment.ASSET_PATH;
   public key: any = JSON.parse(localStorage.getItem('key'));
   public hospital: any = this.key.hospital;
@@ -41,26 +53,26 @@ export class WidgetRescheduleWorklistComponent implements OnInit {
   };
   public datePickerModel: any = {};
   public hospitalFormModel: any;
-  public keywordsModel: KeywordsModel = new KeywordsModel;
-  public keywordsBpjs: KeywordsBpjs = new KeywordsModel;
+  public keywordsModel: KeywordsModel = new KeywordsModel();
+  public keywordsBpjs: KeywordsBpjs = new KeywordsModel();
   public maskBirth = [/\d/, /\d/, '-', /\d/, /\d/, '-', /\d/, /\d/, /\d/, /\d/];
   public alerts: Alert[] = [];
-  public isCanPrevPage: boolean = false;
-  public isCanNextPage: boolean = false;
-  public isCanPrevPageBpjs: boolean = false;
-  public isCanNextPageBpjs: boolean = false;
-  public isWorklist: boolean = true;
-  public isAido: boolean = false;
-  public isBpjs: boolean = false;
+  public isCanPrevPage = false;
+  public isCanNextPage = false;
+  public isCanPrevPageBpjs = false;
+  public isCanNextPageBpjs = false;
+  public isWorklist = true;
+  public isAido = false;
+  public isBpjs = false;
   public countAppRes: number;
   public countAppResBpjs: number;
-  //aido
-  public count: number = -1;
+  // aido
+  public count = -1;
   public countAppResAido: number;
   public aidoAppointments: any [];
-  public showWaitMsg: boolean = false;
-  public showNotFoundMsg: boolean = false;
-  public keywordsModelTwo: KeywordsModelTwo = new KeywordsModelTwo;
+  public showWaitMsg = false;
+  public showNotFoundMsg = false;
+  public keywordsModelTwo: KeywordsModelTwo = new KeywordsModelTwo();
   public bodyKeyword: any = { valueOne: null, valueTwo: null, valueThree: null, valueFour: null,
     valueFive: null, valueSix: null, valueSeven: null, valueEight: null };
   public bodyKeywordTwo: any = { valueOne: null, valueTwo: null, valueThree: null, valueFour: null,
@@ -68,17 +80,13 @@ export class WidgetRescheduleWorklistComponent implements OnInit {
   public appStatusId = appointmentStatusId;
   public payStatus: any = paymentStatus;
   public arrChannel: any = channelId;
-  public isCanPrevPageTwo: boolean = false;
-  public isCanNextPageTwo: boolean = false;
+  public isCanPrevPageTwo = false;
+  public isCanNextPageTwo = false;
+  public eligibleVal: any = eligibleStatus;
 
-  constructor(
-    private appointmentService: AppointmentService,
-    private doctorService: DoctorService,
-    private patientService: PatientService,
-    private webSocketService: WebsocketService,
-    private modalService: NgbModal,
-    private alertService: AlertService,
-  ) {}
+  public rescheduleModalRef: NgbModalRef;
+
+  private page = 0;
 
   ngOnInit() {
     this.keywordsModel.hospitalId = this.hospital.id;
@@ -125,23 +133,27 @@ export class WidgetRescheduleWorklistComponent implements OnInit {
   }
 
   rescheduleWorklistButton(active) {
-    if(active === 'aido') {this.isAido = true; this.isWorklist = false; this.isBpjs = false;}
-    else if(active === 'worklist') {this.isWorklist = true; this.isAido = false; this.isBpjs = false;}
-    else if(active === 'bpjs') {this.isBpjs = true; this.isAido = false; this.isWorklist = false;}
+    if (active === 'aido') {
+      this.isAido = true; this.isWorklist = false; this.isBpjs = false;
+    } else if (active === 'worklist') {
+      this.isWorklist = true; this.isAido = false; this.isBpjs = false;
+    } else if (active === 'bpjs') {
+      this.isBpjs = true; this.isAido = false; this.isWorklist = false;
+    }
   }
 
-  async getAidoWorklist() {
-    this.count+=1;
+  getAidoWorklist() {
+    this.count += 1;
     this.showWaitMsg = true;
     this.showNotFoundMsg = false;
     let offsetTemp;
     const {
       hospitalId = '', fromDate = this.todayDateISO, toDate = this.todayDateISO,
       patientName = '', doctorId, isDoubleMr = null, admStatus = '', payStatus = '', offset = 0, limit = 10
-    } = await this.keywordsModelTwo;
+    } = this.keywordsModelTwo;
     offsetTemp = offset;
-    
-    if(this.count === 0) {
+
+    if (this.count === 0) {
       this.bodyKeyword.valueOne = hospitalId, this.bodyKeyword.valueTwo = fromDate, this.bodyKeyword.valueThree = toDate;
       this.bodyKeyword.valueFour = patientName, this.bodyKeyword.valueFive = doctorId ? doctorId.doctor_id : '';
       this.bodyKeyword.valueSix = isDoubleMr, this.bodyKeyword.valueSeven = admStatus, this.bodyKeyword.valueEight = payStatus;
@@ -149,19 +161,19 @@ export class WidgetRescheduleWorklistComponent implements OnInit {
       this.bodyKeywordTwo.valueOne = hospitalId, this.bodyKeywordTwo.valueTwo = fromDate, this.bodyKeywordTwo.valueThree = toDate;
       this.bodyKeywordTwo.valueFour = patientName, this.bodyKeywordTwo.valueFive = doctorId ? doctorId.doctor_id : '';
       this.bodyKeywordTwo.valueSix = isDoubleMr, this.bodyKeywordTwo.valueSeven = admStatus, this.bodyKeywordTwo.valueEight = payStatus;
-    } else if(this.count > 0) {
+    } else if (this.count > 0) {
       this.bodyKeyword.valueOne = hospitalId, this.bodyKeyword.valueTwo = fromDate, this.bodyKeyword.valueThree = toDate;
       this.bodyKeyword.valueFour = patientName, this.bodyKeyword.valueFive = doctorId ? doctorId.doctor_id : '';
       this.bodyKeyword.valueSix = isDoubleMr, this.bodyKeyword.valueSeven = admStatus, this.bodyKeyword.valueEight = payStatus;
 
-      if(this.bodyKeyword.valueOne !== this.bodyKeywordTwo.valueOne || this.bodyKeyword.valueTwo !== this.bodyKeywordTwo.valueTwo ||
+      if (this.bodyKeyword.valueOne !== this.bodyKeywordTwo.valueOne || this.bodyKeyword.valueTwo !== this.bodyKeywordTwo.valueTwo ||
         this.bodyKeyword.valueThree !== this.bodyKeywordTwo.valueThree || this.bodyKeyword.valueFour !== this.bodyKeywordTwo.valueFour ||
         this.bodyKeyword.valueFive !== this.bodyKeywordTwo.valueFive || this.bodyKeyword.valueSix !== this.bodyKeywordTwo.valueSix ||
-        this.bodyKeyword.valueSeven !== this.bodyKeywordTwo.valueSeven || this.bodyKeyword.valueEight !== this.bodyKeywordTwo.valueEight) {    
+        this.bodyKeyword.valueSeven !== this.bodyKeywordTwo.valueSeven || this.bodyKeyword.valueEight !== this.bodyKeywordTwo.valueEight) {
           this.bodyKeywordTwo.valueOne = hospitalId, this.bodyKeywordTwo.valueTwo = fromDate, this.bodyKeywordTwo.valueThree = toDate;
           this.bodyKeywordTwo.valueFour = patientName, this.bodyKeywordTwo.valueFive = doctorId ? doctorId.doctor_id : '';
           this.bodyKeywordTwo.valueSix = isDoubleMr, this.bodyKeywordTwo.valueSeven = admStatus, this.bodyKeywordTwo.valueEight = payStatus;
-        
+
           this.page = 0;
           offsetTemp = 0;
           this.keywordsModel.offset = offsetTemp;
@@ -169,7 +181,7 @@ export class WidgetRescheduleWorklistComponent implements OnInit {
       }
     }
 
-    let doctorSearch = doctorId ? doctorId.doctor_id : '';
+    const doctorSearch = doctorId ? doctorId.doctor_id : '';
     this.appointmentService.getRescheduleWorklistAido(
       hospitalId,
       fromDate,
@@ -184,15 +196,8 @@ export class WidgetRescheduleWorklistComponent implements OnInit {
           this.showWaitMsg = false;
           this.showNotFoundMsg = false;
           this.aidoAppointments = data.data;
-          this.aidoAppointments.map(x => {
-            x.date_of_birth = moment(x.date_of_birth).format('DD-MM-YYYY');
-            x.appointment_date = moment(x.appointment_date).format('DD-MM-YYYY');
-            x.appointment_from_time = x.appointment_from_time.substr(0, 5);
-            x.appointment_to_time = x.appointment_to_time.substr(0, 5);
-          });
           this.isCanNextPageTwo = this.aidoAppointments.length >= 10 ? true : false;
-        }
-        else {
+        } else {
           this.aidoAppointments = null;
           this.showWaitMsg = false;
           this.showNotFoundMsg = true;
@@ -222,8 +227,8 @@ export class WidgetRescheduleWorklistComponent implements OnInit {
     const month = Number(m.format('MM'));
     const date = Number(m.format('DD'));
     this.datePickerModel = {
-      beginDate: { year: year, month: month, day: date },
-      endDate: { year: year, month: month, day: date },
+      beginDate: { year, month, day: date },
+      endDate: { year, month, day: date },
     };
     this.keywordsModel.fromDate = m.format('YYYY-MM-DD');
     this.keywordsModel.toDate = this.keywordsModel.fromDate;
@@ -231,27 +236,25 @@ export class WidgetRescheduleWorklistComponent implements OnInit {
 
   changeDateRange(dateRange: any) {
     if (dateRange) {
-      let bYear = dateRange.beginDate.year;
+      const bYear = dateRange.beginDate.year;
       let bMonth = dateRange.beginDate.month;
       bMonth = Number(bMonth) < 10 ? '0' + bMonth : bMonth;
       let bDay = dateRange.beginDate.day;
       bDay = Number(bDay) < 10 ? '0' + bDay : bDay;
-      let eYear = dateRange.endDate.year;
+      const eYear = dateRange.endDate.year;
       let eMonth = dateRange.endDate.month;
       eMonth = Number(eMonth) < 10 ? '0' + eMonth : eMonth;
       let eDay = dateRange.endDate.day;
       eDay = Number(eDay) < 10 ? '0' + eDay : eDay;
-      if(this.isAido === true) {
+      if (this.isAido === true) {
         this.keywordsModelTwo.fromDate = bYear + '-' + bMonth + '-' + bDay;
         this.keywordsModelTwo.toDate = eYear + '-' + eMonth + '-' + eDay;
         this.getAidoWorklist();
-      }
-      else if(this.isWorklist === true) {
+      } else if (this.isWorklist === true) {
         this.keywordsModel.fromDate = bYear + '-' + bMonth + '-' + bDay;
         this.keywordsModel.toDate = eYear + '-' + eMonth + '-' + eDay;
         this.getRescheduleWorklist();
-      }
-      else if(this.isBpjs === true) {
+      } else if (this.isBpjs === true) {
         this.keywordsBpjs.fromDate = bYear + '-' + bMonth + '-' + bDay;
         this.keywordsBpjs.toDate = eYear + '-' + eMonth + '-' + eDay;
         this.getRescheduleWorklistBpjs();
@@ -353,13 +356,11 @@ export class WidgetRescheduleWorklistComponent implements OnInit {
       result => {
         if (result === true) {
           this.alertService.success('Reschedule appointment berhasil', false, 5000);
-          if(this.isAido === true) {
+          if (this.isAido === true) {
             this.getAidoWorklist();
-          }
-          else if(this.isWorklist === true) {
+          } else if (this.isWorklist === true) {
             this.getRescheduleWorklist();
-          }
-          else if(this.isBpjs === true) {
+          } else if (this.isBpjs === true) {
             this.getRescheduleWorklistBpjs();
           }
         } else {
@@ -368,8 +369,6 @@ export class WidgetRescheduleWorklistComponent implements OnInit {
       }
     );
   }
-
-  private page: number = 0;
   nextPage() {
     this.page += 1;
     this.keywordsModel.offset = this.page * 10;
@@ -442,6 +441,17 @@ export class WidgetRescheduleWorklistComponent implements OnInit {
     this.alerts = this.alerts.filter(x => x !== alert);
   }
 
+  rescheduleAppointment(item) {
+    this.rescheduleModalRef = this.modalService.open(ModalRescheduleAppointmentComponent, {
+      windowClass: 'cc_modal_confirmation',
+      size: 'lg'
+    });
+    const data: TeleRescheduleAppointmentData = {
+      isTele: true,
+      appointment: item,
+    };
+    this.rescheduleModalRef.componentInstance.teleAppointmentData = data;
+  }
 }
 
 class KeywordsModel {

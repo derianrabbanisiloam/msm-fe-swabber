@@ -247,8 +247,6 @@ export class DoctorInterceptor implements HttpInterceptor {
         }
       }));
     }
-    console.log(req.method);
-    console.log(req.urlWithParams);
     return next.handle(req);
   }
 

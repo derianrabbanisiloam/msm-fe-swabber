@@ -2084,7 +2084,8 @@ export class WidgetPatientDataComponent implements OnInit {
     this.closeAdm = close;
   }
 
-  afterUploadCheckIn(content, close) {
+  async afterUploadCheckIn(content, close) {
+    await this.defaultPatientType(this.selectedCheckIn.patient_hope_id);
     this.modalService.open(content, { windowClass: 'fo_modal_admission_4', size: 'lg' });
     this.closeDocument = close;
   }

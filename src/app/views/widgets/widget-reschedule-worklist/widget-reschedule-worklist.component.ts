@@ -448,7 +448,12 @@ export class WidgetRescheduleWorklistComponent implements OnInit {
     });
     const data: TeleRescheduleAppointmentData = {
       isTele: true,
-      appointment: item,
+      appointment: {
+        ...item,
+        contact_name: item.patient_name,
+        from_time: item.appointment_from_time.substring(0, 5),
+        to_time: item.appointment_to_time.substring(0, 5),
+      },
     };
     this.rescheduleModalRef.componentInstance.teleAppointmentData = data;
   }

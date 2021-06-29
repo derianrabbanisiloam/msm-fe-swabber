@@ -72,7 +72,7 @@ export class WidgetRescheduleWorklistComponent implements OnInit {
   public aidoAppointments: any [];
   public showWaitMsg = false;
   public showNotFoundMsg = false;
-  public keywordsModelTwo: KeywordsModelTwo = new KeywordsModelTwo();
+  public keywordsModelTwo: KeywordsModelAido = new KeywordsModelAido();
   public bodyKeyword: any = { valueOne: null, valueTwo: null, valueThree: null, valueFour: null,
     valueFive: null, valueSix: null, valueSeven: null, valueEight: null };
   public bodyKeywordTwo: any = { valueOne: null, valueTwo: null, valueThree: null, valueFour: null,
@@ -483,7 +483,7 @@ class KeywordsBpjs {
   limit: number;
 }
 
-class KeywordsModelTwo {
+class KeywordsModelAido {
   hospitalId: string;
   fromDate: string;
   toDate: string;

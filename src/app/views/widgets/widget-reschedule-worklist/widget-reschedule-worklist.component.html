@@ -121,8 +121,7 @@
           <th style="min-width: 8em">Multiple MR</th>
           <th>Phone No.</th>
           <th>Address</th>
-          <th width="100px">App. Date</th>
-          <th style="min-width: 12em;">App. Time</th>
+          <th width="100px">Appointment</th>
           <th style="min-width: 13em">
             Doctor
           </th>
@@ -173,7 +172,6 @@
             <td></td>
             <td></td>
             <td></td>
-            <td></td>
           </tr>
 
           <tr class="tele-item" *ngFor="let r of aidoAppointments; let i = index" [ngClass]="{
@@ -200,8 +198,14 @@
                 triggers="mouseenter:mouseleave">{{r.delivery_address && r.delivery_address.length > 10 ?
                    r.delivery_address.substr(0,10)+"..." : r.delivery_address}}</a>
             </td>
-            <td style="text-align: center; white-space: nowrap;">{{ r.appointment_date | date: 'dd-MM-yyyy' }}</td>
-            <td style="min-width: 8em">{{ r.appointment_from_time | slice: 0:5 }} - {{ r.appointment_to_time | slice: 0:5 }}</td>
+            <td style="white-space: nowrap;">
+              <h6 class="text-dark" style="font-weight: 600">
+                {{ r.appointment_date | date: 'dd-MM-yyyy' }}
+              </h6>
+              <h6 class="text-secondary" style="font-weight: 500">
+                {{ r.appointment_from_time | slice: 0:5 }} - {{ r.appointment_to_time | slice: 0:5 }}
+              </h6>
+            </td>
             <td class="kolom-type">
               <a ngbPopover="{{r.doctor_name}}" popoverTitle=""
                 triggers="mouseenter:mouseleave">{{r.doctor_name && r.doctor_name.length > 30 ?
@@ -250,12 +254,10 @@
             </td>
             <td>
               <div *ngIf="r.appointment_status_id !== appStatusId.INACTIVE && r.admission_status_id != 2">
-                <div class="cell-img-nav d-flex justify-content-center">
-                  <div *ngIf="r.appointment_status_id !== appStatusId.INACTIVE
+                <div *ngIf="r.appointment_status_id !== appStatusId.INACTIVE
                   && r.eligible_status_id !== eligibleVal.NOT_ELIGIBLE
                   && (r.channel_id === arrChannel.MOBILE_OTHER || r.channel_id === arrChannel.MOBILE)">
-                    <button (click)="rescheduleAppointment(r)" class="btn ms_btn_black reschedule-button">Reschedule</button>
-                  </div>
+                  <button (click)="rescheduleAppointment(r)" class="btn btn-dark reschedule-button">Reschedule</button>
                 </div>
               </div>
             </td>

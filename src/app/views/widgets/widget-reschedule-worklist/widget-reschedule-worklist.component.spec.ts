@@ -108,29 +108,54 @@ describe('WidgetRescheduleWorklistComponent', () => {
       flush();
     }));
 
-    it('should be able to validate reschedule item(2)', fakeAsync(() => {
-      fixture.whenStable();
+    [
+      {
+        row: 2,
+        expected: [
+          'Rezia Lukius Tejaatmaja',
+          '11-05-1998',
+          'NO',
+          '621287431054',
+          '1600 Amphi...',
+          ' 24-06-2021  11:00 - 11:15 ',
+          'Prof. DR. dr. Eka J. Wahjoepra...',
+          'Cancelled By System',
+          'Not Processed',
+          'MYSILOAM',
+          'Verified',
+          'ef91ac82-350a-4...',
+          'Reschedule'
+        ],
+      },
+      {
+        row: 5,
+        expected: [
+          'test',
+          '20-05-2004',
+          'NO',
+          '8170045150',
+          '3, Jl. Ber...',
+          ' 24-06-2021  19:00 - 19:15 ',
+          'Prof. DR. dr. Eka J. Wahjoepra...',
+          'Paid',
+          'Not Processed',
+          'AIDO',
+          '',
+          'ef91ac82-350a-4...',
+          ''
+        ],
+      },
+    ].forEach((item) => {
+      it(`should be able to validate reschedule item(${item.row})`, fakeAsync(() => {
+        fixture.whenStable();
 
-      clickElement(fixture, '.tele-count-button');
+        clickElement(fixture, '.tele-count-button');
 
-      const contents = getTextContents(fixture, '.tele-table tbody .tele-item:nth-child(2) td');
+        const contents = getTextContents(fixture, `.tele-table tbody .tele-item:nth-child(${item.row}) td`);
 
-      expect(contents).toEqual([
-        'Rezia Lukius Tejaatmaja',
-        '11-05-1998',
-        'NO',
-        '621287431054',
-        '1600 Amphi...',
-        ' 24-06-2021  11:00 - 11:15 ',
-        'Prof. DR. dr. Eka J. Wahjoepra...',
-        'Cancelled By System',
-        'Not Processed',
-        'MYSILOAM',
-        'Verified',
-        'ef91ac82-350a-4...',
-        'Reschedule'
-      ]);
-      flush();
-    }));
+        expect(contents).toEqual(item.expected);
+        flush();
+      }));
+    });
   });
 });

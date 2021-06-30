@@ -85,7 +85,7 @@ export class WidgetRescheduleWorklistComponent implements OnInit {
   public eligibleVal: any = eligibleStatus;
 
   public rescheduleModalRef: NgbModalRef;
-  public readonly channelName: {[key: string]: string} = Object.keys(channelId)
+  public readonly channelName: {readonly [key: string]: string} = Object.keys(channelId)
     .reduce((temp, item) => {
       const tempChannel = temp;
       if (channelId[item] === channelId.MOBILE

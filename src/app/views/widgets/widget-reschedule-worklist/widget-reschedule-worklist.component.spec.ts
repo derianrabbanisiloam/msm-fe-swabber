@@ -108,7 +108,7 @@ describe('WidgetRescheduleWorklistComponent', () => {
       flush();
     }));
 
-    it('should be able to validate reschedule item', fakeAsync(() => {
+    it('should be able to validate reschedule item(2)', fakeAsync(() => {
       fixture.whenStable();
 
       clickElement(fixture, '.tele-count-button');
@@ -123,9 +123,9 @@ describe('WidgetRescheduleWorklistComponent', () => {
         '1600 Amphi...',
         ' 24-06-2021  11:00 - 11:15 ',
         'Prof. DR. dr. Eka J. Wahjoepra...',
-        '',
+        'Cancelled By System',
         'Not Processed',
-        '',
+        'MYSILOAM',
         'Verified',
         'ef91ac82-350a-4...',
         'Reschedule'

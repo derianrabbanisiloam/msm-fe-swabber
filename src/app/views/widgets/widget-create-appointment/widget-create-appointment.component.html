@@ -165,7 +165,7 @@
               <div *ngIf="app.channel_id == aidoChannel
                 || (app.channel_id == mobileChannel && app.zoom_url != null)
                 || (app.channel_id == mobileOtherChannel && app.zoom_url != null)" style="width: auto; text-align: center">
-                <div *ngIf="app.payment_status_id === payStatusId.UNPAID">
+                <div *ngIf="app.payment_status_id === payStatusId.NOTPAID">
                   <span class="flag-payment">Waiting Payment</span>
                 </div>
                 <div *ngIf="app.admission_status_id != 2 && app.appointment_status_id !== appStatusId.INACTIVE && app.payment_status_id === payStatusId.PAID">
@@ -351,7 +351,7 @@
               <div *ngIf="app.channel_id == aidoChannel
               || (app.channel_id == mobileChannel && app.zoom_url != null)
               || (app.channel_id == mobileOtherChannel && app.zoom_url != null)" style="width: auto; text-align: center">
-                <div *ngIf="app.payment_status_id === payStatusId.UNPAID">
+                <div *ngIf="app.payment_status_id === payStatusId.NOTPAID">
                   <span class="flag-payment">Waiting Payment</span>
                 </div>
                 <div *ngIf="app.admission_status_id != 2
@@ -468,7 +468,7 @@
               <div *ngIf="app.channel_id == aidoChannel
               || (app.channel_id == mobileChannel && app.zoom_url != null)
               || (app.channel_id == mobileOtherChannel && app.zoom_url != null)" style="width: auto; text-align: center">
-                <div *ngIf="app.payment_status_id === payStatusId.UNPAID">
+                <div *ngIf="app.payment_status_id === payStatusId.NOTPAID">
                   <span class="flag-payment">Waiting Payment</span>
                 </div>
                 <div *ngIf="app.admission_status_id != 2

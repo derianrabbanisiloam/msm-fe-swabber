@@ -12,9 +12,9 @@
 
   <div style="margin-bottom: 1em;">
     <div class="container-appointment-input">
-      <button class="btn fo_btn_white" [ngClass]="{'fo_btn_active': isWorklist}" 
+      <button class="btn fo_btn_white" [ngClass]="{'fo_btn_active': isWorklist}"
       (click)="rescheduleWorklistButton('worklist')" style="margin-right: 2em;">Reschedule Worklist <span class="roundNumber">{{countAppRes}}</span></button>
-      <button class="btn fo_btn_white" [ngClass]="{'fo_btn_active': isAido}"
+      <button class="btn fo_btn_white tele-count-button" [ngClass]="{'fo_btn_active': isAido}"
       (click)="rescheduleWorklistButton('aido')" style="margin-right: 2em;">Reschedule Worklist - Tele <span class="roundNumber">{{countAppResAido}}</span></button>
       <button class="btn fo_btn_white" [ngClass]="{'fo_btn_active': isBpjs}"
       (click)="rescheduleWorklistButton('bpjs')">Reschedule Worklist - BPJS <span class="roundNumber">{{countAppResBpjs}}</span></button>
@@ -112,7 +112,7 @@
 
   <div *ngIf="isAido">
     <div class="fo_container_list shadow-4">
-      <table class="table table-bordered">
+      <table class="table table-bordered tele-table">
         <thead class="fo_color_blue foot-note" style="text-align: center;">
           <th style="min-width: 14em">
             Patient Name
@@ -121,8 +121,7 @@
           <th style="min-width: 8em">Multiple MR</th>
           <th>Phone No.</th>
           <th>Address</th>
-          <th width="100px">App. Date</th>
-          <th style="min-width: 12em;">App. Time</th>
+          <th width="100px">Appointment</th>
           <th style="min-width: 13em">
             Doctor
           </th>
@@ -130,10 +129,10 @@
           <th>Admission Status</th>
           <th>Channel</th>
           <th>Verify MR</th>
-          <th hidden>App. Manage</th>
           <th style="min-width: 9em">Modified By</th>
+          <th>Action</th>
         </thead>
-    
+
         <tbody>
           <tr class="fo_header_grey filter-row">
             <td>
@@ -157,11 +156,11 @@
                     (selected)='getAidoWorklist()' (inputCleared)='getAidoWorklist()' [itemTemplate]="itemTemplateDoctor"
                     [notFoundTemplate]="notFoundTemplate">
                   </ng-autocomplete>
-    
+
                   <ng-template #itemTemplateDoctor let-item>
                     <a [innerHTML]="item.name"></a>
                   </ng-template>
-    
+
                   <ng-template #notFoundTemplate let-notFound>
                     <div [innerHTML]="notFound"></div>
                   </ng-template>
@@ -172,18 +171,17 @@
             <td></td>
             <td></td>
             <td></td>
-            <td hidden></td>
             <td></td>
           </tr>
-    
-          <tr *ngFor="let r of aidoAppointments; let i = index" [ngClass]="{
+
+          <tr class="tele-item" *ngFor="let r of aidoAppointments; let i = index" [ngClass]="{
             'row-pink' : r.appointment_status_id === appStatusId.INACTIVE}">
             <td style="text-transform: uppercase">
               <a ngbPopover="{{r.contact_name}}" popoverTitle=""
                 triggers="mouseenter:mouseleave">{{r.patient_name && r.patient_name.length > 30 ?
                    r.patient_name.substr(0,30)+"..." : r.patient_name}}</a>
             </td>
-            <td style="width: 1%;">{{ r.date_of_birth }}</td>
+            <td style="width: 1%;">{{ r.birth_date | date: 'dd-MM-yyyy' }}</td>
             <td style="text-align: center; white-space: nowrap; width: 1%">
               <div>
                 <div *ngIf="r.is_double_mr == true">
@@ -200,8 +198,14 @@
                 triggers="mouseenter:mouseleave">{{r.delivery_address && r.delivery_address.length > 10 ?
                    r.delivery_address.substr(0,10)+"..." : r.delivery_address}}</a>
             </td>
-            <td style="text-align: center; white-space: nowrap;">{{ r.appointment_date }}</td>
-            <td style="min-width: 8em">{{ r.appointment_from_time }} - {{ r.appointment_to_time }}</td>
+            <td style="white-space: nowrap;">
+              <h6 class="text-dark" style="font-weight: 600">
+                {{ r.appointment_date | date: 'dd-MM-yyyy' }}
+              </h6>
+              <h6 class="text-secondary" style="font-weight: 500">
+                {{ r.appointment_from_time | slice: 0:5 }} - {{ r.appointment_to_time | slice: 0:5 }}
+              </h6>
+            </td>
             <td class="kolom-type">
               <a ngbPopover="{{r.doctor_name}}" popoverTitle=""
                 triggers="mouseenter:mouseleave">{{r.doctor_name && r.doctor_name.length > 30 ?
@@ -212,10 +216,10 @@
                 <div style="background:green; border-radius: 1em; padding: 0.2em" *ngIf="r.payment_status_id === payStatus.PAID">
                   <span>Paid</span>
                 </div>
-                <div style="background: black; border-radius: 1em;" *ngIf="r.payment_status_id === payStatus.UNPAID">
+                <div style="background: black; border-radius: 1em;" *ngIf="r.payment_status_id === payStatus.NOTPAID">
                   <span>Waiting</span>
                 </div>
-                <div style="background: red; border-radius: 1em;" *ngIf="r.payment_status_id === payStatus.NOTPAID">
+                <div style="background: red; border-radius: 1em;" *ngIf="r.payment_status_id === payStatus.PAYMENTEXPIRED">
                   <span>Cancelled By System</span>
                 </div>
               </div>
@@ -234,8 +238,8 @@
               </div>
             </td>
             <td>
-              <div *ngIf="r.channel_id == arrChannel.AIDO">
-                <span>AIDO</span>
+              <div>
+                <span>{{channelName[r.channel_id]}}</span>
               </div>
             </td>
             <td>
@@ -243,24 +247,19 @@
                 <span>Verified</span>
               </div>
             </td>
-            <td hidden>
-              <div *ngIf="r.appointment_status_id !== appStatusId.INACTIVE && r.admission_status_id != 2">
-    
-                <div class="cell-img-nav d-flex justify-content-center">
-                  <div>
-                    <!--Button reschedule-->
-                  </div>
-                  <span style="opacity: 0; max-width: 0.5em; overflow: hidden">filler</span>
-                  <div (click)="cancelAppointment(r, confirmCancel)">
-                    <img src="{{assetPath}}icons/ic_Cancel@2x.png">
-                  </div>
-                </div>
-                </div>
-            </td>
             <td style="text-align: center; font-size: 11px;">
               <a ngbPopover="{{r.modified_by}}" popoverTitle=""
                 triggers="mouseenter:mouseleave">{{r.modified_by && r.modified_by.length > 15 ?
                    r.modified_by.substr(0,15)+"..." : r.modified_by}}</a>
+            </td>
+            <td>
+              <div *ngIf="r.appointment_status_id !== appStatusId.INACTIVE && r.admission_status_id != 2">
+                <div *ngIf="r.appointment_status_id !== appStatusId.INACTIVE
+                  && r.eligible_status_id !== eligibleVal.NOT_ELIGIBLE
+                  && (r.channel_id === arrChannel.MOBILE_OTHER || r.channel_id === arrChannel.MOBILE)">
+                  <button (click)="rescheduleAppointment(r)" class="btn btn-dark reschedule-button">Reschedule</button>
+                </div>
+              </div>
             </td>
           </tr>
           <tr>
@@ -272,7 +271,7 @@
         </tbody>
       </table>
     </div>
-    
+
     <section class="full-width" id="group-list-appointment">
       <button *ngIf="isCanPrevPageTwo" (click)="prevPageAido()" class="btn ms_btn_blue">
         <img src="{{assetPath}}icons/ic_ArrowRight_White.png"> Prev
@@ -283,6 +282,7 @@
       </button>
     </section>
   </div>
+
   <div class="reschedule-worklist" *ngIf="isBpjs">
     <div class="ms_container ms_shadow_4" id="tutorial_reschedule_table">
       <table class="table">
@@ -371,5 +371,5 @@
       </button>
     </div>
   </div>
-  
+
 </div>

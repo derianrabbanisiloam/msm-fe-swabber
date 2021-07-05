@@ -10,15 +10,25 @@
   </div>
 </div>
 
+<div>
+  <div class="space-export-button">
+    <button class="btn ms_btn_blue" (click)="downloadCsv()">
+      Export
+    </button>
+  </div>
+</div>
+
 <div class="fo_container_list shadow-4">
   <table class="table table-bordered aido-appts-table">
     <thead class="fo_color_blue foot-note" style="text-align: center;">
+      <th>Order Id</th>
       <th style="min-width: 14em">
         Patient Name
       </th>
       <th style="white-space: nowrap; text-align: center; min-width: 10em">Date of Birth</th>
       <th style="min-width: 8em">Multiple MR</th>
-      <th>Phone No.</th>
+      <th>Patient Phone No.</th>
+      <th>User Phone No.</th>
       <th>Address</th>
       <th width="100px">App. Date</th>
       <th>App. Time</th>
@@ -38,6 +48,7 @@
 
     <tbody>
       <tr class="fo_header_grey filter-row">
+        <td></td>
         <td>
           <div class="inner-addon right-addon">
             <i class="glyphicon fa fa-search"></i>
@@ -56,6 +67,7 @@
               </select>
           </div>
         </td>
+        <td></td>
         <td></td>
         <td></td>
         <td></td>
@@ -112,6 +124,7 @@
 
       <tr class="aido-appt-item" *ngFor="let r of aidoAppointments; let i = index" [ngClass]="{
         'row-pink' : r.appointment_status_id === appStatusId.INACTIVE}">
+        <td style="min-width: 10em">{{r.order_id}}</td>
         <td style="text-transform: uppercase">
           <a ngbPopover="{{r.contact_name}}" popoverTitle=""
             triggers="mouseenter:mouseleave">{{r.contact_name && r.contact_name.length > 30 ?
@@ -129,6 +142,7 @@
           </div>
         </td>
         <td style="text-align: center">{{ r.phone_number }}</td>
+        <td style="text-align: center">{{ r.create_phone_number }}</td>
         <td style="text-align: center; white-space: nowrap;">
           <a ngbPopover="{{r.delivery_address}}" popoverTitle=""
             triggers="mouseenter:mouseleave">{{r.delivery_address && r.delivery_address.length > 10 ?
@@ -170,6 +184,9 @@
         <td>
           <div *ngIf="r.channel_id == arrChannel.AIDO">
             <span>AIDO</span>
+          </div>
+          <div *ngIf="r.channel_id == arrChannel.MOBILE || r.channel_id == arrChannel.MOBILE_OTHER">
+            <span>MySiloam</span>
           </div>
         </td>
         <td>

@@ -1214,7 +1214,8 @@ export class WidgetAppointmentListBpjsComponent implements OnInit {
     this.closeAdm = close;
   }
 
-  afterUploadCheckIn(content, close) {
+  async afterUploadCheckIn(content, close) {
+    await this.defaultPatientType(this.selectedCheckIn.patient_hope_id);
     this.open50(content);
     this.closeDocument = close;
   }

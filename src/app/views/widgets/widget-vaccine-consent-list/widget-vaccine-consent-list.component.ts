@@ -58,6 +58,7 @@ export class WidgetVaccineConsentListComponent implements OnInit {
   public consentType: string = null;
   public payer: any;
   public formType: number;
+  public identityNumber: string = null;
 
   constructor(
     private generalService: GeneralService,
@@ -123,11 +124,12 @@ export class WidgetVaccineConsentListComponent implements OnInit {
     this.resetFormValidity();
     this.updateStatus = 'initial';
     this.choosedPatient = undefined;
-    this.doctorSelected = undefined;
+    this.doctorSelected = undefined;  
     this.consents = [];
     this.showWaitMsg = true;
     this.showNotFoundMsg = false;
     this.isAdmissionCreated = false;
+    this.identityNumber = null;
 
     // payload to search consent
     let searchType: number;
@@ -179,6 +181,26 @@ export class WidgetVaccineConsentListComponent implements OnInit {
       );
   }
 
+  getRegistrationForm(registrationFormId: string) {
+    this.consentService
+      .getPreRegisFormById(registrationFormId)
+      .subscribe(
+        (res) => {
+          const data = res.data;
+          this.identityNumber = data[0].identity_number;
+          const payerId = data[0].payer_id;
+          const payer = this.listPayer.filter((item) =>{
+            if (item.payer_id == payerId) {
+              return item;
+            }
+          });
+          if (payer.length > 0) {
+            this.payer = payer[0];
+          }
+        }
+      );
+  }
+
   getDetailInformation(payload: any) {
     if (
       this.isAdmissionCreated &&
@@ -186,8 +208,9 @@ export class WidgetVaccineConsentListComponent implements OnInit {
     ) {
       return;
     }
+    this.getRegistrationForm(payload.registration_form_id)
     this.doctorSelected = undefined;
-    this.payer = undefined;
+    this.payer = this.payer ? this.payer : undefined;
     this.isAdmissionCreated = false;
     this.isConsentDetailChanged = false;
     this.updateStatus = 'initial';

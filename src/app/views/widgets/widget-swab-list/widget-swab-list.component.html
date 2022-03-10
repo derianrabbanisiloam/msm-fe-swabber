@@ -1,0 +1,277 @@
+<div class="fo_container_input_date">
+  <label class="foot-note" for="doctor_name">Admission Date</label>
+  <div class="row">
+      <div class="col-6">
+        <div>    
+          <my-date-range-picker name="mydaterange" [options]="myDateRangePickerOptions"  [(ngModel)]="dateAdmission"
+          (dateRangeChanged)="onDateChangeRange($event)" (dateSelected)="setMaxRangeOfDate($event)">
+          </my-date-range-picker>
+        </div>
+      </div>
+      <div class="col-6" style="text-align: right;">
+        <div class="summary-swab-wrap bg-white">
+          Total test : <strong>{{ summarySwab.total }}</strong>
+        </div>
+        <div class="summary-swab-wrap bg-green">
+          Done : <strong>{{ summarySwab.done }}</strong>
+        </div>
+        <div class="summary-swab-wrap bg-red">
+          Not Done : <strong>{{ summarySwab.undone }}</strong>
+        </div>
+      </div>
+  </div>
+  
+  <div *ngFor="let alert of alerts">
+    <ngb-alert *ngIf="alert" type="{{cssAlertType(alert)}}" (close)="removeAlert(alert)">{{ alert.message }}</ngb-alert>
+  </div>
+
+</div>
+
+
+<div class="fo_container_list shadow-4">
+  <table class="table table-bordered">
+    <thead class="fo_color_blue foot-note">
+      <th style="min-width: 14em">
+        Patient Name
+      </th>
+      <th style="white-space: nowrap; text-align: center; min-width: 10em">Date of Birth</th>
+      <th style="min-width: 10em">Local MR</th>
+      <th>Phone No.</th>
+      <th style="min-width: 10em">ID Number</th>
+      <th width="100px">Admission Date</th>
+      <!-- <th>Time Slot</th> -->
+      <th style="min-width: 14em">Test Type</th>
+      <th>Test Result</th>
+      <th width="90px" style="text-align: center">Action</th>
+      <th style="min-width: 10em; text-align: center">Status</th>
+      <!-- <th style="min-width: 9em">Modified By</th>
+      <th style="min-width: 9em">Notes</th> -->
+    </thead>
+
+    <tbody>
+      <tr class="fo_header_grey filter-row">
+        <td>
+          <div class="inner-addon right-addon">
+            <i class="glyphicon fa fa-search"></i>
+            <input type="text" class="form-control" placeholder="Search name" [(ngModel)]="model.name"
+              (change)="searchAppointment(true)" />
+          </div>
+        </td>
+        <td>
+          <div class="inner-addon right-addon">
+            <i class="glyphicon fa fa-search"></i>
+            <input [textMask]="{mask: mask_birth}" type="text" placeholder="Search dob" class="form-control"
+              [(ngModel)]="model.birth" (change)="searchAppointment(true)" placeholder="dd-mm-yyyy" />
+          </div>
+        </td>
+        <td>
+          <div class="inner-addon right-addon">
+            <i class="glyphicon fa fa-search"></i>
+            <input type="text" class="form-control" placeholder="Search MR" [(ngModel)]="model.mr"
+              (change)="searchAppointment(true)" />
+          </div>
+        </td>
+        <td></td>
+        <td>
+          <div class="inner-addon right-addon">
+            <i class="glyphicon fa fa-search"></i>
+            <input type="text" class="form-control" placeholder="Search Identity Number" [(ngModel)]="model.identityNumber"
+              (change)="searchAppointment(true)" />
+          </div>
+        </td>
+        <td>          
+          <div class="inner-addon right-addon">
+            <i class="glyphicon fa fa-search"></i>
+            <input [textMask]="{mask: mask_birth}" type="text" placeholder="Search Admission Date" class="form-control"
+              [(ngModel)]="model.admissionDate" (change)="searchAppointment(true)" placeholder="dd-mm-yyyy" />
+          </div>
+        </td>
+        <!-- <td></td> -->
+        <td>
+          <div class="ng-autocomplete" class="angular-autocomplete">
+            <ng-autocomplete placeHolder="cagetory name..." [(ngModel)]="model.category" [data]="categoryList"
+              searchKeyword="name" (selected)='searchAppointment(true)' (inputCleared)='searchAppointment(true)'
+              [itemTemplate]="itemTemplateCategory" [notFoundTemplate]="notFoundTemplate">
+            </ng-autocomplete>
+
+            <ng-template #itemTemplateCategory let-item>
+              <a [innerHTML]="item.name"></a>
+            </ng-template>
+
+            <ng-template #notFoundTemplate let-notFound>
+              <div [innerHTML]="notFound"></div>
+            </ng-template>
+          </div>          
+        </td>
+        <td>
+          <div class="inner-addon right-addon">
+            <select id="title" class="form-control" (change)="searchAppointment(true)" [(ngModel)]="model.checkupResult"
+                name="dropDownCheckupResult">
+                <option [ngValue]=undefined [selected]="model.checkupResult === undefined">ALL</option>
+                <option value=TRUE>Positive</option>
+                <option value=FALSE>Negative</option>
+                <option value=NULL>No result</option>
+              </select>
+          </div>          
+        </td>
+        <td></td>
+        <td></td>
+        <!-- <td>
+          <div class="inner-addon right-addon">
+            <i class="glyphicon fa fa-search"></i>
+            <input type="text" class="form-control" placeholder="Min 3 characters" [(ngModel)]="model.modifiedName"
+            (change)="model.modifiedName.length >= 3 || model.modifiedName.length === 0? searchAppointment(true): ''" />
+          </div>
+        </td>
+        <td></td> -->
+      </tr>
+
+      <tr *ngFor="let itr of appList" [ngClass]="{
+        'row-orange' : itr.checkup_result === null,
+        'row-green' : itr.checkup_result !== null
+        }">
+        <td style="text-transform: uppercase">
+          <span class="table-two-row-text">
+            {{itr.contact_name}}
+            <img *ngIf="itr.checkup_result !== null" src="{{assetPath}}icons/ic_Check.png" style="vertical-align: top; margin-left: 3px;"/>
+          </span>
+          <span class="table-two-row-subtext">{{itr.email_address}}</span>
+        </td>
+        <td style="text-align: center; white-space: nowrap; width: 1%">{{itr.custome_birth_date}}</td>
+        <td style="width: 1%;">{{itr.medical_record_number}}</td>
+        <td style="text-align: center">{{itr.phone_number}}</td>
+        <td style="text-align: center">{{itr.identity_number}}</td>
+        <td style="text-align: center; white-space: nowrap;">{{itr.custome_admission_date}}</td>
+        <!-- <td style="text-align: center; white-space: nowrap;">{{itr.custome_from_time}} - {{itr.custome_to_time}}</td> -->
+        <td style="text-align: center; width: fit-content;">{{ itr.checkup_name }}</td>
+        <td style="text-align: center; width: fit-content;">
+          <span *ngIf="itr.checkup_result === false" class="badge badge-success">Negative</span>
+          <span *ngIf="itr.checkup_result === true" class="badge badge-danger">Positive</span>
+          <span *ngIf="itr.checkup_result === null">-</span>
+        </td>
+        <td style="text-align: center; width: fit-content;">
+          <div class="cell-img-nav d-flex justify-content-center">
+            <div class="action-icon" *ngIf="itr.checkup_result === null" (click)="openChekupResultModal(itr, confirmSwabResult)">
+              <img src="{{assetPath}}icons/ic_notes.png">
+            </div>
+            <div class="action-icon" (click)="openChekupResultModal(itr, resendSwabResult)">
+              <img src="{{assetPath}}icons/ic_email.png">
+            </div>
+            <div class="action-icon" (click)="print(itr)">
+              <img src="{{assetPath}}icons/ic_print_2.png">
+            </div>
+          </div>
+        </td>
+        <td style="text-align: center;">
+          <div *ngIf="itr.checkup_result !== null">
+            <span class="table-two-row-text">Sent</span>
+            <span class="table-two-row-subtext">{{itr.checkup_result_created_name}}</span>
+          </div>
+        </td>
+        <!-- <td>
+          <a ngbPopover="{{itr.modified_name}}" popoverTitle=""
+            triggers="mouseenter:mouseleave">{{itr.modified_name && itr.modified_name.length > 10 ? itr.modified_name.substr(0,10)+"..." : itr.modified_name}}</a>
+        </td>
+        <td style="white-space: nowrap; overflow: hidden; text-overflow: ellipsis; max-width: 7em">
+          <a ngbPopover="{{itr.appointment_note}}" popoverTitle=""
+            triggers="mouseenter:mouseleave">{{itr.appointment_note && itr.appointment_note.length > 10 ? itr.appointment_note.substr(0,10)+"..." : itr.appointment_note}}</a>
+        </td> -->
+      </tr>
+      <tr>
+        <td *ngIf="showNotFoundMsg" colspan="13" style="text-align: center;">Displaying no data</td>
+        <td *ngIf="showWaitMsg" colspan="13" style="text-align: center;">
+          <ngb-progressbar value="1000">Loading...</ngb-progressbar>
+        </td>
+      </tr>
+    </tbody>
+  </table>
+</div>
+
+
+<section class="full-width" id="group-list-appointment">
+  <button *ngIf="isCanPrevPage" (click)="prevPage()" class="btn ms_btn_blue">
+    <img src="{{assetPath}}icons/ic_ArrowRight_White.png"> Prev
+  </button>
+  <span style="width:10px">&nbsp;</span>
+  <button *ngIf="isCanNextPage" (click)="nextPage()" class="btn ms_btn_blue">
+    Next <img src="{{assetPath}}icons/ic_ArrowLeft_White.png">
+  </button>
+
+  <ng-template #confirmSwabResult let-c="close" let-d="dismiss">
+    <div class="modal-header">
+      <h4 class="modal-title">Test Result</h4>
+      <button type="button" class="close" aria-label="Close" (click)="d('Cross click')">
+        <span aria-hidden="true">&times;</span>
+      </button>
+    </div>
+    <div class="modal-body modal-result">
+        <div class="row">
+          <div class="col-5">
+            <div class="foto-ktp">
+              <a href="{{assetPath}}icons/identity-card.png" target="_blank">
+                <img src="{{assetPath}}icons/identity-card.png" />
+              </a>
+            </div>
+          </div>
+          <div class="col-7" style="padding-left: 0px;">
+            <div class="patient-data">
+              <span class="title">Name</span>
+              <span class="content">: {{ selectedSwab.contact_name }}</span>
+            </div>        
+            <div class="patient-data">
+              <span class="title">D.O.B</span>
+              <span class="content">: {{ selectedSwab.custome_birth_date }}</span>
+            </div>        
+            <div class="patient-data">
+              <span class="title">Phone No</span>
+              <span class="content">: {{ selectedSwab.phone_number }}</span>
+            </div>        
+            <div class="patient-data">
+              <span class="title">Email</span>
+              <span class="content">: {{ selectedSwab.email_address }}</span>
+            </div>            
+            <div class="patient-data">
+              <span class="title">ID Number</span>
+              <span class="content">: {{ selectedSwab.identity_number }}</span>
+            </div>            
+          </div>
+        </div>
+        <div class="row" style="margin-top: 10px;">
+          <div class="col-6" style="text-align: left;">
+            <h5>Test Result : </h5>
+            <div class="radio-result">
+              <input type="radio" [(ngModel)]="checkupResult" id="radioCheckupResultPositive" value="true" (change)="onChangeCheckupResult($event)">
+              <label style="color: #FF0000DE;" for="radioCheckupResultPositive">Positive</label>
+            </div>
+            <div class="radio-result">
+              <input type="radio" [(ngModel)]="checkupResult" id="radioCheckupResultNegative" value="false" (change)="onChangeCheckupResult($event)">
+              <label style="color: #222F3EDE;" for="radioCheckupResultNegative">Negative</label>
+            </div>
+            
+          </div>
+          <div class="col-6" style="text-align: right;">
+            <button type="button" class="btn fo_btn_green resend-email" (click)="createCheckupResult()"
+            (click)="c('Cross click')">Sent Email</button>
+          </div>
+        </div>
+    </div>
+  </ng-template>
+
+  <ng-template #resendSwabResult let-c="close" let-d="dismiss">
+    <div class="modal-header">
+      <h4 class="modal-title">{{ selectedSwab.contact_name }} - {{ selectedSwab.custome_birth_date }}</h4>
+      <button type="button" class="close" aria-label="Close" (click)="d('Cross click')">
+        <span aria-hidden="true">&times;</span>
+      </button>
+    </div>
+    <div class="modal-body modal-resend">
+      <p class="resend-email">Resend Email ?</p>
+      <div class="fo_confirmation_button d-flex justify-content-center">
+        <div class="" style="width: 100%">
+          <button type="button" class="btn fo_btn_green resend-email" (click)="createCheckupResult(true)"
+            (click)="c('Cross click')">Sent Email</button>
+        </div>
+      </div>
+    </div>
+  </ng-template>
+</section>

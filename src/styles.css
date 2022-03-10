@@ -901,3 +901,6 @@ button:disabled { cursor: not-allowed }
   to {transform: rotate(359deg);}
 }
 
+.body-login {
+  overflow: hidden;
+}

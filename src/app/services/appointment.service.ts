@@ -8,6 +8,7 @@ import { environment } from '../../environments/environment';
 import { httpOptions } from '../utils/http.util';
 import {TeleRescheduleRequest} from '../models/teleconsultation/tele-reschedule-request';
 import {TeleRescheduleResponse} from '../models/teleconsultation/tele-reschedule-response';
+import { checkupTypeId } from "../variables/common.variable"
 
 @Injectable({
   providedIn: 'root'
@@ -29,6 +30,9 @@ export class AppointmentService {
   private aidoWorklistUrl = environment.CALL_CENTER_SERVICE + '/appointments/aido';
   private preRegistrationUrl = environment.FRONT_OFFICE_SERVICE + '/preregistrations';
   private rescheduleTeleUrl = environment.CALL_CENTER_SERVICE + '/appointments/reschedules/aido';
+  private appointmentSwabUrl = environment.FRONT_OFFICE_SERVICE + '/appointments/covid';
+  private addCheckupResultUrl = environment.FRONT_OFFICE_SERVICE + '/appointments/covid/checkupResult';
+  private emailCheckupResultUrl = environment.FRONT_OFFICE_SERVICE + '/notifications/send-checkup-result';
 
   private rescheduleAppSource = new Subject<any>();
   public rescheduleAppSource$ = this.rescheduleAppSource.asObservable();
@@ -153,7 +157,7 @@ export class AppointmentService {
 
     return this.http.get<Appointment[]>(this.appointmentUrl + url, httpOptions);
   }
-
+  
   emitRescheduleApp(params: any) {
     this.rescheduleAppSource.next(params);
   }
@@ -333,7 +337,6 @@ export class AppointmentService {
     return this.http.put<any>(url, body, httpOptions);
   }
 
-
   getTempAppointment(tempId: any) {
     const url = `${this.ccAppointmentUrl}/temporary/${tempId}`;
     // return of(APPOINTMENT);
@@ -354,5 +357,35 @@ export class AppointmentService {
 
   public rescheduleApptTele(payload: TeleRescheduleRequest): Observable<TeleRescheduleResponse> {
     return this.http.post<TeleRescheduleResponse>(this.rescheduleTeleUrl, payload, httpOptions);
+  }
+
+  getListAppointmentSwab(beginDate: any, endDate: any, hospital: string, name?: string, birth?: any, mr?: any, identityNumber?: any, 
+    admissionDate?: any, category?: string, modifiedName?: string, checkupResult?: any, limit?: number, offset?: number, channel?: string,
+    exclude?: boolean): Observable<any> {
+    
+      let uri = `/swab?hospitalId=${hospital}&beginDate=${beginDate}&endDate=${endDate}&checkupTypeId=${checkupTypeId.COV_CHECKUP}`;
+
+      uri = name ? `${uri}&name=${name}` : uri;
+      uri = birth ? `${uri}&birth=${birth}` : uri;
+      uri = mr ? `${uri}&mr=${mr}` : uri;
+      uri = identityNumber ? `${uri}&identityNumber=${identityNumber}` : uri;
+      uri = admissionDate ? `${uri}&admissionDate=${admissionDate}` : uri;
+      uri = category ? `${uri}&category=${category}` : uri;
+      uri = modifiedName ? `${uri}&modifiedName=${modifiedName}` : uri;
+      uri = checkupResult ? `${uri}&checkupResult=${checkupResult}` : uri;
+      uri = channel ? `${uri}&channelId=${channel}` : uri;
+      uri = `${uri}&exclude=${exclude}`;
+  
+      const url = `${uri}&limit=${limit}&offset=${offset}`;
+      
+      return this.http.get<Appointment[]>(this.appointmentSwabUrl + url, httpOptions);
+  }  
+
+  public addCheckupResult(payload: any): Observable<any> {
+    return this.http.post<any>(this.addCheckupResultUrl, payload, httpOptions);
+  }
+
+  public emailCheckupResult(payload: any): Observable<any> {
+    return this.http.post<any>(this.emailCheckupResultUrl, payload, httpOptions);
   }
 }

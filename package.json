@@ -9,7 +9,7 @@
     "lint": "ng lint",
     "e2e": "ng e2e",
     "serve:dev": "ng serve --configuration=development",
-    "serve:test": "ng serve --configuration=testing",
+    "serve:test": "node --max_old_space_size=8000 node_modules/@angular/cli/bin/ng serve --configuration=testing",
     "serve:prod": "ng serve --configuration=production",
     "build:dev": "ng build --configuration=development",
     "build:test": "ng build --configuration=testing",

@@ -3,6 +3,7 @@ import { Injectable } from '@angular/core';
 import { Observable } from 'rxjs';
 import { environment } from '../../environments/environment';
 import { httpOptions } from '../utils/http.util';
+import { checkupTypeId } from "../variables/common.variable"
 
 @Injectable({
   providedIn: 'root'
@@ -13,12 +14,13 @@ export class CheckupService {
     private http: HttpClient
   ) { }
 
-  private getCategoryUrl = environment.OPADMIN_SERVICE + '/checkups/categories/hospital';
+  private getCategoryUrl = environment.FRONT_OFFICE_SERVICE + '/appointments/categories/checkup';
   private checkupUrl = environment.OPADMIN_SERVICE + '/checkups/schedule/note';
 
-  getCategory(hospitalId: string): Observable<any> {
+  getCategory(): Observable<any> {
     let url = this.getCategoryUrl;
-    url = `${url}/${hospitalId}`;
+  
+    url = `${url}?checkupTypeId=${checkupTypeId.COV_CHECKUP}`;
     return this.http.get<any[]>(url, httpOptions)
   }
 

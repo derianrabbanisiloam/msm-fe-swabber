@@ -175,3 +175,8 @@ export const consentTypeValue = {
   ELDERLY: '2',
   CORPORATE: '3',  
 }
+
+export const checkupTypeId = {
+  COV_CHECKUP: '1',
+  COV_VACCINE: '2',
+};

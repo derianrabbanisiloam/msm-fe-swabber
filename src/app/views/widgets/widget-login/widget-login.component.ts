@@ -23,6 +23,10 @@ export class WidgetLoginComponent implements OnInit {
   public isSuccessSubmit = false;
   public applicationId = appInfo.APPLICATION_ID;
   public roleId = appInfo.ROLE_ID;
+  public validation: any = {
+    username: true,
+    password: true
+  }
 
   public alerts: Alert[] = [];
 
@@ -35,6 +39,8 @@ export class WidgetLoginComponent implements OnInit {
   ) { }
 
   ngOnInit() {
+
+    document.body.className = "body-login"
     this.userService.signOut();
     this.returnUrl = this.route.snapshot.queryParams.returnUrl || '/';
     this.getListHopital();
@@ -57,53 +63,37 @@ export class WidgetLoginComponent implements OnInit {
     this.alerts = [];
   }
 
-  async signup() {
-    this.alerts = [];
-    const fullname = this.model.fullnameSignup;
-    const username = this.model.usernameSignup;
-    const mobileNo = this.model.mobileSignup;
-    const email = this.model.emailSignup;
-    const password = this.model.passwordSignup;
-    const hospital = this.model.hospital;
-    const applicationId = this.applicationId;
-    const roleId = this.roleId;
-
-    const body = {
-      userAccount: username,
-      password,
-      fullname,
-      email,
-      mobileNo,
-      applicationId,
-      organizationId: hospital.hope_organization_id,
-      hospitalId: hospital.mobile_organization_id,
-      axOrganizationId: hospital.ax_organization_id,
-      roleId,
-    };
-
-    await this.userService.signUp(body)
-      .toPromise().then(res => {
-        this.alertService.success(res.message);
-      }).catch(err => {
-        this.alertService.error(err.error.message);
-      });
-  }
 
   async login() {
     this.alerts = [];
-    this.loading = true;
     const username = this.model.username;
     const password = this.model.password;
     const applicationId = this.applicationId;
+
+    this.validation.username = true
+    this.validation.password = true
 
     const body = {
       username,
       password,
       applicationId,
     };
+    
+    if (username === "") {
+      this.alertService.error(`Username is Required`);
+      this.validation.username = false
+      return 
+    }
+    else if (password === "") {
+      this.alertService.error(`Password is Required`);
+      this.validation.password = true
+      return 
+    }
 
+    this.loading = true;
     await this.userService.signIn(body)
       .toPromise().then(res => {
+        
         if (res.status == 'OK') {
           
           const collections = [];
@@ -142,13 +132,13 @@ export class WidgetLoginComponent implements OnInit {
 
           this.router.navigate([this.returnUrl]);
         } else {
-          this.alertService.error(`Username or/and Password wrong`);
+          this.alertService.error(`Username or/and Password wrong`,false, 3000);
         }
 
         this.loading = false;
       }).catch(err => {
         this.loading = false;
-        this.alertService.error(err.error.message);
+        this.alertService.error(err.error.message, false, 3000);
       });
   }
 
